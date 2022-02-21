@@ -1,13 +1,15 @@
 import pygame
+from pygame import Surface
 
 from src.lib import SPRITESHEETS
 
-IMG_location = "src/img/"
+IMG_LOCATION = "img/"
 
 SPRITES = {}
 
 def load():
     for filename in SPRITESHEETS.SPRITESHEETS:
+        print(filename)
         data = SPRITESHEETS.SPRITESHEETS[filename]
         _load_spritesheet(filename, data)
     

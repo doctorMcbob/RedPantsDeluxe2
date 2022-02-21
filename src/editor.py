@@ -29,6 +29,7 @@ def draw(G):
     G["SCREEN"].fill((255, 255, 255))
 
 def run(G):
+    load()
     while True:
         draw(G)
         inp = expect_input()
@@ -52,7 +53,7 @@ def run(G):
                 draw(G)
                 G["SCREEN"].blit(
                     G["HEL32"].render("Select spritesheet filename", 0, (0, 0, 0)),
-                    (0, 0)
+                     (0, 0)
                 )
             choice = select_from_list(G, filenames, (0, 32), args=G, cb=update)
             if choice is not None: spritesheet_menu(G, choice)

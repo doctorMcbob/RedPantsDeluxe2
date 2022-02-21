@@ -1,0 +1,48 @@
+|REDPANTSGUY|
+IDLE:0 redpantsstand
+RUNNING:0 redpantsrun0
+RUNNING:4 redpantsrun1
+RUNNING:8 redpantsrun2
+RUNNING:12 redpantsrun3
+ARIAL:0 redpantsjump
+
+|START|
+set self state IDLE
+set self frame 0
+
+|IDLE:0|
+exec checkair
+if self.y_vel == 0
+   if inpLEFT
+     set self state RUNNING
+     set self frame 0
+     set self direction -1
+   endif
+   if inpRIGHT
+        set self state RUNNING
+        set self frame 0
+        set self direction 1
+   endif
+endif
+exec applyGrav
+
+|RUNNING:0|
+set self x_vel self.speed * self.direction
+exec checkAir
+exec applyGrav
+
+|RUNNING:16|
+exec RUNNING:0
+set self frame 0
+
+|ARIAL:0|
+
+
+|checkAir|
+if self.y_vel
+   set self state AIRIAL
+   set self frame 0
+endif
+
+|applyGrav|
+set self y_vel self.y_vel - 1

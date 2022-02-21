@@ -31,6 +31,8 @@ hurtboxes, hitboxes, scripts and sprites
 import pygame
 from pygame import Surface, Rect
 
+import operator as ops
+
 from src import inputs
 from src import sprites
 
@@ -38,11 +40,30 @@ HEL32 = pygame.font.SysFont("Helvetica", 32)
 
 ACTORS = {}
 
+operators = {
+    "+": ops.add,
+    "-": ops.sub,
+    "*": ops.mul,
+    "//": ops.truediv,
+    "/": ops.floordiv,
+    "%": ops.mod,
+    "**": ops.pos,
+    "==": lambda n1, n2: n1==n2,
+    ">": lambda n1, n2: n1>n2,
+    "<": lambda n1, n2: n1<n2,
+    ">=": lambda n1, n2: n1>=n2,
+    "<=": lambda n1, n2: n1<=n2,
+    "!=": lambda n1, n2: n1!=n2,
+}
+
 def load():
     from src.lib import ACTORS as A
 
     for name in A.ACTORS.keys():
         ACTORS[name] = Actor(A.ACTORS[name])
+
+def get_actor(name):
+    return ACTORS[name]
 
 class Actor(Rect):
     def __init__(self, template):
@@ -96,8 +117,7 @@ class Actor(Rect):
     def update(self, world):
         script = _index(self, self.scripts)
 
-        for cmd in script:
-            self.resolve(cmd, world)
+        self.resolve(script, world)
 
         if tangible:
             self.collision_check(world)
@@ -153,8 +173,80 @@ class Actor(Rect):
         
     def collision_with(self, actor, world):
         if "COLLIDE" in self.scrpts:
-            for cmd in self.scripts["COLLIDE"]:
-                actor.resolve(cmd, world)
-        
-    def resolve(self, cmd, world):
-        pass
+            actor.resolve(self.scripts["COLLIDE"], world)
+    
+    def resolve(self, script, world, logfunc=print):
+        cmd_idx = 0
+        while cmd_idx < len(script):
+            if script[cmd_idx].startswith("#"): continue # comments
+            cmd = script[cmd_idx].split()
+            # STEP 1: EVALUATE
+            for idx in range(cmd):
+                token = cmd[idx]
+                try:
+                    if "." in token:
+                        actor, a = token.split(".")
+                        if actor == "self": actor = self
+                        else: actor = get_actor(actor)
+                        if hasattr(actor, a):
+                            if a in ["attributes", "scripts", "hitboxes", "hurtboxes"]:
+                                raise Exception("Cannot refrence {}".format(a))
+                            cmd[idx] = getattr(actor, a)
+                        elif a in actor.attributes:
+                            cmd[idx] = actor.attributes[a]
+                        else:
+                            raise Exception("Actor {} has no refrence {}".format(actor, a))
+                    try:
+                        if int(cmd[idx]) != float(cmd[idx]):
+                            cmd[idx] = float(cmd[idx])
+                        else:
+                            cmd[idx] = int(cmd[idx])
+                    except TypeError:
+                        continue
+
+                except Exception as e:
+                    logfunc("Error evaluating {}... {}".format(token, e))
+
+            # STEP 2: OPERATORS / ALGEBRA
+            evaluated = []
+            for idx in range(cmd):
+                token = cmd[idx]
+                try:
+                    if token in operators:
+                        calculated = operators(evaluated.pop(), cmd.pop(idx+1))
+                        evaluated.append(calculated)
+                    else:
+                        evaluated.append(token)
+                except Exception as e:
+                    logfunc("Error applying operators {}... {}".format(token, e))
+            cmd = evaluated
+            
+            # step 3: COMMANDS
+            try:
+                verb = cmd.pop(0)
+                if verb == "set":
+                    actor, att, value = cmd
+                    if actor == "self": actor = self
+                    else: actor = get_actor(actor)
+                    if hasattr(actor, att):
+                        if att in ["attributes", "scripts", "hitboxes", "hurtboxes"]:
+                            raise Exception("Cannot write over {}".format(att))
+                        setattr(actor, att, value)                        
+                    else:
+                        self.attributes[att] = value
+                    continue
+                if verb == "if":
+                    nest = 1
+                    while nest:
+                        cmd_idx += 1
+                        if cmd_idx > len(script):
+                            raise Exception("End of script while parsing if")
+                        if script[cmd_idx].split()[0] == "if":
+                            nest += 1
+                        if script[cmd_idx].split()[0] == "endif":
+                            nest -= 1
+                        
+            except Exception as e:
+                logfunc("Error resolving {}... {}".format(token, e))
+
+            cmd_idx += 1

@@ -1,1 +1,1 @@
-ACTORS = {}
+WORLDS = {}
