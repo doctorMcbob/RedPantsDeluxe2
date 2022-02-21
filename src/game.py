@@ -36,5 +36,7 @@ def run(G):
         world.update()
         if G["DEBUG"]:
             world.draw(G["SCREEN"], DEBUG=G)
+        else:
+            world.draw(G["SCREEN"]
         pygame.display.update()
     
