@@ -12,6 +12,7 @@ def set_up():
     G["SCREEN"] = pygame.display.set_mode((W, H))
     pygame.display.set_caption("Red Pants Deluxe 2")
     G["HEL32"] = pygame.font.SysFont("Helvetica", 32)
+    G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
     G["SCREEN"].fill((255, 255, 255))
     G["SCREEN"].blit(G["HEL32"].render("Loading...", 0, (0, 0, 0)), (0, 0))
     pygame.display.update()
@@ -25,6 +26,7 @@ def set_up():
     worlds.load()
     actor.load()
     G["CLOCK"] = pygame.time.Clock()
+    G["DEBUG"] = "-d" in sys.argv
     return G
 
 def run(G):
@@ -32,6 +34,7 @@ def run(G):
         inputs.update()
         world = G["WORLDS"].get_world(G["WORLD"])
         world.update()
-        world.draw(G["SCREEN"])
+        if G["DEBUG"]:
+            world.draw(G["SCREEN"], DEBUG=G)
         pygame.display.update()
     

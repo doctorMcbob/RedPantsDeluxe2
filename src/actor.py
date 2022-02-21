@@ -36,7 +36,7 @@ import operator as ops
 from src import inputs
 from src import sprites
 
-HEL32 = pygame.font.SysFont("Helvetica", 32)
+HEL16 = pygame.font.SysFont("Helvetica", 16)
 
 ACTORS = {}
 
@@ -67,7 +67,7 @@ def get_actor(name):
 
 class Actor(Rect):
     def __init__(self, template):
-        self.name = tempalte["name"]
+        self.name = template["name"]
         # The rect that this class *is* should be considered as the ECB
         Rect.__init__(self, template["POS"], template["DIM"])
         self.x_vel = 0
@@ -75,16 +75,17 @@ class Actor(Rect):
         
         self.hurtboxes = {}
         self.hitboxes = {}
-        self.scripts = {}
+        self.scripts = template["scripts"]
         self.sprites = {}
         for key in template["sprites"]:
-            self.sprites[key] = sprites.get_spite(template["sprites"][key])
-        
+            self.sprites[key] = sprites.get_sprite(template["sprites"][key])
+        self.spriteoffset = (0, 0) if "spriteoffset" not in template else template["spriteoffset"]
+            
         self.state = "START"
         self.frame = 0
         self.direction = 1
 
-        self.tangible = False if "tangible" not in template else temlpate["tangible"]
+        self.tangible = False if "tangible" not in template else template["tangible"]
 
     def _index(self, data):
         _frame = self.frame
@@ -95,13 +96,13 @@ class Actor(Rect):
         return None
 
     def get_hitboxes(self):
-        return _index(self, self.hitboxes)
+        return self._index(self.hitboxes)
 
     def get_hurtboxes(self):
-        return _index(self, self.hurtboxes)
+        return self._index(self.hurtboxes)
 
     def get_sprite(self):
-        sprite = _index(self, self.sprites)
+        sprite = self._index(self.sprites)
         if sprite is not None:
             if self.direction == -1:
                 pygame.transform.flip(sprite, 1, 0)
@@ -109,20 +110,38 @@ class Actor(Rect):
         placeholder = Surface((self.w, self.h))
         placeholder.fill((1, 255, 1))
         placeholder.blit(
-            HEL32.render("{}:{}".format(self.state, self.frame), 0, (0, 0, 0)),
+            HEL16.render("{}:{}".format(self.state, self.frame), 0, (0, 0, 0)),
             (0, 0)
         )
         return placeholder
 
     def update(self, world):
-        script = _index(self, self.scripts)
+        script = self._index(self.scripts)
+        if script is not None:
+            self.resolve(script, world)
 
-        self.resolve(script, world)
-
-        if tangible:
+        if self.tangible:
             self.collision_check(world)
             self.x += self.x_vel
             self.y += self.y_vel
+
+    def debug(self, G):
+        Y = 0
+        X = 0
+        G["SCREEN"].blit(G["HEL16"].render("STATE {}".format(self.state), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+        Y += 16
+        G["SCREEN"].blit(G["HEL16"].render("FRAME {}".format(self.frame), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+
+        script = self._index(self.scripts)
+        if script is None: return
+
+        Y += 16
+        G["SCREEN"].blit(G["HEL16"].render("CURRENT SCRIPT", 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+        X += 16
+        for cmd in script:
+            Y += 16
+            G["SCREEN"].blit(G["HEL16"].render("{}".format(cmd), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+        
         
     def collision_check(self, world):
         actors = world.get_actors()
@@ -172,16 +191,18 @@ class Actor(Rect):
             
         
     def collision_with(self, actor, world):
-        if "COLLIDE" in self.scrpts:
+        if "COLLIDE" in self.scripts:
             actor.resolve(self.scripts["COLLIDE"], world)
     
     def resolve(self, script, world, logfunc=print):
         cmd_idx = 0
         while cmd_idx < len(script):
-            if script[cmd_idx].startswith("#"): continue # comments
+            if not script[cmd_idx] or script[cmd_idx].startswith("#"): # comments
+                cmd_idx += 1
+                continue
             cmd = script[cmd_idx].split()
             # STEP 1: EVALUATE
-            for idx in range(cmd):
+            for idx in range(len(cmd)):
                 token = cmd[idx]
                 try:
                     if "." in token:
@@ -201,7 +222,7 @@ class Actor(Rect):
                             cmd[idx] = float(cmd[idx])
                         else:
                             cmd[idx] = int(cmd[idx])
-                    except TypeError:
+                    except ValueError:
                         continue
 
                 except Exception as e:
@@ -209,18 +230,19 @@ class Actor(Rect):
 
             # STEP 2: OPERATORS / ALGEBRA
             evaluated = []
-            for idx in range(cmd):
+            idx = 0
+            while idx < len(cmd):
                 token = cmd[idx]
                 try:
                     if token in operators:
-                        calculated = operators(evaluated.pop(), cmd.pop(idx+1))
+                        calculated = operators[token](evaluated.pop(), cmd.pop(idx+1))
                         evaluated.append(calculated)
                     else:
                         evaluated.append(token)
                 except Exception as e:
                     logfunc("Error applying operators {}... {}".format(token, e))
+                idx += 1
             cmd = evaluated
-            
             # step 3: COMMANDS
             try:
                 verb = cmd.pop(0)
@@ -234,10 +256,9 @@ class Actor(Rect):
                         setattr(actor, att, value)                        
                     else:
                         self.attributes[att] = value
-                    continue
                 if verb == "if":
                     nest = 1
-                    while nest:
+                    while nest > 0:
                         cmd_idx += 1
                         if cmd_idx > len(script):
                             raise Exception("End of script while parsing if")
@@ -247,6 +268,6 @@ class Actor(Rect):
                             nest -= 1
                         
             except Exception as e:
-                logfunc("Error resolving {}... {}".format(token, e))
+                logfunc("Error resolving {}... {}".format(cmd, e))
 
             cmd_idx += 1

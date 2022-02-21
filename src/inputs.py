@@ -33,7 +33,7 @@ def update(inp_map=DEFAULT_KEY_MAP, state=STATE):
                     state[key] = 1
                     state["EVENTS"].append("{} DOWN".format(key))
         if e.type == KEYUP:
-            for key in key_map:
+            for key in inp_map:
                 if e.key == inp_map[key]:
                     state[key] = 0
                     state["EVENTS"].append("{} UP".format(key))

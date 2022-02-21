@@ -9,7 +9,6 @@ SPRITES = {}
 
 def load():
     for filename in SPRITESHEETS.SPRITESHEETS:
-        print(filename)
         data = SPRITESHEETS.SPRITESHEETS[filename]
         _load_spritesheet(filename, data)
     

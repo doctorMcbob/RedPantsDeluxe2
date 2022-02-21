@@ -1,4 +1,4 @@
-|REDPANTSGUY|
+REDPANTSGUY|0,0,32,64|True|-16,0|
 IDLE:0 redpantsstand
 RUNNING:0 redpantsrun0
 RUNNING:4 redpantsrun1
@@ -6,7 +6,7 @@ RUNNING:8 redpantsrun2
 RUNNING:12 redpantsrun3
 ARIAL:0 redpantsjump
 
-|START|
+|START:0|
 set self state IDLE
 set self frame 0
 
@@ -36,7 +36,6 @@ exec RUNNING:0
 set self frame 0
 
 |ARIAL:0|
-
 
 |checkAir|
 if self.y_vel

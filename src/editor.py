@@ -5,6 +5,7 @@ from pygame import Surface, Rect
 import sys
 import os
 
+from src import inputs
 from src.utils import expect_input, select_from_list, get_text_input
 
 WORLDS = {}
@@ -14,7 +15,7 @@ ACTORS = {}
 SAVED = False
 
 IMG_LOCATION = "img/"
-
+SCRIPT_LOCATION = "scripts/"
 
 def set_up():
     pygame.init()
@@ -22,7 +23,9 @@ def set_up():
     G["SCREEN"] = pygame.display.set_mode((1200, 720))
     G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
     G["HEL32"] = pygame.font.SysFont("Helvetica", 32)
-
+    from src import actor
+    G["ACTOR"] = actor
+    
     return G
 
 def draw(G):
@@ -58,13 +61,31 @@ def run(G):
             choice = select_from_list(G, filenames, (0, 32), args=G, cb=update)
             if choice is not None: spritesheet_menu(G, choice)
 
+        if inp == K_l and mods & KMOD_SHIFT:
+            filenames = []
+            for _, _, files in os.walk(SCRIPT_LOCATION):
+                for f in files:
+                    if f[-3:] == ".rp":
+                        filenames.append(f)
+            def update(G):
+                draw(G)
+                G["SCREEN"].blit(
+                    G["HEL32"].render("Select script filename", 0, (0, 0, 0)),
+                     (0, 0)
+                )
+            choice = select_from_list(G, filenames, (0, 32), args=G, cb=update)
+            if choice is not None:
+                template = template_from_script(choice)
+                ACTORS[template["name"]] = template
+
+
 def save():
     global SAVED
     with open("src/lib/WORLDS.py", "w+") as f:
         f.write("WORLDS = {}".format(repr(WORLDS)))
     with open("src/lib/SPRITESHEETS.py", "w+") as f:
         f.write("SPRITESHEETS = {}".format(repr(SPRITESHEETS)))
-    with open("src/lib/WORLDS.py", "w+") as f:
+    with open("src/lib/ACTORS.py", "w+") as f:
         f.write("ACTORS = {}".format(repr(ACTORS)))
     
     SAVED = True
@@ -79,6 +100,46 @@ def load():
     SPRITESHEETS = S.SPRITESHEETS
     ACTORS = A.ACTORS
 
+def template_from_script(filename, name=None):
+    with open(SCRIPT_LOCATION + filename) as f:
+        script = f.read()
+
+    segments = script.split("|")
+    
+    if name is None:
+        name = segments.pop(0)
+    else:
+        segments.pop(0)
+    
+    rect = segments.pop(0)
+    x, y, w, h = [int(n) for n in rect.split(",")]
+    
+    tangible = segments.pop(0)
+    
+    spriteoffset = [int(n) for n in segments.pop(0).split(",")]    
+    
+    sprites = {}
+    for line in segments.pop(0).splitlines():
+        if not line: continue
+        key, sprite = line.split()
+        sprites[key] = sprite
+    
+    scripts = {}
+    while segments:
+        key = segments.pop(0)
+        cmds = segments.pop(0)
+        scripts[key] = cmds.splitlines()
+        
+    return {
+        "name": name,
+        "POS": (x, y),
+        "DIM": (w, h),
+        "spriteoffset": spriteoffset,
+        "sprites": sprites,
+        "scripts": scripts,
+        "tangible": tangible == "True"
+    }
+    
 def drawn_spritesheet_data(G, d, idx=None):
     keys = d.keys()
     surf = Surface((512, (len(d.keys()) + 1) * 16))
@@ -163,3 +224,12 @@ def spritesheet_menu(G, filename):
             else:
                 sheet[get_text_input(G, (0, 0))] = make_rect(corner, (CX, CY))
                 keys = list(sheet.keys())
+
+def run_state(G, world):
+    G["ACTOR"].load()
+    while True:
+        inputs.update()
+        world = World(WORLDS[world])
+        world.update()
+        world.draw(G["SCREEN"])
+        pygame.display.update()
