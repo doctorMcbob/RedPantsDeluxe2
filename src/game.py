@@ -39,4 +39,4 @@ def run(G):
         else:
             world.draw(G["SCREEN"])
         pygame.display.update()
-    
+        G["CLOCK"].tick(30)

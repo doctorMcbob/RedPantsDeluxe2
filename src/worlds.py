@@ -41,7 +41,9 @@ class World(object):
             for y in range((dest.get_height() // background.get_height())):
                 for x in range((dest.get_width() // background.get_width())):
                     dest.blit(background, (x*background.get_width(), y*background.get_height()))
-
+        else:
+            dest.fill((185, 185, 185))
+        
         for name in self.actors:
             Actor = actor.get_actor(name)
             dx, dy = Actor.spriteoffset

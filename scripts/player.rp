@@ -4,14 +4,15 @@ RUNNING:0 redpantsrun0
 RUNNING:4 redpantsrun1
 RUNNING:8 redpantsrun2
 RUNNING:12 redpantsrun3
-ARIAL:0 redpantsjump
+AIRIAL:0 redpantsjump1
 
 |START:0|
 set self state IDLE
 set self frame 0
+set self speed 5
 
 |IDLE:0|
-exec checkair
+exec checkAir
 if self.y_vel == 0
    if inpLEFT
      set self state RUNNING
@@ -35,7 +36,8 @@ exec applyGrav
 exec RUNNING:0
 set self frame 0
 
-|ARIAL:0|
+|AIRIAL:0|
+exec applyGrav
 
 |checkAir|
 if self.y_vel
@@ -44,4 +46,7 @@ if self.y_vel
 endif
 
 |applyGrav|
-set self y_vel self.y_vel - 1
+set self y_vel self.y_vel + 1
+if self.y_vel > 12
+   set self y_vel 12
+endif

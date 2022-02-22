@@ -76,11 +76,12 @@ class Actor(Rect):
         self.hurtboxes = {}
         self.hitboxes = {}
         self.scripts = template["scripts"]
+        self.attributes = {}
         self.sprites = {}
         for key in template["sprites"]:
             self.sprites[key] = sprites.get_sprite(template["sprites"][key])
         self.spriteoffset = (0, 0) if "spriteoffset" not in template else template["spriteoffset"]
-            
+        
         self.state = "START"
         self.frame = 0
         self.direction = 1
@@ -125,27 +126,39 @@ class Actor(Rect):
             self.x += self.x_vel
             self.y += self.y_vel
 
+        self.frame += 1
+
     def debug(self, G):
         Y = 0
         X = 0
         G["SCREEN"].blit(G["HEL16"].render("STATE {}".format(self.state), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
         Y += 16
         G["SCREEN"].blit(G["HEL16"].render("FRAME {}".format(self.frame), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+        Y += 16
+        G["SCREEN"].blit(G["HEL16"].render("X, Y {},{}".format(self.x, self.y), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+        Y += 16
+        G["SCREEN"].blit(G["HEL16"].render("vel {},{}".format(self.x_vel, self.y_vel), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
 
         script = self._index(self.scripts)
         if script is None: return
-
-        Y += 16
+        Y = 0
+        X += 128
         G["SCREEN"].blit(G["HEL16"].render("CURRENT SCRIPT", 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
         X += 16
         for cmd in script:
             Y += 16
             G["SCREEN"].blit(G["HEL16"].render("{}".format(cmd), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+
+        print("state {}".format(self.state))
+        print("x, y: {},{}".format(self.x, self.y))
+        print("veloc {},{}".format(self.x_vel, self.y_vel))
+        print(self.attributes)
         
-        
+
+            
     def collision_check(self, world):
         actors = world.get_actors()
-        tangibles = list(filter(lambda actor: actor.tangible, actors))
+        tangibles = list(filter(lambda actor:not (actor is self) and actor.tangible, actors))
         hits = self.collidelistall(actors)
         for hit in hits:
             self.collision_with(actors[hit], world)
@@ -164,15 +177,15 @@ class Actor(Rect):
                 self.collision_with(tangibles[hit], world)
                 tangibles[hit].collision_with(self, world)
 
-            while self.move(self.x_vel, 0).collidlelist(tangibles) != -1:
+            while self.move(self.x_vel, 0).collidelist(tangibles) != -1:
                 self.x_vel += direction
                 
         # Y axis
         if self.y_vel:
             direction = 1 if self.y_vel < 0 else -1
             for n in range(self.y_vel // self.h):
-                if self.move(0, h*n).collidelist(tangibles) != -1:
-                    self.y_vel = (h*n) + (self.y_vel % h)
+                if self.move(0, self.h*n).collidelist(tangibles) != -1:
+                    self.y_vel = (self.h*n) + (self.y_vel % self.h)
                     break
 
             hits = self.move(0, self.y_vel).collidelistall(tangibles)
@@ -180,7 +193,7 @@ class Actor(Rect):
                 self.collision_with(tangibles[hit], world)
                 tangibles[hit].collision_with(self, world)
 
-            while self.move(0, self.y_vel).collidlelist(tangibles) != -1:
+            while self.move(0, self.y_vel).collidelist(tangibles) != -1:
                 self.y_vel += direction
 
         # cross check
@@ -217,6 +230,20 @@ class Actor(Rect):
                             cmd[idx] = actor.attributes[a]
                         else:
                             raise Exception("Actor {} has no refrence {}".format(actor, a))
+
+                    if token.startswith("inp"):
+                        if token == "inpLEFT":
+                            cmd[idx] = inputs.STATE["LEFT"]
+                        if token == "inpRIGHT":
+                            cmd[idx] = inputs.STATE["RIGHT"]
+                        if token == "inpUP":
+                            cmd[idx] = inputs.STATE["UP"]
+                        if token == "inpDOWN":
+                            cmd[idx] = inputs.STATE["DOWN"]
+                        if token == "inpA":
+                            cmd[idx] = inputs.STATE["A"]
+                        if token == "inpB":
+                            cmd[idx] = inputs.STATE["B"]
                     try:
                         if int(cmd[idx]) != float(cmd[idx]):
                             cmd[idx] = float(cmd[idx])
@@ -257,16 +284,24 @@ class Actor(Rect):
                     else:
                         self.attributes[att] = value
                 if verb == "if":
-                    nest = 1
-                    while nest > 0:
-                        cmd_idx += 1
-                        if cmd_idx > len(script):
-                            raise Exception("End of script while parsing if")
-                        if script[cmd_idx].split()[0] == "if":
-                            nest += 1
-                        if script[cmd_idx].split()[0] == "endif":
-                            nest -= 1
-                        
+                    conditional = cmd.pop(0)
+                    if not conditional:
+                        nest = 1
+                        while nest > 0:
+                            cmd_idx += 1
+                            if cmd_idx > len(script):
+                                raise Exception("End of script while parsing if")
+                            if script[cmd_idx].split()[0] == "if":
+                                nest += 1
+                            if script[cmd_idx].split()[0] == "endif":
+                                nest -= 1
+                if verb == "exec":
+                    key = cmd.pop(0)
+                    if key not in self.scripts:
+                        raise Exception("Cannot exec {}. Does not exist.".format(key))
+                    self.resolve(self.scripts[key], world, logfunc=logfunc)
+                if verb == "print":
+                    print(cmd.pop(0))
             except Exception as e:
                 logfunc("Error resolving {}... {}".format(cmd, e))
 
