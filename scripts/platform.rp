@@ -1,0 +1,31 @@
+PLAT|64,608,1024,64|True|0,0|
+PLATFORM00 platform000
+PLATFORM01 platform001
+PLATFORM02 platform002
+PLATFORM10 platform010
+PLATFORM11 platform011
+PLATFORM12 platform012
+PLATFORM20 platform020
+PLATFORM21 platform021
+PLATFORM22 platform022
+TOUCHED00 touched000
+TOUCHED01 touched001
+TOUCHED02 touched002
+TOUCHED10 touched010
+TOUCHED11 touched011
+TOUCHED12 touched012
+TOUCHED20 touched020
+TOUCHED21 touched021
+TOUCHED22 touched022
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0
+set self touched 0
+
+|PLATFORM:0|
+if self.touched > 0
+    set self state TOUCHED
+endif
+
