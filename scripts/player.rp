@@ -1,18 +1,26 @@
-REDPANTSGUY|0,0,32,64|True|-16,0|
+REDPANTSGUY|128,256,32,64|True|-16,0|
 IDLE:0 redpantsstand
 RUNNING:0 redpantsrun0
 RUNNING:4 redpantsrun1
 RUNNING:8 redpantsrun2
 RUNNING:12 redpantsrun3
 AIRIAL:0 redpantsjump1
+SLIDE0:0 redpantsslide0
+SLIDE1:0 redpantsslide1
 
 |START:0|
+# welcome to red pants script :)
 set self state IDLE
 set self frame 0
 set self speed 5
+set self traction 0.5 * -1
 
 |IDLE:0|
 exec checkAir
+if self.x_vel != 0
+   set self state SLIDE0
+endif
+
 if self.y_vel == 0
    if inpLEFT
      set self state RUNNING
@@ -29,6 +37,15 @@ exec applyGrav
 
 |RUNNING:0|
 set self x_vel self.speed * self.direction
+
+set self calc1 self.direction == 1 nor inpRIGHT
+set self calc2 self.direction == -1 nor inpLEFT
+
+if inpRIGHT == inpLEFT or self.calc1 or self.calc2
+   set self state SLIDE0
+   set self frame 0
+endif
+
 exec checkAir
 exec applyGrav
 
@@ -36,8 +53,49 @@ exec applyGrav
 exec RUNNING:0
 set self frame 0
 
+|SLIDE0:0|
+if self.x_vel == 0
+   set self state IDLE
+endif
+if self.x_vel != 0
+   set self x_vel self.direction * self.traction + self.x_vel
+
+   if self.traction * 3 < self.x_vel
+      set self state SLIDE1
+      set self frame 0
+   endif
+   exec checkAir
+   exec applyGrav
+endif
+
+|SLIDE1:0|
+set self x_vel self.direction * self.traction + self.x_vel
+set self calc1 self.x_vel / 1
+
+if self.calc1 == 0
+   set self x_vel 0
+   set self state IDLE
+   set self frame 0
+   exec IDLE:0
+endif
+if self.x_vel != 0
+   exec checkAir
+   exec applyGrav
+endif
+
 |AIRIAL:0|
+if self.y_vel == 0
+   set self state IDLE
+endif
 exec applyGrav
+
+|LANDING:5|
+set set state IDLE
+
+|COLLIDE|
+if self.state == PLATFORM
+   set self touched 1
+endif
 
 |checkAir|
 if self.y_vel
@@ -50,3 +108,7 @@ set self y_vel self.y_vel + 1
 if self.y_vel > 12
    set self y_vel 12
 endif
+if self.y_vel < -12
+   set self y_vel -12
+endif
+

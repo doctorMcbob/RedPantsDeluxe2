@@ -54,6 +54,9 @@ operators = {
     ">=": lambda n1, n2: n1>=n2,
     "<=": lambda n1, n2: n1<=n2,
     "!=": lambda n1, n2: n1!=n2,
+    "and": lambda n1, n2: n1 and n2,
+    "or": lambda n1, n2: n1 or n2,
+    "nor": lambda n1, n2: n1 and not n2,
 }
 
 def load():
@@ -86,6 +89,8 @@ class Actor(Rect):
         self.frame = 0
         self.direction = 1
 
+        self.platform = False # scripts will flip this for platform draw
+        
         self.tangible = False if "tangible" not in template else template["tangible"]
 
     def _index(self, data):
@@ -103,11 +108,41 @@ class Actor(Rect):
         return self._index(self.hurtboxes)
 
     def get_sprite(self):
+        if self.platform:
+            # dynamically drawing platfrms
+            surf = Surface((self.w, self.h))
+            surf.fill((1, 255, 1))
+            for y in range(self.h // 32):
+                for x in range(self.w // 32):
+                    if (x, y) == (0, 0):
+                        img = self.sprites["{}00".format(self.state)]
+                    elif (x, y) == ((self.w // 32) - 1, 0):
+                        img = self.sprites["{}02".format(self.state)]
+                    elif (x, y) == (0, (self.h // 32) - 1):
+                        img = self.sprites["{}20".format(self.state)]
+                    elif (x, y) == ((self.w // 32) - 1, (self.h // 32) - 1):
+                        img = self.sprites["{}22".format(self.state)]
+                    elif x == 0:
+                        img = self.sprites["{}10".format(self.state)]
+                    elif x == (self.w // 32) - 1:
+                        img = self.sprites["{}12".format(self.state)]
+                    elif y == 0:
+                        img = self.sprites["{}01".format(self.state)]
+                    elif y == (self.h // 32) - 1:
+                        img = self.sprites["{}21".format(self.state)]
+                    else:
+                        img = self.sprites["{}11".format(self.state)]
+
+                    surf.blit(img, (x*32, y*32))
+            surf.set_colorkey((1, 255, 1))
+            return surf
+
         sprite = self._index(self.sprites)
         if sprite is not None:
-            if self.direction == -1:
-                pygame.transform.flip(sprite, 1, 0)
+            if self.direction == 1:
+                return pygame.transform.flip(sprite, 1, 0)
             return sprite
+            
         placeholder = Surface((self.w, self.h))
         placeholder.fill((1, 255, 1))
         placeholder.blit(
@@ -121,10 +156,18 @@ class Actor(Rect):
         if script is not None:
             self.resolve(script, world)
 
+        xflag, yflag = self.x_vel, self.y_vel
         if self.tangible:
             self.collision_check(world)
             self.x += self.x_vel
             self.y += self.y_vel
+
+        if xflag and self.x_vel == 0:
+            if "XCOLLISION" in self.scripts:
+                self.resolve(self.scripts["XCOLLISION"], world)
+        if yflag and self.y_vel == 0:
+            if "YCOLLISION" in self.scripts:
+                self.resolve(self.scripts["YCOLLISION"], world)
 
         self.frame += 1
 
@@ -157,8 +200,8 @@ class Actor(Rect):
 
             
     def collision_check(self, world):
-        actors = world.get_actors()
-        tangibles = list(filter(lambda actor:not (actor is self) and actor.tangible, actors))
+        actors = list(filter(lambda actor:not (actor is self), world.get_actors()))
+        tangibles = list(filter(lambda actor: actor.tangible, actors))
         hits = self.collidelistall(actors)
         for hit in hits:
             self.collision_with(actors[hit], world)
@@ -167,33 +210,36 @@ class Actor(Rect):
         # X axis
         if self.x_vel:
             direction = 1 if self.x_vel < 0 else -1
-            for n in range(self.x_vel // self.w):
-                if self.move(w*n, 0).collidelist(tangibles) != -1:
-                    self.x_vel = (w*n) + (self.x_vel % w)
+            for n in range(int(self.x_vel) // self.w):
+                if self.move(self.w*n, 0).collidelist(tangibles) != -1:
+                    self.x_vel = (self.w*n) + (self.x_vel % w)
                     break
 
-            hits = self.move(self.x_vel, 0).collidelistall(tangibles)
+            hits = self.move(int(self.x_vel), 0).collidelistall(tangibles)
             for hit in hits:
                 self.collision_with(tangibles[hit], world)
                 tangibles[hit].collision_with(self, world)
 
-            while self.move(self.x_vel, 0).collidelist(tangibles) != -1:
+            if int(self.x_vel) == 0:
+                self.x_vel = 0
+            while self.move(int(self.x_vel), 0).collidelist(tangibles) != -1:
                 self.x_vel += direction
                 
         # Y axis
         if self.y_vel:
             direction = 1 if self.y_vel < 0 else -1
-            for n in range(self.y_vel // self.h):
+            for n in range(int(self.y_vel) // self.h):
                 if self.move(0, self.h*n).collidelist(tangibles) != -1:
                     self.y_vel = (self.h*n) + (self.y_vel % self.h)
                     break
 
-            hits = self.move(0, self.y_vel).collidelistall(tangibles)
+            hits = self.move(0, int(self.y_vel)).collidelistall(tangibles)
             for hit in hits:
                 self.collision_with(tangibles[hit], world)
                 tangibles[hit].collision_with(self, world)
-
-            while self.move(0, self.y_vel).collidelist(tangibles) != -1:
+            if int(self.y_vel) == 0:
+                self.y_vel = 0
+            while self.move(0, int(self.y_vel)).collidelist(tangibles) != -1:
                 self.y_vel += direction
 
         # cross check
@@ -218,6 +264,20 @@ class Actor(Rect):
             for idx in range(len(cmd)):
                 token = cmd[idx]
                 try:
+                    if token == "None":
+                        cmd[idx] = None
+
+                    try:
+                        cmd[idx] = int(token)
+                        continue
+                    except ValueError:
+                        pass
+                    try:
+                        cmd[idx] = float(token)
+                        continue
+                    except ValueError:
+                        pass
+
                     if "." in token:
                         actor, a = token.split(".")
                         if actor == "self": actor = self
@@ -229,31 +289,15 @@ class Actor(Rect):
                         elif a in actor.attributes:
                             cmd[idx] = actor.attributes[a]
                         else:
-                            raise Exception("Actor {} has no refrence {}".format(actor, a))
+                            cmd[idx] = None
 
                     if token.startswith("inp"):
-                        if token == "inpLEFT":
-                            cmd[idx] = inputs.STATE["LEFT"]
-                        if token == "inpRIGHT":
-                            cmd[idx] = inputs.STATE["RIGHT"]
-                        if token == "inpUP":
-                            cmd[idx] = inputs.STATE["UP"]
-                        if token == "inpDOWN":
-                            cmd[idx] = inputs.STATE["DOWN"]
-                        if token == "inpA":
-                            cmd[idx] = inputs.STATE["A"]
-                        if token == "inpB":
-                            cmd[idx] = inputs.STATE["B"]
-                    try:
-                        if int(cmd[idx]) != float(cmd[idx]):
-                            cmd[idx] = float(cmd[idx])
-                        else:
-                            cmd[idx] = int(cmd[idx])
-                    except ValueError:
-                        continue
+                        inp = token[3:]
+                        if inp in inputs.STATE:
+                            cmd[idx] = inputs.STATE[inp]
 
                 except Exception as e:
-                    logfunc("Error evaluating {}... {}".format(token, e))
+                    logfunc("Error evaluating {} {}... {}".format(token, cmd_idx, e))
 
             # STEP 2: OPERATORS / ALGEBRA
             evaluated = []
@@ -267,7 +311,7 @@ class Actor(Rect):
                     else:
                         evaluated.append(token)
                 except Exception as e:
-                    logfunc("Error applying operators {}... {}".format(token, e))
+                    logfunc("Error applying operators {} {}... {}".format(token, cmd_idx, e))
                 idx += 1
             cmd = evaluated
             # step 3: COMMANDS
@@ -279,7 +323,7 @@ class Actor(Rect):
                     else: actor = get_actor(actor)
                     if hasattr(actor, att):
                         if att in ["attributes", "scripts", "hitboxes", "hurtboxes"]:
-                            raise Exception("Cannot write over {}".format(att))
+                            raise Exception("Cannot write over {} {}".format(att, cmd_idx))
                         setattr(actor, att, value)                        
                     else:
                         self.attributes[att] = value
@@ -303,6 +347,6 @@ class Actor(Rect):
                 if verb == "print":
                     print(cmd.pop(0))
             except Exception as e:
-                logfunc("Error resolving {}... {}".format(cmd, e))
+                logfunc("Error resolving {} {}... {}".format(verb, cmd_idx, e))
 
             cmd_idx += 1

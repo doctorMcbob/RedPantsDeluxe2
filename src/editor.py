@@ -222,8 +222,10 @@ def spritesheet_menu(G, filename):
             if idx < len(keys):
                 sheet[keys[idx]] = make_rect(corner, (CX, CY))
             else:
-                sheet[get_text_input(G, (0, 0))] = make_rect(corner, (CX, CY))
-                keys = list(sheet.keys())
+                name = get_text_input(G, (0, 0))
+                if name is not None:
+                    sheet[name] = make_rect(corner, (CX, CY))
+                    keys = list(sheet.keys())
 
 def run_state(G, world):
     G["ACTOR"].load()
