@@ -18,7 +18,7 @@ def update_all_scripts(actors):
 
 def set_up(loadscripts=False):
     pygame.init()
-    W = 1200 if "-w" not in sys.argv else int(sys.argv[sys.argv.index("-w")+1])
+    W = 1152 if "-w" not in sys.argv else int(sys.argv[sys.argv.index("-w")+1])
     H = 640 if "-h" not in sys.argv else int(sys.argv[sys.argv.index("-h")+1])
     G = {}
     G["SCREEN"] = pygame.display.set_mode((W, H))

@@ -57,6 +57,8 @@ operators = {
     "and": lambda n1, n2: n1 and n2,
     "or": lambda n1, n2: n1 or n2,
     "nor": lambda n1, n2: n1 and not n2,
+
+    "in": lambda n1, n2: n1 in n2,
 }
 
 def load():
@@ -81,6 +83,7 @@ class Actor(Rect):
         self.scripts = template["scripts"]
         self.attributes = {}
         self.sprites = {}
+        self.img = None # scripts can overwrite the sprite
         for key in template["sprites"]:
             self.sprites[key] = sprites.get_sprite(template["sprites"][key])
         self.spriteoffset = (0, 0) if "spriteoffset" not in template else template["spriteoffset"]
@@ -137,7 +140,7 @@ class Actor(Rect):
             surf.set_colorkey((1, 255, 1))
             return surf
 
-        sprite = self._index(self.sprites)
+        sprite = sprites.get_sprite(self.img) if self.img is not None else self._index(self.sprites)
         if sprite is not None:
             if self.direction == 1:
                 return pygame.transform.flip(sprite, 1, 0)
@@ -152,6 +155,8 @@ class Actor(Rect):
         return placeholder
 
     def update(self, world):
+        self.img = None
+        
         script = self._index(self.scripts)
         if script is not None:
             self.resolve(script, world)
@@ -162,7 +167,7 @@ class Actor(Rect):
             self.x += int(self.x_vel)
             self.y += int(self.y_vel)
 
-        if xflag and self.x_vel == 0:
+        if xflag != self.x_vel:
             if "XCOLLISION" in self.scripts:
                 self.resolve(self.scripts["XCOLLISION"], world)
         if yflag and self.y_vel == 0:
@@ -220,8 +225,6 @@ class Actor(Rect):
                 self.collision_with(tangibles[hit], world)
                 tangibles[hit].collision_with(self, world)
 
-            if int(self.x_vel) == 0:
-                self.x_vel = 0
             while self.move(int(self.x_vel), 0).collidelist(tangibles) != -1:
                 self.x_vel += direction
                 
@@ -237,8 +240,7 @@ class Actor(Rect):
             for hit in hits:
                 self.collision_with(tangibles[hit], world)
                 tangibles[hit].collision_with(self, world)
-            if int(self.y_vel) == 0:
-                self.y_vel = 0
+
             while self.move(0, int(self.y_vel)).collidelist(tangibles) != -1:
                 self.y_vel += direction
 
@@ -308,7 +310,10 @@ class Actor(Rect):
                     if token == "abs":
                         calculated = abs(cmd.pop(idx+1))
                         evaluated.append(calculated)
-                    elif token in operators:
+                    elif token == "not":
+                        calculated = not cmd.pop(idx+1)
+                        evaluated.append(calculated)
+                    elif type(token) == str and token in operators:
                         calculated = operators[token](evaluated.pop(), cmd.pop(idx+1))
                         evaluated.append(calculated)
                     else:
@@ -349,6 +354,8 @@ class Actor(Rect):
                     self.resolve(self.scripts[key], world, logfunc=logfunc)
                 if verb == "print":
                     print(cmd.pop(0))
+                if verb == "img":
+                    self.img = cmd.pop(0)
             except Exception as e:
                 logfunc("Error resolving {} {}... {}".format(verb, cmd_idx, e))
 

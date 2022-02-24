@@ -24,6 +24,7 @@ DEFAULT_KEY_MAP = {
 }
 
 def update(inp_map=DEFAULT_KEY_MAP, state=STATE):
+    state["EVENTS"] = []
     for e in pygame.event.get():
         if e.type == QUIT: sys.exit()
         if e.type == KEYDOWN:
@@ -31,23 +32,23 @@ def update(inp_map=DEFAULT_KEY_MAP, state=STATE):
             for key in inp_map:
                 if e.key == inp_map[key]:
                     state[key] = 1
-                    state["EVENTS"].append("{} DOWN".format(key))
+                    state["EVENTS"].append("{}_DOWN".format(key))
         if e.type == KEYUP:
             for key in inp_map:
                 if e.key == inp_map[key]:
                     state[key] = 0
-                    state["EVENTS"].append("{} UP".format(key))
+                    state["EVENTS"].append("{}_UP".format(key))
 
         if e.type == JOYBUTTONDOWN and state["JOY"] is not None:
             for key in inp_map:
                 if e.button == inp_map[key]:
                     state[key] = 1
-                    state["EVENTS"].append("{} DOWN".format(key))
+                    state["EVENTS"].append("{}_DOWN".format(key))
         if e.type == JOYBUTTONUP and state["JOY"] is not None:
             for key in inp_map:
                 if e.button == inp_map[key]:
                     state[key] = 1
-                    state["EVENTS"].append("{} UP".format(key))
+                    state["EVENTS"].append("{}_UP".format(key))
 
     if state["JOY"] is not None:
         joy = state["JOY"]
