@@ -70,14 +70,14 @@ Structure for these statements are as like this
 
 Statements in Red Pants Script have three steps to resolve
  - Evaluate
-    . in this step, we handle refrences.
-      . objects should be refrenced with their NAME
-      . understands the python concept of self
-      . dot notation `self.x` `platform.SomeVariable`
-    . we also can refrence the input state
-      . uses syntax `inp{name}` where name is the key to the input field
-      . edit the inputs.py file to change how you want inputs to be rendered, though make sure to leave the `EVENTS` key
-      . `inpLEFT` `LEFT_DOWN in inpEVENTS
+    - in this step, we handle refrences.
+      - objects should be refrenced with their NAME
+      - understands the python concept of self
+      - dot notation `self.x` `platform.SomeVariable`
+    - we also can refrence the input state
+      - uses syntax `inp{name}` where name is the key to the input field
+      - edit the inputs.py file to change how you want inputs to be rendered, though make sure to leave the `EVENTS` key
+      - `inpLEFT` `LEFT_DOWN in inpEVENTS
  - Operators
     - in this step, we handle operators strictly from left to right
     - valid operators are
