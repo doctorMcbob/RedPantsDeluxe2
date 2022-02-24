@@ -42,16 +42,25 @@ Immediately after, you define your spritesheet. Names of sprites are defined in 
 IDLE:0 happyguystand0
 IDLE:5 happyguystand1
 ```
-Everything else in the program will be code blocks. 
+Everything else in the program will be code blocks.
+
   In the same way we defined our spritesheet, the game will refrence scripts as `{state}:{frame}`
+  
   So if your actor's state is IDLE and hes on frame 0, any codeblock called IDLE:0 will be run.
+  
   If there is NO codeblock at the specific index, it will scan backwards until it either reaches zero or finds an index
+  
   That means, if you want a code block to run for frames 4 through 6 on state IDLE, you would define it as 
+  
   IDLE:4
+  
   and then define another code block as
+  
   IDLE:7
+  
   which would do something else, or nothing.
   
+
 Structure for these statements are as like this
 ```
 |IDLE:0|
