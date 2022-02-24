@@ -60,6 +60,10 @@ endif
 exec checkJump
 exec applyGrav
 
+|IDLE:32|
+exec IDLE:0
+set self frame 0
+
 |RUNNING:0|
 set self x_vel self.speed * self.direction
 set self calc1 self.direction == 1 nor inpRIGHT

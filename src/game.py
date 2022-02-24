@@ -31,7 +31,8 @@ def set_up(loadscripts=False):
     from src import sprites
     from src import worlds
     from src import actor
-
+    from src import printer
+    G["PRINTER"] = printer
     G["WORLDS"] = worlds
     G["WORLD"] = worlds.root if "-r" not in sys.argv else sys.argv[sys.argv.index("-r")+1]
     sprites.load()
@@ -52,4 +53,11 @@ def run(G):
         else:
             world.draw(G["SCREEN"])
         pygame.display.update()
+        if "PRINTER" in G:
+            G["PRINTER"].save_surface(G["SCREEN"])
+            if "CLIP" in inputs.STATE["EVENTS"]:
+                G["PRINTER"].save_em()
+                G["PRINTER"].make_gif()
+                G["PRINTER"].clear_em()
         G["CLOCK"].tick(30)
+        

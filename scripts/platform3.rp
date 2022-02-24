@@ -28,4 +28,7 @@ set self touched 0
 if self.touched > 0
    set self state TOUCHED
 endif
+set self frame 0
 
+|TOUCHED:0|
+set self frame 0

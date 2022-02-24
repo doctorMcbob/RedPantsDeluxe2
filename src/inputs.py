@@ -28,6 +28,7 @@ def update(inp_map=DEFAULT_KEY_MAP, state=STATE):
     for e in pygame.event.get():
         if e.type == QUIT: sys.exit()
         if e.type == KEYDOWN:
+            if e.key == K_RETURN: STATE["EVENTS"].append("CLIP")
             if e.key == K_ESCAPE: sys.exit()
             for key in inp_map:
                 if e.key == inp_map[key]:
