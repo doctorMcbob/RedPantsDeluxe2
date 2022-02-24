@@ -13,7 +13,8 @@ SLIDE1:0 redpantsslide1
 set self state IDLE
 set self frame 0
 set self speed 5
-set self traction 0.5 * -1
+set self traction 0.4 * -1
+set self limit 20
 
 |IDLE:0|
 exec checkAir
@@ -59,8 +60,8 @@ if self.x_vel == 0
 endif
 if self.x_vel != 0
    set self x_vel self.direction * self.traction + self.x_vel
-
-   if self.traction * 3 < self.x_vel
+   set self absxvel abs self.x_vel
+   if abs self.traction * 10 > self.absxvel
       set self state SLIDE1
       set self frame 0
    endif
@@ -70,9 +71,17 @@ endif
 
 |SLIDE1:0|
 set self x_vel self.direction * self.traction + self.x_vel
-set self calc1 self.x_vel / 1
 
-if self.calc1 == 0
+set self calc1 self.x_vel < 1
+set self calc2 self.direction == 1
+set self check1 self.calc1 and self.calc2
+
+set self calc1 self.x_vel > -1
+set self calc2 self.direction == -1
+
+set self check2 self.calc1 and self.calc2
+
+if self.check1 or self.check2
    set self x_vel 0
    set self state IDLE
    set self frame 0
@@ -105,10 +114,11 @@ endif
 
 |applyGrav|
 set self y_vel self.y_vel + 1
-if self.y_vel > 12
-   set self y_vel 12
+if self.y_vel > self.limit
+   set self y_vel self.limit
 endif
-if self.y_vel < -12
-   set self y_vel -12
+set self neglimit self.limit * -1
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
 endif
 

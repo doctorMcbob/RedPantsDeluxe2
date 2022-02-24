@@ -159,8 +159,8 @@ class Actor(Rect):
         xflag, yflag = self.x_vel, self.y_vel
         if self.tangible:
             self.collision_check(world)
-            self.x += self.x_vel
-            self.y += self.y_vel
+            self.x += int(self.x_vel)
+            self.y += int(self.y_vel)
 
         if xflag and self.x_vel == 0:
             if "XCOLLISION" in self.scripts:
@@ -305,7 +305,10 @@ class Actor(Rect):
             while idx < len(cmd):
                 token = cmd[idx]
                 try:
-                    if token in operators:
+                    if token == "abs":
+                        calculated = abs(cmd.pop(idx+1))
+                        evaluated.append(calculated)
+                    elif token in operators:
                         calculated = operators[token](evaluated.pop(), cmd.pop(idx+1))
                         evaluated.append(calculated)
                     else:
