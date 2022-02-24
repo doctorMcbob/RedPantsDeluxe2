@@ -69,49 +69,49 @@ Structure for these statements are as like this
 ```
 
 Statements in Red Pants Script have three steps to resolve
- . Evaluate
-    - in this step, we handle refrences.
-      - objects should be refrenced with their NAME
-      - understands the python concept of self
-      - dot notation `self.x` `platform.SomeVariable`
-    - we also can refrence the input state
-      - uses syntax `inp{name}` where name is the key to the input field
-      - edit the inputs.py file to change how you want inputs to be rendered, though make sure to leave the `EVENTS` key
-      - `inpLEFT` `LEFT_DOWN in inpEVENTS
- . Operators
+ - Evaluate
+    . in this step, we handle refrences.
+      . objects should be refrenced with their NAME
+      . understands the python concept of self
+      . dot notation `self.x` `platform.SomeVariable`
+    . we also can refrence the input state
+      . uses syntax `inp{name}` where name is the key to the input field
+      . edit the inputs.py file to change how you want inputs to be rendered, though make sure to leave the `EVENTS` key
+      . `inpLEFT` `LEFT_DOWN in inpEVENTS
+ - Operators
     - in this step, we handle operators strictly from left to right
     - valid operators are
-         +, -, *, //, /, %, **,
-         ==, >=, <=, >, <, !=,
-         and, or, nor, not, in
-         abs (absolute value)
- . Commands
+         - +, -, *, //, /, %, **,
+         - ==, >=, <=, >, <, !=,
+         - and, or, nor, not, in
+         - abs (absolute value)
+ - Commands
     - in this step we handle commands.
     - each statement has to follow the syntax for any specific command.
     - commands and syntax are:
         - set - Set an Actor attribute
-    `set {actor key (or self)} {variable name} {value to be set}`
-    `set self x_velocity self.x_velocity + 1`
+             - `set {actor key (or self)} {variable name} {value to be set}`
+             - `set self x_velocity self.x_velocity + 1`
         - if  - I hope you've heard of this one
-    ```
-    if {conditional}
-    ...
-    endif
-    ```
-    ```
-    if self.name == PLAYER
-      ...
-    endif
-    ```
+             - ```
+               if {conditional}
+               ...
+               endif
+               ```
+             - ```
+               if self.name == PLAYER
+               ...
+               endif
+               ```
         - exec - runs another code block
-        `exec {key}`
-        `exec applyGrav`
+            - `exec {key}`
+            - `exec applyGrav`
         - img - overrules the sprite for the frame with a new image key
-        `img {new image key}`
-        `img happyguysad`
+            - `img {new image key}`
+            - `img happyguysad`
         - print - prints something, good for debugging
-        `print {whatever}`
-        `print hello-world`
+            - `print {whatever}`
+            - `print hello-world`
         
 Notes:
 . Any other token will be attempted to evaluate as an int or float in the Evaluate step, otherwize they are all one word strings
