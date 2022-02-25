@@ -52,6 +52,8 @@ def run(G):
             world.draw(G["SCREEN"], DEBUG=G)
         else:
             world.draw(G["SCREEN"])
+        # maybe remove FPS counter before release, dont worry about it for a while though
+        G["SCREEN"].blit(G["HEL16"].render("FPS:{}".format(G["CLOCK"].get_fps()), 0, (0, 0, 0)), (0, 0))
         pygame.display.update()
         if "PRINTER" in G:
             G["PRINTER"].save_surface(G["SCREEN"])

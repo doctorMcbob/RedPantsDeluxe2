@@ -247,6 +247,13 @@ if self.state == ROLLOUT or self.calc1
 endif
 if self.state == AIRIAL
    set self state WALLTOUCH
+   set self frame 0
+   if self.x_vel > 0
+      set self direction 1
+   endif
+   if self.x_vel < 0
+      set self direction -1
+   endif
 endif
 
 |YCOLLISION|
@@ -261,6 +268,7 @@ if self.state == DIVE
 endif
 if self.state == BONK
    set self state BONKLAND
+   set self frame 0
 endif
 
 |COLLIDE|
