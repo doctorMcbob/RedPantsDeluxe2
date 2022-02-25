@@ -9,6 +9,8 @@ SLIDE:0 redpantsslide0
 LANDING:0 redpantsland
 JUMPSQUAT:0 redpantsjumpsquat0
 JUMPSQUAT:3 redpantsjumpsquat1
+FLIPSQUAT:0 redpantsjumpsquat0
+FLIPSQUAT:3 redpantsjumpsquat1
 DIVESTART:0 redpantsdivestart
 DIVE:0 redpantsdive
 DIVELAND:0 redpantsdiveland
@@ -19,6 +21,13 @@ BONKLAND:12 redpantsbonkland1
 WALLTOUCH:0 redpantswalljump0
 WALLJUMP:0 redpantswalljump1
 WALLJUMP:3 redpantswalljump2
+SLIDEFLIP:0 redpantsdiveflip0
+SLIDEFLIP:8 redpantsdiveflip1
+SLIDEFLIP:10 redpantsdiveflip2
+SLIDEFLIP:14 redpantsdiveflip3
+SLIDEFLIP:18 redpantsdiveflip4
+SLIDEFLIP:20 redpantsdiveflip5
+SLIDEFLIP:23 redpantsdiveflip6
 
 |START:0|
 # welcome to red pants script :)
@@ -39,6 +48,8 @@ set self airspeedcontrol 12
 set self negspeed self.speed * -1
 set self neglimit self.limit * -1
 set self grav 1
+set self slideflipxmod 3
+set self slideflipstrength -24
 
 |IDLE:0|
 exec checkAir
@@ -92,6 +103,16 @@ if self.x_vel != 0
       img redpantsslide1
    endif
    exec checkJump
+   if self.state == JUMPSQUAT
+      if self.direction == 1 and inpLEFT
+      	 set self state FLIPSQUAT
+	 set self frame 0
+      endif
+      if self.direction == -1 and inpRIGHT
+      	 set self state FLIPSQUAT
+	 set self frame 0
+      endif
+   endif
    exec checkAir
    exec applyGrav
 endif
@@ -200,7 +221,6 @@ if self.x_vel == 0
    set self frame 0
 endif
 
-
 |ROLLOUT:0|
 exec applyGrav
 
@@ -222,7 +242,8 @@ exec AIRIAL:0
 set self state AIRIAL
 if not self.calc1 nor self.calc2
    img redpantswalljump0
-   if A_DOWN in inpEVENTS
+   # bufferable pog?
+   if inpA
       set self state WALLJUMP
       set self frame 0
    endif
@@ -238,6 +259,37 @@ set self y_vel self.walljumpstrength
 set self direction self.direction * -1
 set self x_vel self.walljumpoff * self.direction
 
+|FLIPSQUAT:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+
+|FLIPSQUAT:6|
+set self state SLIDEFLIP
+set self x_vel self.slideflipxmod * self.direction * -1
+set self y_vel self.slideflipstrength
+set self frame 0
+
+|SLIDEFLIP:0|
+exec applyGrav
+if self.direction == 1
+   if inpLEFT
+      	set self x_vel self.x_vel - self.airdrift
+	if self.x_vel < self.negspeed
+      	   set self x_vel self.negspeed
+   	endif
+   endif
+endif
+if self.direction == -1
+   if inpRIGHT
+      set self x_vel self.x_vel + self.airdrift
+      if self.x_vel > self.speed
+      	 set self x_vel self.speed
+      endif
+   endif
+endif
+
+
 |XCOLLISION|
 set self calc1 self.state == DIVE
 set self calc1 self.state == DIVELAND or self.calc1
@@ -245,7 +297,8 @@ if self.state == ROLLOUT or self.calc1
    set self state BONK
    set self frame 0
 endif
-if self.state == AIRIAL
+set self calc1 self.state == SLIDEFLIP
+if self.state == AIRIAL or self.calc1
    set self state WALLTOUCH
    set self frame 0
    if self.x_vel > 0
@@ -258,6 +311,7 @@ endif
 
 |YCOLLISION|
 set self calc1 self.state == ROLLOUT
+set self calc1 self.state == SLIDEFLIP or self.calc1
 if self.state == AIRIAL or self.calc1
    set self state LANDING
    set self frame 0
