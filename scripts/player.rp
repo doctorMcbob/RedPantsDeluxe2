@@ -28,6 +28,10 @@ SLIDEFLIP:14 redpantsdiveflip3
 SLIDEFLIP:18 redpantsdiveflip4
 SLIDEFLIP:20 redpantsdiveflip5
 SLIDEFLIP:23 redpantsdiveflip6
+CROUCH:0 redpantscrouch
+LONGJUMPSTART:0 redpantslongjumpstart
+LONGJUMP:0 redpantslongjump1
+LONGJUMP:8 redpantslongjump2
 
 |START:0|
 # welcome to red pants script :)
@@ -45,11 +49,14 @@ set self airdrift 0.7
 set self traction 0.6 * -1
 set self limit 20
 set self airspeedcontrol 12
+set self negairspeedcontrol self.airspeedcontrol * -1
 set self negspeed self.speed * -1
 set self neglimit self.limit * -1
 set self grav 1
 set self slideflipxmod 3
 set self slideflipstrength -24
+set self longjumpystrength -9
+set self longjumpxstrength 12
 
 |IDLE:0|
 exec checkAir
@@ -68,12 +75,50 @@ if self.y_vel == 0
         set self direction 1
    endif
 endif
+exec checkCrouch
 exec checkJump
 exec applyGrav
 
 |IDLE:32|
 exec IDLE:0
 set self frame 0
+
+|CROUCH:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+if not inpDOWN
+   set self state IDLE
+   set self frame 0
+endif
+# bufferable pog?
+if self.x_vel != 0 and inpA
+   set self state LONGJUMPSTART
+   set self frame 0
+endif
+
+|LONGJUMPSTART:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+
+|LONGJUMPSTART:2|
+exec LONGJUMPSTART:0
+set self y_vel self.longjumpystrength
+set self x_vel self.longjumpxstrength * self.direction
+set self state LONGJUMP
+set self frame 0
+
+|LONGJUMP:0|
+exec applyGrav
+set self calc1 self.x_vel < self.negairspeedcontrol
+if not self.calc1 and inpLEFT
+   set self x_vel self.x_vel - self.airdrift
+endif
+set self calc1 self.x_vel > self.airspeedcontrol
+if not self.calc1 and inpRIGHT
+   set self x_vel self.x_vel + self.airdrift
+endif
 
 |RUNNING:0|
 set self x_vel self.speed * self.direction
@@ -83,6 +128,7 @@ if inpRIGHT == inpLEFT or self.calc1 or self.calc2
    set self state SLIDE
    set self frame 0
 endif
+exec checkCrouch
 exec checkJump
 exec checkAir
 exec applyGrav
@@ -102,6 +148,7 @@ if self.x_vel != 0
    if abs self.traction * 10 > self.absxvel
       img redpantsslide1
    endif
+   exec checkCrouch
    exec checkJump
    if self.state == JUMPSQUAT
       if self.direction == 1 and inpLEFT
@@ -276,16 +323,16 @@ exec applyGrav
 if self.direction == 1
    if inpLEFT
       	set self x_vel self.x_vel - self.airdrift
-	if self.x_vel < self.negspeed
-      	   set self x_vel self.negspeed
+	if self.x_vel < self.negairspeedcontrol
+      	   set self x_vel self.negairspeedcontrol
    	endif
    endif
 endif
 if self.direction == -1
    if inpRIGHT
       set self x_vel self.x_vel + self.airdrift
-      if self.x_vel > self.speed
-      	 set self x_vel self.speed
+      if self.x_vel > self.airspeedcontrol
+      	 set self x_vel self.airspeedcontrol
       endif
    endif
 endif
@@ -294,6 +341,7 @@ endif
 |XCOLLISION|
 set self calc1 self.state == DIVE
 set self calc1 self.state == DIVELAND or self.calc1
+set self calc1 self.state == LONGJUMP or self.calc1
 if self.state == ROLLOUT or self.calc1
    set self state BONK
    set self frame 0
@@ -313,6 +361,7 @@ endif
 |YCOLLISION|
 set self calc1 self.state == ROLLOUT
 set self calc1 self.state == SLIDEFLIP or self.calc1
+set self calc1 self.state == LONGJUMP or self.calc1
 if self.state == AIRIAL or self.calc1
    set self state LANDING
    set self frame 0
@@ -357,6 +406,12 @@ if self.x_vel != 0
 endif
 if abs self.x_vel / 1 == 0
    set self x_vel 0
+endif
+
+|checkCrouch|
+if inpDOWN
+   set self state CROUCH
+   set self frame 0
 endif
 
 |checkJump|
