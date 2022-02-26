@@ -66,14 +66,14 @@ if self.x_vel != 0
 endif
 if self.y_vel == 0
    if not inpRIGHT and inpLEFT
-     set self state RUNNING
-     set self frame 0
-     set self direction -1
+      set self state RUNNING
+      set self frame 0
+      set self direction -1
    endif
    if not inpLEFT and inpRIGHT
-        set self state RUNNING
-        set self frame 0
-        set self direction 1
+      set self state RUNNING
+      set self frame 0
+      set self direction 1
    endif
 endif
 exec checkCrouch
@@ -315,13 +315,14 @@ exec applyGrav
 
 |FLIPSQUAT:6|
 set self state SLIDEFLIP
-set self x_vel self.slideflipxmod * self.direction * -1
+set self direction self.direction * -1
+set self x_vel self.slideflipxmod * self.direction
 set self y_vel self.slideflipstrength
 set self frame 0
 
 |SLIDEFLIP:0|
 exec applyGrav
-if self.direction == 1
+if self.direction == -1
    if inpLEFT
       	set self x_vel self.x_vel - self.airdrift
 	if self.x_vel < self.negairspeedcontrol
@@ -329,7 +330,7 @@ if self.direction == 1
    	endif
    endif
 endif
-if self.direction == -1
+if self.direction == 1
    if inpRIGHT
       set self x_vel self.x_vel + self.airdrift
       if self.x_vel > self.airspeedcontrol
