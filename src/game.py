@@ -21,7 +21,7 @@ def set_up(loadscripts=False):
     W = 1152 if "-w" not in sys.argv else int(sys.argv[sys.argv.index("-w")+1])
     H = 640 if "-h" not in sys.argv else int(sys.argv[sys.argv.index("-h")+1])
     G = {}
-    G["SCREEN"] = pygame.display.set_mode((W, H))
+    G["SCREEN"] = pygame.display.set_mode((W, H)) if "-f" not in sys.argv else pygame.display.set_mode((W, H), pygame.FULLSCREEN)
     pygame.display.set_caption("Red Pants Deluxe 2")
     G["HEL32"] = pygame.font.SysFont("Helvetica", 32)
     G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
@@ -30,15 +30,34 @@ def set_up(loadscripts=False):
     pygame.display.update()
     from src import sprites
     from src import worlds
+    from src import frames
     from src import actor
     from src import printer
     G["PRINTER"] = printer
     G["WORLDS"] = worlds
+    G["FRAMES"] = frames
     G["WORLD"] = worlds.root if "-r" not in sys.argv else sys.argv[sys.argv.index("-r")+1]
     sprites.load()
     worlds.load()
     actor.load()
-    update_all_scripts(actor)
+    if loadscripts:
+        update_all_scripts(actor)
+    splitscreen = "-S" in sys.argv
+    if splitscreen:
+        frames.add_frame("MAIN", (W//2, H))
+        frames.add_frame("MAIN2", (W//2, H))
+        G["FRAMEMAP"] = {
+            "MAIN": (0, 0),
+            "MAIN2": (W//2, 0)
+        }
+    else:
+        frames.add_frame("MAIN", (W, H))
+        G["FRAMEMAP"] = {
+            "MAIN": (0, 0),
+        }
+        
+        
+    G["FRAME"] = "MAIN"
     G["CLOCK"] = pygame.time.Clock()
     G["DEBUG"] = "-d" in sys.argv
     return G
@@ -48,12 +67,17 @@ def run(G):
         inputs.update()
         world = G["WORLDS"].get_world(G["WORLD"])
         world.update()
-        if G["DEBUG"]:
-            world.draw(G["SCREEN"], DEBUG=G)
-        else:
-            world.draw(G["SCREEN"])
+        for name in G["FRAMEMAP"]:
+            frame = G["FRAMES"].get_frame(name)
+            frame.update()
+            position = G["FRAMEMAP"][name]
+            drawn = frame.drawn(world, DEBUG=G) if G["DEBUG"] else frame.drawn(world)
+            G["SCREEN"].blit(drawn, position)
+
         # maybe remove FPS counter before release, dont worry about it for a while though
-        G["SCREEN"].blit(G["HEL16"].render("FPS:{}".format(G["CLOCK"].get_fps()), 0, (0, 0, 0)), (0, 0))
+        G["SCREEN"].blit(
+            G["HEL16"].render("FPS:{}".format(G["CLOCK"].get_fps()), 0, (0, 0, 0)),
+            (0, 0))
         pygame.display.update()
         if "PRINTER" in G:
             G["PRINTER"].save_surface(G["SCREEN"])
@@ -61,5 +85,6 @@ def run(G):
                 G["PRINTER"].save_em()
                 G["PRINTER"].make_gif()
                 G["PRINTER"].clear_em()
+        
         G["CLOCK"].tick(30)
         

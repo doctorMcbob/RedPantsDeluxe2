@@ -35,6 +35,7 @@ import operator as ops
 
 from src import inputs
 from src import sprites
+from src import frames
 
 HEL16 = pygame.font.SysFont("Helvetica", 16)
 
@@ -327,8 +328,7 @@ class Actor(Rect):
                 verb = cmd.pop(0)
                 if verb == "set":
                     actor, att, value = cmd
-                    if actor == "self": actor = self
-                    else: actor = get_actor(actor)
+                    actor = self if actor == "self" else get_actor(actor)
                     if hasattr(actor, att):
                         if att in ["attributes", "scripts", "hitboxes", "hurtboxes"]:
                             raise Exception("Cannot write over {} {}".format(att, cmd_idx))
@@ -356,6 +356,11 @@ class Actor(Rect):
                     print(cmd.pop(0))
                 if verb == "img":
                     self.img = cmd.pop(0)
+                if verb == "focus":
+                    frame = frames.get_frame(cmd.pop(0))
+                    actor = cmd.pop(0)
+                    actor = self if actor == "self" else get_actor(actor)
+                    frame.focus = actor
             except Exception as e:
                 logfunc("Error resolving {} {}... {}".format(verb, cmd_idx, e))
 

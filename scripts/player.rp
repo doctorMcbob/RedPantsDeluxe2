@@ -57,6 +57,7 @@ set self slideflipxmod 3
 set self slideflipstrength -24
 set self longjumpystrength -9
 set self longjumpxstrength 12
+focus MAIN self
 
 |IDLE:0|
 exec checkAir

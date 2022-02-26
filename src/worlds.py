@@ -26,7 +26,8 @@ class World(object):
     def __init__(self, template):
         self.background = None if template["background"] is None else sprites.get_sprite(template["background"])
         self.actors = template["actors"]
-        self.scrollx, self.scrolly = (0, 0)
+        self.exits = {} if "exits" not in template else template["exits"]
+        self.locks = {} if "locks" not in template else template["locks"]
         
     def update(self):
         for name in self.actors:
@@ -36,7 +37,13 @@ class World(object):
     def get_actors(self):
         return [actor.get_actor(a) for a in self.actors]
 
-    def draw(self, dest, DEBUG=False):
+    def get_exits(self):
+        return list(self.exits.keys())
+
+    def get_locks(self):
+        return list(self.exits.keys())
+
+    def draw(self, dest, frame, DEBUG=False):
         if self.background is not None:
             for y in range((dest.get_height() // background.get_height())):
                 for x in range((dest.get_width() // background.get_width())):
@@ -47,13 +54,9 @@ class World(object):
         for name in self.actors:
             Actor = actor.get_actor(name)
             dx, dy = Actor.spriteoffset
-            if self._is_near(Actor, dest.get_size()):
-                dest.blit(Actor.get_sprite(), self._scroll((Actor.x+dx, Actor.y+dy)))
+            if frame.in_frame(Actor):
+                dest.blit(Actor.get_sprite(), frame.scroll((Actor.x+dx, Actor.y+dy)))
 
             if DEBUG: Actor.debug(DEBUG)
-    def _scroll(self, pos):
-        return pos[0] - self.scrollx, pos[1] - self.scrolly
 
-    def _is_near(self, Actor, dimensions):
-        return Rect((self.scrollx, self.scrolly), dimensions).colliderect(Actor)
 
