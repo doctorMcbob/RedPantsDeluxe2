@@ -1,41 +1,41 @@
-REDPANTSGUY|128,256,32,64|True|-16,0|
-IDLE:0 redpantsstand
-RUNNING:0 redpantsrun0
-RUNNING:4 redpantsrun1
-RUNNING:8 redpantsrun2
-RUNNING:12 redpantsrun3
-AIRIAL:0 redpantsjump1
-SLIDE:0 redpantsslide0
-LANDING:0 redpantsland
-JUMPSQUAT:0 redpantsjumpsquat0
-JUMPSQUAT:3 redpantsjumpsquat1
-FLIPSQUAT:0 redpantsjumpsquat0
-FLIPSQUAT:3 redpantsjumpsquat1
-DIVESTART:0 redpantsdivestart
-DIVE:0 redpantsdive
-DIVELAND:0 redpantsdiveland
-ROLLOUT:0 redpantsrollout
-BONK:0 redpantsbonk
-BONKLAND:0 redpantsbonkland0
-BONKLAND:12 redpantsbonkland1
-WALLTOUCH:0 redpantswalljump0
-WALLJUMP:0 redpantswalljump1
-WALLJUMP:3 redpantswalljump2
-SLIDEFLIP:0 redpantsdiveflip0
-SLIDEFLIP:8 redpantsdiveflip1
-SLIDEFLIP:10 redpantsdiveflip2
-SLIDEFLIP:14 redpantsdiveflip3
-SLIDEFLIP:18 redpantsdiveflip4
-SLIDEFLIP:20 redpantsdiveflip5
-SLIDEFLIP:23 redpantsdiveflip6
-CROUCH:0 redpantscrouch
-LONGJUMPSTART:0 redpantslongjumpstart
-LONGJUMP:0 redpantslongjump1
-LONGJUMP:8 redpantslongjump2
+REDPANTSGUY2|256,256,32,64|True|-16,0|
+IDLE:0 glassesstand
+RUNNING:0 glassesrun0
+RUNNING:4 glassesrun1
+RUNNING:8 glassesrun2
+RUNNING:12 glassesrun3
+AIRIAL:0 glassesjump1
+SLIDE:0 glassesslide0
+LANDING:0 glassesland
+JUMPSQUAT:0 glassesjumpsquat0
+JUMPSQUAT:3 glassesjumpsquat1
+FLIPSQUAT:0 glassesjumpsquat0
+FLIPSQUAT:3 glassesjumpsquat1
+DIVESTART:0 glassesdivestart
+DIVE:0 glassesdive
+DIVELAND:0 glassesdiveland
+ROLLOUT:0 glassesrollout
+BONK:0 glassesbonk
+BONKLAND:0 glassesbonkland0
+BONKLAND:12 glassesbonkland1
+WALLTOUCH:0 glasseswalljump0
+WALLJUMP:0 glasseswalljump1
+WALLJUMP:3 glasseswalljump2
+SLIDEFLIP:0 glassesdiveflip0
+SLIDEFLIP:8 glassesdiveflip1
+SLIDEFLIP:10 glassesdiveflip2
+SLIDEFLIP:14 glassesdiveflip3
+SLIDEFLIP:18 glassesdiveflip4
+SLIDEFLIP:20 glassesdiveflip5
+SLIDEFLIP:23 glassesdiveflip6
+CROUCH:0 glassescrouch
+LONGJUMPSTART:0 glasseslongjumpstart
+LONGJUMP:0 glasseslongjump1
+LONGJUMP:8 glasseslongjump2
 
 |START:0|
 # welcome to red pants script :)
-set self _input_name PLAYER1
+set self _input_name PLAYER2
 set self state IDLE
 set self frame 0
 set self speed 8
@@ -58,7 +58,7 @@ set self slideflipxmod 3
 set self slideflipstrength -24
 set self longjumpystrength -9
 set self longjumpxstrength 12
-focus MAIN self
+focus MAIN2 self
 
 |IDLE:0|
 exec checkAir
@@ -148,7 +148,7 @@ if self.x_vel != 0
    exec applyTraction
    set self absxvel abs self.x_vel
    if abs self.traction * 10 > self.absxvel
-      img redpantsslide1
+      img glassesslide1
    endif
    exec checkCrouch
    exec checkJump
@@ -202,10 +202,10 @@ if not self.calc1 nor self.calc2
    endif
 endif
 if self.calc1
-   img redpantsjump2
+   img glassesjump2
 endif
 if self.calc2
-   img redpantsjump0
+   img glassesjump0
 endif
 exec applyGrav
 
@@ -291,7 +291,7 @@ set self frame 0
 exec AIRIAL:0
 set self state AIRIAL
 if not self.calc1 nor self.calc2
-   img redpantswalljump0
+   img glasseswalljump0
    # bufferable pog?
    if inpA
       set self state WALLJUMP

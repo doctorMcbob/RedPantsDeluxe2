@@ -16,6 +16,8 @@ SAVED = False
 
 IMG_LOCATION = "img/"
 SCRIPT_LOCATION = "scripts/"
+X, Y = 0, 0
+CX, CY = None, None
 
 def set_up():
     pygame.init()
@@ -23,8 +25,8 @@ def set_up():
     G["SCREEN"] = pygame.display.set_mode((1200, 720))
     G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
     G["HEL32"] = pygame.font.SysFont("Helvetica", 32)
-    from src import actor
-    G["ACTOR"] = actor
+    G["WORLD"] = 'root' if "-l" not in sys.argv else sys.argv[sys.argv.index("-l") + 1]
+    
     
     return G
 
@@ -95,7 +97,6 @@ def load():
     from src.lib import WORLDS as W
     from src.lib import SPRITESHEETS as S
     from src.lib import ACTORS as A
-
     WORLDS = W.WORLDS
     SPRITESHEETS = S.SPRITESHEETS
     ACTORS = A.ACTORS
@@ -228,10 +229,10 @@ def spritesheet_menu(G, filename):
                     keys = list(sheet.keys())
 
 def run_state(G, world):
-    G["ACTOR"].load()
     while True:
-        inputs.update()
-        world = World(WORLDS[world])
+        if inputs.update(noquit=True) == "QUIT":
+            break
+        world = worlds.get_world(G["WORLD"])
         world.update()
         world.draw(G["SCREEN"])
         pygame.display.update()

@@ -45,9 +45,14 @@ class World(object):
 
     def draw(self, dest, frame, DEBUG=False):
         if self.background is not None:
-            for y in range((dest.get_height() // background.get_height())):
-                for x in range((dest.get_width() // background.get_width())):
-                    dest.blit(background, (x*background.get_width(), y*background.get_height()))
+            for y in range((dest.get_height() // self.background.get_height())+2):
+                y =  y*self.background.get_height()
+                y -= (frame.scroll_y // 2) % self.background.get_height()
+                for x in range((dest.get_width() // self.background.get_width())+2):
+                    x = x * self.background.get_width()
+                    x -= (frame.scroll_x // 2) % self.background.get_width()
+
+                    dest.blit(self.background, (x, y))
         else:
             dest.fill((185, 185, 185))
         

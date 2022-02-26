@@ -32,6 +32,7 @@ import pygame
 from pygame import Surface, Rect
 
 import operator as ops
+from copy import deepcopy
 
 from src import inputs
 from src import sprites
@@ -39,6 +40,7 @@ from src import frames
 
 HEL16 = pygame.font.SysFont("Helvetica", 16)
 
+TEMPLATES = {}
 ACTORS = {}
 
 operators = {
@@ -66,7 +68,15 @@ def load():
     from src.lib import ACTORS as A
 
     for name in A.ACTORS.keys():
+        TEMPLATES[name] = A.ACTORS[name]
+    for name in A.ACTORS.keys():
         ACTORS[name] = Actor(A.ACTORS[name])
+
+def add_actor_from_template(template_name, updated_values={}):
+     template = deepcopy(TEMPLATES[template_name])
+     for key in updated_values.keys():
+         if key not in template: continue
+         template[key] = updated_values[key]
 
 def get_actor(name):
     return ACTORS[name]
@@ -88,7 +98,9 @@ class Actor(Rect):
         for key in template["sprites"]:
             self.sprites[key] = sprites.get_sprite(template["sprites"][key])
         self.spriteoffset = (0, 0) if "spriteoffset" not in template else template["spriteoffset"]
-        
+
+        self._input_name = None # change in script
+
         self.state = "START"
         self.frame = 0
         self.direction = 1
@@ -295,9 +307,15 @@ class Actor(Rect):
                             cmd[idx] = None
 
                     if token.startswith("inp"):
+                        if self._input_name is None:
+                            cmd[idx] = 0 if token != "inpEVENTS" else []
+                            #raise Exception("Actor without input name attemptint to read input {}".format(token))
+                            continue
                         inp = token[3:]
-                        if inp in inputs.STATE:
-                            cmd[idx] = inputs.STATE[inp]
+                        state = inputs.get_state(self._input_name)
+                        if state is None: continue
+                        if inp in state:
+                            cmd[idx] = state[inp]
 
                 except Exception as e:
                     logfunc("Error evaluating {} {}... {}".format(token, cmd_idx, e))
@@ -362,6 +380,7 @@ class Actor(Rect):
                     actor = self if actor == "self" else get_actor(actor)
                     frame.focus = actor
             except Exception as e:
+                print(script[cmd_idx])
                 logfunc("Error resolving {} {}... {}".format(verb, cmd_idx, e))
 
             cmd_idx += 1

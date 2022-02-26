@@ -46,12 +46,15 @@ def set_up(loadscripts=False):
     if splitscreen:
         frames.add_frame("MAIN", (W//2, H))
         frames.add_frame("MAIN2", (W//2, H))
+        inputs.add_state("PLAYER1")
+        inputs.add_state("PLAYER2")
         G["FRAMEMAP"] = {
             "MAIN": (0, 0),
             "MAIN2": (W//2, 0)
         }
     else:
         frames.add_frame("MAIN", (W, H))
+        inputs.add_state("PLAYER1")
         G["FRAMEMAP"] = {
             "MAIN": (0, 0),
         }
@@ -81,7 +84,7 @@ def run(G):
         pygame.display.update()
         if "PRINTER" in G:
             G["PRINTER"].save_surface(G["SCREEN"])
-            if "CLIP" in inputs.STATE["EVENTS"]:
+            if any(["CLIP" in inputs.get_state(state)["EVENTS"] for state in inputs.STATES]):
                 G["PRINTER"].save_em()
                 G["PRINTER"].make_gif()
                 G["PRINTER"].clear_em()
