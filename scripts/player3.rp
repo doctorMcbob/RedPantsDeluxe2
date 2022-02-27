@@ -35,7 +35,7 @@ LONGJUMP:8 glasseslongjump2
 
 |START:0|
 # welcome to red pants script :)
-set self _input_name PLAYER2
+set self _input_name PLAYER3
 set self state IDLE
 set self frame 0
 set self speed 8
@@ -58,7 +58,7 @@ set self slideflipxmod 3
 set self slideflipstrength -24
 set self longjumpystrength -9
 set self longjumpxstrength 12
-focus MAIN2 self
+focus MAIN3 self
 
 |IDLE:0|
 exec checkAir

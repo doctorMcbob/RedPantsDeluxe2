@@ -98,6 +98,7 @@ if self.x_vel != 0 and inpA
    set self state LONGJUMPSTART
    set self frame 0
 endif
+set self frame 0
 
 |LONGJUMPSTART:0|
 exec checkAir
