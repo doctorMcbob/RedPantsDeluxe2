@@ -72,11 +72,12 @@ def load():
     for name in A.ACTORS.keys():
         ACTORS[name] = Actor(A.ACTORS[name])
 
-def add_actor_from_template(template_name, updated_values={}):
-     template = deepcopy(TEMPLATES[template_name])
-     for key in updated_values.keys():
-         if key not in template: continue
-         template[key] = updated_values[key]
+def add_actor_from_template(actor_name, template_name, updated_values={}):
+    template = deepcopy(TEMPLATES[template_name])
+    for key in updated_values.keys():
+        if key not in template: continue
+        template[key] = updated_values[key]
+    ACTORS[actor_name] = Actor(template)
 
 def get_actor(name):
     return ACTORS[name]

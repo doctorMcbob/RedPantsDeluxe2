@@ -43,6 +43,7 @@ def set_up(loadscripts=False):
     if loadscripts:
         update_all_scripts(actor)
     splitscreen = "-S" in sys.argv
+        
     if splitscreen:
         frames.add_frame("MAIN", (W//2, H))
         frames.add_frame("MAIN2", (W//2, H))
@@ -59,22 +60,22 @@ def set_up(loadscripts=False):
             "MAIN": (0, 0),
         }
         
-        
-    G["FRAME"] = "MAIN"
+
     G["CLOCK"] = pygame.time.Clock()
     G["DEBUG"] = "-d" in sys.argv
     return G
 
-def run(G):
+def run(G, noquit=False):
     while True:
-        inputs.update()
+        if inputs.update(noquit) == "QUIT":
+            return
         world = G["WORLDS"].get_world(G["WORLD"])
         world.update()
         for name in G["FRAMEMAP"]:
             frame = G["FRAMES"].get_frame(name)
             frame.update()
             position = G["FRAMEMAP"][name]
-            drawn = frame.drawn(world, DEBUG=G) if G["DEBUG"] else frame.drawn(world)
+            drawn = frame.drawn(world, DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn(world)
             G["SCREEN"].blit(drawn, position)
 
         # maybe remove FPS counter before release, dont worry about it for a while though

@@ -3,6 +3,10 @@ from pygame import Surface, Rect
 
 FRAMES = {}
 
+def clear():
+    global FRAMES
+    FRAMES = {}
+
 def add_frame(name, size, position=(0, 0), focus=None):
     FRAMES[name] = Frame(size, position, focus)
 

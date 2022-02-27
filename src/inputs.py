@@ -53,11 +53,12 @@ def update(noquit=False):
 
             if e.type == KEYDOWN:
                 if e.key == K_RETURN: state["EVENTS"].append("CLIP")
-                if e.key == K_ESCAPE: sys.exit()
+                if e.key == K_ESCAPE: return "QUIT" if noquit else sys.exit()
                 for key in inp_map:
                     if e.key == inp_map[key]:
                         state[key] = 1
                         state["EVENTS"].append("{}_DOWN".format(key))
+
             if e.type == KEYUP:
                 for key in inp_map:
                     if e.key == inp_map[key]:
@@ -69,6 +70,7 @@ def update(noquit=False):
                     if e.button == inp_map[key]:
                         state[key] = 1
                         state["EVENTS"].append("{}_DOWN".format(key))
+
             if e.type == JOYBUTTONUP and state["JOY"] is not None:
                 for key in inp_map:
                     if e.button == inp_map[key]:
