@@ -5,6 +5,7 @@ import os
 
 from src import inputs
 from src.editor import template_from_script, SCRIPT_LOCATION
+from src import menu
 
 def update_all_scripts(actors):
     filenames = []
@@ -20,7 +21,7 @@ def set_up(loadscripts=False):
     pygame.init()
     W = 1152 if "-w" not in sys.argv else int(sys.argv[sys.argv.index("-w")+1])
     H = 640 if "-h" not in sys.argv else int(sys.argv[sys.argv.index("-h")+1])
-    G = {}
+    G = {"W":W,"H":H}
     G["SCREEN"] = pygame.display.set_mode((W, H)) if "-f" not in sys.argv else pygame.display.set_mode((W, H), pygame.FULLSCREEN)
     pygame.display.set_caption("Red Pants Deluxe 2")
     G["HEL32"] = pygame.font.SysFont("Helvetica", 32)
@@ -42,25 +43,11 @@ def set_up(loadscripts=False):
     actor.load()
     if loadscripts:
         update_all_scripts(actor)
-    splitscreen = "-S" in sys.argv
-        
-    if splitscreen:
-        frames.add_frame("MAIN", (W//2, H))
-        frames.add_frame("MAIN2", (W//2, H))
-        inputs.add_state("PLAYER1")
-        inputs.add_state("PLAYER2")
-        G["FRAMEMAP"] = {
-            "MAIN": (0, 0),
-            "MAIN2": (W//2, 0)
-        }
-    else:
-        frames.add_frame("MAIN", (W, H))
-        inputs.add_state("PLAYER1")
-        G["FRAMEMAP"] = {
-            "MAIN": (0, 0),
-        }
-        
 
+    G["INPUTS"] = inputs
+    G["FRAMES"] = frames
+    menu.run_controller_menu(G)
+    
     G["CLOCK"] = pygame.time.Clock()
     G["DEBUG"] = "-d" in sys.argv
     return G

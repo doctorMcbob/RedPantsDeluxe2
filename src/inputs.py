@@ -25,15 +25,24 @@ DEFAULT_MAP = {
     "DOWN"   : K_DOWN,
     "LEFT"   : K_LEFT,
     "RIGHT"  : K_RIGHT,
+    "START"  : K_RETURN,
     "A"      : K_z,
     "B"      : K_x,
     "X"      : K_a,
     "Y"      : K_s,
 }
+DEFAULT_CONTROLLER_MAP = {
+    "A"      : 0,
+    "B"      : 1,
+    "X"      : 2,
+    "Y"      : 3,
+    "START"  : 10
+}
 
-
-def add_state(name, inp_map=DEFAULT_MAP):
+def add_state(name, inp_map=DEFAULT_MAP, joy=None):
     STATES[name] = deepcopy(STATE_TEMPLATE)
+    if joy is not None:
+        STATES[name]["JOY"] = joy
     KEY_MAPS[name] = deepcopy(inp_map)
 
 def get_state(name):
@@ -52,7 +61,7 @@ def update(noquit=False):
                 return "QUIT" if noquit else sys.exit()
 
             if e.type == KEYDOWN:
-                if e.key == K_RETURN: state["EVENTS"].append("CLIP")
+                if e.key == K_PERIOD: state["EVENTS"].append("CLIP")
                 if e.key == K_ESCAPE: return "QUIT" if noquit else sys.exit()
                 for key in inp_map:
                     if e.key == inp_map[key]:
@@ -65,22 +74,21 @@ def update(noquit=False):
                         state[key] = 0
                         state["EVENTS"].append("{}_UP".format(key))
 
-            if e.type == JOYBUTTONDOWN and state["JOY"] is not None:
+            if e.type == JOYBUTTONDOWN and state["JOY"] is not None and e.instance_id == state["JOY"].get_instance_id():
                 for key in inp_map:
                     if e.button == inp_map[key]:
                         state[key] = 1
                         state["EVENTS"].append("{}_DOWN".format(key))
 
-            if e.type == JOYBUTTONUP and state["JOY"] is not None:
+            if e.type == JOYBUTTONUP and state["JOY"] is not None and e.instance_id == state["JOY"].get_instance_id():
                 for key in inp_map:
                     if e.button == inp_map[key]:
-                        state[key] = 1
+                        state[key] = 0
                         state["EVENTS"].append("{}_UP".format(key))
 
-        if state["JOY"] is not None:
-            joy = state["JOY"]
-            for idx in range(joy.get_num_axes()):
-                dx, dy = joy.get_axis(idx)
+            if e.type == JOYHATMOTION and state["JOY"] is not None and e.instance_id == state["JOY"].get_instance_id():
+                dx, dy = state["JOY"].get_hat(e.hat)
+
                 if dy == 1:
                     if state["UP"] == 0:
                         state["EVENTS"].append("UP DOWN")
@@ -89,10 +97,11 @@ def update(noquit=False):
                     if state["DOWN"] == 0:
                         state["EVENTS"].append("DOWN DOWN")
                     state["DOWN"] = 1
+
                 if state["UP"] == 1 and dy != 1:
                     state["EVENTS"].append("UP UP")
                     state["UP"] = 0
-                if state["DOWN"] == 1 and dy != 1:
+                if state["DOWN"] == 1 and dy != -1:
                     state["EVENTS"].append("DOWN UP")
                     state["DOWN"] = 0
 
@@ -100,13 +109,14 @@ def update(noquit=False):
                     if state["RIGHT"] == 0:
                         state["EVENTS"].append("RIGHT DOWN")
                     state["RIGHT"] = 1
-                if dy == -1:
+                if dx == -1:
                     if state["LEFT"] == 0:
                         state["EVENTS"].append("LEFT DOWN")
-                    state["DOWN"] = 1
-                if state["RIGHT"] == 1 and dy != 1:
+                    state["LEFT"] = 1
+
+                if state["RIGHT"] == 1 and dx != 1:
                     state["EVENTS"].append("RIGHT UP")
                     state["RIGHT"] = 0
-                if state["LEFT"] == 1 and dy != 1:
+                if state["LEFT"] == 1 and dx != -1:
                     state["EVENTS"].append("LEFT UP")
                     state["LEFT"] = 0
