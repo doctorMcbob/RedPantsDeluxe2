@@ -37,7 +37,7 @@ def set_up(loadscripts=False):
     G["PRINTER"] = printer
     G["WORLDS"] = worlds
     G["FRAMES"] = frames
-    G["WORLD"] = worlds.root if "-r" not in sys.argv else sys.argv[sys.argv.index("-r")+1]
+    G["ROOT"] = worlds.root if "-r" not in sys.argv else sys.argv[sys.argv.index("-r")+1]
     sprites.load()
     worlds.load()
     actor.load()
@@ -56,13 +56,16 @@ def run(G, noquit=False):
     while True:
         if inputs.update(noquit) == "QUIT":
             return
-        world = G["WORLDS"].get_world(G["WORLD"])
-        world.update()
+
+        worlds_updated = []
         for name in G["FRAMEMAP"]:
             frame = G["FRAMES"].get_frame(name)
+            if frame.world not in worlds_updated:
+                frame.world.update()
+                worlds_updated.append(frame.world)
             frame.update()
             position = G["FRAMEMAP"][name]
-            drawn = frame.drawn(world, DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn(world)
+            drawn = frame.drawn(DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn()
             G["SCREEN"].blit(drawn, position)
 
         # maybe remove FPS counter before release, dont worry about it for a while though

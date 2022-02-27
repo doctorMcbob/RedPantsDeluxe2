@@ -7,19 +7,21 @@ def clear():
     global FRAMES
     FRAMES = {}
 
-def add_frame(name, size, position=(0, 0), focus=None):
-    FRAMES[name] = Frame(size, position, focus)
+def add_frame(name, world, size, position=(0, 0), focus=None):
+    FRAMES[name] = Frame(world, size, position, focus)
 
 def get_frame(name):
     return FRAMES[name]
 
 class Frame(object):
     # focus should be an actor if not None
-    def __init__(self, size, position=(0, 0), focus=None):
+    def __init__(self, world, size, position=(0, 0), focus=None):
         self.scroll_x = position[0]
         self.scroll_y = position[1]
 
         self.w, self.h = size
+
+        self.world = world
 
         self.focus = focus # can changed toggled with scripts
         
@@ -29,9 +31,9 @@ class Frame(object):
     def scroll(self, position):
         return (position[0] - self.scroll_x, position[1] - self.scroll_y)
 
-    def drawn(self, world, DEBUG=False):
+    def drawn(self, DEBUG=False):
         surf = Surface((self.w, self.h))
-        world.draw(surf, self, DEBUG=DEBUG)
+        self.world.draw(surf, self, DEBUG=DEBUG)
         return surf
 
     def update(self):
