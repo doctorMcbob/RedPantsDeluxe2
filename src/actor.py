@@ -34,11 +34,10 @@ from pygame import Surface, Rect
 import operator as ops
 from copy import deepcopy
 
+from src import worlds
 from src import inputs
 from src import sprites
 from src import frames
-
-HEL16 = pygame.font.SysFont("Helvetica", 16)
 
 TEMPLATES = {}
 ACTORS = {}
@@ -162,10 +161,7 @@ class Actor(Rect):
             
         placeholder = Surface((self.w, self.h))
         placeholder.fill((1, 255, 1))
-        placeholder.blit(
-            HEL16.render("{}:{}".format(self.state, self.frame), 0, (0, 0, 0)),
-            (0, 0)
-        )
+        
         return placeholder
 
     def update(self, world):
@@ -380,6 +376,19 @@ class Actor(Rect):
                     actor = cmd.pop(0)
                     actor = self if actor == "self" else get_actor(actor)
                     frame.focus = actor
+                if verb == "view":
+                    frame = frames.get_frame(cmd.pop(0))
+                    newworld = worlds.get_world(cmd.pop(0))
+                    frame.world = newworld
+                if verb == "move":
+                    name = cmd.pop(0)
+                    if name == "self": name = self.name
+                    if name not in world.actors:
+                        raise Exception("{} not in world".format(name))
+                    world.actors.remove(name)
+                    newworld = worlds.get_world(cmd.pop())
+                    newworld.actors.append(name)
+                
             except Exception as e:
                 print(script[cmd_idx])
                 logfunc("Error resolving {} {}... {}".format(verb, cmd_idx, e))

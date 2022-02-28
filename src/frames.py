@@ -1,6 +1,8 @@
 import pygame
 from pygame import Surface, Rect
 
+from src import worlds
+
 FRAMES = {}
 
 def clear():
@@ -21,7 +23,7 @@ class Frame(object):
 
         self.w, self.h = size
 
-        self.world = world
+        self.world = worlds.get_world(world)
 
         self.focus = focus # can changed toggled with scripts
         

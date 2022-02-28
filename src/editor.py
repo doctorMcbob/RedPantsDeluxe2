@@ -17,6 +17,8 @@ WORLDS = {}
 SPRITESHEETS = {}
 ACTORS = {}
 
+WORLD_TEMPLATE = {"actors":[], "background":None}
+
 SAVED = False
 
 IMG_LOCATION = "img/"
@@ -31,17 +33,17 @@ SPLITSCREEN = False
 
 def make_single_player(G):
     frames.clear()
-    frames.add_frame("EDITOR_VIEW", (W, H))
-    frames.add_frame("MAIN", (W, H))
+    frames.add_frame("EDITOR_VIEW", G["WORLD"], (W, H))
+    frames.add_frame("MAIN", G["WORLD"], (W, H))
     G["FRAMEMAP"] = {
         "MAIN": (0, 0),
     }
 
 def make_split_screen(G):
     frames.clear()
-    frames.add_frame("EDITOR_VIEW", (W, H))
-    frames.add_frame("MAIN", (W//2, H))
-    frames.add_frame("MAIN2", (W//2, H))
+    frames.add_frame("EDITOR_VIEW", G["WORLD"], (W, H))
+    frames.add_frame("MAIN", G["WORLD"], (W//2, H))
+    frames.add_frame("MAIN2", G["WORLD"], (W//2, H))
     G["FRAMEMAP"] = {
         "MAIN": (0, 0),
         "MAIN2": (W//2, 0),
@@ -54,7 +56,6 @@ def set_up():
     G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
     G["HEL32"] = pygame.font.SysFont("Helvetica", 32)
     G["WORLD"] = 'root' if "-l" not in sys.argv else sys.argv[sys.argv.index("-l") + 1]
-    frames.add_frame("MAIN", (W, H))
 
     inputs.add_state("PLAYER1")
     inputs.add_state("PLAYER2")
@@ -70,8 +71,10 @@ def set_up():
     G["WORLDS"] = worlds
     G["ACTOR"] = actor
     G["CLOCK"] = pygame.time.Clock()
+    load()
+
     make_single_player(G)
-    
+        
     return G
 
 def draw(G):
@@ -79,15 +82,16 @@ def draw(G):
     frame = frames.get_frame("EDITOR_VIEW")
     frame.scroll_x = CX
     frame.scroll_y = CY
+    
     world = G["WORLDS"].get_world(G["WORLD"])
-    drawn = frame.drawn(world)
+    frame.world = world
+    drawn = frame.drawn()
     pygame.draw.rect(drawn, (255, 0, 0), Rect(make_rect((CORNER[0]-CX, CORNER[1]-CY) if CORNER is not None else (X-CX+16, Y-CY+16), (X-CX, Y-CY))), width=2)
     G["SCREEN"].blit(drawn, (0, 0))
     G["SCREEN"].blit(G["HEL32"].render("WORLD: {}".format(G["WORLD"]), 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 32))
 
 def run(G):
     global CORNER, X, Y, CX, CY, SPLITSCREEN
-    load()
     while True:
         draw(G)
         inp = expect_input()
@@ -111,7 +115,33 @@ def run(G):
         if inp == K_o and mods & KMOD_CTRL:
             load()
 
+
+        if inp == K_w and mods & KMOD_SHIFT:
+            def update(G):
+                draw(G)
+                G["SCREEN"].blit(
+                    G["HEL32"].render("WORLDS:", 0, (0, 0, 0)),
+                    (0, 0)
+                )
+            world_keys = list(WORLDS.keys())
+            world_keys.append("New...")
+            if not world_keys: continue
+            choice = select_from_list(G, world_keys, (0, 32), args=G, cb=update)
+            if not choice: continue
+            if choice != "New...":
+                G["WORLD"] = choice
+                continue
+            draw(G)
+            G["SCREEN"].blit(
+                G["HEL32"].render("New world name:", 0, (0, 0, 0)),
+                (0, 0)
+            )
+            name = get_text_input(G, (0, 32))
+            if name:
+                WORLDS[name] = deepcopy(WORLD_TEMPLATE)
+            
         if inp == K_BACKSPACE:
+            shift = mods & KMOD_SHIFT
             def update(G):
                 draw(G)
                 G["SCREEN"].blit(
@@ -123,7 +153,7 @@ def run(G):
             choice = select_from_list(G, actor_keys, (0, 32), args=G, cb=update)
             if not choice: continue
             WORLDS[G["WORLD"]]["actors"].remove(choice)
-            ACTORS.pop(choice)
+            if shift: ACTORS.pop(choice)
             
         if inp == K_SPACE:
             if CORNER is None:
@@ -151,6 +181,7 @@ def run(G):
             )
             name = get_text_input(G, (0, 32))
             if name is not None:
+                template["name"] = name
                 ACTORS[name] = template
                 G["ACTOR"].TEMPLATES[name] = template
                 G["ACTOR"].add_actor_from_template(name, name)

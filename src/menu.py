@@ -58,31 +58,31 @@ def run_controller_menu(G, cb=lambda *args: None, args=None, noquit=False):
             inmenu = False
 
     if len(players) == 1:
-        G["FRAMES"].add_frame("MAIN", G["WORLDS"].get_world(G["ROOT"]), (G["W"], G["H"]))
+        G["FRAMES"].add_frame("MAIN", G["ROOT"], (G["W"], G["H"]))
         G["FRAMEMAP"] = {
             "MAIN": (0, 0),
         }        
     elif len(players) == 2:
-        G["FRAMES"].add_frame("MAIN", G["WORLDS"].get_world(G["ROOT"]), (G["W"]//2, G["H"]))
-        G["FRAMES"].add_frame("MAIN2", G["WORLDS"].get_world(G["ROOT"]), (G["W"]//2, G["H"]))
+        G["FRAMES"].add_frame("MAIN", G["ROOT"], (G["W"]//2, G["H"]))
+        G["FRAMES"].add_frame("MAIN2", G["ROOT"], (G["W"]//2, G["H"]))
         G["FRAMEMAP"] = {
             "MAIN": (0, 0),
             "MAIN2": (G["W"]//2, 0)
         }
     elif len(players) == 3:
-        G["FRAMES"].add_frame("MAIN", G["WORLDS"].get_world(G["ROOT"]), (G["W"], G["H"]//2))
-        G["FRAMES"].add_frame("MAIN2", G["WORLDS"].get_world(G["ROOT"]), (G["W"]//2, G["H"]//2))
-        G["FRAMES"].add_frame("MAIN3", G["WORLDS"].get_world(G["ROOT"]), (G["W"]//2, G["H"]//2))
+        G["FRAMES"].add_frame("MAIN", G["ROOT"], (G["W"], G["H"]//2))
+        G["FRAMES"].add_frame("MAIN2", G["ROOT"], (G["W"]//2, G["H"]//2))
+        G["FRAMES"].add_frame("MAIN3", G["ROOT"], (G["W"]//2, G["H"]//2))
         G["FRAMEMAP"] = {
             "MAIN": (0, 0),
             "MAIN2": (0, G["H"] // 2),
             "MAIN3": (G["W"] // 2, G["H"] // 2)
         }
     elif len(players) >= 4:
-        G["FRAMES"].add_frame("MAIN", G["WORLDS"].get_world(G["ROOT"]), (G["W"]//2, G["H"]//2))
-        G["FRAMES"].add_frame("MAIN2", G["WORLDS"].get_world(G["ROOT"]), (G["W"]//2, G["H"]//2))
-        G["FRAMES"].add_frame("MAIN3", G["WORLDS"].get_world(G["ROOT"]), (G["W"]//2, G["H"]//2))
-        G["FRAMES"].add_frame("MAIN4", G["WORLDS"].get_world(G["ROOT"]), (G["W"]//2, G["H"]//2))
+        G["FRAMES"].add_frame("MAIN", G["ROOT"], (G["W"]//2, G["H"]//2))
+        G["FRAMES"].add_frame("MAIN2", G["ROOT"], (G["W"]//2, G["H"]//2))
+        G["FRAMES"].add_frame("MAIN3", G["ROOT"], (G["W"]//2, G["H"]//2))
+        G["FRAMES"].add_frame("MAIN4", G["ROOT"], (G["W"]//2, G["H"]//2))
         G["FRAMEMAP"] = {
             "MAIN": (0, 0),
             "MAIN2": (G["W"] // 2, 0),
