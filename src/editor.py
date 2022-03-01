@@ -115,7 +115,19 @@ def run(G):
         if inp == K_o and mods & KMOD_CTRL:
             load()
 
-
+        if inp == K_a and mods & KMOD_SHIFT:
+            def update(G):
+                draw(G)
+                G["SCREEN"].blit(
+                    G["HEL32"].render("Edit Actor:", 0, (0, 0, 0)),
+                    (0, 0)
+                )
+            actor_keys = WORLDS[G["WORLD"]]["actors"]
+            if not actor_keys: continue
+            choice = select_from_list(G, actor_keys, (0, 32), args=G, cb=update)
+            if not choice: continue
+            actor_menu(G, ACTORS[choice])
+            
         if inp == K_w and mods & KMOD_SHIFT:
             def update(G):
                 draw(G)
@@ -395,4 +407,163 @@ def spritesheet_menu(G, filename):
                     sheet[name] = make_rect(corner, (CX, CY))
                     keys = list(sheet.keys())
 
-    
+def drawn_script(G, script, idx=None, offset=0):
+    surf = Surface((812, 32 * len(script)))
+    surf.fill((255, 255, 255))
+    for i, cmd in enumerate(script):
+        surf.blit(G["HEL32"].render(cmd, 0, (0, 0, 0)), (0, i*32))
+        if idx is not None and idx == i+offset:
+            pygame.draw.line(surf, (255, 0, 0), (0, (i*32)-1), (512, (i*32)-1), 2)
+    return surf
+
+def drawn_actor_spritesheet(G, sprites, idx=None, offset=0):
+    surf = Surface((812, 32*len(sprites)))
+    surf.fill((255, 255, 255))
+    for i, key in enumerate(list(sprites.keys())):
+        surf.blit(G["HEL32"].render("{}: {}".format(key, sprites[key]), 0, (0, 0, 0)), (0, i*32))
+        if idx is not None and idx == i+offset:
+            pygame.draw.line(surf, (255, 0, 0), (0, (i*32)-2), (512, (i*32)-2), 2)
+    return surf
+
+def drawn_actor_template(G, template, scroll=0, idx=None):
+    surf = Surface((812, 512))
+    surf.fill((255, 255, 255))
+    x, y = 0, 0-scroll
+    i = 0
+    keys = ["name", "POS", "DIM", "spriteoffset"]
+    for key in keys:
+        surf.blit(G["HEL32"].render(("{}: {}".format(key, template[key])), 0, (0,0,0)), (x, y))
+        if idx is not None and idx == i:
+            pygame.draw.line(surf, (255, 0, 0), (0, y+31), (512, y+31), 2)
+        i += 1
+        y += 32
+
+    spritesheet_data = drawn_actor_spritesheet(G, template["sprites"], idx=idx, offset=i-1)
+    surf.blit(spritesheet_data, (x, y))
+    i += len(template["sprites"])
+    y += spritesheet_data.get_height()
+
+    for key in list(template["scripts"].keys()):
+        surf.blit(G["HEL32"].render(key, 0, (0, 0, 0)), (x+64, y))
+        if idx is not None and idx == i:
+            pygame.draw.line(surf, (255, 0, 0), (0, y+31), (512, y+31), 2)
+        y += 32
+        i += 1
+        script_data = drawn_script(G, template["scripts"][key], idx=idx, offset=i-1)
+        surf.blit(script_data, (x, y))
+        i += len(template["scripts"][key])
+        y += script_data.get_height()
+    return surf
+
+def index_template(template, idx):
+    "returns (type, data)"
+    i = 0
+    keys = ["name", "POS", "DIM", "spriteoffset"]
+    for key in keys:
+        if i == idx:
+            return 'key', key
+        i += 1
+    for sprite in list(template["sprites"].keys()):
+        if i == idx:
+            return 'sprite', sprite
+        i += 1
+    for key in list(template["scripts"].keys()):
+        if i == idx:
+            return 'script name', key
+        i += 1
+        for _i, cmd in enumerate(template["scripts"][key]):
+            if i == idx:
+                return 'cmd', '{}|{}'.format(key, _i)
+            i += 1
+    return None, None
+
+def actor_menu(G, actor_template):
+    scroll = 0
+    idx = 0
+    while True:
+        draw(G)
+        G["SCREEN"].blit(drawn_actor_template(G, actor_template, scroll=scroll, idx=idx), (250, 0))
+
+        inp = expect_input()
+        mods = pygame.key.get_mods()
+
+        if inp == K_ESCAPE and mods & KMOD_CTRL: sys.exit()
+        if inp == K_ESCAPE: return
+
+        if inp == K_DOWN and mods & KMOD_SHIFT: scroll -= 64
+        elif inp == K_DOWN: idx += 1
+        if inp == K_UP and mods & KMOD_SHIFT: scroll += 64
+        elif inp == K_UP: idx -= 1
+
+        if inp in [K_SPACE, K_BACKSPACE]:
+            data_type, data = index_template(actor_template, idx)
+            if data_type == "key":
+                if data == "name":
+                    draw(G)
+                    G["SCREEN"].blit(
+                        G["HEL32"].render("New name", 0, (0, 0, 0)),
+                        (0, 0)
+                    )
+                    new = get_text_input(G, (0, 32))
+                    if not new: continue
+                    actor_template[data] = new
+                else:
+                    draw(G)
+                    G["SCREEN"].blit(
+                        G["HEL32"].render("(A, B) A:", 0, (0, 0, 0)),
+                        (0, 0)
+                    )
+                    A = get_text_input(G, (0, 32), numeric=True)
+                    if not A: continue
+                    draw(G)
+                    G["SCREEN"].blit(
+                        G["HEL32"].render("(A, B) B:", 0, (0, 0, 0)),
+                        (0, 0)
+                    )
+                    B = get_text_input(G, (0, 32), numeric=True)
+                    if not B: continue
+                    actor_template[data] = (A, B)
+                        
+            if data_type == "sprite":
+                def update(G):
+                    draw(G)
+                    G["SCREEN"].blit(
+                        G["HEL32"].render("Select sprite:", 0, (0, 0, 0)),
+                        (0, 0)
+                    )
+                sprite_keys = []
+                for key in SPRITESHEETS.keys():
+                    for sprite in SPRITESHEETS[key].keys():
+                        sprite_keys.append(sprite)
+                if not sprite_keys: continue
+                choice = select_from_list(G, sprite_keys, (0, 32), args=G, cb=update)
+                if not choice: continue
+                actor_template["sprites"][data] = choice
+
+            if data_type == "script name":
+                draw(G)
+                G["SCREEN"].blit(
+                    G["HEL32"].render("Rename Code Block", 0, (0, 0, 0)),
+                    (0, 0)
+                )
+                new = get_text_input(G, (0, 32))
+                if not new: continue
+                actor_template["scripts"][new] = actor_template["scripts"].pop(data)
+
+            if data_type == "cmd":
+                script, index = data.split("|")
+                try:
+                    index = int(index)
+                except ValueError:
+                    continue
+                if inp == K_SPACE:
+                    draw(G)
+                    G["SCREEN"].blit(
+                        G["HEL32"].render("CMD", 0, (0, 0, 0)),
+                        (0, 0)
+                    )
+                    new = get_text_input(G, (0, 32))
+                    if not new: continue
+                    actor_template["scripts"][script].insert(index+1, new)
+                if inp == K_BACKSPACE:
+                    actor_template["scripts"][script].pop(index)
