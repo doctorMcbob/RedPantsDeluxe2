@@ -91,32 +91,32 @@ def update(noquit=False):
 
                 if dy == 1:
                     if state["UP"] == 0:
-                        state["EVENTS"].append("UP DOWN")
+                        state["EVENTS"].append("UP_DOWN")
                     state["UP"] = 1
                 if dy == -1:
                     if state["DOWN"] == 0:
-                        state["EVENTS"].append("DOWN DOWN")
+                        state["EVENTS"].append("DOWN_DOWN")
                     state["DOWN"] = 1
 
                 if state["UP"] == 1 and dy != 1:
-                    state["EVENTS"].append("UP UP")
+                    state["EVENTS"].append("UP_UP")
                     state["UP"] = 0
                 if state["DOWN"] == 1 and dy != -1:
-                    state["EVENTS"].append("DOWN UP")
+                    state["EVENTS"].append("DOWN_UP")
                     state["DOWN"] = 0
 
                 if dx == 1:
                     if state["RIGHT"] == 0:
-                        state["EVENTS"].append("RIGHT DOWN")
+                        state["EVENTS"].append("RIGHT_DOWN")
                     state["RIGHT"] = 1
                 if dx == -1:
                     if state["LEFT"] == 0:
-                        state["EVENTS"].append("LEFT DOWN")
+                        state["EVENTS"].append("LEFT_DOWN")
                     state["LEFT"] = 1
 
                 if state["RIGHT"] == 1 and dx != 1:
-                    state["EVENTS"].append("RIGHT UP")
+                    state["EVENTS"].append("RIGHT_UP")
                     state["RIGHT"] = 0
                 if state["LEFT"] == 1 and dx != -1:
-                    state["EVENTS"].append("LEFT UP")
+                    state["EVENTS"].append("LEFT_UP")
                     state["LEFT"] = 0
