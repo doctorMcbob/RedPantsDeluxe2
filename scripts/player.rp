@@ -92,8 +92,14 @@ exec checkAir
 exec applyTraction
 exec applyGrav
 if not inpDOWN
-   set self state IDLE
-   set self frame 0
+   if self.x_vel == 0
+      set self state IDLE
+      set self frame 0
+   endif
+   if self.x_vel != 0
+      set self state SLIDE
+      set self frame 0
+   endif
 endif
 # bufferable pog?
 if self.x_vel != 0 and inpA

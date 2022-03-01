@@ -97,8 +97,14 @@ if not inpDOWN
 endif
 # bufferable pog?
 if self.x_vel != 0 and inpA
-   set self state LONGJUMPSTART
-   set self frame 0
+   if self.x_vel == 0
+      set self state IDLE
+      set self frame 0
+   endif
+   if self.x_vel != 0
+      set self state SLIDE
+      set self frame 0
+   endif
 endif
 set self frame 0
 
