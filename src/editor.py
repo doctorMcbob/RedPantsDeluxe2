@@ -495,6 +495,19 @@ def actor_menu(G, actor_template):
         if inp == K_UP and mods & KMOD_SHIFT: scroll += 64
         elif inp == K_UP: idx -= 1
 
+        if inp == K_s and mods & KMOD_SHIFT:
+            draw(G)
+            G["SCREEN"].blit(
+                G["HEL32"].render("Save as? /scripts/{your input}.rp", 0, (0, 0, 0)),
+                (0, 0))
+            filename = get_text_input(G, (0, 32))
+            if not filename: continue
+            try:
+                with open(SCRIPT_LOCATION + filename + ".rp", "w") as f:
+                    f.write(export_as_rp_script(actor_template))
+            except IOError:
+                continue
+            
         if inp in [K_SPACE, K_BACKSPACE]:
             data_type, data = index_template(actor_template, idx)
             if data_type == "key":
@@ -567,3 +580,18 @@ def actor_menu(G, actor_template):
                     actor_template["scripts"][script].insert(index+1, new)
                 if inp == K_BACKSPACE:
                     actor_template["scripts"][script].pop(index)
+
+def export_as_rp_script(template):
+    name = template["name"]
+    x, y = template["POS"]
+    w, h = template["DIM"]
+    tangible = template["tangible"]
+    offx, offy = template["spriteoffset"]
+    # look, im sorry
+    RPS = "{}|{},{},{},{}|{}|{},{}|".format(name, x, y, w, h, tangible, offx, offy)
+    for key in template["sprites"]:
+        RPS += "\n{} {}".format(key, template["sprites"][key])
+    for key in template["scripts"]:
+        RPS += "\n|{}|\n{}\n".format(key, "\n".join(template["scripts"][key]))
+    return RPS
+

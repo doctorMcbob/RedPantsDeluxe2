@@ -4,7 +4,6 @@ DOOR:0 door0
 
 |START:0|
 set self state DOOR
-set self frame 0
 
 |DOOR:0|
 set self frame 0
@@ -13,4 +12,6 @@ set self frame 0
 if UP_DOWN in inpEVENTS 
    move self root
    view self.frame_name root
+   set self respawnx self.x
+   set self respawny self.y
 endif

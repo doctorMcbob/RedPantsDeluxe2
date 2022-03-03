@@ -12,4 +12,6 @@ set self frame 0
 if UP_DOWN in inpEVENTS 
    move self world2
    view self.frame_name world2
+   set self respawnx self.x
+   set self respawny self.y
 endif

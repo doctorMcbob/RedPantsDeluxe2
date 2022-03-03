@@ -104,18 +104,24 @@ class Actor(Rect):
         self.state = "START"
         self.frame = 0
         self.direction = 1
-
+        self.rotation = 0
+        
         self.platform = False # scripts will flip this for platform draw
         
         self.tangible = False if "tangible" not in template else template["tangible"]
 
     def _index(self, data):
-        _frame = self.frame
-        while _frame >= 0:
-            name = "{}:{}".format(self.state, _frame)
-            if name in data: return data[name]
-            _frame -= 1
-        return None
+        bestkey = None
+        bestframe = None
+        for key in data.keys():
+            if ":" not in key: continue
+            state, frame = key.split(":")
+            frame = int(frame)
+            if state == self.state:
+                if frame <= self.frame and (bestframe is None or bestframe < frame):
+                    bestkey = key
+                    bestframe = frame
+        return None if bestkey is None else data[bestkey]
 
     def get_hitboxes(self):
         return self._index(self.hitboxes)
@@ -156,7 +162,9 @@ class Actor(Rect):
         sprite = sprites.get_sprite(self.img) if self.img is not None else self._index(self.sprites)
         if sprite is not None:
             if self.direction == 1:
-                return pygame.transform.flip(sprite, 1, 0)
+                sprite = pygame.transform.flip(sprite, 1, 0)
+            if self.rotation != 0:
+                sprite = pygame.transform.rotate(sprite, self.rotation)
             return sprite
             
         placeholder = Surface((self.w, self.h))

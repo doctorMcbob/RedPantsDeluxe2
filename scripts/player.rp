@@ -33,6 +33,7 @@ CROUCH:0 redpantscrouch
 LONGJUMPSTART:0 redpantslongjumpstart
 LONGJUMP:0 redpantslongjump1
 LONGJUMP:8 redpantslongjump2
+DEAD:0 redpantsdead
 
 |START:0|
 # welcome to red pants script :)
@@ -62,6 +63,22 @@ set self longjumpxstrength 12
 focus MAIN self
 set self frame_name MAIN
 
+set self can_die 1
+set self respawnx self.x
+set self respawny self.y
+
+|DEAD:0|
+set self x_vel 0
+set self y_vel 0
+set self can_die 0
+
+|DEAD:45|
+set self state IDLE
+self self frame 0
+set self x self.respawnx
+set self y self.respawny
+set self can_die 1
+
 |IDLE:0|
 exec checkAir
 if self.x_vel != 0
@@ -80,7 +97,7 @@ if self.y_vel == 0
    endif
 endif
 exec checkCrouch
-exec checkJump
+     exec checkJump
 exec applyGrav
 
 |IDLE:32|
