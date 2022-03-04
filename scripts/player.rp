@@ -210,17 +210,11 @@ endif
 set self calc1 self.y_vel > self.airspeedcontrol
 set self calc2 self.airspeedcontrol * -1 > self.y_vel
 if not self.calc1 nor self.calc2
-   if inpLEFT
+   if self.x_vel - self.airdrift > self.negspeed and inpLEFT
 	set self x_vel self.x_vel - self.airdrift
-   	if self.x_vel < self.negspeed
-      	   set self x_vel self.negspeed
-   	endif
    endif
-   if inpRIGHT
+   if self.x_vel + self.airdrift < self.speed and inpRIGHT
       set self x_vel self.x_vel + self.airdrift
-      if self.x_vel > self.speed
-      	 set self x_vel self.speed
-      endif
    endif
    if B_DOWN in inpEVENTS
       set self state DIVESTART
