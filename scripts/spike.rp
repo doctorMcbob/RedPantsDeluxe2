@@ -1,0 +1,16 @@
+DOOR|0,0,0,0|False|0,0|
+START:0 spike
+SPIKE:0 spike
+
+|START:0|
+set self state SPIKE
+set self rotation 0
+
+|SPIKE:0|
+set self frame 0
+
+|COLLIDE|
+if self.can_die
+   set self state DEAD
+   set self frame 0
+endif

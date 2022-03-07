@@ -1,0 +1,15 @@
+WALKOFF|0,0,0,0|False|0,0|
+WALKOFF:0 empty
+
+|START:0|
+set self state WALKOFF
+
+|WALKOFF:0|
+set self frame 0
+
+|COLLIDE|
+move self world1
+view self.frame_name world1
+set self respawnx self.x
+set self respawny self.y
+

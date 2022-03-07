@@ -1,39 +1,37 @@
-REDPANTSGUY|128,256,32,64|True|-16,0|
-START:0 redpantsstand
-IDLE:0 redpantsstand
-RUNNING:0 redpantsrun0
-RUNNING:4 redpantsrun1
-RUNNING:8 redpantsrun2
-RUNNING:12 redpantsrun3
-AIRIAL:0 redpantsjump1
-SLIDE:0 redpantsslide0
-LANDING:0 redpantsland
-JUMPSQUAT:0 redpantsjumpsquat0
-JUMPSQUAT:3 redpantsjumpsquat1
-FLIPSQUAT:0 redpantsjumpsquat0
-FLIPSQUAT:3 redpantsjumpsquat1
-DIVESTART:0 redpantsdivestart
-DIVE:0 redpantsdive
-DIVELAND:0 redpantsdiveland
-ROLLOUT:0 redpantsrollout
-BONK:0 redpantsbonk
-BONKLAND:0 redpantsbonkland0
-BONKLAND:12 redpantsbonkland1
-WALLTOUCH:0 redpantswalljump0
-WALLJUMP:0 redpantswalljump1
-WALLJUMP:3 redpantswalljump2
-SLIDEFLIP:0 redpantsdiveflip0
-SLIDEFLIP:8 redpantsdiveflip1
-SLIDEFLIP:10 redpantsdiveflip2
-SLIDEFLIP:14 redpantsdiveflip3
-SLIDEFLIP:18 redpantsdiveflip4
-SLIDEFLIP:20 redpantsdiveflip5
-SLIDEFLIP:23 redpantsdiveflip6
-CROUCH:0 redpantscrouch
-LONGJUMPSTART:0 redpantslongjumpstart
-LONGJUMP:0 redpantslongjump1
-LONGJUMP:8 redpantslongjump2
-DEAD:0 redpantsdead
+REDPANTSGUY|128,256,32,64|True|-32,-16|
+START:0 antlerstand
+IDLE:0 antlerstand
+RUNNING:0 antlerrun0
+RUNNING:4 antlerrun1
+RUNNING:8 antlerrun2
+RUNNING:12 antlerrun3
+AIRIAL:0 antlerjump1
+FLYSTART:0 antlerdivestart
+FLYLAND:0 antlerdiveland
+SLIDE:0 antlerslide0
+LANDING:0 antlerland
+JUMPSQUAT:0 antlerjumpsquat0
+JUMPSQUAT:3 antlerjumpsquat1
+FLIPSQUAT:0 antlerjumpsquat0
+FLIPSQUAT:3 antlerjumpsquat1
+BONK:0 antlerbonk
+BONKLAND:0 antlerbonkland0
+BONKLAND:12 antlerbonkland1
+WALLTOUCH:0 antlerwalljump0
+WALLJUMP:0 antlerwalljump1
+WALLJUMP:3 antlerwalljump2
+SLIDEFLIP:0 antlersideflip0
+SLIDEFLIP:8 antlersideflip1
+SLIDEFLIP:10 antlersideflip2
+SLIDEFLIP:14 antlersideflip3
+SLIDEFLIP:18 antlersideflip4
+SLIDEFLIP:20 antlersideflip5
+SLIDEFLIP:23 antlersideflip6
+CROUCH:0 antlercrouch
+LONGJUMPSTART:0 antlerlongjump0
+LONGJUMP:0 antlerlongjump1
+LONGJUMP:8 antlerlongjump2
+DEAD:0 antlerdead
 
 |START:0|
 # welcome to red pants script :)
@@ -174,7 +172,7 @@ if self.x_vel != 0
    exec applyTraction
    set self absxvel abs self.x_vel
    if abs self.traction * 10 > self.absxvel
-      img redpantsslide1
+      img antlerslide1
    endif
    exec checkCrouch
    exec checkJump
@@ -217,15 +215,15 @@ if not self.calc1 nor self.calc2
       set self x_vel self.x_vel + self.airdrift
    endif
    if B_DOWN in inpEVENTS
-      set self state DIVESTART
+      set self state FLYSTART
       set self frame 0
    endif
 endif
 if self.calc1
-   img redpantsjump2
+   img antlerjump2
 endif
 if self.calc2
-   img redpantsjump0
+   img antlerjump0
 endif
 exec applyGrav
 
@@ -265,18 +263,58 @@ if self.x_vel == 0
    exec IDLE:0
 endif
 
-|DIVESTART:0|
+|FLYSTART:0|
 set self y_vel 0
 set self x_vel 0
 
-|DIVESTART:5|
+|FLYSTART:9|
 set self x_vel self.divestrength * self.direction
-set self state DIVE
+set self state FLY
+set self flyangle 0
 
-|DIVE:0|
+|FLY:0|
 exec applyGrav
+set self calc self.direction == -1 and inpRIGHT
+set self calc self.direction == 1 and inpLEFT or self.calc
+if self.calc
+   set self flyangle self.flyangle - 1
+   if self.flyangle < -2
+      set self flyangle -2
+   endif
+endif
 
-|DIVELAND:0|
+set self calc self.direction == 1 and inpRIGHT
+set self calc self.direction == -1 and inpLEFT or self.calc
+if self.calc
+   set self flyangle self.flyangle + 1
+   if self.flyangle > 2
+      set self flyangle 2
+   endif
+endif
+
+if self.flyangle == 0
+   img antlerfly0
+endif
+
+if self.flyangle == 1
+   img antlerflyup0
+endif
+
+if self.flyangle == 2
+   img antlerflyup1
+endif
+
+if self.flyangle == -1
+   img antlerflydown0
+endif
+
+if self.flyangle == -2
+   img antlerflydown1
+endif
+
+endif
+
+|FLYLAND:0|
 exec checkAir
 exec applyTraction
 exec applyGrav
@@ -362,8 +400,8 @@ endif
 
 
 |XCOLLISION|
-set self calc1 self.state == DIVE
-set self calc1 self.state == DIVELAND or self.calc1
+set self calc1 self.state == FLY
+set self calc1 self.state == FLYLAND or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1
 if self.state == ROLLOUT or self.calc1
    set self state BONK
@@ -389,8 +427,8 @@ if self.state == AIRIAL or self.calc1
    set self state LANDING
    set self frame 0
 endif
-if self.state == DIVE
-   set self state DIVELAND
+if self.state == FLY
+   set self state FLYLAND
    set self frame 0
 endif
 if self.state == BONK
