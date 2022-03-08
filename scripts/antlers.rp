@@ -7,6 +7,7 @@ RUNNING:8 antlerrun2
 RUNNING:12 antlerrun3
 AIRIAL:0 antlerjump1
 FLYSTART:0 antlerdivestart
+FLY:0  antlerfly0
 FLYLAND:0 antlerdiveland
 SLIDE:0 antlerslide0
 LANDING:0 antlerland
@@ -41,7 +42,7 @@ set self frame 0
 set self speed 8
 set self jumpstrength -17
 set self hopstrength -12
-set self divestrength 14
+set self flystrength 14
 set self rolloutstrength -8
 set self bonkstrength 2
 set self walljumpstrength -12
@@ -60,6 +61,7 @@ set self longjumpystrength -9
 set self longjumpxstrength 12
 focus MAIN self
 set self frame_name MAIN
+set self flybuffer 4
 
 set self can_die 1
 set self respawnx self.x
@@ -268,50 +270,65 @@ set self y_vel 0
 set self x_vel 0
 
 |FLYSTART:9|
-set self x_vel self.divestrength * self.direction
 set self state FLY
 set self flyangle 0
 
 |FLY:0|
-exec applyGrav
-set self calc self.direction == -1 and inpRIGHT
-set self calc self.direction == 1 and inpLEFT or self.calc
-if self.calc
-   set self flyangle self.flyangle - 1
-   if self.flyangle < -2
-      set self flyangle -2
-   endif
-endif
 
-set self calc self.direction == 1 and inpRIGHT
-set self calc self.direction == -1 and inpLEFT or self.calc
-if self.calc
+set self calc1 self.direction == 1
+set self calc2 self.frame > self.flybuffer and inpLEFT and self.calc1
+set self calc3 self.direction == -1
+set self calc4 self.frame > self.flybuffer and inpRIGHT and self.calc3
+
+if self.calc2 or self.calc4
+   set self frame 0
    set self flyangle self.flyangle + 1
    if self.flyangle > 2
       set self flyangle 2
    endif
 endif
 
+set self calc1 self.direction == -1
+set self calc2 self.frame > self.flybuffer and inpLEFT and self.calc1
+set self calc3 self.direction == 1
+set self calc4 self.frame > self.flybuffer and inpRIGHT and self.calc3
+
+if self.calc2 or self.calc4
+   set self frame 0
+   set self flyangle self.flyangle - 1
+   if self.flyangle < -2
+      set self flyangle -2
+   endif
+endif
+
 if self.flyangle == 0
    img antlerfly0
+   set self y_vel 0
+   set self x_vel self.flystrength * self.direction
 endif
 
 if self.flyangle == 1
    img antlerflyup0
+   set self y_vel 0 - self.flystrength / 3
+   set self x_vel self.flystrength * self.direction / 3 * 2
 endif
 
 if self.flyangle == 2
    img antlerflyup1
+   set self y_vel 0 - self.flystrength
+   set self x_vel self.flystrength * self.direction / 3
 endif
 
 if self.flyangle == -1
    img antlerflydown0
+   set self y_vel self.flystrength / 3
+   set self x_vel self.flystrength * self.direction / 3 * 3.5
 endif
 
 if self.flyangle == -2
    img antlerflydown1
-endif
-
+   set self y_vel self.flystrength
+   set self x_vel self.flystrength * self.direction / 3
 endif
 
 |FLYLAND:0|
