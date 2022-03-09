@@ -417,14 +417,17 @@ endif
 
 
 |XCOLLISION|
-set self calc1 self.state == FLY
+set self calc1 abs self.flyangle != 2
+set self calc1 self.state == FLY and self.calc1
 set self calc1 self.state == FLYLAND or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1
 if self.state == ROLLOUT or self.calc1
    set self state BONK
    set self frame 0
 endif
-set self calc1 self.state == SLIDEFLIP
+set self calc1 abs self.flyangle == 2
+set self calc1 self.state == FLY and self.calc1
+set self calc1 self.state == SLIDEFLIP or self.calc1
 if self.state == AIRIAL or self.calc1
    set self state WALLTOUCH
    set self frame 0
