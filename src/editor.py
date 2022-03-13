@@ -11,11 +11,14 @@ from src import inputs
 from src import frames
 from src import game
 from src import sprites
+from src import scripts
 from src.utils import expect_input, select_from_list, get_text_input
 
 WORLDS = {}
 SPRITESHEETS = {}
 ACTORS = {}
+SCRIPTS = {}
+SPRITEMAPS = {}
 
 WORLD_TEMPLATE = {"actors":[], "background":None}
 
@@ -62,8 +65,8 @@ def set_up():
     
     from src import worlds
     from src import actor
-
     sprites.load()
+    scripts.load()
     worlds.load()
     actor.load()
     
@@ -78,6 +81,7 @@ def set_up():
     return G
 
 def draw(G):
+    global SAVED
     G["SCREEN"].fill((255, 255, 255))
     frame = frames.get_frame("EDITOR_VIEW")
     frame.scroll_x = CX
@@ -91,14 +95,13 @@ def draw(G):
     G["SCREEN"].blit(G["HEL32"].render("WORLD: {}".format(G["WORLD"]), 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 32))
 
 def run(G):
-    global CORNER, X, Y, CX, CY, SPLITSCREEN
+    global CORNER, X, Y, CX, CY, SPLITSCREEN, SAVED
     while True:
         draw(G)
         inp = expect_input()
         mods = pygame.key.get_mods()
         if inp == K_ESCAPE and (SAVED or mods & KMOD_CTRL):
             sys.exit()
-
 
         if inp == K_LEFT and mods & KMOD_SHIFT: CX += 64
         elif inp == K_LEFT: X -= 32
@@ -127,6 +130,7 @@ def run(G):
             choice = select_from_list(G, actor_keys, (0, 32), args=G, cb=update)
             if not choice: continue
             actor_menu(G, ACTORS[choice])
+            SAVED = False
             
         if inp == K_w and mods & KMOD_SHIFT:
             def update(G):
@@ -151,7 +155,8 @@ def run(G):
             name = get_text_input(G, (0, 32))
             if name:
                 WORLDS[name] = deepcopy(WORLD_TEMPLATE)
-            
+                SAVED = False
+
         if inp == K_BACKSPACE:
             shift = mods & KMOD_SHIFT
             def update(G):
@@ -166,7 +171,8 @@ def run(G):
             if not choice: continue
             WORLDS[G["WORLD"]]["actors"].remove(choice)
             if shift: ACTORS.pop(choice)
-            
+            SAVED = False
+
         if inp == K_SPACE:
             if CORNER is None:
                 CORNER = (X, Y)
@@ -198,6 +204,7 @@ def run(G):
                 G["ACTOR"].TEMPLATES[name] = template
                 G["ACTOR"].add_actor_from_template(name, name)
                 WORLDS[G["WORLD"]]["actors"].append(name)
+                SAVED = False
                 
         if inp == K_RETURN:
             save()
@@ -229,7 +236,8 @@ def run(G):
                 )
             choice = select_from_list(G, filenames, (0, 32), args=G, cb=update)
             if choice: spritesheet_menu(G, choice)
-
+            SAVED = False
+            
         elif inp == K_s:
             SPLITSCREEN = not SPLITSCREEN
             if SPLITSCREEN:
@@ -259,26 +267,32 @@ def run(G):
             if name is None: continue
             template = template_from_script(choice)
             TEMPLATES[name] = template
+            SAVED = False
 
 def save():
     global SAVED
     with open("src/lib/WORLDS.py", "w+") as f:
         f.write("WORLDS = {}".format(repr(WORLDS)))
     with open("src/lib/SPRITESHEETS.py", "w+") as f:
-        f.write("SPRITESHEETS = {}".format(repr(SPRITESHEETS)))
+        f.write("""SPRITESHEETS = {}\nSPRITEMAPS = {}""".format(repr(SPRITESHEETS), repr(SPRITEMAPS)))
     with open("src/lib/ACTORS.py", "w+") as f:
         f.write("ACTORS = {}".format(repr(ACTORS)))
+    with open("src/lib/SCRIPTS.py", "w+") as f:
+        f.write("SCRIPTS = {}".format(repr(SCRIPTS)))
 
     SAVED = True
 
 def load():
-    global WORLDS, SPRITESHEETS, ACTORS
+    global WORLDS, SPRITESHEETS, SPRITEMAPS, ACTORS, SCRIPTS
     from src.lib import WORLDS as W
     from src.lib import SPRITESHEETS as S
     from src.lib import ACTORS as A
+    from src.lib import SCRIPTS as SC
     WORLDS = W.WORLDS
     SPRITESHEETS = S.SPRITESHEETS
+    SPRITEMAPS = S.SPRITEMAPS
     ACTORS = A.ACTORS
+    SCRIPTS = SC.SCRIPTS
 
 def template_from_script(filename, name=None):
     with open(SCRIPT_LOCATION + filename) as f:
@@ -309,14 +323,20 @@ def template_from_script(filename, name=None):
         key = segments.pop(0)
         cmds = segments.pop(0)
         scripts[key] = cmds.splitlines()
-        
+
+    spritekey = filename.split(".")[0]
+    SPRITEMAPS[spritekey] = sprites
+    
+    scriptkey = filename.split(".")[0]
+    SCRIPTS[scriptkey] = scripts
+    
     return {
         "name": name,
         "POS": (x, y),
         "DIM": (w, h),
         "spriteoffset": spriteoffset,
-        "sprites": sprites,
-        "scripts": scripts,
+        "sprites": spritekey,
+        "scripts": scriptkey,
         "tangible": tangible == "True"
     }
     
@@ -587,11 +607,12 @@ def export_as_rp_script(template):
     w, h = template["DIM"]
     tangible = template["tangible"]
     offx, offy = template["spriteoffset"]
+
     # look, im sorry
     RPS = "{}|{},{},{},{}|{}|{},{}|".format(name, x, y, w, h, tangible, offx, offy)
-    for key in template["sprites"]:
-        RPS += "\n{} {}".format(key, template["sprites"][key])
-    for key in template["scripts"]:
-        RPS += "\n|{}|\n{}\n".format(key, "\n".join(template["scripts"][key]))
+    for key in SPRITEMAPS[template["sprites"]]:
+        RPS += "\n{} {}".format(key, SPRITEMAPS[template["sprites"]][key])
+    for key in SCRIPTS[template["scripts"]]:
+        RPS += "\n|{}|\n{}\n".format(key, "\n".join(SCRIPTS[template["scripts"]][key]))
     return RPS
 

@@ -31,37 +31,16 @@ hurtboxes, hitboxes, scripts and sprites
 import pygame
 from pygame import Surface, Rect
 
-import operator as ops
 from copy import deepcopy
 
 from src import worlds
 from src import inputs
 from src import sprites
 from src import frames
+from src import scripts
 
 TEMPLATES = {}
 ACTORS = {}
-
-operators = {
-    "+": ops.add,
-    "-": ops.sub,
-    "*": ops.mul,
-    "//": ops.truediv,
-    "/": ops.floordiv,
-    "%": ops.mod,
-    "**": ops.pos,
-    "==": lambda n1, n2: n1==n2,
-    ">": lambda n1, n2: n1>n2,
-    "<": lambda n1, n2: n1<n2,
-    ">=": lambda n1, n2: n1>=n2,
-    "<=": lambda n1, n2: n1<=n2,
-    "!=": lambda n1, n2: n1!=n2,
-    "and": lambda n1, n2: n1 and n2,
-    "or": lambda n1, n2: n1 or n2,
-    "nor": lambda n1, n2: n1 and not n2,
-
-    "in": lambda n1, n2: n1 in n2,
-}
 
 def load():
     from src.lib import ACTORS as A
@@ -91,12 +70,13 @@ class Actor(Rect):
         
         self.hurtboxes = {}
         self.hitboxes = {}
-        self.scripts = template["scripts"]
         self.attributes = {}
         self.sprites = {}
         self.img = None # scripts can overwrite the sprite
-        for key in template["sprites"]:
-            self.sprites[key] = sprites.get_sprite(template["sprites"][key])
+
+        self.load_scripts(template["scripts"])
+        self.load_sprites(template["sprites"])
+
         self.spriteoffset = (0, 0) if "spriteoffset" not in template else template["spriteoffset"]
 
         self._input_name = None # change in script
@@ -110,6 +90,12 @@ class Actor(Rect):
         
         self.tangible = False if "tangible" not in template else template["tangible"]
 
+    def load_sprites(self, name):
+        self.sprites = sprites.get_sprite_map(name)
+
+    def load_scripts(self, name):
+        self.scripts = scripts.get_script_map(name)
+        
     def _index(self, data):
         bestkey = None
         bestframe = None
@@ -155,11 +141,11 @@ class Actor(Rect):
                     else:
                         img = self.sprites["{}11".format(self.state)]
 
-                    surf.blit(img, (x*32, y*32))
+                    surf.blit(sprites.get_sprite(img), (x*32, y*32))
             surf.set_colorkey((1, 255, 1))
             return surf
 
-        sprite = sprites.get_sprite(self.img) if self.img is not None else self._index(self.sprites)
+        sprite = sprites.get_sprite(self.img) if self.img is not None else sprites.get_sprite(self._index(self.sprites))
         if sprite is not None:
             if self.direction == 1:
                 sprite = pygame.transform.flip(sprite, 1, 0)
@@ -177,7 +163,7 @@ class Actor(Rect):
         
         script = self._index(self.scripts)
         if script is not None:
-            self.resolve(script, world)
+            scripts.resolve(self.name, script, world)
 
         xflag, yflag = self.x_vel, self.y_vel
         if self.tangible:
@@ -187,10 +173,10 @@ class Actor(Rect):
 
         if xflag != self.x_vel:
             if "XCOLLISION" in self.scripts:
-                self.resolve(self.scripts["XCOLLISION"], world)
+                scripts.resolve(self.name, self.scripts["XCOLLISION"], world)
         if yflag and self.y_vel == 0:
             if "YCOLLISION" in self.scripts:
-                self.resolve(self.scripts["YCOLLISION"], world)
+                scripts.resolve(self.name, self.scripts["YCOLLISION"], world)
 
         self.frame += 1
 
@@ -271,134 +257,5 @@ class Actor(Rect):
         
     def collision_with(self, actor, world):
         if "COLLIDE" in self.scripts:
-            actor.resolve(self.scripts["COLLIDE"], world)
-    
-    def resolve(self, script, world, logfunc=print):
-        cmd_idx = 0
-        while cmd_idx < len(script):
-            if not script[cmd_idx] or script[cmd_idx].startswith("#"): # comments
-                cmd_idx += 1
-                continue
-            cmd = script[cmd_idx].split()
-            # STEP 1: EVALUATE
-            for idx in range(len(cmd)):
-                token = cmd[idx]
-                try:
-                    if token == "None":
-                        cmd[idx] = None
+            scripts.resolve(actor.name, self.scripts["COLLIDE"], world)
 
-                    try:
-                        cmd[idx] = int(token)
-                        continue
-                    except ValueError:
-                        pass
-                    try:
-                        cmd[idx] = float(token)
-                        continue
-                    except ValueError:
-                        pass
-
-                    if "." in token:
-                        actor, a = token.split(".")
-                        if actor == "self": actor = self
-                        else: actor = get_actor(actor)
-                        if hasattr(actor, a):
-                            if a in ["attributes", "scripts", "hitboxes", "hurtboxes"]:
-                                raise Exception("Cannot refrence {}".format(a))
-                            cmd[idx] = getattr(actor, a)
-                        elif a in actor.attributes:
-                            cmd[idx] = actor.attributes[a]
-                        else:
-                            cmd[idx] = None
-
-                    if token.startswith("inp"):
-                        if self._input_name is None:
-                            cmd[idx] = 0 if token != "inpEVENTS" else []
-                            #raise Exception("Actor without input name attemptint to read input {}".format(token))
-                            continue
-                        inp = token[3:]
-                        state = inputs.get_state(self._input_name)
-                        if state is None: continue
-                        if inp in state:
-                            cmd[idx] = state[inp]
-
-                except Exception as e:
-                    logfunc("Error evaluating {} {}... {}".format(token, cmd_idx, e))
-
-            # STEP 2: OPERATORS / ALGEBRA
-            evaluated = []
-            idx = 0
-            while idx < len(cmd):
-                token = cmd[idx]
-                try:
-                    if token == "abs":
-                        calculated = abs(cmd.pop(idx+1))
-                        evaluated.append(calculated)
-                    elif token == "not":
-                        calculated = not cmd.pop(idx+1)
-                        evaluated.append(calculated)
-                    elif type(token) == str and token in operators:
-                        calculated = operators[token](evaluated.pop(), cmd.pop(idx+1))
-                        evaluated.append(calculated)
-                    else:
-                        evaluated.append(token)
-                except Exception as e:
-                    logfunc("Error applying operators {} {}... {}".format(token, cmd_idx, e))
-                idx += 1
-            cmd = evaluated
-            # step 3: COMMANDS
-            try:
-                verb = cmd.pop(0)
-                if verb == "set":
-                    actor, att, value = cmd
-                    actor = self if actor == "self" else get_actor(actor)
-                    if hasattr(actor, att):
-                        if att in ["attributes", "scripts", "hitboxes", "hurtboxes"]:
-                            raise Exception("Cannot write over {} {}".format(att, cmd_idx))
-                        setattr(actor, att, value)                        
-                    else:
-                        self.attributes[att] = value
-                if verb == "if":
-                    conditional = cmd.pop(0)
-                    if not conditional:
-                        nest = 1
-                        while nest > 0:
-                            cmd_idx += 1
-                            if cmd_idx > len(script):
-                                raise Exception("End of script while parsing if")
-                            if script[cmd_idx].split()[0] == "if":
-                                nest += 1
-                            if script[cmd_idx].split()[0] == "endif":
-                                nest -= 1
-                if verb == "exec":
-                    key = cmd.pop(0)
-                    if key not in self.scripts:
-                        raise Exception("Cannot exec {}. Does not exist.".format(key))
-                    self.resolve(self.scripts[key], world, logfunc=logfunc)
-                if verb == "print":
-                    print(cmd.pop(0))
-                if verb == "img":
-                    self.img = cmd.pop(0)
-                if verb == "focus":
-                    frame = frames.get_frame(cmd.pop(0))
-                    actor = cmd.pop(0)
-                    actor = self if actor == "self" else get_actor(actor)
-                    frame.focus = actor
-                if verb == "view":
-                    frame = frames.get_frame(cmd.pop(0))
-                    newworld = worlds.get_world(cmd.pop(0))
-                    frame.world = newworld
-                if verb == "move":
-                    name = cmd.pop(0)
-                    if name == "self": name = self.name
-                    if name not in world.actors:
-                        raise Exception("{} not in world".format(name))
-                    world.actors.remove(name)
-                    newworld = worlds.get_world(cmd.pop())
-                    newworld.actors.append(name)
-                
-            except Exception as e:
-                print(script[cmd_idx])
-                logfunc("Error resolving {} {}... {}".format(verb, cmd_idx, e))
-
-            cmd_idx += 1

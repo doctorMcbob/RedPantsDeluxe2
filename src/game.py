@@ -34,11 +34,14 @@ def set_up(loadscripts=False):
     from src import frames
     from src import actor
     from src import printer
+    from src import scripts
     G["PRINTER"] = printer
     G["WORLDS"] = worlds
     G["FRAMES"] = frames
+    G["SCRIPTS"] = scripts
     G["ROOT"] = worlds.root if "-r" not in sys.argv else sys.argv[sys.argv.index("-r")+1]
     sprites.load()
+    scripts.load()
     worlds.load()
     actor.load()
     if loadscripts:

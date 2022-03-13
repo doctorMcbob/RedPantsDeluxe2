@@ -1,5 +1,6 @@
 """
 export frames as images
+convert them to gif
 """
 import os
 import sys

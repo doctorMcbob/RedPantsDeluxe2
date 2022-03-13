@@ -1,1 +1,1 @@
-WORLDS = {'root': {'actors': ['p0', 's0', 's1', 's2', 'spike', 'spike2', 'p1', 'p2', 'p3', 'p4', 'd0', 'wo0', 'player', 'guy'], 'background': None}, 'world2': {'actors': ['d1', 'p5', 'p7', 'p6', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13', 'p13', 'p14', 'p15', 's5', 's7', 's8', 'wo3'], 'background': None}, 'world1': {'actors': ['p21', 'w01', 'p20', 'p22', 'p25', 'p26', 'p27', 'p28', 'p29', 'wo2', 'p30', 'p31', 'plat32'], 'background': None}}
+WORLDS = {'root': {'actors': ['plat', 'player', 'plat1', 'plat2', 'plat3'], 'background': None}}

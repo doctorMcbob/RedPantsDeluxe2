@@ -61,7 +61,8 @@ set self longjumpystrength -9
 set self longjumpxstrength 12
 focus MAIN self
 set self frame_name MAIN
-set self flybuffer 4
+set self flydownbuffer 3
+set self flyupbuffer 4
 
 set self can_die 1
 set self respawnx self.x
@@ -276,9 +277,9 @@ set self flyangle 0
 |FLY:0|
 
 set self calc1 self.direction == 1
-set self calc2 self.frame > self.flybuffer and inpLEFT and self.calc1
+set self calc2 self.frame > self.flyupbuffer and inpLEFT and self.calc1
 set self calc3 self.direction == -1
-set self calc4 self.frame > self.flybuffer and inpRIGHT and self.calc3
+set self calc4 self.frame > self.flyupbuffer and inpRIGHT and self.calc3
 
 if self.calc2 or self.calc4
    set self frame 0
@@ -289,9 +290,9 @@ if self.calc2 or self.calc4
 endif
 
 set self calc1 self.direction == -1
-set self calc2 self.frame > self.flybuffer and inpLEFT and self.calc1
+set self calc2 self.frame > self.flydownbuffer and inpLEFT and self.calc1
 set self calc3 self.direction == 1
-set self calc4 self.frame > self.flybuffer and inpRIGHT and self.calc3
+set self calc4 self.frame > self.flydownbuffer and inpRIGHT and self.calc3
 
 if self.calc2 or self.calc4
    set self frame 0
