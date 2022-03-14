@@ -1,1 +1,1 @@
-WORLDS = {'root': {'actors': ['plat', 'player', 'plat1', 'plat2', 'plat3'], 'background': None}}
+WORLDS = {'root': {'actors': ['plat', 'player', 'plat1', 'plat2', 'plat3', 'hat', 'plat4'], 'background': None}}

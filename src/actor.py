@@ -77,8 +77,6 @@ class Actor(Rect):
         self.load_scripts(template["scripts"])
         self.load_sprites(template["sprites"])
 
-        self.spriteoffset = (0, 0) if "spriteoffset" not in template else template["spriteoffset"]
-
         self._input_name = None # change in script
 
         self.state = "START"
@@ -92,6 +90,7 @@ class Actor(Rect):
 
     def load_sprites(self, name):
         self.sprites = sprites.get_sprite_map(name)
+        self.spriteoffset = (0, 0) if "offset" not in self.sprites else self.sprites["offset"]
 
     def load_scripts(self, name):
         self.scripts = scripts.get_script_map(name)
@@ -254,7 +253,6 @@ class Actor(Rect):
                 self.x_vel += 1 if self.x_vel < 0 else -1
                 self.y_vel += 1 if self.y_vel < 0 else -1
             
-        
     def collision_with(self, actor, world):
         if "COLLIDE" in self.scripts:
             scripts.resolve(actor.name, self.scripts["COLLIDE"], world)

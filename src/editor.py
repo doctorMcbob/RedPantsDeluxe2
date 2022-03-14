@@ -309,13 +309,14 @@ def template_from_script(filename, name=None):
     x, y, w, h = [int(n) for n in rect.split(",")]
     
     tangible = segments.pop(0)
-    
-    spriteoffset = [int(n) for n in segments.pop(0).split(",")]    
-    
+        
     sprites = {}
     for line in segments.pop(0).splitlines():
         if not line: continue
         key, sprite = line.split()
+        if key == 'offset':
+            sprite = [int(n) for n in sprite.split(",")]    
+
         sprites[key] = sprite
     
     scripts = {}
@@ -334,7 +335,6 @@ def template_from_script(filename, name=None):
         "name": name,
         "POS": (x, y),
         "DIM": (w, h),
-        "spriteoffset": spriteoffset,
         "sprites": spritekey,
         "scripts": scriptkey,
         "tangible": tangible == "True"

@@ -1,4 +1,5 @@
-REDPANTSGUY|128,256,32,64|True|-32,-16|
+REDPANTSGUY|128,256,32,64|True|
+offset -32,-16
 START:0 antlerstand
 IDLE:0 antlerstand
 RUNNING:0 antlerrun0
