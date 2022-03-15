@@ -1,0 +1,17 @@
+DOOR|0,0,0,0|False|
+START:0 door0
+DOOR:0 door0
+
+|START:0|
+set self state DOOR
+
+|DOOR:0|
+set self frame 0
+
+|COLLIDE|
+if UP_DOWN in inpEVENTS 
+   move self root
+   view self.frame_name root
+   set self respawnx self.x
+   set self respawny self.y
+endif

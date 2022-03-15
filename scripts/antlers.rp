@@ -37,7 +37,6 @@ DEAD:0 antlerdead
 
 |START:0|
 # welcome to red pants script :)
-set self _input_name PLAYER1
 set self state IDLE
 set self frame 0
 set self speed 8
@@ -60,7 +59,6 @@ set self slideflipxmod 3
 set self slideflipstrength -24
 set self longjumpystrength -9
 set self longjumpxstrength 12
-focus MAIN self
 set self frame_name MAIN
 set self flydownbuffer 3
 set self flyupbuffer 4
@@ -68,6 +66,8 @@ set self flyupbuffer 4
 set self can_die 1
 set self respawnx self.x
 set self respawny self.y
+
+set self flyangle 0
 
 |DEAD:0|
 set self x_vel 0
