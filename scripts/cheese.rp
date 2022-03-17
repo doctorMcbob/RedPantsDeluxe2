@@ -1,0 +1,32 @@
+CHEESE|0,0,0,0|False|
+START:0 cheese
+CHEESE:0 cheese
+COLLECT:0 cheese
+
+|START:0|
+set self state CHEESE
+set self frame 0
+set self collected 0
+
+|CHEESE:0|
+if self.collected
+   set self state COLLECT
+   set self frame 0
+endif
+
+|COLLECT:0|
+set self y self.y - 3
+
+|COLLECT:20|
+goodbye
+
+|COLLIDE|
+if player in self.name
+   if self.cheese
+      set self cheese self.cheese + 1
+   endif
+   if not self.cheese
+      set self cheese 1
+   endif
+endif
+

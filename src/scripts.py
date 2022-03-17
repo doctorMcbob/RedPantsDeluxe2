@@ -49,6 +49,8 @@ def resolve(reference, script, world, logfunc=print):
         # resolve command!
         try:
             verb = cmd.pop(0)
+            if verb == "goodbye":
+                world.actors.remove(reference)
             if verb == "set":
                 actor, att, value = cmd
                 actor = a.get_actor(reference) if actor == "self" else a.get_actor(actor)
