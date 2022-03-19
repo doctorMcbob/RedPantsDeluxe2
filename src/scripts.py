@@ -106,6 +106,12 @@ def resolve(reference, script, world, logfunc=print):
                 if "START:0" in actor.scripts:
                     resolve(reference, actor.scripts["START:0"], world, logfunc=logfunc)
 
+            if verb == "remove":
+                l = cmd.pop(0)
+                if type(l) is not list:
+                    raise Exception("Could not remove from {}, not type list".format(l))
+                l.remove(cmd.pop(0))
+
         except Exception as e:
             logfunc(cmd)
             logfunc("Error resolving {}... {}".format(verb, e))

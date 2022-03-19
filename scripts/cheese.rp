@@ -1,7 +1,7 @@
 CHEESE|0,0,0,0|False|
-START:0 cheese
-CHEESE:0 cheese
-COLLECT:0 cheese
+START:0 cheese 0,0
+CHEESE:0 cheese 0,0
+COLLECT:0 cheese 0,0
 
 |START:0|
 set self state CHEESE

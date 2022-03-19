@@ -1,38 +1,42 @@
-REDPANTSGUY2|256,256,32,64|True|-16,0|
-START:0 glassesstand
-IDLE:0 glassesstand
-RUNNING:0 glassesrun0
-RUNNING:4 glassesrun1
-RUNNING:8 glassesrun2
-RUNNING:12 glassesrun3
-AIRIAL:0 glassesjump1
-SLIDE:0 glassesslide0
-LANDING:0 glassesland
-JUMPSQUAT:0 glassesjumpsquat0
-JUMPSQUAT:3 glassesjumpsquat1
-FLIPSQUAT:0 glassesjumpsquat0
-FLIPSQUAT:3 glassesjumpsquat1
-DIVESTART:0 glassesdivestart
-DIVE:0 glassesdive
-DIVELAND:0 glassesdiveland
-ROLLOUT:0 glassesrollout
-BONK:0 glassesbonk
-BONKLAND:0 glassesbonkland0
-BONKLAND:12 glassesbonkland1
-WALLTOUCH:0 glasseswalljump0
-WALLJUMP:0 glasseswalljump1
-WALLJUMP:3 glasseswalljump2
-SLIDEFLIP:0 glassesdiveflip0
-SLIDEFLIP:8 glassesdiveflip1
-SLIDEFLIP:10 glassesdiveflip2
-SLIDEFLIP:14 glassesdiveflip3
-SLIDEFLIP:18 glassesdiveflip4
-SLIDEFLIP:20 glassesdiveflip5
-SLIDEFLIP:23 glassesdiveflip6
-CROUCH:0 glassescrouch
-LONGJUMPSTART:0 glasseslongjumpstart
-LONGJUMP:0 glasseslongjump1
-LONGJUMP:8 glasseslongjump2
+REDPANTSGUY|128,256,32,64|True|
+START:0 redpantsstand -16,0
+IDLE:0 redpantsstand -16,0
+RUNNING:0 redpantsrun0 -16,0
+RUNNING:4 redpantsrun1 -16,0
+RUNNING:8 redpantsrun2 -16,0
+RUNNING:12 redpantsrun3 -16,0
+AIRIAL:0 redpantsjump0 -16,0
+AIRIAL:0 redpantsjump2 -16,0
+AIRIAL:0 redpantsjump1 -16,0
+SLIDE:0 redpantsslide1 -16,0
+SLIDE:0 redpantsslide0 -16,0
+LANDING:0 redpantsland -16,0
+JUMPSQUAT:0 redpantsjumpsquat0 -16,0
+JUMPSQUAT:3 redpantsjumpsquat1 -16,0
+FLIPSQUAT:0 redpantsjumpsquat0 -16,0
+FLIPSQUAT:3 redpantsjumpsquat1 -16,0
+DIVESTART:0 redpantsdivestart -16,0
+DIVE:0 redpantsdive -16,0
+DIVELAND:0 redpantsdiveland -16,0
+ROLLOUT:0 redpantsrollout -16,0
+BONK:0 redpantsbonk -16,0
+BONKLAND:0 redpantsbonkland0 -16,0
+BONKLAND:12 redpantsbonkland1 -16,0
+WALLTOUCH:0 redpantswalljump0 -16,0
+WALLJUMP:0 redpantswalljump1 -16,0
+WALLJUMP:3 redpantswalljump2 -16,0
+SLIDEFLIP:0 redpantsdiveflip0 -16,0
+SLIDEFLIP:8 redpantsdiveflip1 -16,0
+SLIDEFLIP:10 redpantsdiveflip2 -16,0
+SLIDEFLIP:14 redpantsdiveflip3 -16,0
+SLIDEFLIP:18 redpantsdiveflip4 -16,0
+SLIDEFLIP:20 redpantsdiveflip5 -16,0
+SLIDEFLIP:23 redpantsdiveflip6 -16,0
+CROUCH:0 redpantscrouch -16,0
+LONGJUMPSTART:0 redpantslongjumpstart -16,0
+LONGJUMP:0 redpantslongjump1 -16,0
+LONGJUMP:8 redpantslongjump2 -16,0
+DEAD:0 redpantsdead -16,0
 
 |START:0|
 # welcome to red pants script :)
@@ -62,6 +66,22 @@ set self longjumpxstrength 12
 focus MAIN4 self
 set self frame_name MAIN4
 
+set self can_die 1
+set self respawnx self.x
+set self respawny self.y
+
+|DEAD:0|
+set self x_vel 0
+set self y_vel 0
+set self can_die 0
+
+|DEAD:45|
+set self state IDLE
+self self frame 0
+set self x self.respawnx
+set self y self.respawny
+set self can_die 1
+
 |IDLE:0|
 exec checkAir
 if self.x_vel != 0
@@ -80,7 +100,7 @@ if self.y_vel == 0
    endif
 endif
 exec checkCrouch
-exec checkJump
+     exec checkJump
 exec applyGrav
 
 |IDLE:32|
@@ -92,11 +112,6 @@ exec checkAir
 exec applyTraction
 exec applyGrav
 if not inpDOWN
-   set self state IDLE
-   set self frame 0
-endif
-# bufferable pog?
-if self.x_vel != 0 and inpA
    if self.x_vel == 0
       set self state IDLE
       set self frame 0
@@ -105,6 +120,11 @@ if self.x_vel != 0 and inpA
       set self state SLIDE
       set self frame 0
    endif
+endif
+# bufferable pog?
+if self.x_vel != 0 and inpA
+   set self state LONGJUMPSTART
+   set self frame 0
 endif
 set self frame 0
 
@@ -157,7 +177,7 @@ if self.x_vel != 0
    exec applyTraction
    set self absxvel abs self.x_vel
    if abs self.traction * 10 > self.absxvel
-      img glassesslide1
+      img redpantsslide1
    endif
    exec checkCrouch
    exec checkJump
@@ -193,17 +213,11 @@ endif
 set self calc1 self.y_vel > self.airspeedcontrol
 set self calc2 self.airspeedcontrol * -1 > self.y_vel
 if not self.calc1 nor self.calc2
-   if inpLEFT
+   if self.x_vel - self.airdrift > self.negspeed and inpLEFT
 	set self x_vel self.x_vel - self.airdrift
-   	if self.x_vel < self.negspeed
-      	   set self x_vel self.negspeed
-   	endif
    endif
-   if inpRIGHT
+   if self.x_vel + self.airdrift < self.speed and inpRIGHT
       set self x_vel self.x_vel + self.airdrift
-      if self.x_vel > self.speed
-      	 set self x_vel self.speed
-      endif
    endif
    if B_DOWN in inpEVENTS
       set self state DIVESTART
@@ -211,10 +225,10 @@ if not self.calc1 nor self.calc2
    endif
 endif
 if self.calc1
-   img glassesjump2
+   img redpantsjump2
 endif
 if self.calc2
-   img glassesjump0
+   img redpantsjump0
 endif
 exec applyGrav
 
@@ -300,7 +314,7 @@ set self frame 0
 exec AIRIAL:0
 set self state AIRIAL
 if not self.calc1 nor self.calc2
-   img glasseswalljump0
+   img redpantswalljump0
    # bufferable pog?
    if inpA
       set self state WALLJUMP
@@ -390,6 +404,11 @@ endif
 |COLLIDE|
 if self.state == PLATFORM
    set self touched 1
+endif
+set self calc self.state == BANANA
+set self calc self.state == CHEESE or self.calc
+if self.state == COIN or self.calc
+   set self collected 1
 endif
 
 |checkAir|

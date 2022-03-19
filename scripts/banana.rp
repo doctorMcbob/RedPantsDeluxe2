@@ -1,7 +1,7 @@
 BANANA|0,0,0,0|False|
-START:0 banana
-BANANA:0 banana
-COLLECT:0 banana
+START:0 banana 0,0
+BANANA:0 banana 0,0
+COLLECT:0 banana 0,0
 
 |START:0|
 set self state BANANA

@@ -90,7 +90,6 @@ class Actor(Rect):
 
     def load_sprites(self, name):
         self.sprites = sprites.get_sprite_map(name)
-        self.spriteoffset = (0, 0) if "offset" not in self.sprites else self.sprites["offset"]
 
     def load_scripts(self, name):
         self.scripts = scripts.get_script_map(name)
@@ -156,6 +155,10 @@ class Actor(Rect):
         placeholder.fill((1, 255, 1))
         
         return placeholder
+
+    def get_offset(self):
+        key = self.img if self.img is not None else self._index(self.sprites)
+        return sprites.get_offset(key)
 
     def update(self, world):
         self.img = None

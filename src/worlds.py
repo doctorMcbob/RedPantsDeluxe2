@@ -9,7 +9,7 @@ from pygame import Rect
 from src import sprites
 from src import actor
 
-root = "root"
+root = "demostart"
 
 worlds = {}
 
@@ -58,8 +58,8 @@ class World(object):
         
         for name in self.actors:
             Actor = actor.get_actor(name)
-            dx, dy = Actor.spriteoffset
             if frame.in_frame(Actor):
+                dx, dy = Actor.get_offset()
                 dest.blit(Actor.get_sprite(), frame.scroll((Actor.x+dx, Actor.y+dy)))
 
             if DEBUG: Actor.debug(DEBUG)

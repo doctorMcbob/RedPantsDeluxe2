@@ -19,6 +19,7 @@ SPRITESHEETS = {}
 ACTORS = {}
 SCRIPTS = {}
 SPRITEMAPS = {}
+OFFSETS = {}
 
 WORLD_TEMPLATE = {"actors":[], "background":None}
 
@@ -274,7 +275,7 @@ def save():
     with open("src/lib/WORLDS.py", "w+") as f:
         f.write("WORLDS = {}".format(repr(WORLDS)))
     with open("src/lib/SPRITESHEETS.py", "w+") as f:
-        f.write("""SPRITESHEETS = {}\nSPRITEMAPS = {}""".format(repr(SPRITESHEETS), repr(SPRITEMAPS)))
+        f.write("SPRITESHEETS = {}\nSPRITEMAPS = {}\nOFFSETS = {}".format(repr(SPRITESHEETS), repr(SPRITEMAPS), repr(OFFSETS)))
     with open("src/lib/ACTORS.py", "w+") as f:
         f.write("ACTORS = {}".format(repr(ACTORS)))
     with open("src/lib/SCRIPTS.py", "w+") as f:
@@ -283,7 +284,7 @@ def save():
     SAVED = True
 
 def load():
-    global WORLDS, SPRITESHEETS, SPRITEMAPS, ACTORS, SCRIPTS
+    global WORLDS, SPRITESHEETS, SPRITEMAPS, ACTORS, SCRIPTS, OFFSETS
     from src.lib import WORLDS as W
     from src.lib import SPRITESHEETS as S
     from src.lib import ACTORS as A
@@ -291,6 +292,7 @@ def load():
     WORLDS = W.WORLDS
     SPRITESHEETS = S.SPRITESHEETS
     SPRITEMAPS = S.SPRITEMAPS
+    OFFSETS = S.OFFSETS
     ACTORS = A.ACTORS
     SCRIPTS = SC.SCRIPTS
 
@@ -311,13 +313,14 @@ def template_from_script(filename, name=None):
     tangible = segments.pop(0)
         
     sprites = {}
+    offsets = {}
     for line in segments.pop(0).splitlines():
         if not line: continue
-        key, sprite = line.split()
-        if key == 'offset':
-            sprite = [int(n) for n in sprite.split(",")]    
+        key, sprite, offset = line.split()
+        offset = [int(n) for n in offset.split(",")]
 
         sprites[key] = sprite
+        OFFSETS[sprite] = offset
     
     scripts = {}
     while segments:
@@ -327,7 +330,7 @@ def template_from_script(filename, name=None):
 
     spritekey = filename.split(".")[0]
     SPRITEMAPS[spritekey] = sprites
-    
+
     scriptkey = filename.split(".")[0]
     SCRIPTS[scriptkey] = scripts
     
@@ -450,7 +453,7 @@ def drawn_actor_template(G, template, scroll=0, idx=None):
     surf.fill((255, 255, 255))
     x, y = 0, 0-scroll
     i = 0
-    keys = ["name", "POS", "DIM", "spriteoffset"]
+    keys = ["name", "POS", "DIM"]
     for key in keys:
         surf.blit(G["HEL32"].render(("{}: {}".format(key, template[key])), 0, (0,0,0)), (x, y))
         if idx is not None and idx == i:
@@ -478,7 +481,7 @@ def drawn_actor_template(G, template, scroll=0, idx=None):
 def index_template(template, idx):
     "returns (type, data)"
     i = 0
-    keys = ["name", "POS", "DIM", "spriteoffset"]
+    keys = ["name", "POS", "DIM"]
     for key in keys:
         if i == idx:
             return 'key', key

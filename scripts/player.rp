@@ -1,40 +1,42 @@
 REDPANTSGUY|128,256,32,64|True|
-offset -16,0
-START:0 redpantsstand
-IDLE:0 redpantsstand
-RUNNING:0 redpantsrun0
-RUNNING:4 redpantsrun1
-RUNNING:8 redpantsrun2
-RUNNING:12 redpantsrun3
-AIRIAL:0 redpantsjump1
-SLIDE:0 redpantsslide0
-LANDING:0 redpantsland
-JUMPSQUAT:0 redpantsjumpsquat0
-JUMPSQUAT:3 redpantsjumpsquat1
-FLIPSQUAT:0 redpantsjumpsquat0
-FLIPSQUAT:3 redpantsjumpsquat1
-DIVESTART:0 redpantsdivestart
-DIVE:0 redpantsdive
-DIVELAND:0 redpantsdiveland
-ROLLOUT:0 redpantsrollout
-BONK:0 redpantsbonk
-BONKLAND:0 redpantsbonkland0
-BONKLAND:12 redpantsbonkland1
-WALLTOUCH:0 redpantswalljump0
-WALLJUMP:0 redpantswalljump1
-WALLJUMP:3 redpantswalljump2
-SLIDEFLIP:0 redpantsdiveflip0
-SLIDEFLIP:8 redpantsdiveflip1
-SLIDEFLIP:10 redpantsdiveflip2
-SLIDEFLIP:14 redpantsdiveflip3
-SLIDEFLIP:18 redpantsdiveflip4
-SLIDEFLIP:20 redpantsdiveflip5
-SLIDEFLIP:23 redpantsdiveflip6
-CROUCH:0 redpantscrouch
-LONGJUMPSTART:0 redpantslongjumpstart
-LONGJUMP:0 redpantslongjump1
-LONGJUMP:8 redpantslongjump2
-DEAD:0 redpantsdead
+START:0 redpantsstand -16,0
+IDLE:0 redpantsstand -16,0
+RUNNING:0 redpantsrun0 -16,0
+RUNNING:4 redpantsrun1 -16,0
+RUNNING:8 redpantsrun2 -16,0
+RUNNING:12 redpantsrun3 -16,0
+AIRIAL:0 redpantsjump0 -16,0
+AIRIAL:0 redpantsjump2 -16,0
+AIRIAL:0 redpantsjump1 -16,0
+SLIDE:0 redpantsslide1 -16,0
+SLIDE:0 redpantsslide0 -16,0
+LANDING:0 redpantsland -16,0
+JUMPSQUAT:0 redpantsjumpsquat0 -16,0
+JUMPSQUAT:3 redpantsjumpsquat1 -16,0
+FLIPSQUAT:0 redpantsjumpsquat0 -16,0
+FLIPSQUAT:3 redpantsjumpsquat1 -16,0
+DIVESTART:0 redpantsdivestart -16,0
+DIVE:0 redpantsdive -16,0
+DIVELAND:0 redpantsdiveland -16,0
+ROLLOUT:0 redpantsrollout -16,0
+BONK:0 redpantsbonk -16,0
+BONKLAND:0 redpantsbonkland0 -16,0
+BONKLAND:12 redpantsbonkland1 -16,0
+WALLTOUCH:0 redpantswalljump0 -16,0
+WALLJUMP:0 redpantswalljump1 -16,0
+WALLJUMP:3 redpantswalljump2 -16,0
+SLIDEFLIP:0 redpantsdiveflip0 -16,0
+SLIDEFLIP:8 redpantsdiveflip1 -16,0
+SLIDEFLIP:10 redpantsdiveflip2 -16,0
+SLIDEFLIP:14 redpantsdiveflip3 -16,0
+SLIDEFLIP:18 redpantsdiveflip4 -16,0
+SLIDEFLIP:20 redpantsdiveflip5 -16,0
+SLIDEFLIP:23 redpantsdiveflip6 -16,0
+CROUCH:0 redpantscrouch -16,0
+LONGJUMPSTART:0 redpantslongjumpstart -16,0
+LONGJUMP:0 redpantslongjump1 -16,0
+LONGJUMP:8 redpantslongjump2 -16,0
+DEAD:0 redpantsdead -16,0
 
 |START:0|
 # welcome to red pants script :)

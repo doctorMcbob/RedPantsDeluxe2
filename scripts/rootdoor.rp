@@ -1,6 +1,6 @@
 DOOR|0,0,0,0|False|
-START:0 door0
-DOOR:0 door0
+START:0 door0 0,0
+DOOR:0 door0 0,0
 
 |START:0|
 set self state DOOR
@@ -14,4 +14,5 @@ if UP_DOWN in inpEVENTS
    view self.frame_name root
    set self respawnx self.x
    set self respawny self.y
+   remove inpEVENTS UP_DOWN
 endif

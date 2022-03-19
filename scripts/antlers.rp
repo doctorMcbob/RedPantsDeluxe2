@@ -1,42 +1,48 @@
 REDPANTSGUY|128,256,32,64|True|
-offset -32,-16
-START:0 antlerstand
-IDLE:0 antlerstand
-RUNNING:0 antlerrun0
-RUNNING:4 antlerrun1
-RUNNING:8 antlerrun2
-RUNNING:12 antlerrun3
-AIRIAL:0 antlerjump1
-FLYSTART:0 antlerdivestart
-FLY:0  antlerfly0
-FLYLAND:0 antlerdiveland
-SLIDE:0 antlerslide0
-LANDING:0 antlerland
-JUMPSQUAT:0 antlerjumpsquat0
-JUMPSQUAT:3 antlerjumpsquat1
-FLIPSQUAT:0 antlerjumpsquat0
-FLIPSQUAT:3 antlerjumpsquat1
-BONK:0 antlerbonk
-BONKLAND:0 antlerbonkland0
-BONKLAND:12 antlerbonkland1
-WALLTOUCH:0 antlerwalljump0
-WALLJUMP:0 antlerwalljump1
-WALLJUMP:3 antlerwalljump2
-SLIDEFLIP:0 antlersideflip0
-SLIDEFLIP:8 antlersideflip1
-SLIDEFLIP:10 antlersideflip2
-SLIDEFLIP:14 antlersideflip3
-SLIDEFLIP:18 antlersideflip4
-SLIDEFLIP:20 antlersideflip5
-SLIDEFLIP:23 antlersideflip6
-CROUCH:0 antlercrouch
-LONGJUMPSTART:0 antlerlongjump0
-LONGJUMP:0 antlerlongjump1
-LONGJUMP:8 antlerlongjump2
-DEAD:0 antlerdead
+START:0 antlerstand -32,-16
+IDLE:0 antlerstand -32,-16
+RUNNING:0 antlerrun0 -32,-16
+RUNNING:4 antlerrun1 -32,-16
+RUNNING:8 antlerrun2 -32,-16
+RUNNING:12 antlerrun3 -32,-16
+AIRIAL:0 antlerjump0 -32,-16
+AIRIAL:0 antlerjump2 -32,-16
+AIRIAL:0 antlerjump1 -32,-16
+FLYSTART:0 antlerdivestart -32,-16
+FLY:0  antlerflydown1 -32,0
+FLY:0  antlerflydown0 -32,0
+FLY:0  antlerflyup1 -32,0
+FLY:0  antlerflyup0 -32,0
+FLY:0  antlerfly0 -32,0
+ROLLOUT:0 antlerrollout -16,0
+FLYLAND:0 antlerdiveland -32,-16
+SLIDE:0 antlerslide1 -32,-16
+SLIDE:0 antlerslide0 -32,-16
+LANDING:0 antlerland -32,-16
+JUMPSQUAT:0 antlerjumpsquat0 -32,-16
+JUMPSQUAT:3 antlerjumpsquat1 -32,-16
+FLIPSQUAT:0 antlerjumpsquat0 -32,-16
+FLIPSQUAT:3 antlerjumpsquat1 -32,-16
+BONK:0 antlerbonk -32,-16
+BONKLAND:0 antlerbonkland0 -32,-16
+BONKLAND:12 antlerbonkland1 -32,-16
+WALLTOUCH:0 antlerwalljump0 -32,-16
+WALLJUMP:0 antlerwalljump1 -32,-16
+WALLJUMP:3 antlerwalljump2 -32,-16
+SLIDEFLIP:0 antlersideflip0 -48,-16
+SLIDEFLIP:8 antlersideflip1 -48,-16
+SLIDEFLIP:10 antlersideflip2 -32,-16
+SLIDEFLIP:14 antlersideflip3 -32,-16
+SLIDEFLIP:18 antlersideflip4 -32,-16
+SLIDEFLIP:20 antlersideflip5 -32,-16
+SLIDEFLIP:23 antlersideflip6 -32,-16
+CROUCH:0 antlercrouch -32,-16
+LONGJUMPSTART:0 antlerlongjump0 -32,-16
+LONGJUMP:0 antlerlongjump1 -32,-16
+LONGJUMP:8 antlerlongjump2 -32,-16
+DEAD:0 antlerdead -32,-16
 
 |START:0|
-# welcome to red pants script :)
 set self state IDLE
 set self frame 0
 set self speed 8
@@ -59,7 +65,6 @@ set self slideflipxmod 3
 set self slideflipstrength -24
 set self longjumpystrength -9
 set self longjumpxstrength 12
-set self frame_name MAIN
 set self flydownbuffer 3
 set self flyupbuffer 4
 
@@ -368,7 +373,7 @@ set self frame 0
 exec AIRIAL:0
 set self state AIRIAL
 if not self.calc1 nor self.calc2
-   img redpantswalljump0
+   img antlerwalljump0
    # bufferable pog?
    if inpA
       set self state WALLJUMP
