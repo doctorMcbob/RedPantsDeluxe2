@@ -35,6 +35,7 @@ def set_up(loadscripts=False):
     from src import actor
     from src import printer
     from src import scripts
+    from src import boxes
     G["PRINTER"] = printer
     G["WORLDS"] = worlds
     G["FRAMES"] = frames
@@ -44,6 +45,7 @@ def set_up(loadscripts=False):
     scripts.load()
     worlds.load()
     actor.load()
+    boxes.load()
     if loadscripts:
         update_all_scripts(actor)
 

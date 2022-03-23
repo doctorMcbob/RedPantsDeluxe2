@@ -108,10 +108,32 @@ class Actor(Rect):
         return None if bestkey is None else data[bestkey]
 
     def get_hitboxes(self):
-        return self._index(self.hitboxes)
+        hitboxes = self._index(self.hitboxes)
+        if hitboxes is None: return None
+        boxes = []
+        for pos, dim in hitboxes:
+            x, y = pos
+            w, h = dim
+            if self.direction == 1:
+                box = Rect(((self.x + self.w)-(x + w), y + self.y), dim)
+            else:
+                box = Rect((x + self.x, y + self.y), dim)
+            boxes.append(box)
+        return boxes
 
     def get_hurtboxes(self):
-        return self._index(self.hurtboxes)
+        hurtboxes = self._index(self.hurtboxes)
+        if hurtboxes is None: return None
+        boxes = []
+        for pos, dim in hurtboxes:
+            x, y = pos
+            w, h = dim
+            if self.direction == 1:
+                box = Rect(((self.x + self.w)-(x + w), y + self.y), dim)
+            else:
+                box = Rect((x + self.x, y + self.y), dim)
+            boxes.append(box)
+        return boxes
 
     def get_sprite(self):
         if self.platform:
@@ -180,36 +202,40 @@ class Actor(Rect):
             if "YCOLLISION" in self.scripts:
                 scripts.resolve(self.name, self.scripts["YCOLLISION"], world)
 
+        self.hit_check(world)
         self.frame += 1
 
-    def debug(self, G):
-        Y = 0
-        X = 0
-        G["SCREEN"].blit(G["HEL16"].render("STATE {}".format(self.state), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+    def debug(self, dest, pos, font, scrollx, scrolly):
+        X, Y = pos
+        dest.blit(font.render("STATE {}".format(self.state), 0, (0, 0, 0)), (X, Y))
         Y += 16
-        G["SCREEN"].blit(G["HEL16"].render("FRAME {}".format(self.frame), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+        dest.blit(font.render("FRAME {}".format(self.frame), 0, (0, 0, 0)), (X, Y))
         Y += 16
-        G["SCREEN"].blit(G["HEL16"].render("X, Y {},{}".format(self.x, self.y), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+        dest.blit(font.render("X, Y {},{}".format(self.x, self.y), 0, (0, 0, 0)), (X, Y))
         Y += 16
-        G["SCREEN"].blit(G["HEL16"].render("vel {},{}".format(self.x_vel, self.y_vel), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+        dest.blit(font.render("vel {},{}".format(self.x_vel, self.y_vel), 0, (0, 0, 0)), (X, Y))
 
         script = self._index(self.scripts)
         if script is None: return
-        Y = 0
-        X += 128
-        G["SCREEN"].blit(G["HEL16"].render("CURRENT SCRIPT", 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+        Y = pos[1]
+        X += 256
+        dest.blit(font.render("CURRENT SCRIPT", 0, (0, 0, 0)), (X, Y))
         X += 16
         for cmd in script:
             Y += 16
-            G["SCREEN"].blit(G["HEL16"].render("{}".format(cmd), 0, (0, 0, 0)), (self.x+self.w+X, self.y+Y))
+            dest.blit(font.render("{}".format(cmd), 0, (0, 0, 0)), (X, Y))
 
-        print("state {}".format(self.state))
-        print("x, y: {},{}".format(self.x, self.y))
-        print("veloc {},{}".format(self.x_vel, self.y_vel))
-        print(self.attributes)
+        pygame.draw.rect(dest, (0, 0, 255), Rect(self.x-scrollx, self.y-scrolly, self.w, self.h), width=2)
+
+        hitboxes = self.get_hitboxes()
+        if hitboxes is not None:
+            for box in hitboxes:
+                pygame.draw.rect(dest, (255, 0, 0), Rect(box.x-scrollx, box.y-scrolly, box.w, box.h), width=2)
+        hurtboxes = self.get_hurtboxes()
+        if hurtboxes is not None:
+            for box in hurtboxes:
+                pygame.draw.rect(dest, (0, 255, 0), Rect(box.x-scrollx, box.y-scrolly, box.w, box.h), width=2)
         
-
-            
     def collision_check(self, world):
         actors = list(filter(lambda actor:not (actor is self), world.get_actors()))
         tangibles = list(filter(lambda actor: actor.tangible, actors))
@@ -259,4 +285,21 @@ class Actor(Rect):
     def collision_with(self, actor, world):
         if "COLLIDE" in self.scripts:
             scripts.resolve(actor.name, self.scripts["COLLIDE"], world)
+
+    def hit_check(self, world):
+        hurtboxes = self.get_hurtboxes()
+        if hurtboxes is None: return
+        actors = list(filter(lambda actor:not (actor is self), world.get_actors()))
+        for actor in actors:
+            hitboxes = actor.get_hitboxes()
+            if hitboxes is None: continue
+
+            for hitbox in hitboxes:
+                if Rect(hitbox).collidelist(hurtboxes):
+                    self.hit(actor)
+                    break
+                    
+    def hit(self, actor, world):
+        if "HIT" in self.scripts:
+            scripts.resolve(actor.name, self.scripts["HIT"], world)
 

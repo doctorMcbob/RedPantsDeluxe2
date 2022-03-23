@@ -61,7 +61,11 @@ class World(object):
             if frame.in_frame(Actor):
                 dx, dy = Actor.get_offset()
                 dest.blit(Actor.get_sprite(), frame.scroll((Actor.x+dx, Actor.y+dy)))
-
-            if DEBUG: Actor.debug(DEBUG)
+                if DEBUG:
+                    Actor.debug(dest,
+                                frame.scroll((Actor.x+Actor.w, Actor.y)),
+                                DEBUG["HEL16"],
+                                frame.scroll_x, frame.scroll_y
+                    )
 
 

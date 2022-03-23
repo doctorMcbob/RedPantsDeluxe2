@@ -2,6 +2,7 @@ from src import inputs
 from src import frames
 from src import actor as a
 from src import worlds
+from src import boxes
 
 import operator as ops
 
@@ -43,14 +44,17 @@ def resolve(reference, script, world, logfunc=print):
         if not script[cmd_idx] or script[cmd_idx].startswith("#"): # comments
             cmd_idx += 1
             continue
+
         cmd = script[cmd_idx].split()
         cmd = evaluate_literals(cmd, reference, logfunc=logfunc)
         cmd = resolve_operators(cmd, logfunc=logfunc)
         # resolve command!
         try:
             verb = cmd.pop(0)
+
             if verb == "goodbye":
                 world.actors.remove(reference)
+
             if verb == "set":
                 actor, att, value = cmd
                 actor = a.get_actor(reference) if actor == "self" else a.get_actor(actor)
@@ -60,6 +64,7 @@ def resolve(reference, script, world, logfunc=print):
                     setattr(actor, att, value)                        
                 else:
                     a.get_actor(reference).attributes[att] = value
+
             if verb == "if":
                 conditional = cmd.pop(0)
                 if not conditional:
@@ -72,24 +77,30 @@ def resolve(reference, script, world, logfunc=print):
                             nest += 1
                         if script[cmd_idx].split()[0] == "endif":
                             nest -= 1
+
             if verb == "exec":
                 key = cmd.pop(0)
                 if key not in a.get_actor(reference).scripts:
                     raise Exception("Cannot exec {}. Does not exist.".format(key))
                 resolve(reference, a.get_actor(reference).scripts[key], world, logfunc=logfunc)
+
             if verb == "print":
                 print(cmd.pop(0))
+
             if verb == "img":
                 a.get_actor(reference).img = cmd.pop(0)
+
             if verb == "focus":
                 frame = frames.get_frame(cmd.pop(0))
                 actor = cmd.pop(0)
                 actor = a.get_actor(reference) if actor == "self" else a.get_actor(actor)
                 frame.focus = actor
+
             if verb == "view":
                 frame = frames.get_frame(cmd.pop(0))
                 newworld = worlds.get_world(cmd.pop(0))
                 frame.world = newworld
+
             if verb == "move":
                 name = cmd.pop(0)
                 if name == "self": name = a.get_actor(reference).name
@@ -98,6 +109,7 @@ def resolve(reference, script, world, logfunc=print):
                 world.actors.remove(name)
                 newworld = worlds.get_world(cmd.pop())
                 newworld.actors.append(name)
+
             if verb == "rebrand":
                 keyname = cmd.pop(0)
                 actor = a.get_actor(reference)
@@ -111,6 +123,16 @@ def resolve(reference, script, world, logfunc=print):
                 if type(l) is not list:
                     raise Exception("Could not remove from {}, not type list".format(l))
                 l.remove(cmd.pop(0))
+
+            if verb == "hitboxes":
+                keyname = cmd.pop(0)
+                actor = a.get_actor(reference)
+                actor.hitboxes = boxes.get_hitbox_map(keyname)
+
+            if verb == "hurtboxes":
+                keyname = cmd.pop(0)
+                actor = a.get_actor(reference)
+                actor.hurtboxes = boxes.get_hurtbox_map(keyname)
 
         except Exception as e:
             logfunc(cmd)

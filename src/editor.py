@@ -12,7 +12,8 @@ from src import frames
 from src import game
 from src import sprites
 from src import scripts
-from src.utils import expect_input, select_from_list, get_text_input
+from src import boxes
+from src.utils import expect_input, select_from_list, get_text_input, expect_click
 
 WORLDS = {}
 SPRITESHEETS = {}
@@ -20,6 +21,8 @@ ACTORS = {}
 SCRIPTS = {}
 SPRITEMAPS = {}
 OFFSETS = {}
+HITBOXES = {}
+HURTBOXES = {}
 
 WORLD_TEMPLATE = {"actors":[], "background":None}
 
@@ -70,6 +73,7 @@ def set_up():
     scripts.load()
     worlds.load()
     actor.load()
+    boxes.load()
     
     G["FRAMES"] = frames
     G["WORLDS"] = worlds
@@ -118,20 +122,6 @@ def run(G):
 
         if inp == K_o and mods & KMOD_CTRL:
             load()
-
-        if inp == K_a and mods & KMOD_SHIFT:
-            def update(G):
-                draw(G)
-                G["SCREEN"].blit(
-                    G["HEL32"].render("Edit Actor:", 0, (0, 0, 0)),
-                    (0, 0)
-                )
-            actor_keys = WORLDS[G["WORLD"]]["actors"]
-            if not actor_keys: continue
-            choice = select_from_list(G, actor_keys, (0, 32), args=G, cb=update)
-            if not choice: continue
-            actor_menu(G, ACTORS[choice])
-            SAVED = False
             
         if inp == K_w and mods & KMOD_SHIFT:
             def update(G):
@@ -212,13 +202,16 @@ def run(G):
             sprites.load()
             G["ACTOR"].load()
             G["WORLDS"].load()
+            boxes.load()
             game.run(G, noquit=True)
             sprites.load()
             G["ACTOR"].load()
             G["WORLDS"].load()
+            boxes.load()
 
         if inp == K_s and mods & KMOD_CTRL:
             save()
+            boxes.load()
             sprites.load()
             G["ACTOR"].load()
             G["WORLDS"].load()
@@ -238,6 +231,30 @@ def run(G):
             choice = select_from_list(G, filenames, (0, 32), args=G, cb=update)
             if choice: spritesheet_menu(G, choice)
             SAVED = False
+
+        if inp == K_h and mods & KMOD_SHIFT:
+            def update(G):
+                draw(G)
+                G["SCREEN"].blit(
+                    G["HEL32"].render("Actor Box Menu:", 0, (0, 0, 0)),
+                    (0, 0)
+                )
+            actor_keys = WORLDS[G["WORLD"]]["actors"]
+            if not actor_keys: continue
+            choice = select_from_list(G, actor_keys, (0, 32), args=G, cb=update)
+            if not choice: continue
+            def update(G):
+                draw(G)
+                G["SCREEN"].blit(
+                    G["HEL32"].render("hitbox key:", 0, (0, 0, 0)),
+                    (0, 0)
+                )
+            box_keys = list(HITBOXES.keys()) + ["New..."]
+            hitboxkey = select_from_list(G, box_keys, (0, 32), args=G, cb=update)            
+            if hitboxkey is None: continue
+            if hitboxkey == "New...": hitboxkey = get_text_input(G, (0, 32))
+            if not hitboxkey: continue
+            hitbox_menu(G, choice, hitboxkey)
             
         elif inp == K_s:
             SPLITSCREEN = not SPLITSCREEN
@@ -280,21 +297,26 @@ def save():
         f.write("ACTORS = {}".format(repr(ACTORS)))
     with open("src/lib/SCRIPTS.py", "w+") as f:
         f.write("SCRIPTS = {}".format(repr(SCRIPTS)))
-
+    with open("src/lib/BOXES.py", "w+") as f:
+        f.write("HITBOXES = {}\nHURTBOXES = {}".format(repr(HITBOXES), repr(HURTBOXES)))
+    
     SAVED = True
 
 def load():
-    global WORLDS, SPRITESHEETS, SPRITEMAPS, ACTORS, SCRIPTS, OFFSETS
+    global WORLDS, SPRITESHEETS, SPRITEMAPS, ACTORS, SCRIPTS, OFFSETS, HITBOXES, HURTBOXES
     from src.lib import WORLDS as W
     from src.lib import SPRITESHEETS as S
     from src.lib import ACTORS as A
     from src.lib import SCRIPTS as SC
+    from src.lib import BOXES as B
     WORLDS = W.WORLDS
     SPRITESHEETS = S.SPRITESHEETS
     SPRITEMAPS = S.SPRITEMAPS
     OFFSETS = S.OFFSETS
     ACTORS = A.ACTORS
     SCRIPTS = SC.SCRIPTS
+    HITBOXES = B.HITBOXES
+    HURTBOXES = B.HURTBOXES
 
 def template_from_script(filename, name=None):
     with open(SCRIPT_LOCATION + filename) as f:
@@ -478,144 +500,159 @@ def drawn_actor_template(G, template, scroll=0, idx=None):
         y += script_data.get_height()
     return surf
 
-def index_template(template, idx):
-    "returns (type, data)"
-    i = 0
-    keys = ["name", "POS", "DIM"]
-    for key in keys:
-        if i == idx:
-            return 'key', key
-        i += 1
-    for sprite in list(template["sprites"].keys()):
-        if i == idx:
-            return 'sprite', sprite
-        i += 1
-    for key in list(template["scripts"].keys()):
-        if i == idx:
-            return 'script name', key
-        i += 1
-        for _i, cmd in enumerate(template["scripts"][key]):
-            if i == idx:
-                return 'cmd', '{}|{}'.format(key, _i)
-            i += 1
-    return None, None
+def box_menu_draw(G):
+    G["SCREEN"].fill((200, 200, 200))
+    actor = G["ctx"]["actor"]
+    actor.direction = -1
+    sprite = actor.get_sprite()
+    sprite = pygame.transform.scale2x(sprite)
+    sprite = pygame.transform.scale2x(sprite)
+    scrollx = G["ctx"]["scrollx"]
+    scrolly = G["ctx"]["scrolly"]
+    hitboxkey = G["ctx"]["key"]
+    offx, offy = actor.get_offset()
+    G["SCREEN"].blit(sprite, (scrollx + (offx*4), scrolly + (offy*4)))
+    
+    x, y = 0-actor.w*4-1, 0-actor.h*4-1
+    while x <= actor.w * 4 * 2:
+        pygame.draw.line(G["SCREEN"], (100, 100, 100), (x+scrollx, 0-actor.h*4+scrolly), (x+scrollx, actor.h*4*2+scrolly))
+        x += 4
+    while y <= actor.h * 4 * 2:
+        pygame.draw.line(G["SCREEN"], (100, 100, 100), (0-actor.w*4+scrollx, y+scrolly), (actor.w*4*2+scrollx, y+scrolly))
+        y += 4
 
-def actor_menu(G, actor_template):
-    scroll = 0
-    idx = 0
+    # actor is a rect ;) ECB - environmental collision box
+    ecb = Rect(scrollx, scrolly, actor.w, actor.h)
+    pygame.draw.rect(G["SCREEN"], (0, 0, 255), resize_up(ecb), width=2)
+
+    hurtboxes = actor.get_hurtboxes()
+    if hurtboxes is not None:
+        for hurtbox in hurtboxes:
+            box = Rect((hurtbox.x - actor.x) * 4 + scrollx, (hurtbox.y - actor.y) * 4 + scrolly, hurtbox.w, hurtbox.h)
+            pygame.draw.rect(G["SCREEN"], (0, 255, 0), resize_up(box), width=2)
+
+    hitboxes = actor.get_hitboxes()
+    if hitboxes is not None:
+        for hitbox in hitboxes:
+            box = Rect((hitbox.x - actor.x) * 4 + scrollx, (hitbox.y - actor.y) * 4 + scrolly, hitbox.w, hitbox.h)
+            pygame.draw.rect(G["SCREEN"], (255, 0, 0), resize_up(box), width=2)
+
+    G["SCREEN"].blit(G["HEL32"].render("{}:{}   |   {}".format(actor.state, actor.frame, G["ctx"]["identifier"]), 0, (0, 0, 0)), (0, G["SCREEN"].get_height()-32))
+
+    x, y = G["SCREEN"].get_width() // 2, 16
+    G["SCREEN"].blit(G["HEL16"].render("Hitboxes:", 0, (0, 0, 0)), (x, y))
+    y += 16
+    x += 32
+    for key in HITBOXES[hitboxkey].keys():
+        G["SCREEN"].blit(G["HEL16"].render("{}: {}".format(key, repr(HITBOXES[hitboxkey][key])), 0, (0, 0, 0)), (x, y))
+        y += 16
+    x -= 32
+    G["SCREEN"].blit(G["HEL16"].render("Hurtboxes:", 0, (0, 0, 0)), (x, y))
+    y += 16
+    x += 32
+    for key in HURTBOXES[hitboxkey].keys():
+        G["SCREEN"].blit(G["HEL16"].render("{}: {}".format(key, repr(HURTBOXES[hitboxkey][key])), 0, (0, 0, 0)), (x, y))
+        y += 16
+
+def hitbox_menu(G, actor, hitboxkey):
+    if hitboxkey not in HITBOXES: HITBOXES[hitboxkey] = {}
+    if hitboxkey not in HURTBOXES: HURTBOXES[hitboxkey] = {}
+    actor = G["ACTOR"].get_actor(actor)
+    actor.hitboxes = HITBOXES[hitboxkey]
+    actor.hurtboxes = HURTBOXES[hitboxkey]
+    ctx = {
+        "actor": actor,
+        "scrollx": 128,
+        "scrolly": 128,
+        "key": hitboxkey,
+        "identifier": "{}:{}".format(actor.state, actor.frame),
+    }
+    G["ctx"] = ctx
     while True:
-        draw(G)
-        G["SCREEN"].blit(drawn_actor_template(G, actor_template, scroll=scroll, idx=idx), (250, 0))
-
+        if ctx["identifier"] not in HITBOXES[hitboxkey]: HITBOXES[hitboxkey][ctx["identifier"]] = []
+        if ctx["identifier"] not in HURTBOXES[hitboxkey]: HURTBOXES[hitboxkey][ctx["identifier"]] = []
+        box_menu_draw(G)
         inp = expect_input()
-        mods = pygame.key.get_mods()
-
-        if inp == K_ESCAPE and mods & KMOD_CTRL: sys.exit()
-        if inp == K_ESCAPE: return
-
-        if inp == K_DOWN and mods & KMOD_SHIFT: scroll -= 64
-        elif inp == K_DOWN: idx += 1
-        if inp == K_UP and mods & KMOD_SHIFT: scroll += 64
-        elif inp == K_UP: idx -= 1
-
-        if inp == K_s and mods & KMOD_SHIFT:
-            draw(G)
-            G["SCREEN"].blit(
-                G["HEL32"].render("Save as? /scripts/{your input}.rp", 0, (0, 0, 0)),
-                (0, 0))
-            filename = get_text_input(G, (0, 32))
-            if not filename: continue
-            try:
-                with open(SCRIPT_LOCATION + filename + ".rp", "w") as f:
-                    f.write(export_as_rp_script(actor_template))
-            except IOError:
-                continue
+        if inp is None or inp == K_ESCAPE: return None
+        if inp == K_i:
+            rect = input_rect(G, (100, 0, 0))
+            if rect is not None:
+                HITBOXES[hitboxkey][ctx["identifier"]].append(rect)
             
-        if inp in [K_SPACE, K_BACKSPACE]:
-            data_type, data = index_template(actor_template, idx)
-            if data_type == "key":
-                if data == "name":
-                    draw(G)
-                    G["SCREEN"].blit(
-                        G["HEL32"].render("New name", 0, (0, 0, 0)),
-                        (0, 0)
-                    )
-                    new = get_text_input(G, (0, 32))
-                    if not new: continue
-                    actor_template[data] = new
-                else:
-                    draw(G)
-                    G["SCREEN"].blit(
-                        G["HEL32"].render("(A, B) A:", 0, (0, 0, 0)),
-                        (0, 0)
-                    )
-                    A = get_text_input(G, (0, 32), numeric=True)
-                    if not A: continue
-                    draw(G)
-                    G["SCREEN"].blit(
-                        G["HEL32"].render("(A, B) B:", 0, (0, 0, 0)),
-                        (0, 0)
-                    )
-                    B = get_text_input(G, (0, 32), numeric=True)
-                    if not B: continue
-                    actor_template[data] = (A, B)
-                        
-            if data_type == "sprite":
-                def update(G):
-                    draw(G)
-                    G["SCREEN"].blit(
-                        G["HEL32"].render("Select sprite:", 0, (0, 0, 0)),
-                        (0, 0)
-                    )
-                sprite_keys = []
-                for key in SPRITESHEETS.keys():
-                    for sprite in SPRITESHEETS[key].keys():
-                        sprite_keys.append(sprite)
-                if not sprite_keys: continue
-                choice = select_from_list(G, sprite_keys, (0, 32), args=G, cb=update)
-                if not choice: continue
-                actor_template["sprites"][data] = choice
+        if inp == K_u:
+            rect = input_rect(G, (0, 100, 0))
+            if rect is not None:
+                HURTBOXES[hitboxkey][ctx["identifier"]].append(rect)
 
-            if data_type == "script name":
+        if inp == K_RETURN:
+            ctx["identifier"] = "{}:{}".format(actor.state, actor.frame)
+
+        if inp == K_LEFT:
+            actor.frame -= 1
+
+        if inp == K_RIGHT:
+            actor.frame += 1
+
+        if inp == K_SPACE:
+            state = get_text_input(G, (0, 32))
+            actor.state = actor.state if not state else state
+
+        if inp == K_BACKSPACE:
+            def update(G):
                 draw(G)
                 G["SCREEN"].blit(
-                    G["HEL32"].render("Rename Code Block", 0, (0, 0, 0)),
-                    (0, 0)
+                    G["HEL32"].render("Remove from:", 0, (0, 0, 0)),
+                     (0, 0)
                 )
-                new = get_text_input(G, (0, 32))
-                if not new: continue
-                actor_template["scripts"][new] = actor_template["scripts"].pop(data)
+            choice = select_from_list(G, ["Hitbox", "Hurtbox"], (0, 32))
+            if choice is not None:
+                selection = HITBOXES[hitboxkey][ctx["identifier"]] if choice == "Hitbox" else HURTBOXES[hitboxkey][ctx["identifier"]]
+                rect = select_from_list(G, selection, (0, 32))
+                if rect in selection:
+                    selection.remove(rect)
 
-            if data_type == "cmd":
-                script, index = data.split("|")
-                try:
-                    index = int(index)
-                except ValueError:
-                    continue
-                if inp == K_SPACE:
-                    draw(G)
-                    G["SCREEN"].blit(
-                        G["HEL32"].render("CMD", 0, (0, 0, 0)),
-                        (0, 0)
-                    )
-                    new = get_text_input(G, (0, 32))
-                    if not new: continue
-                    actor_template["scripts"][script].insert(index+1, new)
-                if inp == K_BACKSPACE:
-                    actor_template["scripts"][script].pop(index)
+def resize_up(r):
+    return Rect(r.x, r.y, r.w*4, r.h*4)
 
-def export_as_rp_script(template):
-    name = template["name"]
-    x, y = template["POS"]
-    w, h = template["DIM"]
-    tangible = template["tangible"]
-    offx, offy = template["spriteoffset"]
+def input_rect(G, col=(100, 100, 100)):
+    scrollx, scrolly = G["ctx"]["scrollx"], G["ctx"]["scrolly"]
+    G["SCREEN"].blit(G["HEL32"].render("DRAW RECT", 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 128))
+    def draw_helper_(G):
+        box_menu_draw(G)
+        mpos = pygame.mouse.get_pos()
+        G["SCREEN"].blit(G["HEL16"].render("{}".format((mpos[0] // 4, mpos[1] // 4)), 0, (0, 0, 0)), mpos)
+    inp = expect_click(G, cb=draw_helper_)
+    if inp is None: return None
+    pos, btn = inp
+    pos = pos[0] - scrollx, pos[1] - scrolly
+    def draw_helper(G):
+        draw_helper_(G)
+        scrollx, scrolly = G["ctx"]["scrollx"], G["ctx"]["scrolly"]
+        pos2 = pygame.mouse.get_pos()
+        pos2 = pos2[0] - scrollx, pos2[1] - scrolly
+        x1 = min(pos[0], pos2[0]) // 4
+        x2 = max(pos[0], pos2[0]) // 4
+        y1 = min(pos[1], pos2[1]) // 4
+        y2 = max(pos[1], pos2[1]) // 4
+        pygame.draw.rect(
+            G["SCREEN"],
+            col,
+            Rect((x1*4+scrollx, y1*4+scrolly), ((x2 - x1)*4, (y2 - y1)*4)),
+            width=2
+        )
+    inp = expect_click(G, draw_helper)
+    if inp is None: return None
+    pos2, btn2 = inp
+    if not pos2: return None
+    pos2 = pos2[0] - scrollx, pos2[1] - scrolly
+    x1 = min(pos[0], pos2[0])
+    x2 = max(pos[0], pos2[0])
+    y1 = min(pos[1], pos2[1])
+    y2 = max(pos[1], pos2[1])
 
-    # look, im sorry
-    RPS = "{}|{},{},{},{}|{}|{},{}|".format(name, x, y, w, h, tangible, offx, offy)
-    for key in SPRITEMAPS[template["sprites"]]:
-        RPS += "\n{} {}".format(key, SPRITEMAPS[template["sprites"]][key])
-    for key in SCRIPTS[template["scripts"]]:
-        RPS += "\n|{}|\n{}\n".format(key, "\n".join(SCRIPTS[template["scripts"]][key]))
-    return RPS
+    x1 -= x1 % 4
+    y1 -= y1 % 4
+    x2 -= x2 % 4
+    y2 -= y2 % 4
 
+    return (x1 // 4, y1 // 4), ((x2 - x1)//4, (y2 - y1)//4)

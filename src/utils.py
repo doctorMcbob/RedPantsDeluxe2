@@ -54,9 +54,9 @@ def expect_click(args=None, cb=lambda *args: None):
         cb(args)
         pygame.display.update()
         for e in pygame.event.get():
-            if e.type == QUIT or e.type == KEYDOWN and e.key == K_ESCAPE: quit()
+            if e.type == QUIT or e.type == KEYDOWN and e.key == K_ESCAPE: return None
             if e.type == MOUSEBUTTONDOWN:
-                return e.pos
+                return e.pos, e.button
 
 def expect_input(expectlist=[], args=None, cb=lambda *args:None):
     cb(args)
