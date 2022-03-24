@@ -8,8 +8,9 @@ set self rotation 0
 
 |SPIKE:0|
 set self frame 0
+hitboxes spike0
 
-|COLLIDE|
+|HIT|
 if self.can_die
    set self state DEAD
    set self frame 0

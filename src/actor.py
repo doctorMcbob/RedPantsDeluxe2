@@ -294,9 +294,9 @@ class Actor(Rect):
             hitboxes = actor.get_hitboxes()
             if hitboxes is None: continue
 
-            for hitbox in hitboxes:
-                if Rect(hitbox).collidelist(hurtboxes):
-                    self.hit(actor)
+            for hurtbox in hurtboxes:
+                if Rect(hurtbox).collidelist(hitboxes) != -1:
+                    actor.hit(self, world)
                     break
                     
     def hit(self, actor, world):
