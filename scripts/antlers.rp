@@ -23,7 +23,7 @@ JUMPSQUAT:0 antlerjumpsquat0 -32,-16
 JUMPSQUAT:3 antlerjumpsquat1 -32,-16
 FLIPSQUAT:0 antlerjumpsquat0 -32,-16
 FLIPSQUAT:3 antlerjumpsquat1 -32,-16
-BONK:0 antlerbonk -32,-16
+BONK:0 antlerbonk -48,-16
 BONKLAND:0 antlerbonkland0 -64,-16
 BONKLAND:12 antlerbonkland1 -48,-16
 WALLTOUCH:0 antlerwalljump0 -32,-16
