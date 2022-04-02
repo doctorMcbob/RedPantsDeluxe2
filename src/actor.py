@@ -215,16 +215,6 @@ class Actor(Rect):
         Y += 16
         dest.blit(font.render("vel {},{}".format(self.x_vel, self.y_vel), 0, (0, 0, 0)), (X, Y))
 
-        script = self._index(self.scripts)
-        if script is None: return
-        Y = pos[1]
-        X += 256
-        dest.blit(font.render("CURRENT SCRIPT", 0, (0, 0, 0)), (X, Y))
-        X += 16
-        for cmd in script:
-            Y += 16
-            dest.blit(font.render("{}".format(cmd), 0, (0, 0, 0)), (X, Y))
-
         pygame.draw.rect(dest, (0, 0, 255), Rect(self.x-scrollx, self.y-scrolly, self.w, self.h), width=2)
 
         hitboxes = self.get_hitboxes()
@@ -236,6 +226,16 @@ class Actor(Rect):
             for box in hurtboxes:
                 pygame.draw.rect(dest, (0, 255, 0), Rect(box.x-scrollx, box.y-scrolly, box.w, box.h), width=2)
         
+        script = self._index(self.scripts)
+        if script is None: return
+        Y = pos[1]
+        X += 256
+        dest.blit(font.render("CURRENT SCRIPT", 0, (0, 0, 0)), (X, Y))
+        X += 16
+        for cmd in script:
+            Y += 16
+            dest.blit(font.render("{}".format(cmd), 0, (0, 0, 0)), (X, Y))
+
     def collision_check(self, world):
         actors = list(filter(lambda actor:not (actor is self), world.get_actors()))
         tangibles = list(filter(lambda actor: actor.tangible, actors))
