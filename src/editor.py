@@ -587,6 +587,19 @@ def hitbox_menu(G, actor, hitboxkey):
         if inp == K_RETURN:
             ctx["identifier"] = "{}:{}".format(actor.state, actor.frame)
 
+        if inp == K_w:
+            ctx["scrolly"] += 32
+
+        if inp == K_a:
+            ctx["scrollx"] -= 32
+
+        if inp == K_s:
+            ctx["scrolly"] += 32
+
+        if inp == K_d:
+            ctx["scrollx"] += 32
+
+            
         if inp == K_LEFT:
             actor.frame -= 1
 

@@ -1,0 +1,530 @@
+REDPANTSGUY|128,256,32,64|True|
+START:0 fighterstand -16,0
+IDLE:0 fighterstand -16,0
+RUNNING:0 fighterrun -16,0
+RUNNING:4 fighterrun1 -16,0
+RUNNING:8 fighterrun2 -16,0
+RUNNING:12 fighterrun3 -16,0
+AIRIAL:0 fighterjump0 -16,0
+AIRIAL:0 fighterjump2 -16,0
+AIRIAL:0 fighterjump1 -16,0
+SLIDE:0 fighterslide1 -16,0
+SLIDE:0 fighteslide0 -16,0
+LANDING:0 fighterland -16,0
+JUMPSQUAT:0 fighterjumpsquat0 -16,0
+JUMPSQUAT:3 fighterjumpsquat1 -16,0
+FLIPSQUAT:0 fighterjumpsquat0 -16,0
+FLIPSQUAT:3 fighterjumpsquat1 -16,0
+DIVESTART:0 fighterdivestart -16,0
+DIVEKICK:0 fighterdivekick -32,0
+DIVELAND:0 fighterdiveland -16,0
+ROLLOUT:0 fighterrollout -16,0
+BONK:0 fighterbonk -16,0
+BONKLAND:0 fighterbonkland0 -16,0
+BONKLAND:12 fighterbonkland1 -16,0
+WALLTOUCH:0 fighterwalltouch -16,0
+WALLJUMP:0 fighterwalljump0 -16,0
+WALLJUMP:3 fighterwalljump1 -16,0
+SLIDEFLIP:0 fightersideflip0 -16,0
+SLIDEFLIP:8 fightersideflip1 -16,0
+SLIDEFLIP:10 fightersideflip2 -16,0
+SLIDEFLIP:14 fightersideflip3 -16,0
+SLIDEFLIP:18 fightersideflip4 -16,0
+SLIDEFLIP:20 fightersideflip5 -16,0
+SLIDEFLIP:23 fightersideflip6 -16,0
+CROUCH:0 fightercrouch -16,0
+SLIDEKICK:0 fighterkickslide -32,8
+LONGJUMPSTART:0 fighterlongjump0 -16,0
+LONGJUMP:0 fighterlongjump1 -16,0
+LONGJUMP:8 fighterlongjump2 -16,0
+DEAD:0 fighterdead -16,0
+PUNCH:0 fighterpunch0 -32,0
+PUNCH:4 fighterpunch1 -16,0
+PUNCH:6 fighterpunch2 -32,0
+PUNCH:8 fighterpunch3 -16,0
+KICK:0 fighterkick0 -16,0
+KICK:5 fighterkick1 -32,0
+KICK:9 fighterkick2 -16,0
+
+|START:0|
+set self state IDLE
+set self frame 0
+set self speed 8
+set self jumpstrength -17
+set self hopstrength -12
+set self divestrength 14
+set self rolloutstrength -8
+set self bonkstrength 2
+set self walljumpstrength -12
+set self walljumpoff 10
+set self airdrift 0.7
+set self traction 0.6 * -1
+set self limit 20
+set self airspeedcontrol 12
+set self negairspeedcontrol self.airspeedcontrol * -1
+set self negspeed self.speed * -1
+set self neglimit self.limit * -1
+set self grav 1
+set self slideflipxmod 3
+set self slideflipstrength -24
+set self longjumpystrength -9
+set self longjumpxstrength 12
+set self kickseverity 8
+
+set self can_die 1
+set self respawnx self.x
+set self respawny self.y
+
+|DEAD:0|
+set self x_vel 0
+set self y_vel 0
+set self can_die 0
+
+|DEAD:45|
+set self state IDLE
+self self frame 0
+set self x self.respawnx
+set self y self.respawny
+set self can_die 1
+
+|IDLE:0|
+exec checkAir
+if self.x_vel != 0
+   set self state SLIDE
+endif
+if self.y_vel == 0
+   if not inpRIGHT and inpLEFT
+      set self state RUNNING
+      set self frame 0
+      set self direction -1
+   endif
+   if not inpLEFT and inpRIGHT
+      set self state RUNNING
+      set self frame 0
+      set self direction 1
+   endif
+endif
+exec checkCrouch
+exec checkJump
+exec checkPunch
+exec applyGrav
+
+|IDLE:32|
+exec IDLE:0
+set self frame 0
+
+|CROUCH:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+if not inpDOWN
+   if self.x_vel == 0
+      set self state IDLE
+      set self frame 0
+   endif
+   if self.x_vel != 0
+      set self state SLIDE
+      set self frame 0
+   endif
+endif
+# bufferable pog?
+if self.x_vel != 0 and inpA
+   set self state LONGJUMPSTART
+   set self frame 0
+endif
+if inpB
+   set self state DIVEKICK
+   set self x_vel self.direction * self.divestrength
+   set self frame 0
+endif
+set self frame 0
+set self frame 0
+
+|LONGJUMPSTART:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+
+|LONGJUMPSTART:2|
+exec LONGJUMPSTART:0
+set self y_vel self.longjumpystrength
+set self x_vel self.longjumpxstrength * self.direction
+set self state LONGJUMP
+set self frame 0
+
+|LONGJUMP:0|
+exec applyGrav
+set self calc1 self.x_vel < self.negairspeedcontrol
+if not self.calc1 and inpLEFT
+   set self x_vel self.x_vel - self.airdrift
+endif
+set self calc1 self.x_vel > self.airspeedcontrol
+if not self.calc1 and inpRIGHT
+   set self x_vel self.x_vel + self.airdrift
+endif
+
+|RUNNING:0|
+set self x_vel self.speed * self.direction
+set self calc1 self.direction == 1 nor inpRIGHT
+set self calc2 self.direction == -1 nor inpLEFT
+if inpRIGHT == inpLEFT or self.calc1 or self.calc2
+   set self state SLIDE
+   set self frame 0
+endif
+exec checkCrouch
+exec checkJump
+exec checkPunch
+exec checkAir
+exec applyGrav
+
+|RUNNING:16|
+exec RUNNING:0
+set self frame 0
+
+|SLIDE:0|
+if self.x_vel == 0
+   set self state IDLE
+   set self frame 0
+endif
+exec checkPunch
+if self.x_vel != 0
+   exec applyTraction
+   set self absxvel abs self.x_vel
+   if abs self.traction * 10 > self.absxvel
+      img fighterslide1
+   endif
+   exec checkCrouch
+   exec checkJump
+   if self.state == JUMPSQUAT
+      if self.direction == 1 and inpLEFT
+      	 set self state FLIPSQUAT
+	 set self frame 0
+      endif
+      if self.direction == -1 and inpRIGHT
+      	 set self state FLIPSQUAT
+	 set self frame 0
+      endif
+   endif
+   exec checkAir
+   exec applyGrav
+endif
+if abs self.x_vel < self.speed
+   set self calc1 self.x_vel > 0 and inpRIGHT
+   set self calc1 not inpLEFT and self.calc1
+   if self.calc1
+      set self direction 1
+   endif
+   if not inpRIGHT and self.x_vel < 0 and inpLEFT
+      set self direction -1
+   endif
+   if not inpRIGHT and self.x_vel < 0 and inpLEFT or self.calc1
+      set self state RUNNING
+      set self frame 0
+   endif
+endif
+
+|AIRIAL:0|
+set self calc1 self.y_vel > self.airspeedcontrol
+set self calc2 self.airspeedcontrol * -1 > self.y_vel
+if not self.calc1 nor self.calc2
+   if self.x_vel - self.airdrift > self.negspeed and inpLEFT
+	set self x_vel self.x_vel - self.airdrift
+   endif
+   if self.x_vel + self.airdrift < self.speed and inpRIGHT
+      set self x_vel self.x_vel + self.airdrift
+   endif
+   if B_DOWN in inpEVENTS
+      set self state DIVESTART
+      set self frame 0
+   endif
+endif
+if self.calc1
+   img fighterjump2
+endif
+if self.calc2
+   img fighterjump0
+endif
+exec applyGrav
+
+|JUMPSQUAT:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+
+|JUMPSQUAT:6|
+set self state AIRIAL
+if inpA
+   set self y_vel self.jumpstrength
+endif
+if not inpA
+   set self y_vel self.hopstrength
+endif
+set self frame 0
+
+|LANDING:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+if self.x_vel > 0
+   set self direction 1
+endif
+if self.x_vel < 0
+   set self direction -1
+endif
+
+|LANDING:5|
+if self.x_vel
+   set self state SLIDE
+   exec SLIDE:0
+endif
+if self.x_vel == 0
+   set self state IDLE
+   exec IDLE:0
+endif
+
+|DIVESTART:0|
+set self y_vel 0
+set self x_vel 0
+
+|DIVESTART:5|
+set self x_vel self.divestrength * self.direction
+set self state DIVEKICK
+
+|DIVEKICK:0|
+exec applyGrav
+
+|SLIDEKICK:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+# bufferable Pog?
+if inpA
+   set self frame 0
+   set self y_vel self.rolloutstrength
+endif
+if self.x_vel == 0
+   set self state IDLE
+   set self frame 0
+endif
+
+|DIVELAND:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+# bufferable Pog?
+if inpA
+   set self state ROLLOUT
+   set self frame 0
+   set self y_vel self.rolloutstrength
+endif
+if self.x_vel == 0
+   set self state IDLE
+   set self frame 0
+endif
+
+|ROLLOUT:0|
+exec applyGrav
+
+|BONK:0|
+set self x_vel self.bonkstrength * self.direction * -1
+exec applyGrav
+
+|BONKLAND:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+
+|BONKLAND:25|
+set self state IDLE
+set self frame 0
+
+|WALLTOUCH:0|
+exec AIRIAL:0
+set self state AIRIAL
+if not self.calc1 nor self.calc2
+   img fighterwalltouch
+   # bufferable pog?
+   if inpA
+      set self state WALLJUMP
+      set self frame 0
+   endif
+endif
+
+|WALLJUMP:0|
+set self y_vel 0
+
+|WALLJUMP:6|
+set self state AIRIAL
+set self frame 0
+set self y_vel self.walljumpstrength
+set self direction self.direction * -1
+set self x_vel self.walljumpoff * self.direction
+
+|PUNCH:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+
+|PUNCH:9|
+exec PUNCH:0
+exec checkKick
+
+|PUNCH:16|
+set self state IDLE
+set self frame 0
+
+|KICK:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+
+|KICK:20|
+set self state IDLE
+set self frame 0
+
+|FLIPSQUAT:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+
+|FLIPSQUAT:6|
+set self state SLIDEFLIP
+set self direction self.direction * -1
+set self x_vel self.slideflipxmod * self.direction
+set self y_vel self.slideflipstrength
+set self frame 0
+
+|SLIDEFLIP:0|
+exec applyGrav
+if self.direction == -1
+   if inpLEFT
+      	set self x_vel self.x_vel - self.airdrift
+	if self.x_vel < self.negairspeedcontrol
+      	   set self x_vel self.negairspeedcontrol
+   	endif
+   endif
+endif
+if self.direction == 1
+   if inpRIGHT
+      set self x_vel self.x_vel + self.airdrift
+      if self.x_vel > self.airspeedcontrol
+      	 set self x_vel self.airspeedcontrol
+      endif
+   endif
+endif
+
+
+|XCOLLISION|
+set self calc1 self.state == DIVEKICK
+set self calc1 self.state == DIVELAND or self.calc1
+set self calc1 self.state == LONGJUMP or self.calc1
+if self.state == ROLLOUT or self.calc1
+   set self state BONK
+   set self frame 0
+endif
+set self calc1 self.state == SLIDEFLIP
+if self.state == AIRIAL or self.calc1
+   set self state WALLTOUCH
+   set self frame 0
+   if self.x_vel > 0
+      set self direction 1
+   endif
+   if self.x_vel < 0
+      set self direction -1
+   endif
+endif
+
+|YCOLLISION|
+set self calc1 self.state == ROLLOUT
+set self calc1 self.state == SLIDEFLIP or self.calc1
+set self calc1 self.state == LONGJUMP or self.calc1
+if self.state == AIRIAL or self.calc1
+   set self state LANDING
+   set self frame 0
+endif
+if self.state == DIVEKICK
+   set self state SLIDEKICK
+   set self frame 0
+endif
+if self.state == SLIDEKICK
+   set self y_vel -1 * self.y_vel * 0.8
+endif
+if self.state == BONK
+   set self state BONKLAND
+   set self frame 0
+endif
+
+|COLLIDE|
+if self.state == PLATFORM
+   set self touched 1
+endif
+set self calc self.state == BANANA
+set self calc self.state == CHEESE or self.calc
+if self.state == COIN or self.calc
+   set self collected 1
+endif
+
+|checkAir|
+if self.y_vel
+   set self state AIRIAL
+   set self frame 0
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+if self.y_vel > self.limit
+   set self y_vel self.limit
+endif
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
+endif
+
+|applyTraction|
+if self.x_vel != 0
+   if self.x_vel > 0
+      set self x_vel self.traction + self.x_vel
+   endif
+   if self.x_vel < 0
+      set self x_vel self.traction * -1 + self.x_vel
+   endif
+endif
+if abs self.x_vel / 1 == 0
+   set self x_vel 0
+endif
+
+|checkCrouch|
+if inpDOWN
+   set self state CROUCH
+   set self frame 0
+endif
+
+|checkJump|
+if A_DOWN in inpEVENTS
+   set self state JUMPSQUAT
+   set self frame 0
+endif
+
+|checkPunch|
+if B_DOWN in inpEVENTS
+   set self state PUNCH
+   set self frame 0
+endif
+
+|checkKick|
+# bufferable pog?
+if inpB
+   set self x_vel self.direction * self.kickseverity
+   set self state KICK
+   set self frame 0
+endif
+
+|updateSpecials|
+if self.fireball == 0 and inpDOWN
+endif
+
+set self calc inpRIGHT and self.direction == 1
+set self calc inpLEFT and self.direction == -1 or self.calc
+if self.fireball == 1 and inpDOWN and self.calc
+endif
+
+if not inpDOWN and self.fireball == 2 and inp
