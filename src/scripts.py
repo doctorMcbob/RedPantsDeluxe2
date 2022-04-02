@@ -6,6 +6,8 @@ from src import boxes
 
 import operator as ops
 
+from copy import deepcopy
+
 operators = {
     "+": ops.add,
     "-": ops.sub,
@@ -134,8 +136,12 @@ def resolve(reference, script, world, logfunc=print):
                 actor = a.get_actor(reference)
                 actor.hurtboxes = boxes.get_hurtbox_map(keyname)
 
+            if verb == "create":
+                template_name, actor_name, x, y = cmd
+                a.add_actor_from_template(actor_name, template_name, {"x": int(x), "y": int(y)})
+
         except Exception as e:
-            logfunc(cmd)
+            logfunc(script[cmd_idx])
             logfunc("Error resolving {}... {}".format(verb, e))
 
         cmd_idx += 1
@@ -184,6 +190,7 @@ def evaluate_literals(cmd, reference, logfunc=print):
 def resolve_operators(cmd, logfunc=print):
     evaluated = []
     idx = 0
+    line = deepcopy(cmd)
     while idx < len(cmd):
         token = cmd[idx]
         try:
@@ -199,7 +206,7 @@ def resolve_operators(cmd, logfunc=print):
             else:
                 evaluated.append(token)
         except Exception as e:
-            logfunc(cmd)
+            logfunc(line)
             logfunc("Error applying operators {}... {}".format(token, e))
         idx += 1
     return evaluated

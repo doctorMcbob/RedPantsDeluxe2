@@ -53,6 +53,9 @@ TATSUFLIP:3 fightertatsuflip1 -32,0
 TATSUFLIP:5 fightertatsuflip2 -32,0
 TATSUFLIP:8 fightertatsuflip3 -32,0
 TATSUFLIP:12 fightertatsuflip4 -32,0
+SHORYUSTART:0 fighterdragonpunch0 -16,0
+SHORYU:0 fighterdragonpunch1 -16,0
+SHORYUFALL:0 fighterdragonpunch2 -16,0
 
 |START:0|
 set self state IDLE
@@ -82,6 +85,8 @@ set self tatsuspeed 9
 set self slidekickspeed 9
 set self fireball 0
 
+set self shoryuxstr 5
+set self shoryuystr -14
 set self tatsuflipxmod 9
 set self tatsuflipymod -7
 
@@ -250,6 +255,9 @@ if not self.calc1 nor self.calc2
    if B_DOWN in inpEVENTS
       set self state DIVESTART
       set self frame 0
+   endif
+   if B_DOWN in inpEVENTS and inpUP
+      set self state SHORYUSTART
    endif
    set self calc inpRIGHT and self.direction == -1
    set self calc inpLEFT and self.direction == 1 or self.calc
@@ -445,13 +453,28 @@ set self frame 0
 |TATSU:16|
 set self frame 0
 
-
 |TATSUFLIP:0|
 exec applyGrav
 
 |TATSUFLIP:8|
 applyGrav
 exec AIRIAL:0
+
+|SHORYUSTART:7|
+set self state SHORYU
+set self frame 0
+set self x_vel self.direction * self.shoryuxstr
+set self y_vel self.shoryuystr
+
+|SHORYU:0|
+exec applyGrav
+if self.y_vel > 0
+   set self state SHORYUFALL
+   set self frame 0
+endif
+
+|SHORYUFALL:0|
+exec SLIDEFLIP:0
 
 |XCOLLISION|
 set self calc1 self.state == DIVEKICK
@@ -461,7 +484,9 @@ if self.state == ROLLOUT or self.calc1
    set self state BONK
    set self frame 0
 endif
-set self calc1 self.state == SLIDEFLIP
+set self calc1 self.state == SHORYUFALL
+set self calc1 self.state == TATSUFLIP or self.calc1
+set self calc1 self.state == SLIDEFLIP or self.calc1
 if self.state == AIRIAL or self.calc1
    set self state WALLTOUCH
    set self frame 0
@@ -486,7 +511,8 @@ if self.state == TATSU
 endif
 
 |YCOLLISION|
-set self calc1 self.state == TATSUFLIP
+set self calc1 self.state == SHORYUFALL
+set self calc1 self.state == TATSUFLIP or self.calc1
 set self calc1 self.state == ROLLOUT or self.calc1
 set self calc1 self.state == SLIDEFLIP or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1
@@ -559,6 +585,9 @@ endif
 |checkPunch|
 if B_DOWN in inpEVENTS
    set self state PUNCH
+   if inpUP
+      set self state SHORYUSTART
+   endif
    set self frame 0
 endif
 
