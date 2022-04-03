@@ -20,8 +20,8 @@ DIVEKICK:0 fighterdivekick -32,0
 DIVELAND:0 fighterdiveland -16,0
 ROLLOUT:0 fighterrollout -16,0
 BONK:0 fighterbonk -16,0
-BONKLAND:0 fighterbonkland0 -16,0
-BONKLAND:12 fighterbonkland1 -16,0
+BONKLAND:0 fighterbonkland0 -32,0
+BONKLAND:12 fighterbonkland1 -32,0
 WALLTOUCH:0 fighterwalltouch -16,0
 WALLJUMP:0 fighterwalljump0 -16,0
 WALLJUMP:3 fighterwalljump1 -16,0
@@ -56,6 +56,9 @@ TATSUFLIP:12 fightertatsuflip4 -32,0
 SHORYUSTART:0 fighterdragonpunch0 -16,0
 SHORYU:0 fighterdragonpunch1 -16,0
 SHORYUFALL:0 fighterdragonpunch2 -16,0
+HADOKEN:0 fighterfireball0 -16,0
+HADOKEN:6 fighterfireball1 -16,0
+HADOKEN:9 fighterfireball2 -16,0
 
 |START:0|
 set self state IDLE
@@ -83,7 +86,7 @@ set self longjumpxstrength 12
 set self kickseverity 8
 set self tatsuspeed 9
 set self slidekickspeed 9
-set self fireball 0
+set self fireballnumber 0
 
 set self shoryuxstr 5
 set self shoryuystr -14
@@ -151,9 +154,17 @@ if self.x_vel != 0 and inpA
    set self state LONGJUMPSTART
    set self frame 0
 endif
+
+set self calc inpRIGHT and self.direction == 1
+set self calc inpLEFT and self.direction == -1 or self.calc
 if inpB
-   set self state SLIDEKICK
-   set self x_vel self.direction * self.slidekickspeed
+   if self.calc
+      set self state HADOKEN
+   endif
+   if not self.calc
+      set self state SLIDEKICK
+      set self x_vel self.direction * self.slidekickspeed
+   endif
    set self frame 0
 endif
 set self frame 0
@@ -476,6 +487,25 @@ endif
 |SHORYUFALL:0|
 exec SLIDEFLIP:0
 
+|HADOKEN:0|
+exec checkAir
+exec applyTraction
+exec applyGrav
+
+|HADOKEN:12|
+exec HADOKEN:0
+create fireball self.name + fireball + self.fireballnumber self.x self.y
+set self.name + fireball + self.fireballnumber direction self.direction
+set self fireballnumber self.fireballnumber + 1
+
+|HADOKEN:13|
+exec HADOKEN:0
+
+|HADOKEN:20|
+set self state IDLE
+set self frame 0
+exec IDLE:0
+
 |XCOLLISION|
 set self calc1 self.state == DIVEKICK
 set self calc1 self.state == DIVELAND or self.calc1
@@ -502,7 +532,7 @@ if self.state == TATSU
       set self state TATSUFLIP
       set self frame 0
       set self x_vel self.tatsuflipxmod * self.direction * -1
-      set self y_vel self.tatsuflipymod
+       set self y_vel self.tatsuflipymod
    endif
    if not inpA
       set self state BONK

@@ -138,7 +138,14 @@ def resolve(reference, script, world, logfunc=print):
 
             if verb == "create":
                 template_name, actor_name, x, y = cmd
-                a.add_actor_from_template(actor_name, template_name, {"x": int(x), "y": int(y)})
+                a.add_actor_from_template(actor_name, template_name, {
+                    "name": actor_name, "POS": (int(x), int(y))
+                })
+                actor = a.get_actor(actor_name)
+                if actor_name not in world.actors:
+                    world.actors.append(actor_name)
+                if "START:0" in actor.scripts:
+                    resolve(actor_name, actor.scripts["START:0"], world, logfunc=logfunc)
 
         except Exception as e:
             logfunc(script[cmd_idx])
@@ -201,7 +208,10 @@ def resolve_operators(cmd, logfunc=print):
                 calculated = not cmd.pop(idx+1)
                 evaluated.append(calculated)
             elif type(token) == str and token in operators:
-                calculated = operators[token](evaluated.pop(), cmd.pop(idx+1))
+                left, right = evaluated.pop(), cmd.pop(idx+1)
+                if (type(left) == str and type(right) == int) or (type(right) == str and type(left) == int):
+                    left, right = str(left), str(right)
+                calculated = operators[token](left, right)
                 evaluated.append(calculated)
             else:
                 evaluated.append(token)
