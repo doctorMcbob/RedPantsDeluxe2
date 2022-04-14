@@ -1,0 +1,25 @@
+FIREBALL|0,0,0,0|False|
+START:0 airfireballstart 0,0
+FIREBALL:0 airfireballstart 0,0
+FIREBALL:2 airfireball0 -4,8
+FIREBALL:4 airfireball1 -4,8
+
+|START:0|
+set self speed 8
+set self framelifespan 160
+set self state FIREBALL
+set self frame 0
+set self y_vel 8
+
+|FIREBALL:0|
+set self x self.direction * self.speed + self.x
+set self y self.y_vel + self.y
+set self framelifespan self.framelifespan - 1
+if self.framelifespan < 0
+   goodbye
+endif
+
+|FIREBALL:6|
+set self frame 2
+exec FIREBALL:0
+
