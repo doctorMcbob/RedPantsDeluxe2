@@ -67,8 +67,7 @@ focus MAIN self
 set self frame_name MAIN
 hitboxes redpantsguy
 hurtboxes redpantsguy
-
-
+set self base player
 set self can_die 1
 set self respawnx self.x
 set self respawny self.y

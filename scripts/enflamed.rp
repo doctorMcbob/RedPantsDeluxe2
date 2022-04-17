@@ -1,0 +1,178 @@
+REDPANTSGUY|128,256,32,64|True|
+START:0 flaming0 -16,-16
+FLAMING:0 flaming0 -16,-16
+FLAMING:2 flaming1 -16,-16
+FLAMING:4 flaming2 -16,-16
+FLAMING:6 flaming3 -16,-16
+FLAMING:8 flaming4 -16,-16
+FLAMING:10 flaming5 -16,-16
+FLAMING:12 flaming6 -16,-16
+FLAMING:14 flaming7 -16,-16
+FIRERUN:0 firerun0 -16,-16
+FIRERUN:3 firerun1 -16,-16
+FIRERUN:6 firerun2 -16,-16
+FIRERUN:9 firerun3 -16,-16
+JUMPSQUAT:0 firejumpsquat -16,-16
+FIREJUMP:0 firejump0 -16,-16
+FIREJUMP:3 firejump1 -16,-16
+FIREJUMP:6 firejump2 -16,-16
+FIREJUMP:9 firejump3 -16,-16
+TURNAROUND:0 fireturnaround -16,-16
+BURNOUT:0 burnout0 -16,-16
+BURNOUT:4 burnout1 -16,-16
+BURNOUT:8 burnout2 -16,-16
+BURNOUT:12 burnout3 -16,-16
+BURNOUTTURNAROUND:0 burnoutturnaround -16,-16
+DEFLAME:0 deflame0 -16,-16
+DEFLAME:3 deflame1 -16,-16
+DEFLAME:6 deflame2 -16,-16
+DEFLAME:9 deflame3 -16,-16
+BURNOUTJUMP:0 burnoutjump0 -16,-16
+BURNOUTJUMP:3 burnoutjump1 -16,-16
+BURNOUTJUMP:6 burnoutjump2 -16,-16
+BURNOUTJUMP:9 burnoutjump3 -16,-16
+
+|START:0|
+set self state FLAMING
+set self frame 0
+set self speed 8
+set self burnoutspeed 5
+set self jumpstrength -17
+set self grav 1
+if self.direction == 0
+   set self direction 1
+endif
+set self limit 20
+set self neglimit self.limit * -1
+set self x_vel 0
+set self y_vel 0
+set self burnoutframes 90
+set self mashout 0
+set self mashlimit 30
+
+|FLAMING:16|
+set self state FIRERUN
+set self frame 0
+
+|FIRERUN:0|
+set self x_vel self.direction * self.speed
+if inpA
+   set self state JUMPSQUAT
+   set self frame 0
+endif
+if inpB or inpUP or inpDOWN or inpLEFT or inpRIGHT
+   set self mashout self.mashout + 1
+endif
+if self.mashout > self.mashlimit
+   set self state BURNOUT
+   set self frame 0
+endif
+exec checkAir
+exec applyGrav
+
+|FIRERUN:12|
+exec FIRERUN:0
+set self frame 0
+
+|BURNOUT:0|
+set self x_vel self.direction * self.burnoutspeed
+set self burnoutframes self.burnoutframes - 1
+if self.burnoutframes <= 0
+   set self state DEFLAME
+   set self frame 0
+endif
+exec checkAir
+exec applyGrav
+
+|BURNOUT:16|
+exec BURNOUT:0
+set self frame 0
+
+|DEFLAME:0|
+set self x_vel 0
+set self y_vel 0
+
+|DEFLAME:12|
+set self hat 0
+rebrand self.base
+
+|JUMPSQUAT:0|
+exec checkAir
+exec applyGrav
+
+|JUMPSQUAT:4|
+set self frame 0
+set self state FIREJUMP
+set self y_vel self.jumpstrength
+
+|FIREJUMP:0|
+set self x_vel self.direction * self.speed
+exec applyGrav
+
+|FIREJUMP:12|
+exec FIREJUMP:0
+set self frame 0
+
+|BURNOUTJUMP:0|
+set self x_vel self.direction * self.burnoutspeed
+set self burnoutframes self.burnoutframes - 1
+exec applyGrav
+
+|BURNOUTJUMP:12|
+exec BURNOUTJUMP:0
+set self frame 0
+
+|TURNAROUND:3|
+set self direction self.direction * -1
+set self state FIRERUN
+set self frame 0
+
+|BURNOUTTURNAROUND:6|
+set self direction self.direction * -1
+set self state BURNOUT
+set self frame 0
+
+|XCOLLISION|
+set self x_vel 0
+if self.state != FLAMING
+   set self calc self.state != BURNOUT
+   if self.state != BURNOUTJUMP and self.calc
+      set self state TURNAROUND
+   endif
+   set self calc self.state == BURNOUT
+   if  self.state == BURNOUTJUMP or self.calc
+       set self state BURNOUTTURNAROUND
+   endif
+   set self frame 0
+endif
+
+|YCOLLISION|
+if self.state == FIREJUMP
+   set self state FIRERUN
+   set self frame 0
+endif
+if self.state == BURNOUTJUMP
+   set self state BURNOUT
+   set self frame 0
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+if self.y_vel > self.limit
+   set self y_vel self.limit
+endif
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
+endif
+
+|checkAir|
+if self.y_vel
+   if self.state != BURNOUT
+      set self state FIREJUMP
+   endif
+   if self.state == BURNOUT
+      set self state BURNOUTJUMP
+   endif
+   set self frame 0
+endif
+

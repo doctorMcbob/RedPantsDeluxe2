@@ -1,0 +1,20 @@
+TORCH|0,0,0,0|False|
+START:0 torch0 0,0
+TORCH:0 torch0 0,0
+TORCH:4 torch1 0,0
+
+|START:0|
+set self state TORCH
+set self frame 0
+
+|TORCH:8|
+set self frame 0
+
+|COLLIDE|
+if player in self.name
+   if self.hat != enflamed
+      rebrand enflamed
+      set self hat enflamed
+   endif
+endif
+
