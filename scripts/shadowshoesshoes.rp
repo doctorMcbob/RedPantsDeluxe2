@@ -1,0 +1,17 @@
+ANTLERHAT|0,0,0,0|False|
+START:0 shadowshoes 0,0
+HAT:0 shadowshoes 0,0
+
+|START:0|
+set self state HAT
+
+|HAT:0|
+set self frame 0
+
+|COLLIDE|
+if player in self.name
+   if self.hat != shadowshoes
+      rebrand shadowshoes
+      set self hat shadowshoes
+   endif
+endif
