@@ -49,6 +49,7 @@ set self y_vel 0
 set self burnoutframes 90
 set self mashout 0
 set self mashlimit 30
+set self rotation 0
 
 |FLAMING:16|
 set self state FIRERUN

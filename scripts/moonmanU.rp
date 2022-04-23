@@ -39,17 +39,15 @@ LONGJUMP:8 redpantslongjump2 -16,0
 DEAD:0 redpantsdead -16,0
 
 |START:0|
-# welcome to red pants script :)
-set self _input_name PLAYER1
 set self state IDLE
 set self frame 0
 set self speed 8
-set self jumpstrength -17
-set self hopstrength -12
+set self jumpstrength 17
+set self hopstrength 12
 set self divestrength 14
-set self rolloutstrength -8
+set self rolloutstrength 8
 set self bonkstrength 2
-set self walljumpstrength -12
+set self walljumpstrength 12
 set self walljumpoff 10
 set self airdrift 0.7
 set self traction 0.6 * -1
@@ -60,18 +58,13 @@ set self negspeed self.speed * -1
 set self neglimit self.limit * -1
 set self grav 1
 set self slideflipxmod 3
-set self slideflipstrength -24
-set self longjumpystrength -9
+set self slideflipstrength 24
+set self longjumpystrength 9
 set self longjumpxstrength 12
-focus MAIN self
-set self frame_name MAIN
-hitboxes redpantsguy
-hurtboxes redpantsguy
-set self base player
+
+set self rotation 180
 set self can_die 1
-set self respawnx self.x
-set self respawny self.y
-set self rotation 0
+
 
 |DEAD:0|
 set self x_vel 0
@@ -103,7 +96,7 @@ if self.y_vel == 0
    endif
 endif
 exec checkCrouch
-     exec checkJump
+exec checkJump
 exec applyGrav
 
 |IDLE:32|
@@ -216,11 +209,14 @@ endif
 set self calc1 self.y_vel > self.airspeedcontrol
 set self calc2 self.airspeedcontrol * -1 > self.y_vel
 if not self.calc1 nor self.calc2
-   if self.x_vel - self.airdrift > self.negspeed and inpLEFT
-	set self x_vel self.x_vel - self.airdrift
+   if inpLEFT
+      rebrand moonmanL
    endif
-   if self.x_vel + self.airdrift < self.speed and inpRIGHT
-      set self x_vel self.x_vel + self.airdrift
+   if inpRIGHT
+      rebrand moonmanR
+   endif
+   if inpDOWN
+      rebrand moonmanD
    endif
    if B_DOWN in inpEVENTS
       set self state DIVESTART
@@ -228,10 +224,10 @@ if not self.calc1 nor self.calc2
    endif
 endif
 if self.calc1
-   img redpantsjump2
+   img redpantsjump0
 endif
 if self.calc2
-   img redpantsjump0
+   img redpantsjump2
 endif
 exec applyGrav
 
@@ -421,7 +417,7 @@ if self.y_vel
 endif
 
 |applyGrav|
-set self y_vel self.y_vel + self.grav
+set self y_vel self.y_vel - self.grav
 if self.y_vel > self.limit
    set self y_vel self.limit
 endif

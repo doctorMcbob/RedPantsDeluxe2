@@ -39,17 +39,15 @@ LONGJUMP:8 redpantslongjump2 -16,0
 DEAD:0 redpantsdead -16,0
 
 |START:0|
-# welcome to red pants script :)
-set self _input_name PLAYER1
 set self state IDLE
 set self frame 0
 set self speed 8
-set self jumpstrength -17
-set self hopstrength -12
+set self jumpstrength 17
+set self hopstrength 12
 set self divestrength 14
-set self rolloutstrength -8
+set self rolloutstrength 8
 set self bonkstrength 2
-set self walljumpstrength -12
+set self walljumpstrength 12
 set self walljumpoff 10
 set self airdrift 0.7
 set self traction 0.6 * -1
@@ -60,18 +58,13 @@ set self negspeed self.speed * -1
 set self neglimit self.limit * -1
 set self grav 1
 set self slideflipxmod 3
-set self slideflipstrength -24
-set self longjumpystrength -9
+set self slideflipstrength 24
+set self longjumpystrength 9
 set self longjumpxstrength 12
-focus MAIN self
-set self frame_name MAIN
-hitboxes redpantsguy
-hurtboxes redpantsguy
-set self base player
+
+set self rotation 270
 set self can_die 1
-set self respawnx self.x
-set self respawny self.y
-set self rotation 0
+
 
 |DEAD:0|
 set self x_vel 0
@@ -87,10 +80,10 @@ set self can_die 1
 
 |IDLE:0|
 exec checkAir
-if self.x_vel != 0
+if self.y_vel != 0
    set self state SLIDE
 endif
-if self.y_vel == 0
+if self.x_vel == 0
    if not inpRIGHT and inpLEFT
       set self state RUNNING
       set self frame 0
@@ -115,17 +108,17 @@ exec checkAir
 exec applyTraction
 exec applyGrav
 if not inpDOWN
-   if self.x_vel == 0
+   if self.y_vel == 0
       set self state IDLE
       set self frame 0
    endif
-   if self.x_vel != 0
+   if self.y_vel != 0
       set self state SLIDE
       set self frame 0
    endif
 endif
 # bufferable pog?
-if self.x_vel != 0 and inpA
+if self.y_vel != 0 and inpA
    set self state LONGJUMPSTART
    set self frame 0
 endif
@@ -138,24 +131,24 @@ exec applyGrav
 
 |LONGJUMPSTART:2|
 exec LONGJUMPSTART:0
-set self y_vel self.longjumpystrength
-set self x_vel self.longjumpxstrength * self.direction
+set self x_vel self.longjumpystrength
+set self y_vel self.longjumpxstrength * self.direction
 set self state LONGJUMP
 set self frame 0
 
 |LONGJUMP:0|
 exec applyGrav
-set self calc1 self.x_vel < self.negairspeedcontrol
+set self calc1 self.y_vel < self.negairspeedcontrol
 if not self.calc1 and inpLEFT
-   set self x_vel self.x_vel - self.airdrift
+   set self y_vel self.y_vel - self.airdrift
 endif
-set self calc1 self.x_vel > self.airspeedcontrol
+set self calc1 self.y_vel > self.airspeedcontrol
 if not self.calc1 and inpRIGHT
-   set self x_vel self.x_vel + self.airdrift
+   set self y_vel self.y_vel + self.airdrift
 endif
 
 |RUNNING:0|
-set self x_vel self.speed * self.direction
+set self y_vel self.speed * self.direction
 set self calc1 self.direction == 1 nor inpRIGHT
 set self calc2 self.direction == -1 nor inpLEFT
 if inpRIGHT == inpLEFT or self.calc1 or self.calc2
@@ -172,13 +165,13 @@ exec RUNNING:0
 set self frame 0
 
 |SLIDE:0|
-if self.x_vel == 0
+if self.y_vel == 0
    set self state IDLE
    set self frame 0
 endif
-if self.x_vel != 0
+if self.y_vel != 0
    exec applyTraction
-   set self absxvel abs self.x_vel
+   set self absxvel abs self.y_vel
    if abs self.traction * 10 > self.absxvel
       img redpantsslide1
    endif
@@ -197,30 +190,33 @@ if self.x_vel != 0
    exec checkAir
    exec applyGrav
 endif
-if abs self.x_vel < self.speed
-   set self calc1 self.x_vel > 0 and inpRIGHT
+if abs self.y_vel < self.speed
+   set self calc1 self.y_vel > 0 and inpRIGHT
    set self calc1 not inpLEFT and self.calc1
    if self.calc1
       set self direction 1
    endif
-   if not inpRIGHT and self.x_vel < 0 and inpLEFT
+   if not inpRIGHT and self.y_vel < 0 and inpLEFT
       set self direction -1
    endif
-   if not inpRIGHT and self.x_vel < 0 and inpLEFT or self.calc1
+   if not inpRIGHT and self.y_vel < 0 and inpLEFT or self.calc1
       set self state RUNNING
       set self frame 0
    endif
 endif
 
 |AIRIAL:0|
-set self calc1 self.y_vel > self.airspeedcontrol
-set self calc2 self.airspeedcontrol * -1 > self.y_vel
+set self calc1 self.x_vel > self.airspeedcontrol
+set self calc2 self.airspeedcontrol * -1 > self.x_vel
 if not self.calc1 nor self.calc2
-   if self.x_vel - self.airdrift > self.negspeed and inpLEFT
-	set self x_vel self.x_vel - self.airdrift
+   if inpUP
+      rebrand moonmanU
    endif
-   if self.x_vel + self.airdrift < self.speed and inpRIGHT
-      set self x_vel self.x_vel + self.airdrift
+   if inpRIGHT
+      rebrand moonmanR
+   endif
+   if inpDOWN
+      rebrand moonmanD
    endif
    if B_DOWN in inpEVENTS
       set self state DIVESTART
@@ -243,30 +239,29 @@ exec applyGrav
 |JUMPSQUAT:6|
 set self state AIRIAL
 if inpA
-   set self y_vel self.jumpstrength
+   set self x_vel self.jumpstrength
 endif
 if not inpA
-   set self y_vel self.hopstrength
+   set self x_vel self.hopstrength
 endif
 set self frame 0
 
 |LANDING:0|
-exec checkAir
 exec applyTraction
 exec applyGrav
-if self.x_vel > 0
+if self.y_vel > 0
    set self direction 1
 endif
-if self.x_vel < 0
+if self.y_vel < 0
    set self direction -1
 endif
 
 |LANDING:5|
-if self.x_vel
+if self.y_vel
    set self state SLIDE
    exec SLIDE:0
 endif
-if self.x_vel == 0
+if self.y_vel == 0
    set self state IDLE
    exec IDLE:0
 endif
@@ -276,7 +271,7 @@ set self y_vel 0
 set self x_vel 0
 
 |DIVESTART:5|
-set self x_vel self.divestrength * self.direction
+set self y_vel self.divestrength * self.direction
 set self state DIVE
 
 |DIVE:0|
@@ -290,9 +285,9 @@ exec applyGrav
 if inpA
    set self state ROLLOUT
    set self frame 0
-   set self y_vel self.rolloutstrength
+   set self x_vel self.rolloutstrength
 endif
-if self.x_vel == 0
+if self.y_vel == 0
    set self state IDLE
    set self frame 0
 endif
@@ -301,7 +296,7 @@ endif
 exec applyGrav
 
 |BONK:0|
-set self x_vel self.bonkstrength * self.direction * -1
+set self y_vel self.bonkstrength * self.direction * -1
 exec applyGrav
 
 |BONKLAND:0|
@@ -326,14 +321,14 @@ if not self.calc1 nor self.calc2
 endif
 
 |WALLJUMP:0|
-set self y_vel 0
+set self x_vel 0
 
 |WALLJUMP:6|
 set self state AIRIAL
 set self frame 0
-set self y_vel self.walljumpstrength
+set self x_vel self.walljumpstrength
 set self direction self.direction * -1
-set self x_vel self.walljumpoff * self.direction
+set self y_vel self.walljumpoff * self.direction
 
 |FLIPSQUAT:0|
 exec checkAir
@@ -343,31 +338,30 @@ exec applyGrav
 |FLIPSQUAT:6|
 set self state SLIDEFLIP
 set self direction self.direction * -1
-set self x_vel self.slideflipxmod * self.direction
-set self y_vel self.slideflipstrength
+set self y_vel self.slideflipxmod * self.direction
+set self x_vel self.slideflipstrength
 set self frame 0
 
 |SLIDEFLIP:0|
 exec applyGrav
 if self.direction == -1
    if inpLEFT
-      	set self x_vel self.x_vel - self.airdrift
-	if self.x_vel < self.negairspeedcontrol
-      	   set self x_vel self.negairspeedcontrol
+      	set self y_vel self.y_vel - self.airdrift
+	if self.y_vel < self.negairspeedcontrol
+      	   set self y_vel self.negairspeedcontrol
    	endif
    endif
 endif
 if self.direction == 1
    if inpRIGHT
-      set self x_vel self.x_vel + self.airdrift
-      if self.x_vel > self.airspeedcontrol
-      	 set self x_vel self.airspeedcontrol
+      set self y_vel self.y_vel + self.airdrift
+      if self.y_vel > self.airspeedcontrol
+      	 set self y_vel self.airspeedcontrol
       endif
    endif
 endif
 
-
-|XCOLLISION|
+|YCOLLISION|
 set self calc1 self.state == DIVE
 set self calc1 self.state == DIVELAND or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1
@@ -379,19 +373,20 @@ set self calc1 self.state == SLIDEFLIP
 if self.state == AIRIAL or self.calc1
    set self state WALLTOUCH
    set self frame 0
-   if self.x_vel > 0
+   if self.y_vel > 0
       set self direction 1
    endif
-   if self.x_vel < 0
+   if self.y_vel < 0
       set self direction -1
    endif
 endif
 
-|YCOLLISION|
+|XCOLLISION|
 set self calc1 self.state == ROLLOUT
 set self calc1 self.state == SLIDEFLIP or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1
 if self.state == AIRIAL or self.calc1
+   set self x_vel 0
    set self state LANDING
    set self frame 0
 endif
@@ -415,31 +410,31 @@ if self.state == COIN or self.calc
 endif
 
 |checkAir|
-if self.y_vel
+if self.x_vel
    set self state AIRIAL
    set self frame 0
 endif
 
 |applyGrav|
-set self y_vel self.y_vel + self.grav
-if self.y_vel > self.limit
-   set self y_vel self.limit
+set self x_vel self.x_vel - self.grav
+if self.x_vel > self.limit
+   set self x_vel self.limit
 endif
-if self.y_vel < self.neglimit
-   set self y_vel self.neglimit
+if self.x_vel < self.neglimit
+   set self x_vel self.neglimit
 endif
 
 |applyTraction|
-if self.x_vel != 0
-   if self.x_vel > 0
-      set self x_vel self.traction + self.x_vel
+if self.y_vel != 0
+   if self.y_vel > 0
+      set self y_vel self.traction + self.y_vel
    endif
-   if self.x_vel < 0
-      set self x_vel self.traction * -1 + self.x_vel
+   if self.y_vel < 0
+      set self y_vel self.traction * -1 + self.y_vel
    endif
 endif
-if abs self.x_vel / 1 == 0
-   set self x_vel 0
+if abs self.y_vel / 1 == 0
+   set self y_vel 0
 endif
 
 |checkCrouch|

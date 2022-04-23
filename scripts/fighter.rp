@@ -101,6 +101,7 @@ set self tatsuflipymod -7
 set self can_die 1
 set self respawnx self.x
 set self respawny self.y
+set self rotation 0
 
 |DEAD:0|
 set self x_vel 0
