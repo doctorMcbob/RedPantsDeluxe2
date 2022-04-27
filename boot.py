@@ -7,5 +7,5 @@ if __name__ == "__main__":
         G = editor.set_up()
         editor.run(G)
     else:
-        G = game.set_up(loadscripts="-R" in sys.argv)
+        G = game.set_up()
         game.run(G)

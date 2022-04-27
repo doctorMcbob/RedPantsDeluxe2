@@ -33,6 +33,8 @@ def get_sprite(name):
 def get_sprite_map(name):
     return None if name not in SPRITEMAPS else SPRITEMAPS[name]
 
-def get_offset(name):
-    return (0, 0) if name not in OFFSETS else OFFSETS[name]
+def get_offset(key, name):
+    if key not in OFFSETS:
+        return (0, 0)
+    return (0, 0) if name not in OFFSETS[key] else OFFSETS[key][name]
 

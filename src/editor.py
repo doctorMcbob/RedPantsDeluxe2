@@ -333,7 +333,7 @@ def template_from_script(filename, name=None):
     x, y, w, h = [int(n) for n in rect.split(",")]
     
     tangible = segments.pop(0)
-        
+
     sprites = {}
     offsets = {}
     for line in segments.pop(0).splitlines():
@@ -342,14 +342,17 @@ def template_from_script(filename, name=None):
         offset = [int(n) for n in offset.split(",")]
 
         sprites[key] = sprite
-        OFFSETS[sprite] = offset
-    
+        offsets[sprite] = offset
+
     scripts = {}
     while segments:
         key = segments.pop(0)
         cmds = segments.pop(0)
         scripts[key] = cmds.splitlines()
 
+    offsetkey = filename.split(".")[0]
+    OFFSETS[offsetkey]= offsets
+    
     spritekey = filename.split(".")[0]
     SPRITEMAPS[spritekey] = sprites
 
@@ -362,6 +365,7 @@ def template_from_script(filename, name=None):
         "DIM": (w, h),
         "sprites": spritekey,
         "scripts": scriptkey,
+        "offsetkey": offsetkey,
         "tangible": tangible == "True"
     }
     

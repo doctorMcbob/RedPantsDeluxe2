@@ -76,7 +76,7 @@ class Actor(Rect):
 
         self.load_scripts(template["scripts"])
         self.load_sprites(template["sprites"])
-
+        self.offsetkey = template["scripts"]
         self._input_name = None # change in script
 
         self.state = "START"
@@ -92,6 +92,7 @@ class Actor(Rect):
         self.sprites = sprites.get_sprite_map(name)
 
     def load_scripts(self, name):
+        self.offsetkey = name
         self.scripts = scripts.get_script_map(name)
         
     def _index(self, data):
@@ -179,12 +180,12 @@ class Actor(Rect):
         return placeholder
 
     def get_offset(self):
-        key = self.img if self.img is not None else self._index(self.sprites)
-        return sprites.get_offset(key)
+        name = self.img if self.img is not None else self._index(self.sprites)
+        return sprites.get_offset(self.offsetkey, name)
 
     def update(self, world):
         self.img = None
-        
+
         script = self._index(self.scripts)
         if script is not None:
             scripts.resolve(self.name, script, world)
@@ -195,10 +196,10 @@ class Actor(Rect):
             self.x += int(self.x_vel)
             self.y += int(self.y_vel)
 
-        if xflag != self.x_vel:
+        if xflag != self.x_vel and int(self.x_vel) == 0:
             if "XCOLLISION" in self.scripts:
                 scripts.resolve(self.name, self.scripts["XCOLLISION"], world)
-        if yflag and self.y_vel == 0:
+        if yflag != self.y_vel and int(self.y_vel) == 0:
             if "YCOLLISION" in self.scripts:
                 scripts.resolve(self.name, self.scripts["YCOLLISION"], world)
 
@@ -249,7 +250,7 @@ class Actor(Rect):
             direction = 1 if self.x_vel < 0 else -1
             for n in range(int(self.x_vel) // self.w):
                 if self.move(self.w*n, 0).collidelist(tangibles) != -1:
-                    self.x_vel = (self.w*n) + (self.x_vel % w)
+                    self.x_vel = (self.w*n) + (self.x_vel % self.w)
                     break
 
             hits = self.move(int(self.x_vel), 0).collidelistall(tangibles)
@@ -259,7 +260,7 @@ class Actor(Rect):
 
             while self.move(int(self.x_vel), 0).collidelist(tangibles) != -1:
                 self.x_vel += direction
-                
+
         # Y axis
         if self.y_vel:
             direction = 1 if self.y_vel < 0 else -1

@@ -65,6 +65,20 @@ set self longjumpxstrength 12
 set self rotation 180
 set self can_die 1
 
+set self width 32
+set self height 64
+
+if COLLIDE?
+   set self revert moonman + self.gravdir
+endif
+
+if not self.revert
+   set self gravdir U
+endif
+if self.revert
+   set self revert 0
+   rebrand moonman + self.gravdir
+endif
 
 |DEAD:0|
 set self x_vel 0
@@ -209,13 +223,13 @@ endif
 set self calc1 self.y_vel > self.airspeedcontrol
 set self calc2 self.airspeedcontrol * -1 > self.y_vel
 if not self.calc1 nor self.calc2
-   if inpLEFT
+   if LEFT_DOWN in inpEVENTS
       rebrand moonmanL
    endif
-   if inpRIGHT
+   if RIGHT_DOWN in inpEVENTS
       rebrand moonmanR
    endif
-   if inpDOWN
+   if DOWN_DOWN in inpEVENTS
       rebrand moonmanD
    endif
    if B_DOWN in inpEVENTS

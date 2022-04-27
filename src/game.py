@@ -7,17 +7,7 @@ from src import inputs
 from src.editor import template_from_script, SCRIPT_LOCATION
 from src import menu
 
-def update_all_scripts(actors):
-    filenames = []
-    for _, _, files in os.walk(SCRIPT_LOCATION):
-        for f in files:
-            if f[-3:] == ".rp": filenames.append(f)
-    templates = [template_from_script(fn) for fn in filenames]
-    for template in templates:
-        if template["name"] in actors.ACTORS:
-            actors.ACTORS[template["name"]] = actors.Actor(template)
-
-def set_up(loadscripts=False):
+def set_up():
     pygame.init()
     W = 1152 if "-w" not in sys.argv else int(sys.argv[sys.argv.index("-w")+1])
     H = 640 if "-h" not in sys.argv else int(sys.argv[sys.argv.index("-h")+1])
@@ -46,8 +36,6 @@ def set_up(loadscripts=False):
     worlds.load()
     actor.load()
     boxes.load()
-    if loadscripts:
-        update_all_scripts(actor)
 
     G["INPUTS"] = inputs
     G["FRAMES"] = frames

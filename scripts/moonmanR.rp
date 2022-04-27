@@ -1,42 +1,42 @@
 REDPANTSGUY|128,256,32,64|True|
-START:0 redpantsstand -16,0
-IDLE:0 redpantsstand -16,0
-RUNNING:0 redpantsrun0 -16,0
-RUNNING:4 redpantsrun1 -16,0
-RUNNING:8 redpantsrun2 -16,0
-RUNNING:12 redpantsrun3 -16,0
-AIRIAL:0 redpantsjump0 -16,0
-AIRIAL:0 redpantsjump2 -16,0
-AIRIAL:0 redpantsjump1 -16,0
-SLIDE:0 redpantsslide1 -16,0
-SLIDE:0 redpantsslide0 -16,0
-LANDING:0 redpantsland -16,0
-JUMPSQUAT:0 redpantsjumpsquat0 -16,0
-JUMPSQUAT:3 redpantsjumpsquat1 -16,0
-FLIPSQUAT:0 redpantsjumpsquat0 -16,0
-FLIPSQUAT:3 redpantsjumpsquat1 -16,0
-DIVESTART:0 redpantsdivestart -16,0
-DIVE:0 redpantsdive -16,0
-DIVELAND:0 redpantsdiveland -16,0
-ROLLOUT:0 redpantsrollout -16,0
-BONK:0 redpantsbonk -16,0
-BONKLAND:0 redpantsbonkland0 -16,0
-BONKLAND:12 redpantsbonkland1 -16,0
-WALLTOUCH:0 redpantswalljump0 -16,0
-WALLJUMP:0 redpantswalljump1 -16,0
-WALLJUMP:3 redpantswalljump2 -16,0
-SLIDEFLIP:0 redpantsdiveflip0 -16,0
-SLIDEFLIP:8 redpantsdiveflip1 -16,0
-SLIDEFLIP:10 redpantsdiveflip2 -16,0
-SLIDEFLIP:14 redpantsdiveflip3 -16,0
-SLIDEFLIP:18 redpantsdiveflip4 -16,0
-SLIDEFLIP:20 redpantsdiveflip5 -16,0
-SLIDEFLIP:23 redpantsdiveflip6 -16,0
-CROUCH:0 redpantscrouch -16,0
-LONGJUMPSTART:0 redpantslongjumpstart -16,0
-LONGJUMP:0 redpantslongjump1 -16,0
-LONGJUMP:8 redpantslongjump2 -16,0
-DEAD:0 redpantsdead -16,0
+START:0 redpantsstand 0,-16
+IDLE:0 redpantsstand 0,-16
+RUNNING:0 redpantsrun0 0,-16
+RUNNING:4 redpantsrun1 0,-16
+RUNNING:8 redpantsrun2 0,-16
+RUNNING:12 redpantsrun3 0,-16
+AIRIAL:0 redpantsjump0 0,-16
+AIRIAL:0 redpantsjump2 0,-16
+AIRIAL:0 redpantsjump1 0,-16
+SLIDE:0 redpantsslide1 0,-16
+SLIDE:0 redpantsslide0 0,-16
+LANDING:0 redpantsland 0,-16
+JUMPSQUAT:0 redpantsjumpsquat0 0,-16
+JUMPSQUAT:3 redpantsjumpsquat1 0,-16
+FLIPSQUAT:0 redpantsjumpsquat0 0,-16
+FLIPSQUAT:3 redpantsjumpsquat1 0,-16
+DIVESTART:0 redpantsdivestart 0,-16
+DIVE:0 redpantsdive 0,-16
+DIVELAND:0 redpantsdiveland 0,-16
+ROLLOUT:0 redpantsrollout 0,-16
+BONK:0 redpantsbonk 0,-16
+BONKLAND:0 redpantsbonkland0 0,-16
+BONKLAND:12 redpantsbonkland1 0,-16
+WALLTOUCH:0 redpantswalljump0 0,-16
+WALLJUMP:0 redpantswalljump1 0,-16
+WALLJUMP:3 redpantswalljump2 0,-16
+SLIDEFLIP:0 redpantsdiveflip0 0,-16
+SLIDEFLIP:8 redpantsdiveflip1 0,-16
+SLIDEFLIP:10 redpantsdiveflip2 0,-16
+SLIDEFLIP:14 redpantsdiveflip3 0,-16
+SLIDEFLIP:18 redpantsdiveflip4 0,-16
+SLIDEFLIP:20 redpantsdiveflip5 0,-16
+SLIDEFLIP:23 redpantsdiveflip6 0,-16
+CROUCH:0 redpantscrouch 0,-16
+LONGJUMPSTART:0 redpantslongjumpstart 0,-16
+LONGJUMP:0 redpantslongjump1 0,-16
+LONGJUMP:8 redpantslongjump2 0,-16
+DEAD:0 redpantsdead 0,-16
 
 |START:0|
 set self state IDLE
@@ -65,6 +65,20 @@ set self longjumpxstrength 12
 set self rotation 90
 set self can_die 1
 
+set self width 64
+set self height 32
+
+if COLLIDE?
+   set self revert moonman + self.gravdir
+endif
+
+if not self.revert
+   set self gravdir R
+endif
+if self.revert
+   set self revert 0
+   rebrand moonman + self.gravdir
+endif
 
 |DEAD:0|
 set self x_vel 0
@@ -178,11 +192,11 @@ if self.y_vel != 0
    exec checkCrouch
    exec checkJump
    if self.state == JUMPSQUAT
-      if self.direction == 1 and inpLEFT
+      if self.direction == -1 and inpLEFT
       	 set self state FLIPSQUAT
 	 set self frame 0
       endif
-      if self.direction == -1 and inpRIGHT
+      if self.direction == 1 and inpRIGHT
       	 set self state FLIPSQUAT
 	 set self frame 0
       endif
@@ -209,13 +223,13 @@ endif
 set self calc1 self.x_vel > self.airspeedcontrol
 set self calc2 self.airspeedcontrol * -1 > self.x_vel
 if not self.calc1 nor self.calc2
-   if inpUP
+   if UP_DOWN in inpEVENTS
       rebrand moonmanU
    endif
-   if inpLEFT
+   if LEFT_DOWN in inpEVENTS
       rebrand moonmanL
    endif
-   if inpDOWN
+   if DOWN_DOWN in inpEVENTS
       rebrand moonmanD
    endif
    if B_DOWN in inpEVENTS

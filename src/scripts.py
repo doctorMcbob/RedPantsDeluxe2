@@ -43,12 +43,12 @@ def get_script_map(name):
 def resolve(reference, script, world, logfunc=print):
     cmd_idx = 0
     while cmd_idx < len(script):
-        if not script[cmd_idx] or script[cmd_idx].startswith("#"): # comments
+        if not script[cmd_idx].split() or script[cmd_idx].startswith("#"): # comments
             cmd_idx += 1
             continue
 
         cmd = script[cmd_idx].split()
-        cmd = evaluate_literals(cmd, reference, logfunc=logfunc)
+        cmd = evaluate_literals(cmd, reference, world, logfunc=logfunc)
         cmd = resolve_operators(cmd, logfunc=logfunc)
         # resolve command!
         try:
@@ -73,12 +73,13 @@ def resolve(reference, script, world, logfunc=print):
                     nest = 1
                     while nest > 0:
                         cmd_idx += 1
-                        if cmd_idx > len(script):
+                        if cmd_idx >= len(script):
                             raise Exception("End of script while parsing if")
-                        if script[cmd_idx].split()[0] == "if":
-                            nest += 1
-                        if script[cmd_idx].split()[0] == "endif":
-                            nest -= 1
+                        if script[cmd_idx].split():
+                            if script[cmd_idx].split()[0] == "if":
+                                nest += 1
+                            if script[cmd_idx].split()[0] == "endif":
+                                nest -= 1
 
             if verb == "exec":
                 key = cmd.pop(0)
@@ -148,15 +149,22 @@ def resolve(reference, script, world, logfunc=print):
                     resolve(actor_name, actor.scripts["START:0"], world, logfunc=logfunc)
 
         except Exception as e:
-            logfunc(script[cmd_idx])
+            logfunc("Error on line {}".format(cmd_idx))
+            for i, cmd in enumerate(script):
+                logfunc(("> " if i == cmd_idx else "") + "{} ".format(i) + cmd)
             logfunc("Error resolving {}... {}".format(verb, e))
 
         cmd_idx += 1
 
-def evaluate_literals(cmd, reference, logfunc=print):
+def evaluate_literals(cmd, reference, world, logfunc=print):
     for idx in range(len(cmd)):
         token = cmd[idx]
         try:
+            if token == "COLLIDE?":
+                actor = a.get_actor(reference)
+                actors = list(filter(lambda actr:not (actr is actor), world.get_actors()))
+                tangibles = list(filter(lambda actr: actr.tangible, actors))
+                cmd[idx] =  actor.collidelist(tangibles) != -1
             if token == "None":
                 cmd[idx] = None
             try:

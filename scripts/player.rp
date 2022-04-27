@@ -73,6 +73,9 @@ set self respawnx self.x
 set self respawny self.y
 set self rotation 0
 
+set self width 32
+set self height 64
+
 |DEAD:0|
 set self x_vel 0
 set self y_vel 0
