@@ -378,6 +378,9 @@ endif
 
 
 |XCOLLISION|
+if abs self.x_vel < 1
+   set self x_vel 0
+endif
 set self calc1 self.state == DIVE
 set self calc1 self.state == DIVELAND or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1
@@ -398,6 +401,9 @@ if self.state == AIRIAL or self.calc1
 endif
 
 |YCOLLISION|
+if abs self.y_vel < 1
+   set self y_vel 0
+endif
 set self calc1 self.state == ROLLOUT
 set self calc1 self.state == SLIDEFLIP or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1

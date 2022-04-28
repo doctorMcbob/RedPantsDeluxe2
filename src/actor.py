@@ -197,9 +197,13 @@ class Actor(Rect):
             self.y += int(self.y_vel)
 
         if xflag != self.x_vel and int(self.x_vel) == 0:
+            if abs(self.x_vel) > 1:
+                self.x_vel = 0
             if "XCOLLISION" in self.scripts:
                 scripts.resolve(self.name, self.scripts["XCOLLISION"], world)
         if yflag != self.y_vel and int(self.y_vel) == 0:
+            if abs(self.y_vel) > 1:
+                self.y_vel = 0
             if "YCOLLISION" in self.scripts:
                 scripts.resolve(self.name, self.scripts["YCOLLISION"], world)
 
