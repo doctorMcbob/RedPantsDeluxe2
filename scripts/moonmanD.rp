@@ -32,7 +32,7 @@ SLIDEFLIP:14 moonmansideflip3 -16,0
 SLIDEFLIP:18 moonmansideflip4 -16,0
 SLIDEFLIP:20 moonmansideflip5 -16,-32
 SLIDEFLIP:23 moonmansideflip6 -16,-32
-CROUCH:0 moonmancrouch -16,-32
+CROUCH:0 moonmancrouch -16,0
 LONGJUMPSTART:0 moonmanlongjump0 -16,-32
 LONGJUMP:0 moonmanlongjump1 -16,-32
 LONGJUMP:8 moonmanlongjump2 -16,-32
