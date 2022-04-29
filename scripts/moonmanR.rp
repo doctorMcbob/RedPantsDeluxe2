@@ -1,42 +1,42 @@
 REDPANTSGUY|128,256,32,64|True|
-START:0 redpantsstand 0,-16
-IDLE:0 redpantsstand 0,-16
-RUNNING:0 redpantsrun0 0,-16
-RUNNING:4 redpantsrun1 0,-16
-RUNNING:8 redpantsrun2 0,-16
-RUNNING:12 redpantsrun3 0,-16
-AIRIAL:0 redpantsjump0 0,-16
-AIRIAL:0 redpantsjump2 0,-16
-AIRIAL:0 redpantsjump1 0,-16
-SLIDE:0 redpantsslide1 0,-16
-SLIDE:0 redpantsslide0 0,-16
-LANDING:0 redpantsland 0,-16
-JUMPSQUAT:0 redpantsjumpsquat0 0,-16
-JUMPSQUAT:3 redpantsjumpsquat1 0,-16
-FLIPSQUAT:0 redpantsjumpsquat0 0,-16
-FLIPSQUAT:3 redpantsjumpsquat1 0,-16
-DIVESTART:0 redpantsdivestart 0,-16
-DIVE:0 redpantsdive 0,-16
-DIVELAND:0 redpantsdiveland 0,-16
-ROLLOUT:0 redpantsrollout 0,-16
-BONK:0 redpantsbonk 0,-16
-BONKLAND:0 redpantsbonkland0 0,-16
-BONKLAND:12 redpantsbonkland1 0,-16
-WALLTOUCH:0 redpantswalljump0 0,-16
-WALLJUMP:0 redpantswalljump1 0,-16
-WALLJUMP:3 redpantswalljump2 0,-16
-SLIDEFLIP:0 redpantsdiveflip0 0,-16
-SLIDEFLIP:8 redpantsdiveflip1 0,-16
-SLIDEFLIP:10 redpantsdiveflip2 0,-16
-SLIDEFLIP:14 redpantsdiveflip3 0,-16
-SLIDEFLIP:18 redpantsdiveflip4 0,-16
-SLIDEFLIP:20 redpantsdiveflip5 0,-16
-SLIDEFLIP:23 redpantsdiveflip6 0,-16
-CROUCH:0 redpantscrouch 0,-16
-LONGJUMPSTART:0 redpantslongjumpstart 0,-16
-LONGJUMP:0 redpantslongjump1 0,-16
-LONGJUMP:8 redpantslongjump2 0,-16
-DEAD:0 redpantsdead 0,-16
+START:0 moonmanstand -32,-16
+IDLE:0 moonmanstand -32,-16
+RUNNING:0 moonmanrun0 -32,-16
+RUNNING:4 moonmanrun1 -32,-16
+RUNNING:8 moonmanrun2 -32,-16
+RUNNING:12 moonmanrun3 -32,-16
+AIRIAL:0 moonmanjump0 -32,-16
+AIRIAL:0 moonmanjump2 -32,-16
+AIRIAL:0 moonmanjump1 -32,-16
+SLIDE:0 moonmanslide1 -32,-16
+SLIDE:0 moonmanslide0 -32,-16
+LANDING:0 moonmanland -32,-16
+JUMPSQUAT:0 moonmanjumpsquat0 -32,-16
+JUMPSQUAT:3 moonmanjumpsquat1 -32,-16
+FLIPSQUAT:0 moonmanjumpsquat0 -32,-16
+FLIPSQUAT:3 moonmanjumpsquat1 -32,-16
+DIVESTART:0 moonmandivestart -32,-16
+DIVE:0 moonmandive 0,-32
+DIVELAND:0 moonmandiveland 0,-32
+ROLLOUT:0 moonmanrollout -0,-16
+BONK:0 moonmanbonk -32,-16
+BONKLAND:0 moonmanbonkland0 0,-48
+BONKLAND:12 moonmanbonkland1 0,-32
+WALLTOUCH:0 moonmanwalljump0 -32,-16
+WALLJUMP:0 moonmanwalljump1 -32,-16
+WALLJUMP:3 moonmanwalljump2 -32,-16
+SLIDEFLIP:0 moonmansideflip0 0,-48
+SLIDEFLIP:8 moonmansideflip1 0,-48
+SLIDEFLIP:10 moonmansideflip2 0,-16
+SLIDEFLIP:14 moonmansideflip3 0,-16
+SLIDEFLIP:18 moonmansideflip4 0,-16
+SLIDEFLIP:20 moonmansideflip5 -32,-16
+SLIDEFLIP:23 moonmansideflip6 -32,-16
+CROUCH:0 moonmancrouch -32,-16
+LONGJUMPSTART:0 moonmanlongjump0 -32,-16
+LONGJUMP:0 moonmanlongjump1 -32,-16
+LONGJUMP:8 moonmanlongjump2 -32,-16
+DEAD:0 moonmandead -32,-16
 
 |START:0|
 set self state IDLE
@@ -188,7 +188,7 @@ if self.y_vel != 0
    exec applyTraction
    set self absxvel abs self.y_vel
    if abs self.traction * 10 > self.absxvel
-      img redpantsslide1
+      img moonmanslide1
    endif
    exec checkCrouch
    exec checkJump
@@ -239,10 +239,10 @@ if not self.calc1 nor self.calc2
    endif
 endif
 if self.calc1
-   img redpantsjump2
+   img moonmanjump2
 endif
 if self.calc2
-   img redpantsjump0
+   img moonmanjump0
 endif
 exec applyGrav
 
@@ -327,7 +327,7 @@ set self frame 0
 exec AIRIAL:0
 set self state AIRIAL
 if not self.calc1 nor self.calc2
-   img redpantswalljump0
+   img moonmanwalljump0
    # bufferable pog?
    if inpA
       set self state WALLJUMP
