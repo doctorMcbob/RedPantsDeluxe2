@@ -90,6 +90,7 @@ set self kickseverity 8
 set self tatsuspeed 9
 set self slidekickspeed 9
 set self fireballnumber 0
+set self door_key UP
 
 set self fireballxmod -7
 set self fireballymod -8

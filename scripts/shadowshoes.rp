@@ -68,6 +68,7 @@ set self can_die 1
 set self respawnx self.x
 set self respawny self.y
 set self rotation 0
+set self door_key UP
 
 set self width 32
 set self height 64

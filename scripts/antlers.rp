@@ -67,6 +67,7 @@ set self longjumpystrength -9
 set self longjumpxstrength 12
 set self flydownbuffer 3
 set self flyupbuffer 4
+set self door_key UP
 
 set self can_die 1
 set self respawnx self.x

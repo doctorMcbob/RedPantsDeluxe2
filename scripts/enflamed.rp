@@ -52,6 +52,7 @@ set self mashlimit 30
 set self rotation 0
 set self width 32
 set self height 64
+set self door_key UP
 
 
 |FLAMING:16|

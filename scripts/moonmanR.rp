@@ -93,6 +93,7 @@ set self y self.respawny
 set self can_die 1
 
 |IDLE:0|
+set self door_key LEFT
 exec checkAir
 if self.y_vel != 0
    set self state SLIDE
@@ -154,7 +155,7 @@ set self frame 0
 exec applyGrav
 set self calc1 self.y_vel > self.airspeedcontrol
 if not self.calc1 and inpDOWN
-   set self y_vel self.y_vel = self.airdrift
+   set self y_vel self.y_vel + self.airdrift
 endif
 set self calc1 self.y_vel < self.negairspeedcontrol
 if not self.calc1 and inpUP

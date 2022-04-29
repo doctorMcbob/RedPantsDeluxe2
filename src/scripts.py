@@ -149,7 +149,7 @@ def resolve(reference, script, world, logfunc=print):
                     resolve(actor_name, actor.scripts["START:0"], world, logfunc=logfunc)
 
         except Exception as e:
-            logfunc("Error on line {}".format(cmd_idx))
+            logfunc("{} Error on line {}".format(reference, cmd_idx))
             for i, cmd in enumerate(script):
                 logfunc(("> " if i == cmd_idx else "") + "{} ".format(i) + cmd)
             logfunc("Error resolving {}... {}".format(verb, e))

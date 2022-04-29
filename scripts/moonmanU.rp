@@ -93,6 +93,7 @@ set self y self.respawny
 set self can_die 1
 
 |IDLE:0|
+set self door_key DOWN
 exec checkAir
 if self.x_vel != 0
    set self state SLIDE

@@ -9,21 +9,10 @@ set self state DOOR
 set self frame 0
 
 |COLLIDE|
-set self check_key UP
-if self.offsetkey == moonmanU
-   set self check_key DOWN
-endif
-if self.offsetkey == moonmanL
-   set self check_key RIGHT
-endif
-if self.offsetkey == moonmanR
-   set self check_key LEFT
-endif
-
-if self.check_key + _DOWN in inpEVENTS 
+if self.door_key + _DOWN in inpEVENTS 
    move self root
    view self.frame_name root
    set self respawnx self.x
    set self respawny self.y
-   remove inpEVENTS self.check_key + _DOWN
+   remove inpEVENTS self.door_key + _DOWN
 endif
