@@ -1,0 +1,261 @@
+REDPANTSGUY|128,256,32,64|True|
+START:0 milkdrink0 -16,0
+DRINK:0 milkdrink0 -16,0
+DRINK:4 milkdrink1 -16,0
+DRINK:8 milkdrink2 -32,0
+DRINK:12 milkdrink3 -16,0
+DRINK:16 milkdrink4 -16,0
+DRINK:20 milkdrink5 -16,0
+DRINK:24 milkdrink6 -16,0
+DRINK:28 milkdrink7 -16,0
+DRINK:32 milkdrink8 -32,0
+DRINK:36 milkdrink9 -16,0
+DRINK:40 milkdrink10 -16,0
+DRINK:44 milkdrink11 -16,0
+IDLE:0 milkdrink11 -16,0
+WALK:0 bloatedwalk0 -16,0
+WALK:4 bloatedwalk1 -16,0
+WALK:8 bloatedwalk2 -16,0
+WALK:12 bloatedwalk3 -16,0
+LILSQUAT:0 bloatedsquat0 -16,0
+MEDSQUAT:0 bloatedsquat1 -16,0
+BIGSQUAT:0 bloatedsquat2 -16,0
+JUMPING:0 bloatedjump0 -16,0
+FALLING:0 bloatedjump1 -16,0
+LANDING:0 bloatedland -16,0
+BONK:0 bloatedbonk -16,0
+BONKLAND:0 bloatedbonkland0 -16,0
+BONKLAND:8 bloatedbonkland1 -16,0
+
+|START:0|
+set self speed 3
+set self airspeed 5
+set self liljumpstr -15
+set self medjumpstr -20
+set self bigjumpstr -25
+set self farts 3
+set self fartstr -12
+set self grav 1
+set self limit 25
+set self neglimit -25
+set self bonkstr -4
+set self state DRINK
+
+|DRINK:0|
+set self x_vel 0
+set self y_vel 0
+
+|DRINK:48|
+set self state IDLE
+set self frame 0
+
+|IDLE:0|
+exec checkAir
+set self x_vel 0
+if not inpRIGHT and inpLEFT
+   set self state WALK
+   set self frame 0
+   set self direction -1
+endif
+if not inpLEFT and inpRIGHT
+   set self state WALK
+   set self frame 0
+   set self direction 1
+endif
+
+exec checkJump
+exec checkFart
+exec applyGrav
+
+|WALK:0|
+set self x_vel self.speed * self.direction
+set self calc1 self.direction == 1 nor inpRIGHT
+set self calc2 self.direction == -1 nor inpLEFT
+if inpRIGHT == inpLEFT or self.calc1 or self.calc2
+   set self state IDLE
+   set self frame 0
+endif
+exec checkAir
+exec checkJump
+exec checkFart
+exec applyGrav
+
+|WALK:16|
+exec WALK:0
+set self frame 0
+
+|JUMPING:0|
+exec applyGrav
+if self.y_vel > 0
+   set self state FALLING
+   set self frame 0
+endif
+exec checkFart
+
+|FALLING:0|
+exec applyGrav
+exec checkFart
+
+|LILSQUAT:0|
+set self x_vel 0
+if not inpA
+   set self state JUMPING
+   set self frame 0
+   set self y_vel self.liljumpstr
+   if inpLEFT != inpRIGHT
+      if inpRIGHT
+         set self x_vel self.airspeed
+      	 set self direction 1
+      endif
+      if inpLEFT
+      	 set self x_vel self.airspeed * -1
+      	 set self direction -1
+      endif      
+   endif
+endif
+
+|LILSQUAT:15|
+exec LILSQUAT:0
+set self state MEDSQUAT
+set self frame 0
+
+|MEDSQUAT:0|
+if not inpA
+   set self state JUMPING
+   set self frame 0
+   set self y_vel self.medjumpstr
+   if inpLEFT != inpRIGHT
+      if inpRIGHT
+         set self x_vel self.airspeed
+      	 set self direction 1
+      endif
+      if inpLEFT
+      	 set self x_vel self.airspeed * -1
+      	 set self direction -1
+      endif      
+   endif
+endif
+
+|MEDSQUAT:15|
+exec MEDSQUAT:0
+set self state BIGSQUAT
+set self frame 0
+
+|BIGSQUAT:0|
+if not inpA
+   set self state JUMPING
+   set self frame 0
+   set self y_vel self.bigjumpstr
+   if inpLEFT != inpRIGHT
+      if inpRIGHT
+         set self x_vel self.airspeed
+      	 set self direction 1
+      endif
+      if inpLEFT
+      	 set self x_vel self.airspeed * -1
+      	 set self direction -1
+      endif      
+   endif
+endif
+
+|BIGSQUAT:15|
+set self state JUMPING
+set self frame 0
+set self y_vel self.bigjumpstr
+if inpLEFT != inpRIGHT
+   if inpRIGHT
+      set self x_vel self.airspeed
+      set self direction 1
+   endif
+   if inpLEFT
+      set self x_vel self.airspeed * -1
+      set self direction -1
+   endif      
+endif
+
+|BONK:0|
+exec applyGrav
+
+|BONKLAND:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|BONKLAND:25|
+set self state IDLE
+set self frame 0
+
+|LANDING:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|LANDING:10|
+set self x_vel 0
+set self state IDLE
+set self frame 0
+
+|XCOLLISION|
+set self calc self.state == JUMPING
+if self.state == FALLING or self.calc
+   set self state BONK
+   set self x_vel self.bonkstr * self.direction
+   set self frame 0
+endif
+
+|YCOLLISION|
+if self.state == FALLING
+    set self state LANDING
+    set self frame 0
+endif
+if self.state == BONK
+   set self state BONKLAND
+   set self frame 0
+endif
+
+|checkAir|
+if self.y_vel
+   set self state FALLING
+   set self frame 0
+endif
+
+|checkJump|
+if A_DOWN in inpEVENTS
+   set self state LILSQUAT
+   set self frame 0
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+if self.y_vel > self.limit
+   set self y_vel self.limit
+endif
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
+endif
+
+|checkFart|
+if B_DOWN in inpEVENTS
+   set self state JUMPING
+   set self y_vel self.fartstr
+   set self frame 0
+   if inpLEFT != inpRIGHT
+      if inpRIGHT
+         set self x_vel self.airspeed
+      	 set self direction 1
+      endif
+      if inpLEFT
+         set self x_vel self.airspeed * -1
+         set self direction -1
+      endif
+   endif
+   set self farts self.farts - 1
+   if self.farts == 0
+      rebrand self.base
+      set self hat 0
+      set self state IDLE
+      set self frame 0
+   endif
+   create fart self.name + fart + self.farts self.x self.y + 32
+endif
+

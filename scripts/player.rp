@@ -107,7 +107,7 @@ if self.y_vel == 0
    endif
 endif
 exec checkCrouch
-     exec checkJump
+exec checkJump
 exec applyGrav
 
 |IDLE:32|
