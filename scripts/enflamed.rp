@@ -31,6 +31,7 @@ BURNOUTJUMP:0 burnoutjump0 -16,-16
 BURNOUTJUMP:3 burnoutjump1 -16,-16
 BURNOUTJUMP:6 burnoutjump2 -16,-16
 BURNOUTJUMP:9 burnoutjump3 -16,-16
+DEAD:0 redpantsdead -16,0
 
 |START:0|
 set self state FLAMING
@@ -137,6 +138,17 @@ set self direction self.direction * -1
 set self state BURNOUT
 set self frame 0
 
+|DEAD:0|
+set self x_vel 0
+set self y_vel 0
+set self can_die 0
+
+|DEAD:45|
+set self state FIRERUN
+set self frame 0
+set self x self.respawnx
+set self y self.respawny
+
 |XCOLLISION|
 set self x_vel 0
 if self.state != FLAMING
@@ -159,6 +171,22 @@ endif
 if self.state == BURNOUTJUMP
    set self state BURNOUT
    set self frame 0
+endif
+
+|COLLIDE|
+if self.state == PLATFORM
+   set self touched 1
+endif
+set self calc self.state == BANANA
+set self calc self.state == CHEESE or self.calc
+if self.state == COIN or self.calc
+   set self collected 1
+endif
+if self.base == redpantsguy
+   if self.hat != enflamed
+      rebrand enflamed
+      set self hat enflamed
+   endif
 endif
 
 |applyGrav|

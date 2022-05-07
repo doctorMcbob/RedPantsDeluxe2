@@ -69,8 +69,7 @@ hitboxes redpantsguy
 hurtboxes redpantsguy
 set self base player
 set self can_die 1
-set self respawnx self.x
-set self respawny self.y
+
 set self rotation 0
 set self door_key UP
 

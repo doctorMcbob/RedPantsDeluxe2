@@ -598,7 +598,7 @@ def hitbox_menu(G, actor, hitboxkey):
             ctx["scrollx"] -= 32
 
         if inp == K_s:
-            ctx["scrolly"] += 32
+            ctx["scrolly"] -= 32
 
         if inp == K_d:
             ctx["scrollx"] += 32
@@ -624,6 +624,7 @@ def hitbox_menu(G, actor, hitboxkey):
             choice = select_from_list(G, ["Hitbox", "Hurtbox"], (0, 32))
             if choice is not None:
                 selection = HITBOXES[hitboxkey][ctx["identifier"]] if choice == "Hitbox" else HURTBOXES[hitboxkey][ctx["identifier"]]
+                if not selection: continue
                 rect = select_from_list(G, selection, (0, 32))
                 if rect in selection:
                     selection.remove(rect)

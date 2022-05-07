@@ -26,6 +26,7 @@ LANDING:0 bloatedland -16,0
 BONK:0 bloatedbonk -16,0
 BONKLAND:0 bloatedbonkland0 -16,0
 BONKLAND:8 bloatedbonkland1 -16,0
+DEAD:0 redpantsdead -16,0
 
 |START:0|
 set self speed 3
@@ -40,6 +41,10 @@ set self limit 25
 set self neglimit -25
 set self bonkstr -4
 set self state DRINK
+set self rotation 0
+set self door_key UP
+set self width 32
+set self height 64
 
 |DRINK:0|
 set self x_vel 0
@@ -162,6 +167,7 @@ endif
 set self state JUMPING
 set self frame 0
 set self y_vel self.bigjumpstr
+set self x_vel 0
 if inpLEFT != inpRIGHT
    if inpRIGHT
       set self x_vel self.airspeed
@@ -175,6 +181,17 @@ endif
 
 |BONK:0|
 exec applyGrav
+
+|DEAD:0|
+set self x_vel 0
+set self y_vel 0
+set self can_die 0
+
+|DEAD:45|
+set self state IDLE
+set self frame 0
+set self x self.respawnx
+set self y self.respawny
 
 |BONKLAND:0|
 set self x_vel 0
@@ -213,6 +230,16 @@ if self.state == BONK
    set self frame 0
 endif
 
+|COLLIDE|
+if self.state == PLATFORM
+   set self touched 1
+endif
+set self calc self.state == BANANA
+set self calc self.state == CHEESE or self.calc
+if self.state == COIN or self.calc
+   set self collected 1
+endif
+
 |checkAir|
 if self.y_vel
    set self state FALLING
@@ -239,6 +266,7 @@ if B_DOWN in inpEVENTS
    set self state JUMPING
    set self y_vel self.fartstr
    set self frame 0
+   set self x_vel 0
    if inpLEFT != inpRIGHT
       if inpRIGHT
          set self x_vel self.airspeed

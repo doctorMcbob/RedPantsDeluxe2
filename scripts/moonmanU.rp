@@ -224,6 +224,12 @@ endif
 set self calc1 self.y_vel > self.airspeedcontrol
 set self calc2 self.airspeedcontrol * -1 > self.y_vel
 if not self.calc1 nor self.calc2
+   if self.x_vel - self.airdrift > self.negspeed and inpLEFT
+	set self x_vel self.x_vel - self.airdrift
+   endif
+   if self.x_vel + self.airdrift < self.speed and inpRIGHT
+      set self x_vel self.x_vel + self.airdrift
+   endif
    if LEFT_DOWN in inpEVENTS
       rebrand moonmanL
    endif
