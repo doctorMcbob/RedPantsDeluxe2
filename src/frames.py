@@ -42,4 +42,10 @@ class Frame(object):
         if self.focus is not None:
             self.scroll_x = self.focus.x - self.w // 2
             self.scroll_y = self.focus.y - self.h // 2
+        # world x_lock and y_lock are values that override the frames focus
+        # ie, no scroll worlds, scroll x only or scroll y only worlds
+        if self.world.x_lock is not None:
+            self.scroll_x = self.world.x_lock
+        if self.world.y_lock is not None:
+            self.scroll_y = self.world.y_lock
 

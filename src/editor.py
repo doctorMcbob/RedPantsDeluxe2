@@ -1,3 +1,11 @@
+"""
+A note on the UX of this editor:
+  fuck, i know, i really just need to re make this completely at this point, gone too deep
+  maybe move the read/write logic out of this file into utils or something
+  use the freaking mouse you idiot
+  show text on mouse over (use actor debug?)
+
+"""
 import pygame
 from pygame.locals import *
 from pygame import Surface, Rect
@@ -24,7 +32,7 @@ OFFSETS = {}
 HITBOXES = {}
 HURTBOXES = {}
 
-WORLD_TEMPLATE = {"actors":[], "background":None}
+WORLD_TEMPLATE = {"actors":[], "background":None, "x_lock": None, "y_lock": None}
 
 SAVED = False
 
@@ -33,6 +41,7 @@ SCRIPT_LOCATION = "scripts/"
 X, Y = 0, 0
 W, H = 1152, 640
 CX, CY = 0, 0
+X_LOCK, Y_LOCK = None, None
 CORNER = None
 TEMPLATES = {}
 
@@ -98,9 +107,15 @@ def draw(G):
     pygame.draw.rect(drawn, (255, 0, 0), Rect(make_rect((CORNER[0]-CX, CORNER[1]-CY) if CORNER is not None else (X-CX+16, Y-CY+16), (X-CX, Y-CY))), width=2)
     G["SCREEN"].blit(drawn, (0, 0))
     G["SCREEN"].blit(G["HEL32"].render("WORLD: {}".format(G["WORLD"]), 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 32))
+    if X_LOCK is not None:
+        pygame.draw.line(G["SCREEN"], (0, 255, 0), (X_LOCK, 0), (X_LOCK + 32, 0))
+    if Y_LOCK is not None:
+        pygame.draw.line(G["SCREEN"], (0, 255, 0), (0, Y_LOCK), (0, Y_LOCK+32))
+        
+        
 
 def run(G):
-    global CORNER, X, Y, CX, CY, SPLITSCREEN, SAVED
+    global CORNER, X, Y, CX, CY, SPLITSCREEN, SAVED, X_LOCK, Y_LOCK
     while True:
         draw(G)
         inp = expect_input()
@@ -209,6 +224,14 @@ def run(G):
             G["WORLDS"].load()
             boxes.load()
 
+        if inp == K_x and mods & KMOD_SHIFT:
+            X_LOCK = CX if X_LOCK is None else None
+            WORLDS[G["WORLD"]]["x_lock"] = X_LOCK
+            
+        if inp == K_y and mods & KMOD_SHIFT:
+            Y_LOCK = CY if Y_LOCK is None else None
+            WORLDS[G["WORLD"]]["y_lock"] = Y_LOCK
+
         if inp == K_s and mods & KMOD_CTRL:
             save()
             boxes.load()
@@ -237,7 +260,7 @@ def run(G):
                 draw(G)
                 G["SCREEN"].blit(
                     G["HEL32"].render("Actor Box Menu:", 0, (0, 0, 0)),
-                    (0, 0)
+                     (0, 0)
                 )
             actor_keys = WORLDS[G["WORLD"]]["actors"]
             if not actor_keys: continue
@@ -373,7 +396,7 @@ def drawn_spritesheet_data(G, d, idx=None):
     keys = d.keys()
     surf = Surface((512, (len(d.keys()) + 1) * 16))
     surf.fill((255, 255, 255))
-    offset = 0 if idx < 20 else 20 * 16
+    offset = 0 if idx < 20 else (idx - 20) * 16
         
     for i, key in enumerate(keys):
         col = (200, 0, 120) if i == idx else (0, 0, 0)
@@ -452,8 +475,20 @@ def spritesheet_menu(G, filename):
                 sheet[keys[idx]] = make_rect(corner, (CX, CY))
             else:
                 name = get_text_input(G, (0, 0))
-                if name is not None:
-                    sheet[name] = make_rect(corner, (CX, CY))
+                if name is not None and name != "":
+                    if mods & KMOD_SHIFT:
+                        X, Y = corner
+                        sheet[name+"00"] = make_rect((X, Y), (CX, CY))
+                        sheet[name+"01"] = make_rect((X+32, Y), (CX+32, CY))
+                        sheet[name+"02"] = make_rect((X+64, Y), (CX+64, CY))
+                        sheet[name+"10"] = make_rect((X, Y+32), (CX, CY+32))
+                        sheet[name+"11"] = make_rect((X+32, Y+32), (CX+32, CY+32))
+                        sheet[name+"12"] = make_rect((X+64, Y+32), (CX+64, CY+32))
+                        sheet[name+"20"] = make_rect((X, Y+64), (CX, CY+64))
+                        sheet[name+"21"] = make_rect((X+32, Y+64), (CX+32, CY+64))
+                        sheet[name+"22"] = make_rect((X+64, Y+64), (CX+64, CY+64))
+                    else:
+                        sheet[name] = make_rect(corner, (CX, CY))
                     keys = list(sheet.keys())
 
 def drawn_script(G, script, idx=None, offset=0):

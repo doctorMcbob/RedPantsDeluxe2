@@ -26,8 +26,8 @@ class World(object):
     def __init__(self, template):
         self.background = None if template["background"] is None else sprites.get_sprite(template["background"])
         self.actors = template["actors"]
-        self.exits = {} if "exits" not in template else template["exits"]
-        self.locks = {} if "locks" not in template else template["locks"]
+        self.x_lock = None if "x_lock" not in template else template["x_lock"]
+        self.y_lock = None if "y_lock" not in template else template["y_lock"]
         
     def update(self):
         for name in self.actors:
@@ -36,12 +36,6 @@ class World(object):
 
     def get_actors(self):
         return [actor.get_actor(a) for a in self.actors]
-
-    def get_exits(self):
-        return list(self.exits.keys())
-
-    def get_locks(self):
-        return list(self.exits.keys())
 
     def draw(self, dest, frame, DEBUG=False):
         if self.background is not None:
