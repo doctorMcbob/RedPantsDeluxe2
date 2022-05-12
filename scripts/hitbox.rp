@@ -1,0 +1,23 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+CHECK:0 empty 0,0
+
+|START:0|
+set self frame 0
+set self state CHECK
+set self return 0
+set self trigger trigger
+set self lookfor 0
+set self timer 0
+
+|CHECK:0|
+set self collide COLLIDE?
+
+if self.return and self.collide
+   set self.return self.trigger self.collide
+endif
+
+if self.frame >= self.timer
+   goodbye
+endif
+

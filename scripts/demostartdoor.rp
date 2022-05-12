@@ -9,10 +9,12 @@ set self state DOOR
 set self frame 0
 
 |COLLIDE|
-if self.door_key + _DOWN in inpEVENTS 
-   move self demostart
-   view self.frame_name demostart
-   set self respawnx self.x
-   set self respawny self.y
-   remove inpEVENTS self.door_key + _DOWN
+if self.door_key
+   if self.door_key + _DOWN in inpEVENTS 
+      move self demostart
+      view self.frame_name demostart
+      set self respawnx self.x
+      set self respawny self.y
+      remove inpEVENTS self.door_key + _DOWN
+   endif
 endif

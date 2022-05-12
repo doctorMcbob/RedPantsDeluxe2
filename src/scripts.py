@@ -8,6 +8,8 @@ import operator as ops
 
 from copy import deepcopy
 
+from random import randint
+
 operators = {
     "+": ops.add,
     "-": ops.sub,
@@ -65,7 +67,7 @@ def resolve(reference, script, world, logfunc=print):
                         raise Exception("Cannot write over {} {}".format(att, cmd_idx))
                     setattr(actor, att, value)                        
                 else:
-                    a.get_actor(reference).attributes[att] = value
+                    actor.attributes[att] = value
 
             if verb == "if":
                 conditional = cmd.pop(0)
@@ -160,11 +162,14 @@ def evaluate_literals(cmd, reference, world, logfunc=print):
     for idx in range(len(cmd)):
         token = cmd[idx]
         try:
+            if token == "RAND?":
+                cmd[idx] = randint(0, 1)
             if token == "COLLIDE?":
                 actor = a.get_actor(reference)
-                actors = list(filter(lambda actr:not (actr is actor), world.get_actors()))
+                actors = list(filter(lambda actr:not (actr is actor), world.get_actors()[::-1]))
                 tangibles = list(filter(lambda actr: actr.tangible, actors))
-                cmd[idx] =  actor.collidelist(tangibles) != -1
+                hit = actor.collidelist(tangibles)
+                cmd[idx] = False if hit == -1 else tangibles[hit].name
             if token == "None":
                 cmd[idx] = None
             try:

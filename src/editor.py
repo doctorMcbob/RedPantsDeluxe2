@@ -108,9 +108,9 @@ def draw(G):
     G["SCREEN"].blit(drawn, (0, 0))
     G["SCREEN"].blit(G["HEL32"].render("WORLD: {}".format(G["WORLD"]), 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 32))
     if X_LOCK is not None:
-        pygame.draw.line(G["SCREEN"], (0, 255, 0), (X_LOCK, 0), (X_LOCK + 32, 0))
+        pygame.draw.line(G["SCREEN"], (0, 255, 0), (X_LOCK, 0), (X_LOCK + 32, 0), 10)
     if Y_LOCK is not None:
-        pygame.draw.line(G["SCREEN"], (0, 255, 0), (0, Y_LOCK), (0, Y_LOCK+32))
+        pygame.draw.line(G["SCREEN"], (0, 255, 0), (0, Y_LOCK), (0, Y_LOCK + 32), 10)
         
         
 
