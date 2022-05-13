@@ -289,7 +289,7 @@ class Actor(Rect):
             
     def collision_with(self, actor, world):
         if "COLLIDE" in self.scripts:
-            scripts.resolve(actor.name, self.scripts["COLLIDE"], world)
+            scripts.resolve(actor.name, self.scripts["COLLIDE"], world, related=self.name)
 
     def hit_check(self, world):
         hurtboxes = self.get_hurtboxes()
@@ -306,5 +306,5 @@ class Actor(Rect):
                     
     def hit(self, actor, world):
         if "HIT" in self.scripts:
-            scripts.resolve(actor.name, self.scripts["HIT"], world)
+            scripts.resolve(actor.name, self.scripts["HIT"], world, related=self.name)
 

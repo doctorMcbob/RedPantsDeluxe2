@@ -1,24 +1,25 @@
 GOOSEBALL|0,0,0,0|True|
-START:0 gooseballlook0 -16,0
-LOOK:0 gooseballlook0 -16,0
-LOOK:30 gooseballlook1 -16,0
-LOOK:34 gooseballlook2 -16,0
-LOOK:64 gooseballlook1 -16,0
-JUMPSTART:0 gooseballjumpstart0 -16,0
-JUMPSTART:2 gooseballjumpstart1 -16,0
-JUMPSTART:4 gooseballstartjump2 -16,0
-JUMPSTART:6 gooseballstartjump3 -16,0
-JUMP:0 gooseballjump1 -16,0
-JUMP:0 gooseballjump0 -16,0
-LAND:0 gooseballland0 -16,0
-LAND:4 gooseballland1 -16,0
-CHARGESTART:0 gooseballchargestart0 -16,0
-CHARGESTART:19 gooseballchargestart1 -16,0
-CHARGE:0 gooseballcharge0 -16,0
-CHARGE:4 gooseballcharge1 -16,0
-BONK:0 gooseballbonk -16,0
-BONKLAND:0 gooseballbonkland0 -16,0
-BONKLAND:4 gooseballbonkland1 -16,0
+START:0 gooseballlook0 -8,-16
+LOOK:0 gooseballlook0 -8,-16
+LOOK:30 gooseballlook1 -8,-16
+LOOK:34 gooseballlook2 -8,-16
+LOOK:64 gooseballlook1 -8,-16
+JUMPSTART:0 gooseballjumpstart0 -8,-16
+JUMPSTART:2 gooseballjumpstart1 -8,-16
+JUMPSTART:4 gooseballstartjump2 -8,-16
+JUMPSTART:6 gooseballstartjump3 -8,-16
+JUMP:0 gooseballjump1 -8,-16
+JUMP:0 gooseballjump0 -8,-16
+LAND:0 gooseballland0 -8,-16
+LAND:4 gooseballland1 -8,-16
+CHARGESTART:0 gooseballchargestart0 -8,-16
+CHARGESTART:19 gooseballchargestart1 -8,-16
+CHARGE:0 gooseballcharge0 -8,-16
+CHARGE:4 gooseballcharge1 -8,-16
+BONK:0 gooseballbonk -8,-16
+HITSTUN:0 gooseballbonk -8,-16
+BONKLAND:0 gooseballbonkland0 -8,-16
+BONKLAND:4 gooseballbonkland1 -8,-16
 
 |START:0|
 set self frame 0
@@ -134,6 +135,7 @@ set self frame 0
 exec applyGrav
 
 |BONKLAND:0|
+set self x_vel 0
 exec checkAir
 exec applyGrav
 
@@ -166,8 +168,23 @@ endif
 |HIT|
 if player in self.name
    set self state BONK
+   set self frame 0
    set self y_vel -3
+   set self direction related.direction * -1
+   set self x_vel self.direction * 4
 endif
+
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self state BONK
+set self frame 0
+set self x_vel self.hit_x_vel
+set self y_vel self.hit_y_vel
+set self hit_x_vel 0
+set self hit_y_vel 0
 
 |applyGrav|
 set self y_vel self.y_vel + self.grav

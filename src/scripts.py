@@ -42,7 +42,7 @@ def load():
 def get_script_map(name):
     return SCRIPTS[name] if name in SCRIPTS else None
 
-def resolve(reference, script, world, logfunc=print):
+def resolve(reference, script, world, related=None, logfunc=print):
     cmd_idx = 0
     while cmd_idx < len(script):
         if not script[cmd_idx].split() or script[cmd_idx].startswith("#"): # comments
@@ -50,7 +50,7 @@ def resolve(reference, script, world, logfunc=print):
             continue
 
         cmd = script[cmd_idx].split()
-        cmd = evaluate_literals(cmd, reference, world, logfunc=logfunc)
+        cmd = evaluate_literals(cmd, reference, world, related=related, logfunc=logfunc)
         cmd = resolve_operators(cmd, logfunc=logfunc)
         # resolve command!
         try:
@@ -61,6 +61,8 @@ def resolve(reference, script, world, logfunc=print):
 
             if verb == "set":
                 actor, att, value = cmd
+                if actor == "related" and related is not None:
+                    actor = related
                 actor = a.get_actor(reference) if actor == "self" else a.get_actor(actor)
                 if hasattr(actor, att):
                     if att in ["attributes", "scripts", "hitboxes", "hurtboxes"]:
@@ -158,7 +160,7 @@ def resolve(reference, script, world, logfunc=print):
 
         cmd_idx += 1
 
-def evaluate_literals(cmd, reference, world, logfunc=print):
+def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
     for idx in range(len(cmd)):
         token = cmd[idx]
         try:
@@ -184,6 +186,8 @@ def evaluate_literals(cmd, reference, world, logfunc=print):
                 pass
             if "." in token:
                 actor, att = token.split(".")
+                if actor == "related" and related is not None:
+                    actor = related
                 actor = a.get_actor(reference) if actor == "self" else a.get_actor(actor)
                 if hasattr(actor, att):
                     if att in ["attributes", "scripts", "hitboxes", "hurtboxes"]:
