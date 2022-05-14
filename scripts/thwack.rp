@@ -1,0 +1,42 @@
+THWACK|0,0,0,0|False|
+START:0 thwacksmall 0,0
+THWACKSMALL:0 thwacksmall 0,0
+THWACKMIDDLE:0 thwackmiddle 0,0
+THWACKBIG:0 thwackbig 0,0
+
+|START:0|
+set self roll RAND? + RAND?
+if self.roll == 0
+   set self state THWACKSMALL
+endif
+if self.roll == 1
+   set self state THWACKMIDDLE
+endif
+if self.roll == 2
+   set self state THWACKBIG  
+endif
+set self frame 0
+set self x_vel -1 + RAND? + RAND? * 3
+set self y_vel -1 + RAND? + RAND? * 3
+
+|THWACKSMALL:0|
+set self x self.x + self.x_vel
+set self y self.y + self.y_vel
+
+|THWACKMIDDLE:0|
+set self x self.x + self.x_vel
+set self y self.y + self.y_vel
+
+|THWACKBIG:0|
+set self x self.x + self.x_vel
+set self y self.y + self.y_vel
+
+|THWACKSMALL:8|
+goodbye
+
+|THWACKMIDDLE:8|
+goodbye
+
+|THWACKBIG:8|
+goodbye
+

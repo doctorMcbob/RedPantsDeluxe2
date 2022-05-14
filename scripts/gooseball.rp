@@ -166,13 +166,11 @@ if self.state == JUMP
 endif
 
 |HIT|
-if player in self.name
-   set self state BONK
-   set self frame 0
-   set self y_vel -3
-   set self direction related.direction * -1
-   set self x_vel self.direction * 4
-endif
+set self state HITSTUN
+set self frame 0
+set self direction related.direction * -1
+set self hit_x_vel 8 * related.direction
+set self hit_y_vel -6
 
 |HITSTUN:0|
 set self x_vel 0

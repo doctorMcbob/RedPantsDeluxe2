@@ -32,6 +32,7 @@ BURNOUTJUMP:3 burnoutjump1 -16,-16
 BURNOUTJUMP:6 burnoutjump2 -16,-16
 BURNOUTJUMP:9 burnoutjump3 -16,-16
 DEAD:0 redpantsdead -16,0
+HITSTUN:0 flaming7 -16,-16
 
 |START:0|
 set self state FLAMING
@@ -148,6 +149,18 @@ set self state FIRERUN
 set self frame 0
 set self x self.respawnx
 set self y self.respawny
+
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self state DEFLAME
+set self frame 0
+set self x_vel self.hit_x_vel
+set self y_vel self.hit_y_vel
+set self hit_x_vel 0
+set self hit_y_vel 0
 
 |XCOLLISION|
 set self x_vel 0

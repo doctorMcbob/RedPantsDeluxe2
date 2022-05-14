@@ -173,7 +173,7 @@ class Actor(Rect):
             if self.rotation != 0:
                 sprite = pygame.transform.rotate(sprite, self.rotation)
             return sprite
-            
+
         placeholder = Surface((self.w, self.h))
         placeholder.fill((1, 255, 1))
         

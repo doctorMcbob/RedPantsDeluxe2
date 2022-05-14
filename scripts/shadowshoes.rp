@@ -37,6 +37,11 @@ LONGJUMPSTART:0 shadowshoelongjumpstart -16,0
 LONGJUMP:0 shadowshoelongjump1 -16,0
 LONGJUMP:8 shadowshoelongjump2 -16,0
 DEAD:0 shadowshoedead -16,0
+HITSTUN:0 shadowshoebonk -16,0
+PUNCH:0 shadowpunch0 -32,0
+PUNCH:4 shadowpunch1 -16,0
+PUNCH:6 shadowpunch2 -32,0
+PUNCH:8 shadowpunch3 -16,0
 
 |START:0|
 # welcome to red pants script :)
@@ -104,6 +109,7 @@ if self.y_vel == 0
 endif
 exec checkCrouch
 exec checkJump
+exec checkPunch
 
 |IDLE:32|
 exec IDLE:0
@@ -162,6 +168,7 @@ if inpRIGHT == inpLEFT or self.calc1 or self.calc2
 endif
 exec checkCrouch
 exec checkJump
+exec checkPunch
 exec checkAir
 
 |RUNNING:16|
@@ -173,6 +180,7 @@ if self.x_vel == 0
    set self state IDLE
    set self frame 0
 endif
+exec checkPunch
 if self.x_vel != 0
    exec applyTraction
    set self absxvel abs self.x_vel
@@ -357,6 +365,58 @@ if self.direction == 1
    endif
 endif
 
+|PUNCH:0|
+exec checkAir
+exec applyTraction
+
+|PUNCH:16|
+set self state IDLE
+set self frame 0
+
+|HIT|
+set self state HITSTUN
+set self frame 0
+set self direction related.direction * -1
+if related.state == DIVE
+   set self hit_x_vel 15 * related.direction
+   set self hit_y_vel -10
+endif
+if related.state == PUNCH
+   set self hit_x_vel 8 * related.direction
+   set self hit_y_vel -8
+endif
+
+if self.thwacks == None
+   set self thwacks 1
+endif
+
+if related.x <= self.x
+   set self thw_x self.x + related.x - self.x
+endif
+if related.x > self.x
+   set self thw_x self.x + self.x - related.x
+endif
+if related.y <= self.y
+   set self thw_y self.y + related.y - self.y
+endif
+if related.y > self.y
+   set self thw_y self.y + self.y - related.y
+endif
+
+create thwack self.name + thwack + self.thwacks self.thw_x self.thw_y
+set self thwacks self.thwacks + 1
+
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self state BONK
+set self frame 0
+set self x_vel self.hit_x_vel
+set self y_vel self.hit_y_vel
+set self hit_x_vel 0
+set self hit_y_vel 0
 
 |XCOLLISION|
 set self calc1 self.state == DIVE
@@ -442,6 +502,12 @@ endif
 |checkJump|
 if A_DOWN in inpEVENTS
    set self state JUMPSQUAT
+   set self frame 0
+endif
+
+|checkPunch|
+if B_DOWN in inpEVENTS
+   set self state PUNCH
    set self frame 0
 endif
 

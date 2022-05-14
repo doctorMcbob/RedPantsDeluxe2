@@ -27,6 +27,7 @@ BONK:0 bloatedbonk -16,0
 BONKLAND:0 bloatedbonkland0 -16,0
 BONKLAND:8 bloatedbonkland1 -16,0
 DEAD:0 redpantsdead -16,0
+HITSTUN:0 bloatedbonk -16,0
 
 |START:0|
 set self speed 3
@@ -211,6 +212,46 @@ exec applyGrav
 set self x_vel 0
 set self state IDLE
 set self frame 0
+
+|HIT|
+set self state HITSTUN
+set self frame 0
+set self direction related.direction * -1
+set self hit_x_vel 4 * related.direction
+set self hit_y_vel -13
+endif
+
+if self.thwacks == None
+   set self thwacks 1
+endif
+
+if related.x <= self.x
+   set self thw_x self.x + related.x - self.x
+endif
+if related.x > self.x
+   set self thw_x self.x + self.x - related.x
+endif
+if related.y <= self.y
+   set self thw_y self.y + related.y - self.y
+endif
+if related.y > self.y
+   set self thw_y self.y + self.y - related.y
+endif
+
+create thwack self.name + thwack + self.thwacks self.thw_x self.thw_y
+set self thwacks self.thwacks + 1
+
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self state BONK
+set self frame 0
+set self x_vel self.hit_x_vel
+set self y_vel self.hit_y_vel
+set self hit_x_vel 0
+set self hit_y_vel 0
 
 |XCOLLISION|
 set self calc self.state == JUMPING

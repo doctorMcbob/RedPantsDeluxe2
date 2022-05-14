@@ -62,6 +62,7 @@ HADOKEN:9 fighterfireball2 -16,0
 AIRHADOKEN:0 fighterairfireball0 -16,0
 AIRHADOKEN:6 fighterairfireball1 -16,0
 AIRHADOKEN:9 fighterairfireball2 -16,0
+HITSTUN:0 fighterbonk -16,0
 
 |START:0|
 set self state IDLE
@@ -535,6 +536,67 @@ exec HADOKEN:0
 set self state IDLE
 set self frame 0
 exec IDLE:0
+
+|HIT|
+set self state HITSTUN
+set self frame 0
+set self direction related.direction * -1
+if related.state == DIVEKICK
+   set self hit_x_vel 15 * related.direction
+   set self hit_y_vel -10
+endif
+if related.state == SLIDEKICK
+   set self hit_x_vel 13 * related.direction
+   set self hit_y_vel -9
+endif
+if related.state == PUNCH
+   set self hit_x_vel 8 * related.direction
+   set self hit_y_vel -8
+endif
+if related.state == KICK
+   set self hit_x_vel 10 * related.direction
+   set self hit_y_vel -15
+endif
+if related.state == SHORYU
+   set self hit_x_vel 4 * related.direction
+   set self hit_y_vel -19   
+endif
+if related.state == TATSU
+   set self hit_x_vel 12 * related.direction
+   set self hit_y_vel -6   
+endif
+
+if self.thwacks == None
+   set self thwacks 1
+endif
+
+if related.x <= self.x
+   set self thw_x self.x + related.x - self.x
+endif
+if related.x > self.x
+   set self thw_x self.x + self.x - related.x
+endif
+if related.y <= self.y
+   set self thw_y self.y + related.y - self.y
+endif
+if related.y > self.y
+   set self thw_y self.y + self.y - related.y
+endif
+
+create thwack self.name + thwack + self.thwacks self.thw_x self.thw_y
+set self thwacks self.thwacks + 1
+
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self state BONK
+set self frame 0
+set self x_vel self.hit_x_vel
+set self y_vel self.hit_y_vel
+set self hit_x_vel 0
+set self hit_y_vel 0
 
 |XCOLLISION|
 set self calc1 self.state == DIVEKICK
