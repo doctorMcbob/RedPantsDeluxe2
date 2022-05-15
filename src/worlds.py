@@ -54,7 +54,12 @@ class World(object):
             Actor = actor.get_actor(name)
             if frame.in_frame(Actor):
                 dx, dy = Actor.get_offset()
-                dest.blit(Actor.get_sprite(), frame.scroll((Actor.x+dx, Actor.y+dy)))
+                if Actor.direction == 1 and not Actor.rotation in [270, 90]:
+                    sprite = Actor.get_sprite()
+                    dest.blit(sprite, frame.scroll((
+                        (Actor.x+Actor.w-dx)-sprite.get_width(), Actor.y+dy)))
+                else:
+                    dest.blit(Actor.get_sprite(), frame.scroll((Actor.x+dx, Actor.y+dy)))
                 if DEBUG:
                     Actor.debug(dest,
                                 frame.scroll((Actor.x+Actor.w, Actor.y)),
