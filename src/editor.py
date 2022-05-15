@@ -120,16 +120,24 @@ def run(G):
         if inp == K_ESCAPE and (SAVED or mods & KMOD_CTRL):
             sys.exit()
 
-        if inp == K_LEFT and mods & KMOD_SHIFT: CX += 64
+        if inp == K_LEFT and mods & KMOD_SHIFT:
+            CX += 64
+            X += 64
         elif inp == K_LEFT: X -= 32
 
-        if inp == K_UP and mods & KMOD_SHIFT: CY += 64
+        if inp == K_UP and mods & KMOD_SHIFT:
+            CY += 64
+            Y += 64
         elif inp == K_UP: Y -= 32
 
-        if inp == K_RIGHT and mods & KMOD_SHIFT: CX -= 64
+        if inp == K_RIGHT and mods & KMOD_SHIFT:
+            CX -= 64
+            X -= 64
         elif inp == K_RIGHT: X += 32
 
-        if inp == K_DOWN and mods & KMOD_SHIFT: CY -= 64
+        if inp == K_DOWN and mods & KMOD_SHIFT:
+            CY -= 64
+            Y -= 64
         elif inp == K_DOWN: Y += 32
 
         if inp == K_o and mods & KMOD_CTRL:
