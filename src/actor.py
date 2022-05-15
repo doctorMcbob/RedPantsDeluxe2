@@ -108,6 +108,27 @@ class Actor(Rect):
                     bestframe = frame
         return None if bestkey is None else data[bestkey]
 
+    def _rotate_box(self, rect, deg):
+        x1, y1 = self.x, self.y
+        w1, h1 = self.w, self.h
+        x2, y2 = rect.x - x1, rect.y - y1
+        w2, h2 = rect.w, rect.h
+
+        if deg == 0:
+            return Rect((x1+x2, y1+y2), (w2, h2))
+        if deg ==  90:
+            if self.direction == 1:
+                return Rect((x1+y2, (y1+h1+h1)-(x2+w2)), (h2, w2))
+            else:
+                return Rect((x1+y2, (y1+h1)-(x2+w2)), (h2, w2))
+        if deg == 180:
+            return Rect(((x1+w1)-(x2+w2), (y1+h1)-(y2+h2)), (w2, h2))
+        if deg == 270:
+            if self.direction == 1:
+                return Rect(((x1+w1)-(y2+h2), y1+x2-h1), (h2, w2))
+            else:
+                return Rect(((x1+w1)-(y2+h2), y1+x2), (h2, w2))
+
     def get_hitboxes(self):
         hitboxes = self._index(self.hitboxes)
         if hitboxes is None: return None
@@ -119,6 +140,7 @@ class Actor(Rect):
                 box = Rect(((self.x + self.w)-(x + w), y + self.y), dim)
             else:
                 box = Rect((x + self.x, y + self.y), dim)
+            box = self._rotate_box(box, self.rotation)
             boxes.append(box)
         return boxes
 
@@ -133,6 +155,7 @@ class Actor(Rect):
                 box = Rect(((self.x + self.w)-(x + w), y + self.y), dim)
             else:
                 box = Rect((x + self.x, y + self.y), dim)
+            box = self._rotate_box(box, self.rotation)
             boxes.append(box)
         return boxes
 
