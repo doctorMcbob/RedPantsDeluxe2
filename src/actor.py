@@ -94,7 +94,20 @@ class Actor(Rect):
     def load_scripts(self, name):
         self.offsetkey = name
         self.scripts = scripts.get_script_map(name)
-        
+
+    def _index_key(self, data):
+        bestkey = None
+        bestframe = None
+        for key in data.keys():
+            if ":" not in key: continue
+            state, frame = key.split(":")
+            frame = int(frame)
+            if state == self.state:
+                if frame <= self.frame and (bestframe is None or bestframe < frame):
+                    bestkey = key
+                    bestframe = frame
+        return bestkey
+
     def _index(self, data):
         bestkey = None
         bestframe = None
@@ -234,16 +247,6 @@ class Actor(Rect):
         self.frame += 1
 
     def debug(self, dest, pos, font, scrollx, scrolly, text=False):
-        if text:
-            X, Y = pos
-            dest.blit(font.render("STATE {}".format(self.state), 0, (0, 0, 0)), (X, Y))
-            Y += 16
-            dest.blit(font.render("FRAME {}".format(self.frame), 0, (0, 0, 0)), (X, Y))
-            Y += 16
-            dest.blit(font.render("X, Y {},{}".format(self.x, self.y), 0, (0, 0, 0)), (X, Y))
-            Y += 16
-            dest.blit(font.render("vel {},{}".format(self.x_vel, self.y_vel), 0, (0, 0, 0)), (X, Y))
-
         pygame.draw.rect(dest, (0, 0, 255), Rect(self.x-scrollx, self.y-scrolly, self.w, self.h), width=2)
 
         hitboxes = self.get_hitboxes()
@@ -256,15 +259,35 @@ class Actor(Rect):
                 pygame.draw.rect(dest, (0, 255, 0), Rect(box.x-scrollx, box.y-scrolly, box.w, box.h), width=2)
 
         if text:
+            surf = Surface((512, 256))
+            pygame.draw.rect(surf, (255, 255, 255), Rect((8, 8), (512 - 16, 256 - 16)))
+            
+            X, Y = 16, 16
+            surf.blit(font.render("NAME {}".format(self.name), 0, (0, 0, 0)), (X, Y))
+            Y += 24
+            surf.blit(font.render("STATE {}".format(self.state), 0, (0, 0, 0)), (X, Y))
+            Y += 24
+            surf.blit(font.render("FRAME {}".format(self.frame), 0, (0, 0, 0)), (X, Y))
+            Y += 24
+            surf.blit(font.render("X, Y {},{}".format(self.x, self.y), 0, (0, 0, 0)), (X, Y))
+            Y += 24
+            surf.blit(font.render("vel {},{}".format(self.x_vel, self.y_vel), 0, (0, 0, 0)), (X, Y))
+
+
             script = self._index(self.scripts)
             if script is None: return
-            Y = pos[1]
+            Y = 16
             X += 256
-            dest.blit(font.render("CURRENT SCRIPT", 0, (0, 0, 0)), (X, Y))
-            X += 16
-            for cmd in script:
-                Y += 16
-                dest.blit(font.render("{}".format(cmd), 0, (0, 0, 0)), (X, Y))
+            surf.blit(font.render("TANGIBLE {}".format(self.tangible), 0, (0, 0, 0)), (X, Y))
+            Y += 24
+            surf.blit(font.render("SCRIPT KEY {}".format(self._index_key(self.scripts)), 0, (0, 0, 0)), (X, Y))
+            Y += 24
+            surf.blit(font.render("SPRITE KEY {}".format(self._index_key(self.sprites)), 0, (0, 0, 0)), (X, Y))
+            Y += 24
+            surf.blit(font.render("SPRIET NAME {}".format(self._index(self.sprites)), 0, (0, 0, 0)), (X, Y))
+            Y += 24
+            dest.blit(surf, (16, 16))
+
 
     def collision_check(self, world):
         actors = list(filter(lambda actor:not (actor is self), world.get_actors()))

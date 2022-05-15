@@ -60,7 +60,10 @@ class World(object):
                         (Actor.x+Actor.w-dx)-sprite.get_width(), Actor.y+dy)))
                 else:
                     dest.blit(Actor.get_sprite(), frame.scroll((Actor.x+dx, Actor.y+dy)))
-                if DEBUG:
+        if DEBUG:
+            for name in self.actors:
+                Actor = actor.get_actor(name)
+                if frame.in_frame(Actor):
                     maketext = Rect(frame.scroll((Actor.x, Actor.y)), Actor.size).collidepoint(pygame.mouse.get_pos())
 
                     Actor.debug(dest,
