@@ -233,15 +233,16 @@ class Actor(Rect):
         self.hit_check(world)
         self.frame += 1
 
-    def debug(self, dest, pos, font, scrollx, scrolly):
-        X, Y = pos
-        dest.blit(font.render("STATE {}".format(self.state), 0, (0, 0, 0)), (X, Y))
-        Y += 16
-        dest.blit(font.render("FRAME {}".format(self.frame), 0, (0, 0, 0)), (X, Y))
-        Y += 16
-        dest.blit(font.render("X, Y {},{}".format(self.x, self.y), 0, (0, 0, 0)), (X, Y))
-        Y += 16
-        dest.blit(font.render("vel {},{}".format(self.x_vel, self.y_vel), 0, (0, 0, 0)), (X, Y))
+    def debug(self, dest, pos, font, scrollx, scrolly, text=False):
+        if text:
+            X, Y = pos
+            dest.blit(font.render("STATE {}".format(self.state), 0, (0, 0, 0)), (X, Y))
+            Y += 16
+            dest.blit(font.render("FRAME {}".format(self.frame), 0, (0, 0, 0)), (X, Y))
+            Y += 16
+            dest.blit(font.render("X, Y {},{}".format(self.x, self.y), 0, (0, 0, 0)), (X, Y))
+            Y += 16
+            dest.blit(font.render("vel {},{}".format(self.x_vel, self.y_vel), 0, (0, 0, 0)), (X, Y))
 
         pygame.draw.rect(dest, (0, 0, 255), Rect(self.x-scrollx, self.y-scrolly, self.w, self.h), width=2)
 
@@ -253,16 +254,17 @@ class Actor(Rect):
         if hurtboxes is not None:
             for box in hurtboxes:
                 pygame.draw.rect(dest, (0, 255, 0), Rect(box.x-scrollx, box.y-scrolly, box.w, box.h), width=2)
-        
-        script = self._index(self.scripts)
-        if script is None: return
-        Y = pos[1]
-        X += 256
-        dest.blit(font.render("CURRENT SCRIPT", 0, (0, 0, 0)), (X, Y))
-        X += 16
-        for cmd in script:
-            Y += 16
-            dest.blit(font.render("{}".format(cmd), 0, (0, 0, 0)), (X, Y))
+
+        if text:
+            script = self._index(self.scripts)
+            if script is None: return
+            Y = pos[1]
+            X += 256
+            dest.blit(font.render("CURRENT SCRIPT", 0, (0, 0, 0)), (X, Y))
+            X += 16
+            for cmd in script:
+                Y += 16
+                dest.blit(font.render("{}".format(cmd), 0, (0, 0, 0)), (X, Y))
 
     def collision_check(self, world):
         actors = list(filter(lambda actor:not (actor is self), world.get_actors()))
