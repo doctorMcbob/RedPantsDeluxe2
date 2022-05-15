@@ -23,7 +23,7 @@ ALPHABET_KEY_MAP = {
 ALPHABET_SHIFT_MAP = {
     K_0: ")", K_1: "!", K_2: "@", K_3: "#", K_4: "$",
     K_5: "%", K_6: "^", K_7: "&", K_8: "*", K_9: "(",
-    K_SEMICOLON: ":"
+    K_SEMICOLON: ":", K_MINUS:"_",
 }
 
 def get_text_input(G, pos, numeric=False):
@@ -59,8 +59,8 @@ def expect_click(args=None, cb=lambda *args: None):
                 return e.pos, e.button
 
 def expect_input(expectlist=[], args=None, cb=lambda *args:None):
-    cb(args)
     while True:
+        cb(args)
         pygame.display.update()
         for e in pygame.event.get():
             if e.type == QUIT:

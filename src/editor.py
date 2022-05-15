@@ -103,22 +103,19 @@ def draw(G):
     
     world = G["WORLDS"].get_world(G["WORLD"])
     frame.world = world
-    drawn = frame.drawn()
+    drawn = frame.drawn(DEBUG=G)
     pygame.draw.rect(drawn, (255, 0, 0), Rect(make_rect((CORNER[0]-CX, CORNER[1]-CY) if CORNER is not None else (X-CX+16, Y-CY+16), (X-CX, Y-CY))), width=2)
     G["SCREEN"].blit(drawn, (0, 0))
     G["SCREEN"].blit(G["HEL32"].render("WORLD: {}".format(G["WORLD"]), 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 32))
     if X_LOCK is not None:
         pygame.draw.line(G["SCREEN"], (0, 255, 0), (X_LOCK, 0), (X_LOCK + 32, 0), 10)
     if Y_LOCK is not None:
-        pygame.draw.line(G["SCREEN"], (0, 255, 0), (0, Y_LOCK), (0, Y_LOCK + 32), 10)
-        
-        
+        pygame.draw.line(G["SCREEN"], (0, 255, 0), (0, Y_LOCK), (0, Y_LOCK + 32), 10)      
 
 def run(G):
     global CORNER, X, Y, CX, CY, SPLITSCREEN, SAVED, X_LOCK, Y_LOCK
     while True:
-        draw(G)
-        inp = expect_input()
+        inp = expect_input(args=G, cb=draw)
         mods = pygame.key.get_mods()
         if inp == K_ESCAPE and (SAVED or mods & KMOD_CTRL):
             sys.exit()
