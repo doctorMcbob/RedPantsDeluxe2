@@ -30,7 +30,7 @@ def get_text_input(G, pos, numeric=False):
     string = ''
     KEY_MAP = NUMBERS_ONLY if numeric else ALPHABET_KEY_MAP
     while True:
-        surf = Surface((256, 32))
+        surf = Surface((512, 32))
         surf.fill((230, 230, 230))
         surf.blit(G["HEL32"].render(string, 0, (0, 0, 0)), (0, 0))
         G["SCREEN"].blit(surf, pos)

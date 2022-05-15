@@ -29,6 +29,7 @@ def run_controller_menu(G, cb=lambda *args: None, args=None, noquit=False):
         pygame.display.update()
         pygame.event.pump()
         keys = pygame.key.get_pressed()
+        mods = pygame.key.get_mods()
         if pygame.event.peek(QUIT) or keys[K_ESCAPE]:
             return None if noquit else sys.exit()
 
@@ -47,8 +48,13 @@ def run_controller_menu(G, cb=lambda *args: None, args=None, noquit=False):
                 elif btn == DEFAULT_CONTROLLER_MAP["START"]: inmenu = False
 
         for name in DEFAULT_MAP.keys():
-            key = DEFAULT_MAP[name] 
-            if keys[key] and "key" not in registered:
+            key = DEFAULT_MAP[name]
+            force = False
+            registered_keys = registered.count("key")
+            force = (keys[K_2] and registered_keys < 2) or force
+            force = (keys[K_3] and registered_keys < 3) or force
+            force = (keys[K_4] and registered_keys < 4) or force
+            if keys[key] and "key" not in registered or force:
                 registered.append("key")
                 players.append(deepcopy(DEFAULT_MAP))
                 G["INPUTS"].add_state(
