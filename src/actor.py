@@ -42,6 +42,16 @@ from src import scripts
 TEMPLATES = {}
 ACTORS = {}
 
+def swap_in(actors):
+    global TEMPLATES, ACTORS
+    TEMPLATES = {}
+    ACTORS = {}
+
+    for name in actors.keys():
+        TEMPLATES[name] = actors[name]
+    for name in actors.keys():
+        ACTORS[name] = Actor(actors[name])
+
 def load():
     from src.lib import ACTORS as A
 
@@ -290,8 +300,8 @@ class Actor(Rect):
 
 
     def collision_check(self, world):
-        actors = list(filter(lambda actor:not (actor is self), world.get_actors()))
-        tangibles = list(filter(lambda actor: actor.tangible, actors))
+        actors = list(filter(lambda actor:actor is not None and not (actor is self), world.get_actors()))
+        tangibles = list(filter(lambda actor: actor is not None and actor.tangible, actors))
         hits = self.collidelistall(actors)
         for hit in hits:
             self.collision_with(actors[hit], world)

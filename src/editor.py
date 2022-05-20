@@ -26,7 +26,6 @@ from src import frames
 from src import scripts
 from src import sprites
 from src import boxes
-
 from src import actor
 from src import worlds
 
@@ -77,11 +76,11 @@ CURSOR_SCROLLER = {
 }
 
 def load_game():
-    sprites.load()
-    scripts.load()
-    worlds.load()
-    actor.load()
-    boxes.load()
+    sprites.swap_in(offsets=OFFSETS, sprite_maps=SPRITEMAPS)
+    scripts.swap_in(SCRIPTS)
+    worlds.swap_in(WORLDS)
+    actor.swap_in(ACTORS)
+    boxes.swap_in(hitboxes=HITBOXES, hurtboxes=HURTBOXES)
     
 def make_rect(pos, pos2):
     x1 = min(pos[0], pos2[0])
@@ -122,22 +121,12 @@ def save():
     SAVED = True
     load_game()
     
-def make_single_player(G):
+def update_frames(G):
     frames.clear()
     frames.add_frame("EDITOR_VIEW", G["WORLD"], (1152, 640))
     frames.add_frame("MAIN", G["WORLD"], (1152, 640))
     G["FRAMEMAP"] = {
         "MAIN": (0, 0),
-    }
-
-def make_split_screen(G):
-    frames.clear()
-    frames.add_frame("EDITOR_VIEW", G["WORLD"], (1152, 640))
-    frames.add_frame("MAIN", G["WORLD"], (1152//2, 640))
-    frames.add_frame("MAIN2", G["WORLD"], (1152//2, 640))
-    G["FRAMEMAP"] = {
-        "MAIN": (0, 0),
-        "MAIN2": (W//2, 0),
     }
 
 def set_up():
@@ -151,14 +140,14 @@ def set_up():
     inputs.add_state("PLAYER1")
     inputs.add_state("PLAYER2")
 
+    load()
     load_game()
 
     G["FRAMES"] = frames
     G["WORLDS"] = worlds
     G["ACTOR"] = actor
     G["CLOCK"] = pygame.time.Clock()
-    make_single_player(G)
-    load()
+    update_frames(G)
     return G
 
 def draw_buttons(G, mpos):
@@ -220,7 +209,9 @@ def update_actors_bar(G, mpos, btn):
             hitbox_menu(G, friend.name)
 
         elif Rect((1168+8 + 100 + 100, (i+scroll) * seg_h + 4 + 32), (80, 48)).collidepoint(mpos) and btn in [0, 1]:
+            WORLDS[G['WORLD']]['actors'].remove(friend.name)
             world.actors.remove(friend.name)
+            load_game()
         
         elif Rect((1168, (i+scroll) * seg_h), (seg_w, seg_h)).collidepoint(mpos) and btn in [0, 1]:
             CURSOR_SCROLLER["X"] = friend.x
@@ -238,9 +229,9 @@ def add_actor(G, template_name):
     name = "{}{}".format(template_name, n)
     template["name"] = name
     ACTORS[name] = template
-    actor.TEMPLATES[template_name] = template
-    actor.add_actor_from_template(name, template_name)
     WORLDS[G["WORLD"]]["actors"].append(name)
+    load_game()
+    update_frames(G)
     
 def update_templates_scroll(G, mpos, btn):
     zone = Rect((288, 640), (512, G["SCREEN"].get_height()-640))
@@ -306,10 +297,17 @@ def draw(G, mpos=None):
     draw_templates(G, mpos)
     
 def main_click_helper(G):
+    global WORLDS
     mpos = pygame.mouse.get_pos()
     draw(G, mpos)
     update_cursor(G)
-
+    if "EVENTS" in G:
+        for e in G["EVENTS"]:
+            if e.type == KEYDOWN and e.key == K_RETURN:
+                load_game()
+                game.run(G, noquit=True)
+                load_game()
+   
 def update_cursor(G):
     mods = pygame.key.get_mods()
     drag = CURSOR_SCROLLER["DRAG"]
@@ -352,6 +350,7 @@ def do_buttons(G, pos):
     
 def run(G):
     while True:
+        update_frames(G)
         pos, btn = expect_click(args=G, cb=main_click_helper)
         mods = pygame.key.get_mods()
         if pos is None:

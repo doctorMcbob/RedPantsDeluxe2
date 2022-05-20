@@ -1,5 +1,14 @@
+from copy import deepcopy
+
 HITBOXES = {}
 HURTBOXES = {}
+
+def swap_in(hitboxes=None, hurtboxes=None):
+    global HITBOXES, HURTBOXES
+    if hitboxes is not None:
+        HITBOXES = deepcopy(hitboxes)
+    if hurtboxes is not None:
+        HURTBOXES = deepcopy(hurtboxes)
 
 def load():
     from src.lib import BOXES as B

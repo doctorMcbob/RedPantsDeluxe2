@@ -33,6 +33,10 @@ operators = {
 
 SCRIPTS = {}
 
+def swap_in(scripts):
+    global SCRIPTS
+    SCRIPTS = deepcopy(scripts)
+
 def load():
     from src.lib import SCRIPTS as S
 

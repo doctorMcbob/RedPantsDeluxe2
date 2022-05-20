@@ -6,12 +6,21 @@ A world will have actors
 import pygame
 from pygame import Rect
 
+from copy import deepcopy
+
 from src import sprites
 from src import actor
 
 root = "demostart"
 
 worlds = {}
+
+def swap_in(w):
+    global worlds
+    worlds = {}
+
+    for name in w.keys():
+        worlds[name] = World(deepcopy(w[name]))
 
 def load():
     from src.lib import WORLDS as W
@@ -55,6 +64,7 @@ class World(object):
         
         for name in self.actors:
             Actor = actor.get_actor(name)
+            if Actor is None: continue
             if frame.in_frame(Actor):
                 dx, dy = Actor.get_offset()
                 if Actor.direction == 1 and not Actor.rotation in [270, 90]:
@@ -66,6 +76,7 @@ class World(object):
         if DEBUG:
             for name in self.actors:
                 Actor = actor.get_actor(name)
+                if Actor is None: continue
                 if frame.in_frame(Actor):
                     mpos = pygame.mouse.get_pos()
                     maketext = Rect(

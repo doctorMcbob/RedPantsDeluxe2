@@ -1,11 +1,24 @@
 import pygame
 from pygame import Surface
 
+from copy import deepcopy
+
 IMG_LOCATION = "img/"
 
 SPRITES = {}
 OFFSETS = {}
 SPRITEMAPS = {}
+
+def swap_in(offsets=None, sprite_maps=None):
+    global OFFSETS, SPRITEMAPS
+    load()
+    OFFSET = {}
+    SPRITEMAPS = {}
+    
+    if offsets is not None:
+        OFFSETS = deepcopy(offsets)
+    if sprite_maps is not None:
+        SPRITEMAPS = deepcopy(sprite_maps)
 
 def load():
     global SPRITEMAPS, OFFSETS
