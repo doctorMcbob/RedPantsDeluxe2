@@ -22,6 +22,9 @@ def load():
 def get_world(world):
     return worlds[world]
 
+def get_all_worlds():
+    return list(worlds.keys())
+
 class World(object):
     def __init__(self, template):
         self.background = None if template["background"] is None else sprites.get_sprite(template["background"])
@@ -64,7 +67,11 @@ class World(object):
             for name in self.actors:
                 Actor = actor.get_actor(name)
                 if frame.in_frame(Actor):
-                    maketext = Rect(frame.scroll((Actor.x, Actor.y)), Actor.size).collidepoint(pygame.mouse.get_pos())
+                    mpos = pygame.mouse.get_pos()
+                    maketext = Rect(
+                        frame.scroll((Actor.x, Actor.y)),
+                        Actor.size
+                    ).collidepoint(mpos) and mpos[1] < frame.h
 
                     Actor.debug(dest,
                                 frame.scroll((Actor.x+Actor.w, Actor.y)),

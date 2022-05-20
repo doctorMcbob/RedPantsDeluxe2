@@ -50,11 +50,14 @@ def get_text_input(G, pos, numeric=False):
             string = string + KEY_MAP[inp]
 
 def expect_click(args=None, cb=lambda *args: None):
+    args["EVENTS"] = []
     while True:
         cb(args)
+        args["EVENTS"] = []
         pygame.display.update()
         for e in pygame.event.get():
-            if e.type == QUIT or e.type == KEYDOWN and e.key == K_ESCAPE: return None
+            args["EVENTS"].append(e)
+            if e.type == QUIT or e.type == KEYDOWN and e.key == K_ESCAPE: return None, None
             if e.type == MOUSEBUTTONDOWN:
                 return e.pos, e.button
 
@@ -88,3 +91,45 @@ def select_from_list(G, list, pos, args=None, cb=lambda *args: None):
         if inp in [K_ESCAPE, K_BACKSPACE] or not list: return False
         idx %= len(list)
 
+def input_rect(G, col=(100, 100, 100), cb=lambda *args: None, snap=4):
+    scrollx, scrolly = G["ctx"]["scrollx"], G["ctx"]["scrolly"]
+    G["SCREEN"].blit(G["HEL32"].render("DRAW RECT", 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 128))
+    def draw_helper_(G):
+        cb(G)
+        mpos = pygame.mouse.get_pos()
+        G["SCREEN"].blit(G["HEL16"].render("{}".format((mpos[0] // snap, mpos[1] // snap)), 0, (0, 0, 0)), mpos)
+    inp = expect_click(G, cb=draw_helper_)
+    if inp is None: return None
+    pos, btn = inp
+    pos = pos[0] - scrollx, pos[1] - scrolly
+    def draw_helper(G):
+        draw_helper_(G)
+        scrollx, scrolly = G["ctx"]["scrollx"], G["ctx"]["scrolly"]
+        pos2 = pygame.mouse.get_pos()
+        pos2 = pos2[0] - scrollx, pos2[1] - scrolly
+        x1 = min(pos[0], pos2[0]) // snap
+        x2 = max(pos[0], pos2[0]) // snap
+        y1 = min(pos[1], pos2[1]) // snap
+        y2 = max(pos[1], pos2[1]) // snap
+        pygame.draw.rect(
+            G["SCREEN"],
+            col,
+            Rect((x1*snap+scrollx, y1*snap+scrolly), ((x2 - x1)*snap, (y2 - y1)*snap)),
+            width=2
+        )
+    inp = expect_click(G, draw_helper)
+    if inp is None: return None
+    pos2, btn2 = inp
+    if not pos2: return None
+    pos2 = pos2[0] - scrollx, pos2[1] - scrolly
+    x1 = min(pos[0], pos2[0])
+    x2 = max(pos[0], pos2[0])
+    y1 = min(pos[1], pos2[1])
+    y2 = max(pos[1], pos2[1])
+
+    x1 -= x1 % snap
+    y1 -= y1 % snap
+    x2 -= x2 % snap
+    y2 -= y2 % snap
+
+    return (x1, y1), (x2 - x1, y2 - y1)

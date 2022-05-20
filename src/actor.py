@@ -58,7 +58,7 @@ def add_actor_from_template(actor_name, template_name, updated_values={}):
     ACTORS[actor_name] = Actor(template)
 
 def get_actor(name):
-    return ACTORS[name]
+    return ACTORS[name] if name in ACTORS else None
 
 class Actor(Rect):
     def __init__(self, template):
