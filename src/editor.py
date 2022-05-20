@@ -210,6 +210,7 @@ def update_actors_bar(G, mpos, btn):
 
         elif Rect((1168+8 + 100 + 100, (i+scroll) * seg_h + 4 + 32), (80, 48)).collidepoint(mpos) and btn in [0, 1]:
             WORLDS[G['WORLD']]['actors'].remove(friend.name)
+            ACTORS.pop(friend.name)
             world.actors.remove(friend.name)
             load_game()
         
@@ -221,6 +222,7 @@ def update_actors_bar(G, mpos, btn):
 
 def add_actor(G, template_name):
     rect = input_rect(G, (0, 0, 100), cb=draw, snap=16)
+    if not rect: return
     rect = ((rect[0][0] + CURSOR_SCROLLER["CX"], rect[0][1] + CURSOR_SCROLLER["CY"]), rect[1])
     template = deepcopy(TEMPLATES[template_name])
     template["POS"], template["DIM"] = rect
@@ -301,13 +303,18 @@ def main_click_helper(G):
     mpos = pygame.mouse.get_pos()
     draw(G, mpos)
     update_cursor(G)
+    mods = pygame.key.get_mods()
     if "EVENTS" in G:
         for e in G["EVENTS"]:
             if e.type == KEYDOWN and e.key == K_RETURN:
                 load_game()
                 game.run(G, noquit=True)
                 load_game()
-   
+                update_frames(G)
+
+            if e.type == KEYDOWN and e.key == K_s and mods & KMOD_CTRL:
+                save()
+
 def update_cursor(G):
     mods = pygame.key.get_mods()
     drag = CURSOR_SCROLLER["DRAG"]
