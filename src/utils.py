@@ -98,9 +98,8 @@ def input_rect(G, col=(100, 100, 100), cb=lambda *args: None, snap=4):
         cb(G)
         mpos = pygame.mouse.get_pos()
         G["SCREEN"].blit(G["HEL16"].render("{}".format((mpos[0] // snap, mpos[1] // snap)), 0, (0, 0, 0)), mpos)
-    inp = expect_click(G, cb=draw_helper_)
-    if inp is None: return None
-    pos, btn = inp
+    pos, btn = expect_click(G, cb=draw_helper_)
+    if pos is None: return None
     pos = pos[0] - scrollx, pos[1] - scrolly
     def draw_helper(G):
         draw_helper_(G)
@@ -117,10 +116,8 @@ def input_rect(G, col=(100, 100, 100), cb=lambda *args: None, snap=4):
             Rect((x1*snap+scrollx, y1*snap+scrolly), ((x2 - x1)*snap, (y2 - y1)*snap)),
             width=2
         )
-    inp = expect_click(G, draw_helper)
-    if inp is None: return None
-    pos2, btn2 = inp
-    if not pos2: return None
+    pos2, btn2 = expect_click(G, draw_helper)
+    if pos2 is None: return None
     pos2 = pos2[0] - scrollx, pos2[1] - scrolly
     x1 = min(pos[0], pos2[0])
     x2 = max(pos[0], pos2[0])

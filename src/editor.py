@@ -143,6 +143,10 @@ def set_up():
     load()
     load_game()
 
+    from src import printer
+    printer.GIF_SIZE = 30 * 4
+    G["PRINTER"] = printer
+    
     G["FRAMES"] = frames
     G["WORLDS"] = worlds
     G["ACTOR"] = actor
@@ -236,7 +240,7 @@ def add_actor(G, template_name):
     update_frames(G)
     
 def update_templates_scroll(G, mpos, btn):
-    zone = Rect((288, 640), (512, G["SCREEN"].get_height()-640))
+    zone = Rect((288, 640), (6*128, G["SCREEN"].get_height()-640))
     if zone.collidepoint(mpos):
         for e in ACTOR_SCROLL["EVENTS"]:
             if e == "SCROLL UP": TEMPLATES_SCROLL["SCROLL"] = max(TEMPLATES_SCROLL["SCROLL"] - 1, 2 - len(TEMPLATES.keys()) // 6)
@@ -711,7 +715,11 @@ def switch_worlds(G):
             G["HEL32"].render("Select World: ", 0, (0, 0, 0)),
             (0, 0)
         )
-    choice = select_from_list(G, worlds.get_all_worlds(), (0, 32), args=G, cb=update)
+    choice = select_from_list(G, worlds.get_all_worlds() + ["New..."], (0, 32), args=G, cb=update)
+    if choice == "New...":
+        choice = get_text_input(G, (0, 32))
+        WORLDS[choice] = deepcopy(WORLD_TEMPLATE)
+        load_game()
     if not choice: return
     G["WORLD"] = choice
     ACTOR_SCROLL["SCROLL"] = 0
