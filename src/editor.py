@@ -59,6 +59,7 @@ TEMPLATES = {}
 TEMPLATES_SCROLL = {
     "SCROLL": 0,
     "EVENTS": [],
+    "SELECTED": None,
 }
 
 ACTOR_SCROLL = {
@@ -224,8 +225,12 @@ def update_actors_bar(G, mpos, btn):
             CURSOR_SCROLLER["CX"] = friend.x
             CURSOR_SCROLLER["CY"] = friend.y
 
-def add_actor(G, template_name):
-    rect = input_rect(G, (0, 0, 100), cb=draw, snap=16)
+def add_actor(G, pos, template_name):
+    if 'plat' in template_name:
+        pos = pos[0] // 32 * 32, pos[1] // 32 * 32
+        rect = input_rect(G, (0, 0, 100), cb=draw, snap=32, pos=pos)
+    else:
+        rect = input_rect(G, (0, 0, 100), cb=draw, snap=16, pos=pos)
     if not rect: return
     rect = ((rect[0][0] + CURSOR_SCROLLER["CX"], rect[0][1] + CURSOR_SCROLLER["CY"]), rect[1])
     template = deepcopy(TEMPLATES[template_name])
@@ -252,14 +257,8 @@ def update_templates_scroll(G, mpos, btn):
             if y < 640 or y > G["SCREEN"].get_height():
                 continue
             if Rect((x, y), (128, 64)).collidepoint(mpos) and btn in [0, 1]:
-                ctx = {
-                    "scrollx": 0,
-                    "scrolly": 0,
-                }
-                G["ctx"] = ctx
-                
-                add_actor(G, template)
-            
+                TEMPLATES_SCROLL["SELECTED"] = template if TEMPLATES_SCROLL["SELECTED"] != template else None
+
 def draw_templates(G, mpos):
     for i, template in enumerate(TEMPLATES.keys()):
         y = (i // 6 + TEMPLATES_SCROLL["SCROLL"]) * 64 + 640
@@ -267,9 +266,10 @@ def draw_templates(G, mpos):
         if y < 640 or y > G["SCREEN"].get_height():
             continue
         col = (255, 0, 0) if Rect((x, y), (128, 64)).collidepoint(mpos) else (0, 0, 0)
+        col2 = (150, 250, 150) if template == TEMPLATES_SCROLL["SELECTED"] else (255, 255, 255)
         surf = Surface((128, 64))
         surf.fill(col)
-        pygame.draw.rect(surf, (255, 255, 255), Rect((2, 2), (124, 60)))
+        pygame.draw.rect(surf, col2, Rect((2, 2), (124, 60)))
         surf.blit(G["HEL16"].render(template, 0, (0, 0, 0)), (4, 4))
         G["SCREEN"].blit(surf, (x, y))
         
@@ -306,6 +306,8 @@ def main_click_helper(G):
     global WORLDS
     mpos = pygame.mouse.get_pos()
     draw(G, mpos)
+    if mpos[0] < 1152 and mpos[1] < 640:
+        pygame.draw.circle(G["SCREEN"], (0, 0, 0), (mpos[0]//16*16, mpos[1]//16*16), 2)
     update_cursor(G)
     mods = pygame.key.get_mods()
     if "EVENTS" in G:
@@ -379,9 +381,18 @@ def run(G):
 
         update_actors_bar(G, pos, btn)
         update_templates_scroll(G, pos, btn)
+        
         if pos[0] < 1152 and pos[1] < 640 and btn in [2, 3]:
             CURSOR_SCROLLER["DRAG"] = True
-
+            
+        if pos[0] < 1152 and pos[1] < 640 and btn in [0, 1] and TEMPLATES_SCROLL["SELECTED"] is not None:
+            ctx = {
+                "scrollx": 0,
+                "scrolly": 0,
+            }
+            G["ctx"] = ctx
+            add_actor(G, pos, TEMPLATES_SCROLL["SELECTED"])
+            
         do_buttons(G, pos)
             
 def template_from_script(filename, name=None):
@@ -564,9 +575,11 @@ def load_all_templates_button(G):
                 filenames.append(f)
 
     for filename in filenames:
-        template = template_from_script(filename)
-        TEMPLATES[filename.split(".")[0]] = template
-
+        try:
+            template = template_from_script(filename)
+            TEMPLATES[filename.split(".")[0]] = template
+        except Exception as e:
+            print("Failed to load {} because of {}".format(filename, e))
 def box_menu_draw(G):
     G["SCREEN"].fill((200, 200, 200))
     actor = G["ctx"]["actor"]
@@ -759,7 +772,6 @@ BUTTONS = {
     ((16, 656 + 48 * 2), (256, 48)): load_all_templates_button,
     ((16, 656 + 48 * 3), (256, 48)): switch_worlds,
     ((16, 656 + 48 * 4), (256, 48)): delete_world,
-#    ((16, 656 + 48 * 4), (256, 48)): hitbox_menu,
     ((16, 656 + 48 * 5), (256, 48)): change_world_background,
 }
 

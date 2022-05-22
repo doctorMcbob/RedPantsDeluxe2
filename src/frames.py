@@ -34,8 +34,17 @@ class Frame(object):
         return (position[0] - self.scroll_x, position[1] - self.scroll_y)
 
     def drawn(self, DEBUG=False):
+        resize = self.w < 800 and self.h < 500
+        if resize:
+            self.w *= 2
+            self.h *= 2
+            self.update()
         surf = Surface((self.w, self.h))
         self.world.draw(surf, self, DEBUG=DEBUG)
+        if resize:
+            self.w /= 2
+            self.h /= 2
+            return pygame.transform.smoothscale(surf, (self.w, self.h))
         return surf
 
     def update(self):

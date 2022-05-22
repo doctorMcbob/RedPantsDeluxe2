@@ -183,7 +183,11 @@ class Actor(Rect):
         return boxes
 
     def get_sprite(self):
-        if self.platform:
+        if self.platform or ("plat" in self.name and self.state == "START"):
+            flag = False
+            if self.state == "START":
+                flag = True
+                self.state = "PLATFORM"
             # dynamically drawing platfrms
             surf = Surface((self.w, self.h))
             surf.fill((1, 255, 1))
@@ -210,6 +214,8 @@ class Actor(Rect):
 
                     surf.blit(sprites.get_sprite(img), (x*32, y*32))
             surf.set_colorkey((1, 255, 1))
+            if flag:
+                self.state = "START"
             return surf
 
         sprite = sprites.get_sprite(self.img) if self.img is not None else sprites.get_sprite(self._index(self.sprites))

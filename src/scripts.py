@@ -10,6 +10,8 @@ from copy import deepcopy
 
 from random import randint
 
+import string
+
 operators = {
     "+": ops.add,
     "-": ops.sub,
@@ -29,6 +31,7 @@ operators = {
     "nor": lambda n1, n2: n1 and not n2,
 
     "in": lambda n1, n2: n1 in n2,
+    "at": lambda n1, n2: n1[n2]
 }
 
 SCRIPTS = {}
@@ -53,7 +56,7 @@ def resolve(reference, script, world, related=None, logfunc=print):
             cmd_idx += 1
             continue
 
-        cmd = script[cmd_idx].split()
+        cmd = parse_tokens(script[cmd_idx], logfunc=logfunc)
         cmd = evaluate_literals(cmd, reference, world, related=related, logfunc=logfunc)
         cmd = resolve_operators(cmd, logfunc=logfunc)
         # resolve command!
@@ -164,6 +167,37 @@ def resolve(reference, script, world, related=None, logfunc=print):
 
         cmd_idx += 1
 
+def parse_tokens(cmd, logfunc=print):
+    parsed = []
+    token = ""
+    idx = 0
+    try:
+        while idx < len(cmd):
+            if cmd[idx] in string.whitespace:
+                if token:
+                    parsed.append(token)
+                token = ""
+
+            elif cmd[idx] in ["'", '"']:
+                if token != "":
+                    raise Exception('Bunked String Syntax')
+                quote = cmd[idx]
+                idx += 1
+                while cmd[idx] != quote:
+                    token += cmd[idx]
+                    idx += 1
+
+            else:
+                token += cmd[idx]
+            idx += 1
+        if token:
+            parsed.append(token)
+        return parsed
+    except Exception as e:
+        logfunc(cmd)
+        logfunc('Parse Error {}'.format(e))
+        return []
+        
 def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
     for idx in range(len(cmd)):
         token = cmd[idx]
@@ -222,7 +256,10 @@ def resolve_operators(cmd, logfunc=print):
     while idx < len(cmd):
         token = cmd[idx]
         try:
-            if token == "abs":
+            if token == "len":
+                calculated = len(cmd.pop(idx+1))
+                evaluated.append(calculated)
+            elif token == "abs":
                 calculated = abs(cmd.pop(idx+1))
                 evaluated.append(calculated)
             elif token == "not":
@@ -230,8 +267,9 @@ def resolve_operators(cmd, logfunc=print):
                 evaluated.append(calculated)
             elif type(token) == str and token in operators:
                 left, right = evaluated.pop(), cmd.pop(idx+1)
-                if (type(left) == str and type(right) == int) or (type(right) == str and type(left) == int):
-                    left, right = str(left), str(right)
+                if token != "at":
+                    if (type(left) == str and type(right) == int) or (type(right) == str and type(left) == int):
+                        left, right = str(left), str(right)
                 calculated = operators[token](left, right)
                 evaluated.append(calculated)
             else:

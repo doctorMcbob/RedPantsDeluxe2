@@ -11,7 +11,7 @@ from copy import deepcopy
 from src import sprites
 from src import actor
 
-root = "demostart"
+root = "root"
 
 worlds = {}
 
@@ -36,6 +36,7 @@ def get_all_worlds():
 
 class World(object):
     def __init__(self, template):
+        
         self.background = None if template["background"] is None else sprites.get_sprite(template["background"])
         self.actors = template["actors"]
         self.x_lock = None if "x_lock" not in template else template["x_lock"]

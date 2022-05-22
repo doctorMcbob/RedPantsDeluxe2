@@ -91,15 +91,16 @@ def select_from_list(G, list, pos, args=None, cb=lambda *args: None):
         if inp in [K_ESCAPE, K_BACKSPACE] or not list: return False
         idx %= len(list)
 
-def input_rect(G, col=(100, 100, 100), cb=lambda *args: None, snap=4):
+def input_rect(G, col=(100, 100, 100), cb=lambda *args: None, snap=4, pos=None):
     scrollx, scrolly = G["ctx"]["scrollx"], G["ctx"]["scrolly"]
     G["SCREEN"].blit(G["HEL32"].render("DRAW RECT", 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 128))
     def draw_helper_(G):
         cb(G)
         mpos = pygame.mouse.get_pos()
         G["SCREEN"].blit(G["HEL16"].render("{}".format((mpos[0] // snap, mpos[1] // snap)), 0, (0, 0, 0)), mpos)
-    pos, btn = expect_click(G, cb=draw_helper_)
-    if pos is None: return None
+    if pos is None:
+        pos, btn = expect_click(G, cb=draw_helper_)
+        if pos is None: return None
     pos = pos[0] - scrollx, pos[1] - scrolly
     def draw_helper(G):
         draw_helper_(G)
