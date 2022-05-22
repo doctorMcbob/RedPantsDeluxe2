@@ -2,8 +2,13 @@ PLAYER1|128,256,32,64|False|
 START:0 empty -16,0
 
 |START:0|
-set self _input_name PLAYER2
-focus MAIN2 self
-set self frame_name MAIN2
-rebrand redpantsguy
-set self tangible 1
+if isframe MAIN2
+   set self _input_name PLAYER2
+   focus MAIN2 self
+   set self frame_name MAIN2
+   rebrand redpantsguy
+   set self tangible 1
+endif
+if not isframe MAIN2
+   goodbye
+endif

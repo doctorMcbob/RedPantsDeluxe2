@@ -15,14 +15,16 @@ set self timer -1
 img self.letter
 set self counter self.counter + 1
 
-if self.ascending
-   set self y self.y - 1
-endif
-if not self.ascending
-   set self y self.y + 1
+if self.counter % 2
+   if self.ascending
+      set self y self.y - 1
+   endif
+   if not self.ascending
+      set self y self.y + 1
+   endif
 endif
 
-if self.counter == 15
+if self.counter == 8
    set self ascending not self.ascending
    set self counter 0
 endif

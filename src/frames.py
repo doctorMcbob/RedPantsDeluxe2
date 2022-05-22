@@ -13,7 +13,7 @@ def add_frame(name, world, size, position=(0, 0), focus=None):
     FRAMES[name] = Frame(world, size, position, focus)
 
 def get_frame(name):
-    return FRAMES[name]
+    return FRAMES[name] if name in FRAMES else None
 
 class Frame(object):
     # focus should be an actor if not None

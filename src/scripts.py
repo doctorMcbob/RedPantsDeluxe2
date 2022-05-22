@@ -256,7 +256,10 @@ def resolve_operators(cmd, logfunc=print):
     while idx < len(cmd):
         token = cmd[idx]
         try:
-            if token == "len":
+            if token == "isframe":
+                frame = frames.get_frame(cmd.pop(idx+1))
+                evaluated.append(frame is not None)
+            elif token == "len":
                 calculated = len(cmd.pop(idx+1))
                 evaluated.append(calculated)
             elif token == "abs":
