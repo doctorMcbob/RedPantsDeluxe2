@@ -6,16 +6,13 @@ LETTER:0 empty 0,0
 set self frame 0
 set self letter " "
 set self state LETTER
-set self counter 0
 set self ascending 1
 set self direction -1
 set self timer -1
 
 |LETTER:0|
 img self.letter
-set self counter self.counter + 1
-
-if self.counter % 2
+if self.frame % 2
    if self.ascending
       set self y self.y - 1
    endif
@@ -23,12 +20,9 @@ if self.counter % 2
       set self y self.y + 1
    endif
 endif
-
-if self.counter == 8
+if self.frame % 8 == 0
    set self ascending not self.ascending
-   set self counter 0
 endif
-
 if self.timer != -1
    if self.timer <= self.frame
       goodbye
