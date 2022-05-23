@@ -1,13 +1,10 @@
 MILK|0,0,0,0|False|
-START:0 fart0 0,0
-FART:0 fart0 0,0
-FART:4 fart1 0,0
-FART:8 fart2 0,0
-FART:12 fart3 0,0
+START:0  0,0
+LOOK:0 fart0 0,0
 
 |START:0|
-set self state FART
+set self state LOOK
 set self frame 0
 
-|FART:16|
-goodbye
+|LOOK:0|
+set self frame 0
