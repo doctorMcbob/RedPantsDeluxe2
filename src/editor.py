@@ -291,7 +291,8 @@ def draw(G, mpos=None):
     
     pygame.draw.rect(drawn, (255, 0, 0), Rect(make_rect((CORNER[0]-CX, CORNER[1]-CY) if CORNER is not None else (X-CX+16, Y-CY+16), (X-CX, Y-CY))), width=2)
     G["SCREEN"].blit(drawn, (0, 0))
-    G["SCREEN"].blit(G["HEL32"].render("WORLD: {}".format(G["WORLD"]), 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 32))
+    G["SCREEN"].blit(G["HEL16"].render("WORLD: {}".format(G["WORLD"]), 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 16))
+    G["SCREEN"].blit(G["HEL16"].render("TEMPL: {}".format(TEMPLATES_SCROLL["SELECTED"]), 0, (0, 0, 0)), (0, G["SCREEN"].get_height() - 32))
     if world.x_lock is not None:
         pygame.draw.line(G["SCREEN"], (0, 255, 0), (world.x_lock, 0), (world.x_lock + 32, 0), 10)
     if world.y_lock is not None:
