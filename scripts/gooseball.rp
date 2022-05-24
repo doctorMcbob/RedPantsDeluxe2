@@ -202,7 +202,7 @@ endif
 |lookRight|
 set self lookboxname self.name + lookbox + self.lookboxnumber
 set self lookboxnumber self.lookboxnumber + 1
-create hitbox self.lookboxname self.x + self.w self.y
+create hitbox0 self.lookboxname self.x + self.w self.y
 set self.lookboxname timer 10
 set self.lookboxname return self.name
 set self.lookboxname trigger seeright
@@ -212,7 +212,7 @@ set self.lookboxname h 32
 |lookLeft|
 set self lookboxname self.name + lookbox + self.lookboxnumber
 set self lookboxnumber self.lookboxnumber + 1
-create hitbox self.lookboxname self.x - 256 self.y
+create hitbox0 self.lookboxname self.x - 256 self.y
 set self.lookboxname timer 10
 set self.lookboxname return self.name
 set self.lookboxname trigger seeleft

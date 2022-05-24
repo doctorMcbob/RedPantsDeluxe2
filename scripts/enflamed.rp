@@ -201,6 +201,10 @@ if self.base == redpantsguy
       set self hat enflamed
    endif
 endif
+if self.burnable
+   set self state BURNING
+   set self frame 0
+endif
 
 |applyGrav|
 set self y_vel self.y_vel + self.grav

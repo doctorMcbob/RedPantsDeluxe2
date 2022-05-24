@@ -71,7 +71,7 @@ ACTOR_SCROLL = {
 
 CURSOR_SCROLLER = {
     "CX": 0, "CY": 0,
-    "X": 0, "Y": 0,
+     "X": 0,  "Y": 0,
     "CORNER": None,
     "DRAG": False,
 }
@@ -189,10 +189,20 @@ def draw_actors_bar(G, world, mpos):
         G["SCREEN"].blit(hitbox_button, (1168+8 + 100, (i+scroll) * seg_h + 4 + 32))
 
         delete_button = Surface((80, 48))
-        delete_button.fill((255, 150, 150))
+        delete_button.fill((150, 150, 150))
         delete_button.blit(G["HEL16"].render("REMOVE", 0, (0, 0, 0)), (8, 4))
         delete_button.blit(G["HEL16"].render("ACTOR", 0, (0, 0, 0)), (16, 24))
         G["SCREEN"].blit(delete_button, (1168+8 + 100 + 100, (i+scroll) * seg_h + 4 + 32))
+
+        up_button = Surface((64, 20))
+        up_button.fill((255, 150, 150))
+        up_button.blit(G["HEL16"].render("TOP", 0, (0, 0, 0)), (8, 2))
+        G["SCREEN"].blit(up_button, (1168+8 + 100 + 100 + 100, (i+scroll) * seg_h + 4 + 32))
+
+        down_button = Surface((64, 20))
+        down_button.fill((155, 155, 155))
+        down_button.blit(G["HEL16"].render("BOT", 0, (0, 0, 0)), (8, 2))
+        G["SCREEN"].blit(down_button, (1168+8 + 100 + 100 + 100, (i+scroll) * seg_h + 4 + 32+32))
 
 def update_actors_bar(G, mpos, btn):
     seg_h = ACTOR_SCROLL["SEG_H"]
@@ -218,7 +228,16 @@ def update_actors_bar(G, mpos, btn):
             ACTORS.pop(friend.name)
             world.actors.remove(friend.name)
             load_game()
-        
+
+        elif Rect((1168+8 + 100 + 100 + 100, (i+scroll) * seg_h + 4 + 32), (64, 20)).collidepoint(mpos) and btn in [0, 1]:
+            WORLDS[G["WORLD"]]["actors"].remove(a)
+            WORLDS[G["WORLD"]]["actors"].append(a)
+            load_game()
+        elif Rect((1168+8 + 100 + 100 + 100, (i+scroll) * seg_h + 4 + 32+32), (64, 20)).collidepoint(mpos) and btn in [0, 1]:
+            WORLDS[G["WORLD"]]["actors"].remove(a)
+            WORLDS[G["WORLD"]]["actors"] = [a] + WORLDS[G["WORLD"]]["actors"]
+            load_game()
+            
         elif Rect((1168, (i+scroll) * seg_h), (seg_w, seg_h)).collidepoint(mpos) and btn in [0, 1]:
             CURSOR_SCROLLER["X"] = friend.x
             CURSOR_SCROLLER["Y"] = friend.y
@@ -251,7 +270,9 @@ def update_templates_scroll(G, mpos, btn):
             if e == "SCROLL UP": TEMPLATES_SCROLL["SCROLL"] = max(TEMPLATES_SCROLL["SCROLL"] - 1, 2 - len(TEMPLATES.keys()) // 6)
             if e == "SCROLL DOWN": TEMPLATES_SCROLL["SCROLL"] = min(TEMPLATES_SCROLL["SCROLL"] + 1, 0)
 
-        for i, template in enumerate(TEMPLATES.keys()):
+        keys = list(TEMPLATES.keys())
+        keys.sort()
+        for i, template in enumerate(keys):
             y = (i // 6 + TEMPLATES_SCROLL["SCROLL"]) * 64 + 640
             x = (i % 6) * 128 + 288
             if y < 640 or y > G["SCREEN"].get_height():
@@ -260,7 +281,9 @@ def update_templates_scroll(G, mpos, btn):
                 TEMPLATES_SCROLL["SELECTED"] = template if TEMPLATES_SCROLL["SELECTED"] != template else None
 
 def draw_templates(G, mpos):
-    for i, template in enumerate(TEMPLATES.keys()):
+    keys = list(TEMPLATES.keys())
+    keys.sort()
+    for i, template in enumerate(keys):
         y = (i // 6 + TEMPLATES_SCROLL["SCROLL"]) * 64 + 640
         x = (i % 6) * 128 + 288
         if y < 640 or y > G["SCREEN"].get_height():
@@ -468,12 +491,14 @@ def spritesheet_menu(G):
         for f in files:
             if f[-4:] == ".png":
                 filenames.append(f)
+
     def update(G):
         draw(G)
         G["SCREEN"].blit(
             G["HEL32"].render("Select spritesheet filename", 0, (0, 0, 0)),
             (0, 0)
         )
+
     filename = select_from_list(G, filenames, (0, 32), args=G, cb=update)
     if not filename: return
     if filename not in SPRITESHEETS:
@@ -581,6 +606,7 @@ def load_all_templates_button(G):
             TEMPLATES[filename.split(".")[0]] = template
         except Exception as e:
             print("Failed to load {} because of {}".format(filename, e))
+
 def box_menu_draw(G):
     G["SCREEN"].fill((200, 200, 200))
     actor = G["ctx"]["actor"]

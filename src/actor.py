@@ -183,7 +183,7 @@ class Actor(Rect):
         return boxes
 
     def get_sprite(self):
-        if self.platform or ("plat" in self.name and self.state == "START"):
+        if self.platform or (("plat" in self.name or "background" in self.name) and self.state == "START"):
             flag = False
             if self.state == "START":
                 flag = True
