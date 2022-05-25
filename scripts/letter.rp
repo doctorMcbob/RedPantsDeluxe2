@@ -1,31 +1,42 @@
 LETTER|0,0,0,0|False|
 START:0 empty 0,0
-LETTER:0 empty 0,0
+ASC:0 empty 0,0
+DESC:0 empty 0,0
 
 |START:0|
 set self frame 0
 set self letter " "
-set self state LETTER
-set self ascending 1
+set self state ASC
 set self direction -1
 set self timer -1
 
-|LETTER:0|
+|ASC:0|
 img self.letter
-if self.frame % 2
-   if self.ascending
-      set self y self.y - 1
-   endif
-   if not self.ascending
-      set self y self.y + 1
-   endif
-endif
-if self.frame % 8 == 0
-   set self ascending not self.ascending
-endif
+set self y self.y - 1
+exec updateTimer
+
+|ASC:4|
+img self.letter
+set self state DESC
+set self frame 0
+exec updateTimer
+
+|DESC:0|
+img self.letter
+set self y self.y + 1
+exec updateTimer
+
+|DESC:4|
+img self.letter
+set self state ASC
+set self frame 0
+exec updateTimer
+
+|updateTimer|
 if self.timer != -1
-   if self.timer <= self.frame
+   if self.timer <= 0
       goodbye
    endif
+   set self timer self.timer - 1
 endif
 
