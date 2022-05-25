@@ -98,4 +98,3 @@ class World(object):
                                 text=maketext
                     )
 
-

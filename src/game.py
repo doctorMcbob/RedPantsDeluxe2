@@ -62,8 +62,18 @@ def run(G, noquit=False):
             G["SCREEN"].blit(drawn, position)
 
         # maybe remove FPS counter before release, dont worry about it for a while though
+        fps = G["CLOCK"].get_fps()
+        # if fps < 15:
+        #     print('very significant lag')
+        # elif fps < 20:
+        #     print('legit lag')
+        # elif fps < 25:
+        #     print('lag')
+        # elif fps < 29:
+        #     print('minor lag')
+
         G["SCREEN"].blit(
-            G["HEL16"].render("FPS:{}".format(G["CLOCK"].get_fps()), 0, (0, 0, 0)),
+            G["HEL16"].render("FPS:{}".format(fps), 0, (0, 0, 0)),
             (0, 0))
         pygame.display.update()
         if "PRINTER" in G:

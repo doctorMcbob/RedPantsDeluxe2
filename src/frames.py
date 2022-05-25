@@ -39,12 +39,13 @@ class Frame(object):
             self.w *= 2
             self.h *= 2
             self.update()
+        
         surf = Surface((self.w, self.h))
         self.world.draw(surf, self, DEBUG=DEBUG)
         if resize:
             self.w /= 2
             self.h /= 2
-            return pygame.transform.smoothscale(surf, (self.w, self.h))
+            return pygame.transform.scale(surf, (int(self.w), int(self.h)))
         return surf
 
     def update(self):
