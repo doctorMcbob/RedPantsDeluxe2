@@ -191,6 +191,7 @@ class Actor(Rect):
             # dynamically drawing platfrms
             surf = Surface((self.w, self.h))
             surf.fill((1, 255, 1))
+            blitz = []
             for y in range(self.h // 32):
                 for x in range(self.w // 32):
                     if (x, y) == (0, 0):
@@ -211,8 +212,8 @@ class Actor(Rect):
                         img = self.sprites["{}21".format(self.state)]
                     else:
                         img = self.sprites["{}11".format(self.state)]
-
-                    surf.blit(sprites.get_sprite(img), (x*32, y*32))
+                    blitz.append((sprites.get_sprite(img), (x*32, y*32)))
+            surf.blits(blitz)
             surf.set_colorkey((1, 255, 1))
             if flag:
                 self.state = "START"
@@ -348,8 +349,12 @@ class Actor(Rect):
         # cross check
         if self.x_vel and self.y_vel:
             while self.move(self.x_vel, self.y_vel).collidelist(tangibles) != -1:
-                self.x_vel += 1 if self.x_vel < 0 else -1
-                self.y_vel += 1 if self.y_vel < 0 else -1
+                if self.x_vel == 0 or self.y_vel == 0:
+                    break
+                else:
+                    if self.x_vel != 0: self.x_vel += 1 if self.x_vel < 0 else -1
+                    if self.y_vel != 0: self.y_vel += 1 if self.y_vel < 0 else -1
+                
             
     def collision_with(self, actor, world):
         if "COLLIDE" in self.scripts:

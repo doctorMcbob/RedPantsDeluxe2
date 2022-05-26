@@ -10,7 +10,9 @@ set self frame 0
 
 |COLLIDE|
 move self root
-view self.frame_name root
-set self respawnx self.x
-set self respawny self.y
+if self.frame_name
+   view self.frame_name root
+   set self respawnx self.x
+   set self respawny self.y
+endif
 
