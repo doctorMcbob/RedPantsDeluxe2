@@ -7,6 +7,8 @@ set self message "WELCOME TO RED PANTS DELUXE 2"
 set self state SAY
 set self frame -1
 set self timer 120
+set self y_off 0
+set self x_off 0
 
 |SAY:0|
 set self calc len self.message - 1
@@ -15,9 +17,19 @@ if self.calc == self.frame
    goodbye
 endif
 
-create letter0 self.name + letter + self.frame 16 * self.frame + self.x self.y
-set self.name + letter + self.frame letter self.message at self.frame
-if self.timer != -1
-   set self.name + letter + self.frame timer 120
+set self calc self.message at self.frame == "^"
+
+if self.calc
+   set self y_off self.y_off + 20
+   set self x_off 0
+endif
+
+if not self.calc
+   create letter0 self.name + letter + self.frame self.x + self.x_off self.y + self.y_off
+   set self.name + letter + self.frame letter self.message at self.frame
+   if self.timer != -1
+      set self.name + letter + self.frame timer 120
+   endif
+set self x_off self.x_off + 16
 endif
 

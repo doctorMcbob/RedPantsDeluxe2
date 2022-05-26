@@ -18,10 +18,7 @@ set self frame 0
 |COLLIDE|
 if related.state == WAIT
    create say0 related.name + say + related.count related.x related.y
-   set related.name + say + related.count message "HOLD DOWN JUMP"
-   set related count related.count + 1
-   create say0 related.name + say + related.count related.x related.y + 20
-   set related.name + say + related.count message "FOR BUFFER WALLJUMP"
+   set related.name + say + related.count message "HOLD DOWN JUMP^FOR BUFFER WALLJUMP"
    set related count related.count + 1
    set related state LAUNCHED
 endif
