@@ -524,8 +524,8 @@ def spritesheet_menu(G):
         if inp == K_BACKSPACE: corner = None
 
         if mods & KMOD_CTRL:
-            if inp == K_UP: idx = max(0, idx - 1) 
-            if inp == K_DOWN: idx = min(len(keys), idx + 1)
+            if inp == K_UP: idx = (idx - 1) % (len(keys) + 1)
+            if inp == K_DOWN: idx = (idx + 1) % (len(keys) + 1)
 
         else:
             if inp == K_LEFT: CX -= 16 + (48 * (mods & KMOD_SHIFT))
@@ -549,7 +549,7 @@ def spritesheet_menu(G):
             if idx < len(keys):
                 pos, dim = sheet[keys[idx]]
                 CX, CY = pos
-                SX, SY = (0-pos[0], pos[1])
+                SX, SY = (pos[0], pos[1])
                 corner = pos[0] + dim[0], pos[1] + dim[1]
         
         elif inp == K_SPACE:
