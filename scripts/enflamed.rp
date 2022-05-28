@@ -147,6 +147,7 @@ set self can_die 0
 |DEAD:45|
 set self state FIRERUN
 set self frame 0
+set self can_die 1
 set self x self.respawnx
 set self y self.respawny
 

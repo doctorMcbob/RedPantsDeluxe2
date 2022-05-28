@@ -118,11 +118,34 @@ def resolve(reference, script, world, related=None, logfunc=print):
             if verb == "move":
                 name = cmd.pop(0)
                 if name == "self": name = a.get_actor(reference).name
+                if name == "related": name = a.get_actor(related).name
                 if name not in world.actors:
                     raise Exception("{} not in world".format(name))
                 world.actors.remove(name)
                 newworld = worlds.get_world(cmd.pop())
                 newworld.actors.append(name)
+
+            if verb == "place":
+                name = cmd.pop(0)
+                if name == "self": name = a.get_actor(reference).name
+                if name == "related": name = a.get_actor(related).name
+                world_ref = cmd.pop(0)
+                world = worlds.get_world(world_ref)
+                if world is None:
+                    raise Exception("Invalid Place destination {}".format(world_ref))
+                if name not in world.actors:
+                    world.actors.append(name)
+                
+            if verb == "take":
+                name = cmd.pop(0)
+                if name == "self": name = a.get_actor(reference).name
+                if name == "related": name = a.get_actor(related).name
+                world = worlds.get_world(world_ref)
+                if world is None:
+                    raise Exception("Invalid Place destination {}".format(world_ref))
+                if name not in world.actors:
+                    raise Exception("{} not in world {}".format(name, world_ref))
+                world.actors.remove(name)
 
             if verb == "rebrand":
                 keyname = cmd.pop(0)
@@ -137,6 +160,12 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 if type(l) is not list:
                     raise Exception("Could not remove from {}, not type list".format(l))
                 l.remove(cmd.pop(0))
+
+            if verb == "add":
+                l = cmd.pop(0)
+                if type(l) is not list:
+                    raise Exception("Could not remove from {}, not type list".format(l))
+                l.append(cmd.pop(0))
 
             if verb == "hitboxes":
                 keyname = cmd.pop(0)
@@ -159,6 +188,37 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 if "START:0" in actor.scripts:
                     resolve(actor_name, actor.scripts["START:0"], world, logfunc=logfunc)
 
+            if verb == "for": # gulp
+                key = cmd.pop(0)
+                target = deepcopy(cmd.pop())
+                if not hasattr(target, '__iter__'):
+                    raise Exception('Target of for loop is not iterable')
+
+                miniscript = []
+                nest = 1
+                while nest > 0:
+                    cmd_idx += 1
+                    if cmd_idx >= len(script):
+                        raise Exception("End of script while parsing for")
+                    miniscript .append(script[cmd_idx])
+
+                    line = script[cmd_idx].split()
+
+                    if line:
+                        if line[0] == "for":
+                            nest += 1
+                        if line[0] == "endfor":
+                            nest -= 1
+                            
+                # pop off the final remaining endfor
+                miniscript.pop()
+
+                miniscript = miniscript
+                
+                for value in target:
+                    to_run = [str(value).join(s.split(key)) for s in miniscript]
+                    resolve(reference, to_run, world, related=related, logfunc=logfunc)
+                    
         except Exception as e:
             logfunc("{} Error on line {}".format(reference, cmd_idx))
             for i, cmd in enumerate(script):
@@ -208,10 +268,12 @@ def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
                 actor = a.get_actor(reference)
                 actors = list(filter(lambda actr:not (actr is actor), world.get_actors()[::-1]))
                 tangibles = list(filter(lambda actr: actr.tangible, actors))
-                hit = actor.collidelist(tangibles)
-                cmd[idx] = False if hit == -1 else tangibles[hit].name
+                hits = actor.collidelistall(tangibles)
+                cmd[idx] = [tangibles[hit].name for hit in hits]
             if token == "None":
                 cmd[idx] = None
+            if token == "[]":
+                cmd[idx] = []
             try:
                 cmd[idx] = int(token)
                 continue

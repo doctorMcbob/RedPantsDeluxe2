@@ -27,8 +27,8 @@ set self state LOOK
 set self limit 20
 set self neglimit self.limit * -1
 set self lookboxnumber 0
-set self seeleft off
-set self seeright off
+set self seeleft []
+set self seeright []
 set self grav 1
 set self chargespeed 7
 set self chargebounce -3
@@ -220,17 +220,20 @@ set self.lookboxname w 256
 set self.lookboxname h 32
 
 |checkCharge|
-if player in self.seeleft
-   set self seeleft off
-   set self direction -1
-   set self state CHARGESTART
-   set self frame 0
-endif
-if player in self.seeright
-   set self seeright off
-   set self direction 1
-   set self state CHARGESTART
-   set self frame 0
-endif
-
+for name self.seeleft
+   if player in name
+      set self seeleft []
+      set self direction -1
+      set self state CHARGESTART
+      set self frame 0
+   endif
+endfor
+for name self.seeright
+   if player in name
+      set self seeright []
+      set self direction 1
+      set self state CHARGESTART
+      set self frame 0
+   endif
+endfor
 
