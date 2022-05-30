@@ -1,0 +1,14 @@
+WALKOFF|0,0,0,0|False|
+START:0 empty 0,0
+WALKOFF:0 empty 0,0
+
+|START:0|
+set self state WALKOFF
+set self init 0
+
+|WALKOFF:0|
+set self frame 0
+
+|COLLIDE|
+take yard1 self
+

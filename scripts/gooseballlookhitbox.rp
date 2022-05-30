@@ -1,0 +1,20 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+CHECK:0 empty 0,0
+
+|START:0|
+set self frame 0
+set self state CHECK:0
+set self return 0
+set self trigger trigger
+set self lookfor 0
+
+|CHECK:0|
+set self calc ?COLLIDE == self.lookfor and self.lookfor != 0
+set self calc ?COLLIDE and self.lookfor == 0
+
+if self.return
+   set self.return  self.trigger self.calc
+endif
+
+goodbye

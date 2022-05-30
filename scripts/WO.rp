@@ -1,0 +1,30 @@
+WALKOFF|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+# to is left, from is right
+set self to yard0
+set self from yard1
+
+create WOinbetween self.name + inbetween self.x +  32 self.y
+set self.name + inbetween w self.w - 64
+set self.name + inbetween h self.h
+
+create WOto self.name + to self.x self.y
+set self.name + to w 32
+set self.name + to h self.h
+
+create WOfrom self.name + from self.x + self.w - 32 self.y
+set self.name + from w 32
+set self.name + from h self.h
+
+set self.name + inbetween A self.to
+set self.name + inbetween B self.from
+
+set self.name + to to self.to
+set self.name + from from self.from
+
+set self.name + inbetween init 1
+set self.name + to init 1
+set self.name + from init 1
+

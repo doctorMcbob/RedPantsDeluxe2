@@ -1,0 +1,25 @@
+TEXT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+LAUNCHED:0 empty 0,0
+
+|START:0|
+set self frame 0
+set self state WAIT
+set self count 0
+
+|WAIT:0|
+set self frame 0
+
+|LAUNCHED:160|
+set self state WAIT
+set self frame 0
+
+|COLLIDE|
+if related.state == WAIT
+   create say0 related.name + say + related.count related.x related.y
+   set related.name + say + related.count message "KEEP ON SHMOOVIN"
+   set related count related.count + 1
+   set related state LAUNCHED
+endif
+
