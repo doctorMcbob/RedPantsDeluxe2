@@ -3,10 +3,10 @@ START:0 empty 0,0
 
 |START:0|
 # to is _left, from is _right
-set self _left yard0
-set self _right yard1
-set self offset_left 128
-set self offset_right 128
+set self _left redpantshouse1
+set self _right redpantshouse0
+set self offset_left 64
+set self offset_right 64
 
 create WOinbetween0 self.name + inbetween self.x + 32 self.y
 set self.name + inbetween w self.w - 64

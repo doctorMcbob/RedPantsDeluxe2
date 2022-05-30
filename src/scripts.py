@@ -64,7 +64,9 @@ def resolve(reference, script, world, related=None, logfunc=print):
             verb = cmd.pop(0)
 
             if verb == "goodbye":
-                world.actors.remove(reference)
+                for w in worlds.get_worlds():
+                    if reference in w.actors:
+                        w.actors.remove(reference)
 
             if verb == "set":
                 actor, att, value = cmd
