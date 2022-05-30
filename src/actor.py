@@ -70,6 +70,9 @@ def add_actor_from_template(actor_name, template_name, updated_values={}):
 def get_actor(name):
     return ACTORS[name] if name in ACTORS else None
 
+def get_actors():
+    return ACTORS.values()
+
 class Actor(Rect):
     def __init__(self, template):
         self.name = template["name"]
@@ -97,7 +100,8 @@ class Actor(Rect):
         self.platform = False # scripts will flip this for platform draw
         
         self.tangible = False if "tangible" not in template else template["tangible"]
-
+        self.updated = False
+        
     def load_sprites(self, name):
         self.sprites = sprites.get_sprite_map(name)
 
@@ -237,6 +241,11 @@ class Actor(Rect):
         return sprites.get_offset(self.offsetkey, name)
 
     def update(self, world):
+        if self.updated:
+            if self.tangible: self.collision_check(world)
+            return
+        self.updated = True
+        
         self.img = None
 
         script = self._index(self.scripts)

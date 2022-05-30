@@ -30,6 +30,7 @@ def set_up():
     G["WORLDS"] = worlds
     G["FRAMES"] = frames
     G["SCRIPTS"] = scripts
+    G["ACTOR"] = actor
     G["ROOT"] = worlds.root if "-r" not in sys.argv else sys.argv[sys.argv.index("-r")+1]
     sprites.load()
     scripts.load()
@@ -50,31 +51,50 @@ def run(G, noquit=False):
         if inputs.update(noquit) == "QUIT":
             return
 
-        worlds_updated = []
+        worlds_for_updating = [G["FRAMES"].get_frame(name).world for name in G["FRAMEMAP"]]
+
+        for world in G["WORLDS"].get_worlds():
+
+            if world not in worlds_for_updating and world.flagged_for_update:
+#                print(list(G["WORLDS"].get_all_worlds())[list(G["WORLDS"].get_worlds()).index(world)])
+                worlds_for_updating.append(world)
+
+        for world in worlds_for_updating:
+            world.flagged_for_update = False
+            world.update()
+
+        for actor in  G["ACTOR"].get_actors():
+            actor.updated = False
+
+        blitz = []
         for name in G["FRAMEMAP"]:
             frame = G["FRAMES"].get_frame(name)
-            if frame.world not in worlds_updated:
-                frame.world.update()
-                worlds_updated.append(frame.world)
             frame.update()
             position = G["FRAMEMAP"][name]
             drawn = frame.drawn(DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn()
-            G["SCREEN"].blit(drawn, position)
+            blitz.append((drawn, position))
+
+        G["SCREEN"].blits(blitz)
 
         # maybe remove FPS counter before release, dont worry about it for a while though
         fps = G["CLOCK"].get_fps()
-        # if fps < 15:
-        #     print('very significant lag')
-        # elif fps < 20:
-        #     print('legit lag')
-        # elif fps < 25:
-        #     print('lag')
-        # elif fps < 29:
-        #     print('minor lag')
-
+        msg = ""
+        if fps < 15:
+            msg = 'very significant lag'
+        elif fps < 20:
+            msg = 'legit lag'
+        elif fps < 25:
+            msg = 'lag'
+        elif fps < 29:
+            msg = 'minor lag'
         G["SCREEN"].blit(
             G["HEL16"].render("FPS:{}".format(fps), 0, (0, 0, 0)),
             (0, 0))
+        if msg:
+            G["SCREEN"].blit(
+                G["HEL16"].render(msg, 0, (0, 0, 0)),
+                (0, 16))
+
         pygame.display.update()
         if "PRINTER" in G:
             G["PRINTER"].save_surface(G["SCREEN"])

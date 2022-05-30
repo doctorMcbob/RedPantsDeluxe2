@@ -189,13 +189,13 @@ def draw_actors_bar(G, world, mpos):
         G["SCREEN"].blit(hitbox_button, (1168+8 + 100, (i+scroll) * seg_h + 4 + 32))
 
         delete_button = Surface((80, 48))
-        delete_button.fill((150, 150, 150))
+        delete_button.fill((255, 150, 150))
         delete_button.blit(G["HEL16"].render("REMOVE", 0, (0, 0, 0)), (8, 4))
         delete_button.blit(G["HEL16"].render("ACTOR", 0, (0, 0, 0)), (16, 24))
         G["SCREEN"].blit(delete_button, (1168+8 + 100 + 100, (i+scroll) * seg_h + 4 + 32))
 
         up_button = Surface((64, 20))
-        up_button.fill((255, 150, 150))
+        up_button.fill((155, 155, 155))
         up_button.blit(G["HEL16"].render("TOP", 0, (0, 0, 0)), (8, 2))
         G["SCREEN"].blit(up_button, (1168+8 + 100 + 100 + 100, (i+scroll) * seg_h + 4 + 32))
 
@@ -225,6 +225,10 @@ def update_actors_bar(G, mpos, btn):
 
         elif Rect((1168+8 + 100 + 100, (i+scroll) * seg_h + 4 + 32), (80, 48)).collidepoint(mpos) and btn in [0, 1]:
             WORLDS[G['WORLD']]['actors'].remove(friend.name)
+            for w in WORLDS.keys():
+                if friend.name in WORLDS[w]['actors']:
+                    WORLDS[w]['actors'].remove(friend.name)
+                
             ACTORS.pop(friend.name)
             world.actors.remove(friend.name)
             load_game()
@@ -244,12 +248,13 @@ def update_actors_bar(G, mpos, btn):
             CURSOR_SCROLLER["CX"] = friend.x
             CURSOR_SCROLLER["CY"] = friend.y
 
+    
 def add_actor(G, pos, template_name):
     if 'plat' in template_name:
         pos = pos[0] // 32 * 32, pos[1] // 32 * 32
-        rect = input_rect(G, (0, 0, 100), cb=draw, snap=32, pos=pos)
+        rect = input_rect(G, (0, 0, 100), cb=main_click_helper, snap=32, pos=pos)
     else:
-        rect = input_rect(G, (0, 0, 100), cb=draw, snap=16, pos=pos)
+        rect = input_rect(G, (0, 0, 100), cb=main_click_helper, snap=16, pos=pos)
     if not rect: return
     rect = ((rect[0][0] + CURSOR_SCROLLER["CX"], rect[0][1] + CURSOR_SCROLLER["CY"]), rect[1])
     template = deepcopy(TEMPLATES[template_name])
@@ -791,22 +796,47 @@ def change_world_background(G):
     if not background: return
     WORLDS[G["WORLD"]]["background"] = background
     worlds.get_world(G["WORLD"]).background = sprites.get_sprite(background)
+
+def add_actor_from_world(G):
+    def update(G):
+        draw(G)
+        G["SCREEN"].blit(
+            G["HEL32"].render("World to select actor from:", 0, (0, 0, 0)),
+            (0, 0)
+        )
+    world_ref = select_from_list(G, worlds.get_all_worlds(), (0, 32), args=G, cb=update)
+    if not world_ref: return
+    world = worlds.get_world(world_ref)
+    def update(G):
+        draw(G)
+        G["SCREEN"].blit(
+            G["HEL32"].render("Actor from world {}".format(world_ref), 0, (0, 0, 0)),
+            (0, 0)
+        )
+    name = select_from_list(G, world.actors, (0, 32), args=G, cb=update)
+    if not name: return
+    if name not in WORLDS[G["WORLD"]]["actors"]:
+        WORLDS[G["WORLD"]]["actors"].append(name)
+        load_game()
     
 def off(*args, **kwargs): pass
 BUTTONS = {
-    ((16, 656), (256, 48)): spritesheet_menu,
-    ((16, 656 + 48), (256, 48)): load_template_button,
-    ((16, 656 + 48 * 2), (256, 48)): load_all_templates_button,
-    ((16, 656 + 48 * 3), (256, 48)): switch_worlds,
-    ((16, 656 + 48 * 4), (256, 48)): delete_world,
-    ((16, 656 + 48 * 5), (256, 48)): change_world_background,
+    ((16, 656), (256, 32)): spritesheet_menu,
+    ((16, 656 + 32), (256, 32)): load_template_button,
+    ((16, 656 + 32 * 2), (256, 32)): load_all_templates_button,
+    ((16, 656 + 32 * 3), (256, 32)): add_actor_from_world,
+    ((16, 656 + 32 * 4), (256, 32)): switch_worlds,
+    ((16, 656 + 32 * 5), (256, 32)): delete_world,
+    ((16, 656 + 32 * 6), (256, 32)): change_world_background,
 }
 
 BUTTON_TEXT = {
-    ((16, 656), (256, 48)): "Spritesheet Menu",
-    ((16, 656 + 48), (256, 48)): "Load Template",
-    ((16, 656 + 48 * 2), (256, 48)): "Load All Templates",
-    ((16, 656 + 48 * 3), (256, 48)): "Switch Worlds",
-    ((16, 656 + 48 * 4), (256, 48)): "Delete World",    
-    ((16, 656 + 48 * 5), (256, 48)): "Change World Background",
+    ((16, 656), (256, 32)): "Spritesheet Menu",
+    ((16, 656 + 32), (256, 32)): "Load Template",
+    ((16, 656 + 32 * 2), (256, 32)): "Load All Templates",
+    ((16, 656 + 32 * 3), (256, 32)): "Add Actor From World",
+    ((16, 656 + 32 * 4), (256, 32)): "Switch Worlds",
+    ((16, 656 + 32 * 5), (256, 32)): "Delete World",    
+    ((16, 656 + 32 * 6), (256, 32)): "Change World Background",
+    
 }

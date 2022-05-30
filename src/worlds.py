@@ -34,6 +34,9 @@ def get_world(world):
 def get_all_worlds():
     return list(worlds.keys())
 
+def get_worlds():
+    return list(worlds.values())
+
 class World(object):
     def __init__(self, template):
         
@@ -41,12 +44,14 @@ class World(object):
         self.actors = template["actors"]
         self.x_lock = None if "x_lock" not in template else template["x_lock"]
         self.y_lock = None if "y_lock" not in template else template["y_lock"]
-        
+        self.flagged_for_update = True
+
     def update(self):
         for name in self.actors:
             Actor = actor.get_actor(name)
-            Actor.update(self)
-
+            if not Actor.updated:
+                Actor.update(self)
+                
     def get_actors(self):
         return [actor.get_actor(a) for a in self.actors]
 
@@ -89,7 +94,8 @@ class World(object):
                     maketext = Rect(
                         frame.scroll((Actor.x, Actor.y)),
                         Actor.size
-                    ).collidepoint(mpos) and mpos[1] < frame.h
+                    ).collidepoint(mpos)
+                    maketext = maketext and mpos[1] < frame.h and pygame.mouse.get_focused()
 
                     Actor.debug(dest,
                                 frame.scroll((Actor.x+Actor.w, Actor.y)),

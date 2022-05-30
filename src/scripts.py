@@ -137,15 +137,15 @@ def resolve(reference, script, world, related=None, logfunc=print):
                     world.actors.append(name)
                 
             if verb == "take":
+                world_ref = cmd.pop(0)
+                world = worlds.get_world(world_ref)
                 name = cmd.pop(0)
                 if name == "self": name = a.get_actor(reference).name
                 if name == "related": name = a.get_actor(related).name
-                world = worlds.get_world(world_ref)
                 if world is None:
                     raise Exception("Invalid Place destination {}".format(world_ref))
-                if name not in world.actors:
-                    raise Exception("{} not in world {}".format(name, world_ref))
-                world.actors.remove(name)
+                if name in world.actors:
+                    world.actors.remove(name)
 
             if verb == "rebrand":
                 keyname = cmd.pop(0)
@@ -187,6 +187,10 @@ def resolve(reference, script, world, related=None, logfunc=print):
                     world.actors.append(actor_name)
                 if "START:0" in actor.scripts:
                     resolve(actor_name, actor.scripts["START:0"], world, logfunc=logfunc)
+
+            if verb == "update":
+                world_ref = cmd.pop(0)
+                worlds.get_world(world_ref).flagged_for_update = True
 
             if verb == "for": # gulp
                 key = cmd.pop(0)
