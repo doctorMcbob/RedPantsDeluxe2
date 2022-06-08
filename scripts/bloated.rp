@@ -238,7 +238,7 @@ if related.y > self.y
    set self thw_y self.y + self.y - related.y
 endif
 
-create thwack self.name + thwack + self.thwacks self.thw_x self.thw_y
+create thwack0 self.name + thwack + self.thwacks self.thw_x self.thw_y
 set self thwacks self.thwacks + 1
 
 |HITSTUN:0|

@@ -2,42 +2,365 @@ KNIGHT|0,0,0,0|True|
 START:0 knightidle -16,-16
 LOOK:0 knightidle -16,-16
 WALK:0 knightwalk0 0,-16
-WALK:3 knightwalk1 -16,-16
-WALK:6 knightwalk2 -16,-16
-WALK:9 knightwalk3 -16,-16
-WALK:12 knightwalk4 -16,-16
+WALK:4 knightwalk1 -16,-16
+WALK:8 knightwalk2 -16,-16
+WALK:12 knightwalk3 -16,-16
+WALK:16 knightwalk4 -16,-16
 RUN:0 knightrun0 0,-48
-RUN:3 knightrun1 0,-48
-RUN:6 knightrun2 0,-32
-RUN:9 knightrun3 0,-32
-RUN:12 knightrun4 0,-48
+RUN:4 knightrun1 0,-48
+RUN:8 knightrun2 0,-32
+RUN:12 knightrun3 0,-32
+RUN:16 knightrun4 0,-48
 RUNSLASH:0 knightrunslash0 -16,-80
-RUNSLASH:4 knightrunslash1 -80,16
-RUNSLASH:6 knightrunslash2 -80,32
+RUNSLASH:8 knightrunslash1 -80,16
+RUNSLASH:12 knightrunslash2 -80,32
 JUMPSQUAT:0 knightsquat -16,-16
 JUMPATK:0 knightjump0 -16,-16
 JUMPATK:6 knightjump1 -32,-64
 JUMPATK:8 knightjump2 -64,0
 LAND:0 knightland -24,-16
 SLASH:0 knightslash0 -8,-48
-SLASH:6 knightslash1 -72,-16
-SLASH:8 knightslash2 -56,-16
-SLASH:11 knightslash3 -16,-48
+SLASH:8 knightslash1 -72,-16
+SLASH:12 knightslash2 -56,-16
+SLASH:15 knightslash3 -16,-48
 BONK:0 knightbonk -16,-16
 BONKLAND:0 knightbonkland0 -48,-16
-BONKLAND:6 knightbonkland1 -32,0
+BONKLAND:11 knightbonkland1 -32,0
 FALL:0 knightfall -16,0
 
 |START:0|
 set self frame 0
 set self state LOOK
-set self limt 20
+set self limit 20
 set self neglimit self.limit * -1
 set self lookboxnumber 0
-set self seeleft []
-set self seeright []
+set self slashLeft []
+set self slashRight []
+set self jumpLeft []
+set self jumpRight []
+set self runLeft []
+set self runRight []
 set self grav 1
 set self walkspeed 4
-set self runspeed 9
+set self runspeed 8
+set self bonkxmod -4
+set self bonkymod -5
+set self jumpatkxmod 6
+set self jumpatkymod -6
 
+|LOOK:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|LOOK:3|
+set self x_vel 0
+exec clearLooks
+exec lookLeft
+exec lookRight
+exec checkAir
+exec applyGrav
+
+|LOOK:4|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+exec checkSlash
+exec checkJump
+exec checkRun
+
+|LOOK:60|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+set self state WALK
+set self choice RAND?
+if self.choice
+   set self direction -1
+endif
+if not self.choice
+   set self direction 1
+endif
+set self frame 0
+
+|WALK:0|
+exec checkAir
+exec applyGrav
+set self x_vel self.walkspeed * self.direction
+
+|WALK:20|
+exec WALK:0
+set self frame 0
+if RAND?
+   set self state LOOK
+endif
+
+|RUN:0|
+exec checkAir
+exec applyGrav
+set self x_vel self.runspeed * self.direction
+
+|RUN:1|
+exec RUN:0
+if self.direction == 1
+   exec runLookRight
+endif
+if self.direction == -1
+   exec runLookLeft
+endif
+
+|RUN:2|
+exec RUN:0
+exec checkRunningLook
+
+|RUN:12|
+exec RUN:1
+
+|RUN:13|
+exec RUN:2
+
+|RUN:20|
+exec RUN:2
+set self frame 0
+
+|RUNSLASH:0|
+exec checkAir
+exec applyGrav
+
+|RUNSLASH:12|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|RUNSLASH:20|
+exec RUNSLASH:0
+set self state LOOK
+set self frame 0
+
+|BONK:0|
+exec applyGrav
+
+|BONKLAND:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|BONKLAND:22|
+exec checkAir
+exec applyGrav
+set self state LOOK
+set self frame 0
+
+|FALL:0|
+exec applyGrav
+
+|LAND:0|
+exec checkAir
+exec applyGrav
+
+|LAND:4|
+exec checkAir
+exec applyGrav
+set self state LOOK
+set self frame 0
+
+|JUMPSQUAT:0|
+exec checkAir
+exec applyGrav
+
+|JUMPSQUAT:5|
+exec JUMPSQUAT:0
+set self state JUMPATK
+set self frame 0
+set self x_vel self.jumpatkxmod * self.direction
+set self y_vel self.jumpatkymod
+
+|SLASH:0|
+exec checkAir
+exec applyGrav
+
+|SLASH:25|
+exec SLASH:0
+set self frame 0
+set self state LOOK
+
+|JUMPATK:0|
+exec applyGrav
+
+|XCOLLISION|
+if self.state == WALK
+   set self direction self.direction * -1
+endif
+if self.state == RUN
+   set self state BONK
+   set self frame 0
+   set self y_vel self.bonkymod
+   set self x_vel self.bonkxmod * self.direction
+endif
+
+|YCOLLISION|
+set self calc self.state == JUMPATK
+if self.state == FALL or self.calc
+   set self state LAND
+   set self frame 0
+endif
+if self.state == BONK
+   set self state BONKLAND
+   set self frame 0
+endif
+
+|checkAir|
+if self.y_vel
+   set self state FALL
+   set self frame 0
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+if self.y_vel > self.limit
+   set self y_vel self.limit
+endif
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
+endif
+
+|lookRight|
+set self lookboxname self.name + slashLookbox + self.lookboxnumber
+create hitbox0 self.lookboxname self.x + self.w self.y
+set self.lookboxname timer 30
+set self.lookboxname return self.name
+set self.lookboxname trigger slashRight
+set self.lookboxname w 80
+set self.lookboxname h self.h
+set self lookboxname self.name + jumpLookbox + self.lookboxnumber
+create hitbox0 self.lookboxname self.x + self.w + 80 self.y
+set self.lookboxname timer 30
+set self.lookboxname return self.name
+set self.lookboxname trigger jumpRight
+set self.lookboxname w 100
+set self.lookboxname h self.h
+set self lookboxname self.name + runLookbox + self.lookboxnumber
+create hitbox0 self.lookboxname self.x + self.w + 180 self.y
+set self.lookboxname timer 30
+set self.lookboxname return self.name
+set self.lookboxname trigger runRight
+set self.lookboxname w 200
+set self.lookboxname h self.h
+set self lookboxnumber self.lookboxnumber + 1
+
+|lookLeft|
+set self lookboxname self.name + slashLookbox + self.lookboxnumber
+create hitbox0 self.lookboxname self.x - 80 self.y
+set self.lookboxname timer 30
+set self.lookboxname return self.name
+set self.lookboxname trigger slashLeft
+set self.lookboxname w 80
+set self.lookboxname h self.h
+set self lookboxname self.name + jumpLookbox + self.lookboxnumber
+create hitbox0 self.lookboxname self.x - 180 self.y
+set self.lookboxname timer 30
+set self.lookboxname return self.name
+set self.lookboxname trigger jumpLeft
+set self.lookboxname w 100
+set self.lookboxname h self.h
+set self lookboxname self.name + runLookbox + self.lookboxnumber
+create hitbox0 self.lookboxname self.x - 380 self.y
+set self.lookboxname timer 30
+set self.lookboxname return self.name
+set self.lookboxname trigger runLeft
+set self.lookboxname w 200
+set self.lookboxname h self.h
+set self lookboxnumber self.lookboxnumber + 1
+
+|runLookRight|
+set self lookboxname self.name + runningLookbox + self.lookboxnumber
+create hitbox0 self.lookboxname self.x + self.w + self.w self.y
+set self.lookboxname timer 10
+set self.lookboxname return self.name
+set self.lookboxname trigger runningVision
+set self.lookboxname w 100
+set self.lookboxname h self.h
+set self lookboxnumber self.lookboxnumber + 1
+
+|runLookLeft|
+set self lookboxname self.name + runningLookbox + self.lookboxnumber
+create hitbox0 self.lookboxname self.x - self.w - 100 self.y
+set self.lookboxname timer 10
+set self.lookboxname return self.name
+set self.lookboxname trigger runningVision
+set self.lookboxname w 100
+set self.lookboxname h self.h
+set self lookboxnumber self.lookboxnumber + 1
+
+|clearLooks|
+set self slashLeft []
+set self slashRight []
+set self jumpLeft []
+set self jumpRight []
+set self runLeft []
+set self runRight []
+set self runningVision []
+
+|checkSlash|
+for name self.slashLeft
+    if player in name
+       exec clearLooks
+       set self direction -1
+       set self state SLASH
+       set self frame 0
+    endif
+endfor
+for name self.slashRight
+    if player in name
+       exec clearLooks
+       set self direction 1
+       set self state SLASH
+       set self frame 0
+    endif
+endfor
+
+|checkJump|
+for name self.jumpLeft
+    if player in name
+       exec clearLooks
+       set self direction -1
+       set self state JUMPSQUAT
+       set self frame 0
+    endif
+endfor
+for name self.jumpRight
+    if player in name
+       exec clearLooks
+       set self direction 1
+       set self state JUMPSQUAT
+       set self frame 0
+    endif
+endfor
+
+|checkRun|
+for name self.runLeft
+    if player in name
+       exec clearLooks
+       set self direction -1 
+       set self state RUN
+       set self frame 0
+   endif
+endfor
+for name self.runRight
+    if player in name
+       exec clearLooks
+       set self direction 1
+       set self state RUN
+       set self frame 0
+    endif
+endfor
+
+|checkRunningLook|
+for name self.runningVision
+    if player in name
+       exec clearLooks
+       set self state RUNSLASH
+       set self frame 0
+   endif
+endfor
 
