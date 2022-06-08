@@ -1,0 +1,43 @@
+KNIGHT|0,0,0,0|True|
+START:0 knightidle -16,-16
+LOOK:0 knightidle -16,-16
+WALK:0 knightwalk0 0,-16
+WALK:3 knightwalk1 -16,-16
+WALK:6 knightwalk2 -16,-16
+WALK:9 knightwalk3 -16,-16
+WALK:12 knightwalk4 -16,-16
+RUN:0 knightrun0 0,-48
+RUN:3 knightrun1 0,-48
+RUN:6 knightrun2 0,-32
+RUN:9 knightrun3 0,-32
+RUN:12 knightrun4 0,-48
+RUNSLASH:0 knightrunslash0 -16,-80
+RUNSLASH:4 knightrunslash1 -80,16
+RUNSLASH:6 knightrunslash2 -80,32
+JUMPSQUAT:0 knightsquat -16,-16
+JUMPATK:0 knightjump0 -16,-16
+JUMPATK:6 knightjump1 -32,-64
+JUMPATK:8 knightjump2 -64,0
+LAND:0 knightland -24,-16
+SLASH:0 knightslash0 -8,-48
+SLASH:6 knightslash1 -72,-16
+SLASH:8 knightslash2 -56,-16
+SLASH:11 knightslash3 -16,-48
+BONK:0 knightbonk -16,-16
+BONKLAND:0 knightbonkland0 -48,-16
+BONKLAND:6 knightbonkland1 -32,0
+FALL:0 knightfall -16,0
+
+|START:0|
+set self frame 0
+set self state LOOK
+set self limt 20
+set self neglimit self.limit * -1
+set self lookboxnumber 0
+set self seeleft []
+set self seeright []
+set self grav 1
+set self walkspeed 4
+set self runspeed 9
+
+
