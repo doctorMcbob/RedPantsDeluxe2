@@ -1,0 +1,29 @@
+THWACK|0,0,0,0|False|
+START:0 bloodup 0,0
+BLOOD:0 blooddown 0,0
+BLOOD:0 bloodmed 0,0
+
+|START:0|
+set self state BLOOD
+set self frame 0
+set self grav 0.5 + RAND?
+set self y_vel -6 + RAND? + RAND? + RAND?
+set self direction -1
+if RAND?
+   set self direction 1
+endif
+set self x_vel 2 + RAND? + RAND? * self.direction * -1
+
+|BLOOD:0|
+if self.y_vel > 3
+   img blooddown
+endif
+if self.y_vel < -3
+   img bloodup
+endif
+set self x self.x + self.x_vel
+set self y self.y + self.y_vel
+set self y_vel self.y_vel + self.grav
+
+|BLOOD:16|
+goodbye

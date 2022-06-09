@@ -27,6 +27,7 @@ BONK:0 knightbonk -16,-16
 BONKLAND:0 knightbonkland0 -48,-16
 BONKLAND:11 knightbonkland1 -32,0
 FALL:0 knightfall -16,0
+HITSTUN:0 knightbonk -16,-16
 
 |START:0|
 set self frame 0
@@ -47,6 +48,9 @@ set self bonkxmod -4
 set self bonkymod -5
 set self jumpatkxmod 6
 set self jumpatkymod -6
+hitboxes knight
+hurtboxes knight
+set self slashfxnumber 0
 
 |LOOK:0|
 set self x_vel 0
@@ -187,6 +191,34 @@ set self state LOOK
 |JUMPATK:0|
 exec applyGrav
 
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self state BONK
+set self frame 0
+set self x_vel self.hit_x_vel
+set self y_vel self.hit_y_vel
+set self hit_x_vel 0
+set self hit_y_vel 0
+
+|HIT|
+if self.can_die
+   set self state DEAD
+   set self frame 0
+endif
+if not self.can_die
+   set self state HITSTUN
+   set self frame 0
+   set self direction related.direction * -1
+   set self hit_x_vel 14 * related.direction
+   set self hit_y_vel -8
+endif
+create slashfx0 related.name + SLASH + related.slashfxnumber self.x self.y
+set related.name + SLASH + related.slashfxnumber direction related.direction * -1
+set related slashfxnumber related.slashfxnumber + 1
+
 |XCOLLISION|
 if self.state == WALK
    set self direction self.direction * -1
@@ -303,7 +335,7 @@ set self runningVision []
 
 |checkSlash|
 for name self.slashLeft
-    if player in name
+    if name.can_die
        exec clearLooks
        set self direction -1
        set self state SLASH
@@ -311,7 +343,7 @@ for name self.slashLeft
     endif
 endfor
 for name self.slashRight
-    if player in name
+    if name.can_die
        exec clearLooks
        set self direction 1
        set self state SLASH
@@ -321,7 +353,7 @@ endfor
 
 |checkJump|
 for name self.jumpLeft
-    if player in name
+    if name.can_die
        exec clearLooks
        set self direction -1
        set self state JUMPSQUAT
@@ -329,7 +361,7 @@ for name self.jumpLeft
     endif
 endfor
 for name self.jumpRight
-    if player in name
+    if name.can_die
        exec clearLooks
        set self direction 1
        set self state JUMPSQUAT
@@ -339,7 +371,7 @@ endfor
 
 |checkRun|
 for name self.runLeft
-    if player in name
+    if name.can_die
        exec clearLooks
        set self direction -1 
        set self state RUN
@@ -347,7 +379,7 @@ for name self.runLeft
    endif
 endfor
 for name self.runRight
-    if player in name
+    if name.can_die
        exec clearLooks
        set self direction 1
        set self state RUN
@@ -357,7 +389,7 @@ endfor
 
 |checkRunningLook|
 for name self.runningVision
-    if player in name
+    if name.can_die
        exec clearLooks
        set self state RUNSLASH
        set self frame 0

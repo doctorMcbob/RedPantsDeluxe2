@@ -71,6 +71,7 @@ hitboxes redpantsguy
 hurtboxes redpantsguy
 set self base redpantsguy
 set self can_die 1
+set self bloodnumber 0
 
 set self rotation 0
 set self door_key UP
@@ -82,6 +83,10 @@ set self height 64
 set self x_vel 0
 set self y_vel 0
 set self can_die 0
+if self.frame % 4 == 0
+   create blood0 self.name + blood + self.bloodnumber self.x + 16 self.y + 16
+   set self bloodnumber self.bloodnumber + 1
+endif
 
 |DEAD:45|
 set self state IDLE

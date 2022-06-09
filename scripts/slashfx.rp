@@ -1,0 +1,15 @@
+THWACK|0,0,0,0|False|
+START:0 slashfx 0,0
+SLASH:0 slashfx 0,0
+
+|START:0|
+set self state SLASH
+set self frame 0
+set self x_vel 12
+
+|SLASH:0|
+set self mov self.x_vel * self.direction * -1
+set self x self.x + self.mov
+
+|SLASH:7|
+goodbye

@@ -187,6 +187,10 @@ exec applyGrav
 set self x_vel 0
 set self y_vel 0
 set self can_die 0
+if self.frame % 4 == 0
+   create blood0 self.name + blood + self.bloodnumber self.x + 16 self.y + 16
+   set self bloodnumber self.bloodnumber + 1
+endif
 
 |DEAD:45|
 set self state IDLE
