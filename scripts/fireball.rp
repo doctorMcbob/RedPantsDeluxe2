@@ -1,16 +1,17 @@
 FIREBALL|0,0,0,0|False|
 START:0 fireballstart 0,0
 FIREBALL:0 fireballstart 0,0
-FIREBALL:2 fireball0 -4,8
-FIREBALL:4 fireball1 -4,8
-FIREBALL:6 fireball3 -4,8
-FIREBALL:8 fireball4 -4,8
+FIREBALL:5 fireball0 -16,-8
+FIREBALL:7 fireball1 -16,-8
+FIREBALL:9 fireball3 -16,-8
+FIREBALL:11 fireball4 -16,-8
 
 |START:0|
 set self speed 8
-set self framelifespan 160
+set self framelifespan 90
 set self state FIREBALL
 set self frame 0
+hitboxes fireball
 
 |FIREBALL:0|
 set self x self.direction * self.speed + self.x
@@ -18,8 +19,22 @@ set self framelifespan self.framelifespan - 1
 if self.framelifespan < 0
    goodbye
 endif
+for _name COLLIDE?
+    if _name != self.creatorname
+       goodbye
+    endif
+endfor
 
-|FIREBALL:10|
-set self frame 2
+|FIREBALL:13|
+set self frame 5
 exec FIREBALL:0
+
+|HIT|
+if self.name != related.creatorname
+   set self state HITSTUN
+   set self frame 0
+   set self direction related.direction * -1
+   set self hit_x_vel 6 * related.direction
+   set self hit_y_vel -4
+endif
 

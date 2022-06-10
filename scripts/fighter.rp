@@ -60,8 +60,8 @@ HADOKEN:0 fighterfireball0 -16,0
 HADOKEN:6 fighterfireball1 -16,0
 HADOKEN:9 fighterfireball2 -16,0
 AIRHADOKEN:0 fighterairfireball0 -16,0
-AIRHADOKEN:6 fighterairfireball1 -16,0
-AIRHADOKEN:9 fighterairfireball2 -16,0
+AIRHADOKEN:4 fighterairfireball1 -16,0
+AIRHADOKEN:6 fighterairfireball2 -16,0
 HITSTUN:0 fighterbonk -32,0
 
 |START:0|
@@ -309,15 +309,22 @@ exec applyGrav
 |AIRHADOKEN:0|
 exec applyGrav
 
-|AIRHADOKEN:12|
+|AIRHADOKEN:9|
 set self x_vel self.fireballxmod * self.direction
 set self y_vel self.fireballymod
-create airfireball self.name + fireball + self.fireballnumber self.x self.y
+if self.direction == -1
+   set self hadox self.x
+endif
+if self.direction == 1
+   set self hadox self.x + self.w
+endif
+create airfireball0 self.name + fireball + self.fireballnumber self.hadox self.y + 32
+set self.name + fireball + self.fireballnumber creatorname self.name
 set self.name + fireball + self.fireballnumber direction self.direction
 set self fireballnumber self.fireballnumber + 1
 exec applyGrav
 
-|AIRHADOKEN:13|
+|AIRHADOKEN:10|
 exec applyGrav
 
 |JUMPSQUAT:0|
@@ -529,14 +536,21 @@ exec applyGrav
 
 |HADOKEN:12|
 exec HADOKEN:0
-create fireball self.name + fireball + self.fireballnumber self.x self.y
+if self.direction == -1
+   set self hadox self.x
+endif
+if self.direction == 1
+   set self hadox self.x + self.w
+endif
+create fireball0 self.name + fireball + self.fireballnumber self.hadox self.y + 32
+set self.name + fireball + self.fireballnumber creatorname self.name
 set self.name + fireball + self.fireballnumber direction self.direction
 set self fireballnumber self.fireballnumber + 1
 
 |HADOKEN:13|
 exec HADOKEN:0
 
-|HADOKEN:20|
+|HADOKEN:24|
 set self state IDLE
 set self frame 0
 exec IDLE:0
@@ -575,10 +589,10 @@ if self.thwacks == None
 endif
 
 if related.x <= self.x
-   set self thw_x self.x + related.x - self.x
+   set self thw_x related.x + related.w
 endif
 if related.x > self.x
-   set self thw_x self.x + self.x - related.x
+   set self thw_x related.x
 endif
 if related.y <= self.y
    set self thw_y self.y + related.y - self.y
@@ -612,6 +626,7 @@ if self.state == ROLLOUT or self.calc1
 endif
 set self calc1 self.state == SHORYUFALL
 set self calc1 self.state == TATSUFLIP or self.calc1
+set self calc1 self.state == AIRHADOKEN or self.calc1
 set self calc1 self.state == SLIDEFLIP or self.calc1
 if self.state == AIRIAL or self.calc1
    set self state WALLTOUCH

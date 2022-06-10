@@ -453,10 +453,10 @@ if self.thwacks == None
 endif
 
 if related.x <= self.x
-   set self thw_x self.x + related.x - self.x
+   set self thw_x related.x + related.w
 endif
 if related.x > self.x
-   set self thw_x self.x + self.x - related.x
+   set self thw_x related.x
 endif
 if related.y <= self.y
    set self thw_y self.y + related.y - self.y
