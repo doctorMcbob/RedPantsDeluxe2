@@ -554,7 +554,7 @@ def spritesheet_menu(G):
             if idx < len(keys):
                 pos, dim = sheet[keys[idx]]
                 CX, CY = pos
-                SX, SY = (pos[0], pos[1])
+                SX, SY = (0-pos[0], 0-pos[1])
                 corner = pos[0] + dim[0], pos[1] + dim[1]
         
         elif inp == K_SPACE:

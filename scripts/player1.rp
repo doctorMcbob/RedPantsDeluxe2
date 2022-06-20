@@ -8,6 +8,8 @@ if isframe MAIN
    set self frame_name MAIN
    rebrand redpantsguy
    set self tangible 1
+   set self respawnx self.x
+   set self respawny self.y
 endif
 if not isframe MAIN
    goodbye

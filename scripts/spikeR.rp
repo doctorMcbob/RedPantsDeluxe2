@@ -4,7 +4,7 @@ SPIKE:0 spike 0,0
 
 |START:0|
 set self state SPIKE
-set self rotation 0
+set self rotation 270
 set self direction -1
 
 |SPIKE:0|

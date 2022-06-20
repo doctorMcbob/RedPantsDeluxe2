@@ -1,0 +1,29 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 platform000 0,0
+PLATFORM01 platform001 0,0
+PLATFORM02 platform002 0,0
+PLATFORM10 platform010 0,0
+PLATFORM11 platform011 0,0
+PLATFORM12 platform012 0,0
+PLATFORM20 platform020 0,0
+PLATFORM21 platform021 0,0
+PLATFORM22 platform022 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0
+set self sticky 1
+
+|PLATFORM:0|
+# set self x_vel 1
+set self y_vel -1
+
+|PLATFORM:30|
+# set self x_vel 1
+set self y_vel 1
+if self.frame == 60
+   set self frame 0
+   exec PLATFORM:0
+endif
+
