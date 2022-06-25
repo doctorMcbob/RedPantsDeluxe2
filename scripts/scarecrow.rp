@@ -1,0 +1,18 @@
+SCARECROW|0,0,0,0|False|
+START:0 scarecrow -16,0
+SCARECROW:0 scarecrow -16,0
+HITSTUN:0 scarecrowhit -16,0
+
+|START:0|
+set self frame 0
+set self state SCARECROW
+hitboxes scarecrow
+hurtboxes scarecrow
+
+|SCARECROW:0|
+set self frame 0
+
+|HITSTUN:4|
+set self state SCARECROW
+set self frame 0
+

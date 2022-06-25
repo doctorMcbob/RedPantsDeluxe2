@@ -502,8 +502,22 @@ set self y_vel 0
 set self x_vel self.direction * self.tatsuspeed
 set self state TATSU
 set self frame 0
+set self cantatsucancel 0
+
+|TATSU:0|
+if abs self.x_vel > self.tatsuspeed or self.y_vel
+   set self state AIRIAL
+   set self frame 0
+endif
+set self x_vel self.direction * self.tatsuspeed
+if B_DOWN in inpEVENTS and self.cantatsucancel
+   set self state TATSUFLIP
+   set self frame 0
+endif
 
 |TATSU:16|
+exec TATSU:0
+set self cantatsucancel 1
 set self frame 0
 
 |TATSUFLIP:0|

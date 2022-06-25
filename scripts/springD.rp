@@ -1,0 +1,23 @@
+DOOR|0,0,0,0|False|
+START:0 springdown 0,0
+SPRING:0 springdown 0,0
+SHOT:0 springup 0,-16
+
+|START:0|
+set self state SPRING
+set self direction -1
+set self strength 20
+set self rotation 180
+
+|SPRING:0|
+set self frame 0
+
+|SHOT:8|
+set self state SPRING
+set self frame 0
+
+|COLLIDE|
+set self y_vel related.strength
+set related state SHOT
+set related frame 0
+
