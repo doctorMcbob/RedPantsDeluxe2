@@ -9,6 +9,7 @@ set self letter " "
 set self state ASC
 set self direction -1
 set self timer -1
+back
 
 |ASC:0|
 img self.letter

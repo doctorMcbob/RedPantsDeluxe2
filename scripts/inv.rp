@@ -1,0 +1,17 @@
+INV|0,0,0,0|False|
+START:0 empty 0,0
+INV:0 empty 0,0
+
+|START:0|
+set self state INV
+set self frame 0
+
+set self collected []
+set self coins 0
+set self bananas 0
+
+set self fighter_unlock 0
+
+|INV:0|
+set self frame 0
+

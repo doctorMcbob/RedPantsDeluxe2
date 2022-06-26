@@ -1,0 +1,14 @@
+MILK|0,0,0,0|False|
+START:0 yamashitapoof0 0,0
+POOF:0 yamashitapoof0 0,0
+POOF:3 yamashitapoof1 0,0
+POOF:6 yamashitapoof2 0,0
+POOF:9 yamashitapoof3 0,0
+POOF:12 yamashitapoof4 0,0
+
+|START:0|
+set self state POOF
+set self frame 0
+
+|POOF:15|
+goodbye

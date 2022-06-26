@@ -1,9 +1,16 @@
 ANTLERHAT|0,0,0,0|False|
 START:0 fighterbandana 0,0
 HAT:0 fighterbandana 0,0
+LOCKED:0 empty 0,0
 
 |START:0|
-set self state HAT
+set self state LOCKED
+
+|LOCKED:0|
+set self frame 0
+if inv0.fighter_unlock
+   set self state HAT
+endif
 
 |HAT:0|
 set self frame 0
@@ -11,7 +18,9 @@ set self frame 0
 |COLLIDE|
 if player in self.name
    if self.hat != fighter
-      rebrand fighter
-      set self hat fighter
+      if related.state == HAT
+         rebrand fighter
+         set self hat fighter
+      endif
    endif
 endif

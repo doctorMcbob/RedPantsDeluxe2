@@ -1,0 +1,49 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+NOTHERE:0 empty 0,0
+HERE:0 empty 0,0
+LAUNCHED:0 empty 0,0
+
+|START:0|
+set self state NOTHERE
+set self messagename shoryualmosttheretutorial
+set self message "YOU CAN^DO IT  "
+
+|NOTHERE:0|
+set self frame 0
+
+|HERE:0|
+if yamashita1.whereat != self.name
+   set self state NOTHERE
+endif
+set self frame 0
+
+|LAUNCHED:200|
+set self state HERE
+
+|COLLIDE|
+if related.state == HERE
+   if player in self.name
+      create say0 related.messagename yamashita1.x - 180 yamashita1.y - 16
+      set related.messagename message related.message
+      set related.messagename back backgroundsayR0
+      set related state LAUNCHED
+      set related frame 0
+   endif
+endif
+if related.state == NOTHERE
+   if player in self.name
+      set yamashita1 shuffle 0
+      set yamashita1 state WALL
+      set yamashita1 direction 1
+      set yamashita1 y_vel 0
+      set yamashita1 frame 0
+      set yamashita1 x related.x + related.w - 32
+      set yamashita1 y related.y
+      set yamashita1 whereat related.name
+      create yamashitapoof0 yamashitapoof yamashita1.x - 16 yamashita1.y
+      set related state HERE
+      set related frame 0
+   endif
+endif
+

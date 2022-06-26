@@ -23,11 +23,9 @@ goodbye
 
 |COLLIDE|
 if player in self.name
-   if self.bananas
-      set self bananas self.bananas + 1
-   endif
-   if not self.bananas
-      set self bananas 1
+   if related.name in inv0.collected == 0
+      add inv0.collected related.name
+      set inv0 bananas inv0.bananas + 1
    endif
 endif
 

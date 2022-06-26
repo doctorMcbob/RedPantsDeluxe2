@@ -30,9 +30,9 @@ set self y self.y - 3
 goodbye
 
 |COLLIDE|
-if self.coins
-   set self coins self.coins + 1
-endif
-if not self.coins
-   set self coins 1
+if player in self.name
+   if related.name in inv0.collected == 0
+      add inv0.collected related.name
+      set inv0 coins inv0.coins + 1
+   endif
 endif

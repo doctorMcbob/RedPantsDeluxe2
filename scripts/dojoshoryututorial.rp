@@ -1,0 +1,47 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+NOTHERE:0 empty 0,0
+HERE:0 empty 0,0
+LAUNCHED:0 empty 0,0
+
+|START:0|
+set self state NOTHERE
+set self messagename shoryututorial
+set self message "HOLD UP AND PRESS PUNCH  ^FOR BIG JUMPING PUNCH  "
+
+|NOTHERE:0|
+set self frame 0
+
+|HERE:0|
+if yamashita0.whereat != self.name
+   set self state NOTHERE
+endif
+set self frame 0
+
+|LAUNCHED:200|
+set self state HERE
+
+|COLLIDE|
+if related.state == HERE
+   if player in self.name
+      create say0 related.messagename yamashita0.x + 32 yamashita0.y - 96
+      set related.messagename message related.message
+      set related.messagename back backgroundsayL0
+      set related state LAUNCHED
+      set related frame 0
+   endif
+endif
+if related.state == NOTHERE
+   if player in self.name
+      set yamashita0 shuffle 0
+      set yamashita0 state SQUAT
+      set yamashita0 frame 0
+      set yamashita0 x related.x
+      set yamashita0 y related.y + 288
+      set yamashita0 whereat related.name
+      create yamashitapoof0 yamashitapoof yamashita0.x - 16 yamashita0.y
+      set related state HERE
+      set related frame 0
+   endif
+endif
+

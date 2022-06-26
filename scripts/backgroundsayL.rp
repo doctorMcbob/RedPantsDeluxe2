@@ -1,0 +1,22 @@
+PLAT|64,608,1024,64|False|
+PLATFORM00 backgroundsay100 0,0
+PLATFORM01 backgroundsay101 0,0
+PLATFORM02 backgroundsay102 0,0
+PLATFORM10 backgroundsay110 0,0
+PLATFORM11 backgroundsay111 0,0
+PLATFORM12 backgroundsay112 0,0
+PLATFORM20 backgroundsay120 0,0
+PLATFORM21 backgroundsay121 0,0
+PLATFORM22 backgroundsay122 0,0
+
+|START:0|
+set self platform 1
+set self state PLATFORM
+set self timer -1
+back
+
+|PLATFORM:0|
+if self.frame > self.timer
+    goodbye
+endif
+

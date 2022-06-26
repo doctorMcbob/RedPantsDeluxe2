@@ -100,6 +100,7 @@ class Actor(Rect):
         self.platform = False # scripts will flip this for platform draw
         
         self.tangible = False if "tangible" not in template else template["tangible"]
+        self.physics = 0
         self.updated = False
         
     def load_sprites(self, name):
@@ -242,7 +243,7 @@ class Actor(Rect):
 
     def update(self, world):
         if self.updated:
-            if self.tangible: self.collision_check(world)
+            if self.physics or self.tangible: self.collision_check(world)
             return
         self.updated = True
         
@@ -253,7 +254,7 @@ class Actor(Rect):
             scripts.resolve(self.name, script, world)
 
         xflag, yflag = self.x_vel, self.y_vel
-        if self.tangible:
+        if self.physics or self.tangible:
             self.collision_check(world)
             self.x += int(self.x_vel)
             self.y += int(self.y_vel)
@@ -318,6 +319,8 @@ class Actor(Rect):
     def collision_check(self, world):
         actors = list(filter(lambda actor:actor is not None and not (actor is self), world.get_actors()))
         tangibles = list(filter(lambda actor: actor is not None and actor.tangible, actors))
+        if not self.tangible:
+            tangibles = list(filter(lambda actor: actor is not None and actor.tangible and actor.platform, actors))
         hits = self.collidelistall(actors)
         for hit in hits:
             self.collision_with(actors[hit], world)

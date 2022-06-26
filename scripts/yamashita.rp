@@ -1,0 +1,70 @@
+YAMASHITA|0,0,0,0|False|
+START:0 yamashitastand0 -16,0
+STAND:0 yamashitastand0 -16,0
+STAND:8 yamashitastand1 -16,0
+BOW:0 yamashitabow0 -16,0
+BOW:16 yamashitabow1 -16,0
+WALL:0 yamashitawall -16,0
+SQUAT:0 yamashitasquat0 -16,0
+SQUAT:3 yamashitasquat1 -16,0
+SQUAT:6 yamashitasquat2 -16,0
+JUMP:0 yamashitajump1 -16,0
+JUMP:0 yamashitajump0 -16,0
+LAND:0 yamashitasquat2 -16,0
+
+|START:0|
+set self state STAND
+set self frame 0
+set self jumpstr -16
+set self grav 1
+set self physics 1
+set self shuffle 0
+
+|STAND:16|
+set self frame 0
+set self direction self.direction * -1
+exec shuffle?
+
+|BOW:32|
+set self frame 0
+set self direction self.direction * -1
+exec shuffle?
+
+|SQUAT:9|
+set self state JUMP
+set self frame 0
+set self y_vel self.jumpstr
+
+|JUMP:0|
+if self.y_vel > 0
+   img yamashitajump0
+endif
+if self.y_vel <= 0
+   img yamashitajump1
+endif
+set self y_vel self.y_vel + self.grav
+
+|LAND:6|
+set self state SQUAT
+set self frame 0
+exec shuffle?
+
+|YCOLLISION|
+if self.state == JUMP
+   set self state LAND
+   set self frame 0
+endif
+
+|shuffle?|
+if self.shuffle
+   if RAND? and RAND?
+      set self state BOW
+   endif
+   if RAND? and RAND?
+      set self state SQUAT
+   endif
+   if RAND? and RAND?
+      set self state STAND
+      endif
+endif
+

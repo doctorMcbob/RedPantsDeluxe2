@@ -103,6 +103,15 @@ def resolve(reference, script, world, related=None, logfunc=print):
             if verb == "print":
                 print(cmd.pop(0))
 
+            if verb == "back":
+                if reference in world.actors:
+                    me = world.actors.index(reference)
+                    i = 0
+                    while "back" in world.actors[i]:
+                        i += 1
+                    if i < me:
+                        world.actors.insert(i, world.actors.pop(me))
+                        
             if verb == "img":
                 a.get_actor(reference).img = cmd.pop(0)
 

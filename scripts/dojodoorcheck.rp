@@ -1,0 +1,43 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+LOOK:0 empty 0,0
+CHECK:0 empty 0,0
+
+|START:0|
+set self state LOOK
+set self coinlimit 10
+
+|LOOK:0|
+set self frame 0
+
+|CHECK:0|
+if self.frame == 1
+   exec onCheck
+   if inv0.coins >= self.coinlimit
+      exec onPass
+   endif
+endif
+
+|CHECK:200|
+set self state LOOK
+set self frame 0
+
+|COLLIDE|
+if related.state == LOOK
+   if player in self.name
+      set related state CHECK
+      set self frame 0
+   endif
+endif
+
+|onCheck|
+create say0 50centmessage yamashita0.x + 32 yamashita0.y - 96
+set 50centmessage message "YOU NEED " + self.coinlimit + " CENTS    ^FOR BANDANA LESSONS    ^     ONLY HAVE " + inv0.coins
+set 50centmessage back backgroundsayL0
+
+|onPass|
+set yamashita0 shuffle 1
+create doordojo11 doordojo10 -10736 -832
+set inv0 fighter_unlock 1
+set inv0 coins inv0.coins - self.coinlimit
+goodbye
