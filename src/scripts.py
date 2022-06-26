@@ -330,6 +330,15 @@ def resolve_operators(cmd, logfunc=print):
             elif token == "len":
                 calculated = len(cmd.pop(idx+1))
                 evaluated.append(calculated)
+            elif token == "countof":
+                calculated = cmd.pop(idx+1).count(cmd.pop(idx+1))
+                evaluated.append(calculated)
+            elif token == "min":
+                calculated = min(cmd.pop(idx+1), cmd.pop(idx+1))
+                evaluated.append(calculated)
+            elif token == "max":
+                calculated = max(cmd.pop(idx+1), cmd.pop(idx+1))
+                evaluated.append(calculated)
             elif token == "abs":
                 calculated = abs(cmd.pop(idx+1))
                 evaluated.append(calculated)

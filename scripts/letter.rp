@@ -12,25 +12,27 @@ set self timer -1
 
 |ASC:0|
 img self.letter
-set self y self.y - 1
+if self.frame % 2 == 0
+   set self y self.y - 1
+endif
 exec updateTimer
 
 |ASC:4|
-img self.letter
+exec ASC:0
 set self state DESC
 set self frame 0
-exec updateTimer
 
 |DESC:0|
 img self.letter
-set self y self.y + 1
+if self.frame % 2 == 0
+   set self y self.y + 1
+endif
 exec updateTimer
 
 |DESC:4|
-img self.letter
+exec DESC:0
 set self state ASC
 set self frame 0
-exec updateTimer
 
 |updateTimer|
 if self.timer != -1
