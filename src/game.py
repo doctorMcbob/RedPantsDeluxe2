@@ -56,7 +56,6 @@ def run(G, noquit=False):
         for world in G["WORLDS"].get_worlds():
 
             if world not in worlds_for_updating and world.flagged_for_update:
-#                print(list(G["WORLDS"].get_all_worlds())[list(G["WORLDS"].get_worlds()).index(world)])
                 worlds_for_updating.append(world)
 
         for world in worlds_for_updating:
