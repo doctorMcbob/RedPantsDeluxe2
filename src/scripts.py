@@ -354,6 +354,12 @@ def resolve_operators(cmd, logfunc=print):
             elif token == "not":
                 calculated = not cmd.pop(idx+1)
                 evaluated.append(calculated)
+            elif token == "exists":
+                check = cmd.pop(idx+1)
+                calculated = any(check in w.actors for w in worlds.get_worlds())
+                evaluated.append(calculated)
+            elif token == "range":
+                evaluated.append(list(range(int(cmd.pop(idx+1)))))
             elif type(token) == str and token in operators:
                 left, right = evaluated.pop(), cmd.pop(idx+1)
                 if token != "at":
