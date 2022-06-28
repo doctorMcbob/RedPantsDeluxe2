@@ -1,0 +1,21 @@
+TARGET|0,0,0,0|False|
+START:0 target 0,0
+TARGET:0 target 0,0
+HITSTUN:0 target 0,0
+BREAK:0 targetbreak -16,0
+
+|START:0|
+set self state TARGET
+hitboxes target
+hurtboxes target
+
+|TARGET:0|
+set self frame 0
+
+|BREAK:4|
+goodbye
+
+|HITSTUN:4|
+set self state BREAK
+set self frame 0
+

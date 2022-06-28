@@ -1,0 +1,56 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+LOOK:0 empty 0,0
+CHECK:0 empty 0,0
+
+|START:0|
+set self state LOOK
+set self coinlimit 10
+
+|LOOK:0|
+set self frame 0
+
+|CHECK:0|
+if self.frame == 1
+   exec onCheck
+   set self pass 1
+   for number range 31
+       if exists targetnumber
+       	  set self pass 0
+       endif
+   endfor
+   if self.pass
+      exec onPass
+   endif
+endif
+
+|CHECK:200|
+set self state LOOK
+set self frame 0
+
+|COLLIDE|
+if related.state == LOOK
+   if player in self.name
+      if yamashita0.whereat != related.name
+	 set yamashita0 whereat related.name
+      	 create yamashitapoof0 yamashitapoof related.x - 16 -1184
+      endif
+      set related state CHECK
+      set self frame 0
+   endif
+endif
+
+|onCheck|
+set yamashita0 x self.x
+set yamashita0 y -1184
+set yamashita0 state STAND
+set yamashita0 shuffle 0
+set yamashita0 y_vel 0
+create say0 targetmessage yamashita0.x + 32 yamashita0.y - 96
+set targetmessage message "BREAK ALL THE TARGETS^AND I WILL OPEN DOOR     "
+set targetmessage back backgroundsayL0
+
+|onPass|
+set yamashita0 shuffle 1
+create doordojo11 doordojo13 -10352 -1184
+goodbye
