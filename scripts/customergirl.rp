@@ -1,0 +1,120 @@
+GOOSEBALL|0,0,0,0|False|
+START:0 customergirlrun0 0,0
+RUN:0 customergirlrun0 0,0
+RUN:3 customergirlrun1 0,0
+RUN:6 customergirlrun2 0,0
+RUN:9 customergirlrun3 0,0
+RUN:12 customergirlrun4 0,0
+RUN:15 customergirlrun5 0,0
+TURN:0 customergirlturn0 0,0
+TURN:3 customergirlturn1 0,0
+BONK:0 customergirlhit 0,0
+BONK:10 customergirlhitland 0,0
+GETUP:0 customergirlgetup 0,0
+HITSTUN:0 customergirlhit 0,0
+
+|START:0|
+set self frame 0
+set self state RUN
+set self physics 1
+set self speed 5
+set self lookboxnumber 0
+set self turnaround 0
+set self messageidx 0
+set self messages []
+add self.messages "IS THERE NO^MORE CHEESE   "
+add self.messages "IS THIS MILK FRESH   "
+add self.messages "DO THEY HAVE  ^ORGANIC SPAM"
+add self.messages "I DONT LIKE THIS^BRAND OF PASTA   "
+set self messagecap len self.messages
+set self shouldsay 1
+set self saynumber 0
+set self saytimer 0
+set self direction self.direction * -1
+hitboxes customer
+hurtboxes customer
+
+|RUN:0|
+if self.saytimer
+   set self saytimer self.saytimer - 1
+endif
+if self.saytimer == 0
+   set self shouldsay 1
+endif
+set self x_vel self.direction * self.speed
+set self turnaround 0
+exec lookTurn
+if not self.turnaround
+   set self state TURN
+   set self frame 0
+endif
+
+|RUN:18|
+set self frame 0
+exec RUN:0
+
+|TURN:0|
+set self x_vel 0
+
+|TURN:8|
+set self direction self.direction * -1
+set self state RUN
+set self frame 0
+
+|BONK:10|
+set self x_vel 0
+
+|BONK:20|
+set self state GETUP
+set self frame 0
+
+|GETUP:6|
+set self state RUN
+set self frame 0
+
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self direction self.direction * -1
+set self state BONK
+set self frame 0
+set self x_vel 4 * self.direction
+
+|XCOLLISION|
+set self state TURN
+set self frame 0
+
+|COLLIDE|
+if player in self.name
+   if related.shouldsay
+      set related sayname related.name + say + related.saynumber 
+      create say0 related.sayname related.w / 2 + related.x related.y - 48
+      set related.sayname message related.messages at related.messageidx
+      set related.sayname back backgroundsayL0
+      set related saynumber related.saynumber + 1
+      set related messageidx related.messageidx + 1
+      set related messageidx related.messageidx % related.messagecap
+      set related shouldsay 0
+      set related saytimer 160
+   endif
+endif
+
+|lookTurn|
+set self old_x self.x
+set self old_y self.y
+set self old_w self.w
+set self old_h self.h
+set self y self.y + self.h
+if self.direction == 1
+   set self x self.w / 2 + self.x
+endif
+set self w self.w / 2
+set self h 32
+set self turnaround COLLIDE?
+set self x self.old_x
+set self y self.old_y
+set self w self.old_w
+set self h self.old_h
+
