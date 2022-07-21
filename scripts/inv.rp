@@ -12,6 +12,8 @@ set self bananas 0
 
 set self fighter_unlock 0
 
+set self breakroomlocked 1
+
 |INV:0|
 set self frame 0
 

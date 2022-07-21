@@ -31,6 +31,8 @@ set self shouldsay 1
 set self saynumber 0
 set self saytimer 0
 set self direction self.direction * -1
+set self coinnumber 0
+set self coinlimit 5
 hitboxes customer
 hurtboxes customer
 
@@ -61,6 +63,13 @@ set self direction self.direction * -1
 set self state RUN
 set self frame 0
 
+|BONK:0|
+set self turnaround 0
+exec lookTurn
+if not self.turnaround
+   set self x_vel 0
+endif
+
 |BONK:10|
 set self x_vel 0
 
@@ -81,7 +90,10 @@ set self direction self.direction * -1
 set self state BONK
 set self frame 0
 set self x_vel 4 * self.direction
-
+if self.coinnumber < self.coinlimit
+   create coinbouncy0 self.name + coinbouncy + self.coinnumber self.w / 2 + self.x self.y
+   set self coinnumber self.coinnumber + 1
+endif
 |XCOLLISION|
 set self state TURN
 set self frame 0
