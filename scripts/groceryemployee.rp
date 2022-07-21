@@ -1,0 +1,48 @@
+GOOSEBALL|0,0,0,0|False|
+START:0 groceryworker 0,0
+WAIT:0 groceryworker 0,0
+TALK:0 groceryworkertalk0 0,0
+TALK:4 groceryworkertalk1 0,0
+
+|START:0|
+set self frame 0
+set self state WAIT
+set self messageidx 0
+set self messages []
+add self.messages "IVE BEEN HERE ALL DAY  "
+add self.messages "I WANNA GO HOME  "
+add self.messages "GET ME OUTTA HERE  "
+add self.messages "MY FEET HURT  "
+set self messagecap len self.messages
+set self saynumber 0
+set self saytimer 0
+set self counter 0
+
+|WAIT:0|
+set self frame 0
+
+|TALK:0|
+set self counter self.counter - 1
+if self.counter <= 0
+   set self state WAIT
+endif
+
+|TALK:8|
+set self frame 0
+exec TALK:0
+
+|COLLIDE|
+if player in self.name
+   if related.state == WAIT
+      set related sayname related.name + say + related.saynumber 
+      create say0 related.sayname related.x + related.w related.y - 80
+      set related.sayname message related.messages at related.messageidx
+      set related.sayname back backgroundsayL0
+      set related saynumber related.saynumber + 1
+      set related messageidx related.messageidx + 1
+      set related messageidx related.messageidx % related.messagecap
+      set related state TALK
+      set related counter 160
+   endif
+endif
+

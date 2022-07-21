@@ -1,0 +1,13 @@
+1COIN|0,0,0,0|False|
+START:0 lock 0,0
+LOCK:0 lock 0,0
+
+|START:0|
+set self state LOCK
+set self frame 0
+
+|LOCK:0|
+set self y self.y - 3
+
+|LOCK:15|
+goodbye

@@ -1,0 +1,31 @@
+MILK|0,0,0,0|False|
+START:0 cashregister 0,0
+WAIT:0 cashregister 0,0
+HITSTUN:0 cashregisterbonk 0,0
+BONK:0 cashregisterbonk2 0,0
+
+|START:0|
+set self state WAIT 
+set self direction -1
+set self frame 0
+set self coinnumber 0
+set self coinlimit 12
+hitboxes cashregister
+hurtboxes cashregister
+
+|WAIT:0|
+set self frame 0
+
+|HITSTUN:4|
+set self state BONK
+set self frame 0
+
+|BONK:0|
+if self.coinnumber < self.coinlimit
+   create coinbouncy0 self.name + coinbouncy + self.coinnumber self.w / 2 + self.x self.y
+   set self coinnumber self.coinnumber + 1
+endif
+
+|BONK:4|
+set self state WAIT
+set self frame 0

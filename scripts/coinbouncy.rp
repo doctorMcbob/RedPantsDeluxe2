@@ -1,0 +1,63 @@
+1COIN|0,0,0,0|False|
+START:0 coin0 0,0
+COIN:0 coin0 0,0
+COIN:4 coin1 0,0
+COIN:8 coin2 0,0
+COIN:12 coin3 0,0
+COIN:16 coin2 0,0
+COIN:20 coin1 0,0
+COLLECT:0 coin0 0,0
+
+|START:0|
+set self state COIN
+set self frame 0
+set self physics 1
+set self collected 0
+set self y_vel -5 + RAND? + RAND?
+set self x_vel 2 + RAND? + RAND?
+set self grav 1 + RAND?
+if RAND?
+   set self x_vel self.x_vel * -1
+endif
+
+|COIN:0|
+if self.collected
+   set self state COLLECT
+   set self frame 0
+endif
+exec applyGrav
+if self.x_vel
+   set self x_bounce_vel self.x_vel
+endif
+if self.y_vel
+   set self y_bounce_vel self.y_vel
+endif
+
+|COIN:24|
+set self frame 0
+exec COIN:0
+
+|COLLECT:0|
+set self x_vel 0
+set self y_vel 0
+set self y self.y - 3
+
+|COLLECT:20|
+goodbye
+
+|XCOLLISION|
+set self x_vel self.x_bounce_vel * -1
+
+|YCOLLISION|
+set self y_vel self.y_bounce_vel * -1
+
+|COLLIDE|
+if player in self.name
+   if related.name in inv0.collected == 0
+      add inv0.collected related.name
+      set inv0 coins inv0.coins + 1
+   endif
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
