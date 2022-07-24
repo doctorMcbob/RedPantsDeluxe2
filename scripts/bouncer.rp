@@ -1,0 +1,26 @@
+BOUNCER|0,0,0,0|False|
+START:0 bouncerstand -16,0
+STAND:0 bouncerstand -16,0
+PEEK:0 bouncerpeek0 -16,0
+PEEK:6 bouncerpeek1 -16,0
+PEEK:66 bouncerpeek0 -16,0
+
+|START:0|
+set self state STAND
+set self frame 0
+
+|STAND:0|
+set self frame 0
+
+|PEEK:72|
+set self frame 0
+set self state STAND
+
+|COLLIDE|
+if player in self.name
+   if related.state != PEEK
+      set related state PEEK
+      set related frame 0
+   endif
+endif
+

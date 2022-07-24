@@ -329,6 +329,6 @@ if B_DOWN in inpEVENTS
       set self state IDLE
       set self frame 0
    endif
-   create fart self.name + fart + self.farts self.x self.y + 32
+   create fart0 self.name + fart + self.farts self.x self.y + 32
 endif
 

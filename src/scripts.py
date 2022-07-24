@@ -111,7 +111,12 @@ def resolve(reference, script, world, related=None, logfunc=print):
                         i += 1
                     if i < me:
                         world.actors.insert(i, world.actors.pop(me))
-                        
+
+            if verb == "front":
+                if reference in world.actors and world.actors[-1] != reference:
+                    me = world.actors.index(reference)
+                    world.actors.append(world.actors.pop(me))
+                
             if verb == "img":
                 a.get_actor(reference).img = cmd.pop(0)
 
