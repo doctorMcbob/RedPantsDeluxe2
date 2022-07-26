@@ -306,7 +306,6 @@ endif
 exec applyGrav
 
 |BONK:0|
-set self x_vel self.bonkstrength * self.direction * -1
 exec applyGrav
 
 |BONKLAND:0|
@@ -428,6 +427,7 @@ set self calc1 self.state == DIVELAND or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1
 if self.state == ROLLOUT or self.calc1
    set self state BONK
+   set self x_vel self.bonkstrength * self.direction * -1
    set self frame 0
 endif
 set self calc1 self.state == SLIDEFLIP

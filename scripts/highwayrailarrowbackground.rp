@@ -1,0 +1,15 @@
+PLAT|64,608,1024,64|False|
+PLATFORM00 highwayrail000 0,0
+PLATFORM01 highwayrail001 0,0
+PLATFORM02 highwayrail002 0,0
+PLATFORM10 highwayrail010 0,0
+PLATFORM11 highwayrail011 0,0
+PLATFORM12 highwayrail012 0,0
+PLATFORM20 highwayrail020 0,0
+PLATFORM21 highwayrail021 0,0
+PLATFORM22 highwayrail022 0,0
+
+|START:0|
+set self platform 1
+set self frame 0
+
