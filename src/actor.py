@@ -243,12 +243,11 @@ class Actor(Rect):
 
     def update(self, world):
         if self.updated:
-            if self.physics or self.tangible: self.collision_check(world)
-            return
+            if (self.physics or self.tangible) and self.name in world.actors: self.collision_check(world)
+            returng
         self.updated = True
         
         self.img = None
-
         script = self._index(self.scripts)
         if script is not None:
             scripts.resolve(self.name, script, world)
@@ -325,6 +324,9 @@ class Actor(Rect):
         for hit in hits:
             self.collision_with(actors[hit], world)
             actors[hit].collision_with(self, world)
+        
+        if self.name not in world.actors:
+            return
 
         # X axis
         if self.x_vel:

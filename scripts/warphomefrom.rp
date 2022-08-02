@@ -1,0 +1,38 @@
+DOOR|0,0,0,0|False|
+START:0 warpoff 0,0
+OFF:0 warpoff 0,0
+ON:0 warp0 0,0
+ON:3 warp1 0,0
+ON:6 warp2 0,0
+
+|START:0|
+set self state OFF
+set self destination yard3
+set self partner warphome0
+
+|OFF:0|
+set self frame 0
+
+|ON:9|
+set self frame 0
+
+|COLLIDE|
+if self.door_key
+   if related.state == ON
+      if self.door_key + _DOWN in inpEVENTS
+      	 move self related.destination
+      	 view self.frame_name related.destination
+
+	 set self calcx self.x - related.x
+	 set self calcy self.y - related.y - 1
+	 
+	 set self x warphome0.x + self.calcx
+	 set self y warphome0.y + self.calcy
+	 
+      	 set self respawnx self.x
+      	 set self respawny self.y
+      	 remove inpEVENTS self.door_key + _DOWN
+      endif
+   endif
+endif
+
