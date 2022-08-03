@@ -22,13 +22,13 @@ if self.door_key
       if self.door_key + _DOWN in inpEVENTS
       	 move self related.destination
       	 view self.frame_name related.destination
+	 
+	 set self calcx related.x - self.x
+	 set self calcy related.y - self.y
 
-	 set self calcx self.x - related.x
-	 set self calcy self.y - related.y - 1
-	 
-	 set self x warphome0.x + self.calcx
-	 set self y warphome0.y + self.calcy
-	 
+	 set self x warphome0.x - self.calcx
+	 set self y warphome0.y - self.calcy
+
       	 set self respawnx self.x
       	 set self respawny self.y
       	 remove inpEVENTS self.door_key + _DOWN
