@@ -305,18 +305,21 @@ def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
             except ValueError:
                 pass
             if "." in token:
-                actor, att = token.split(".")
-                if actor == "related" and related is not None:
-                    actor = related
-                actor = a.get_actor(reference) if actor == "self" else a.get_actor(actor)
-                if hasattr(actor, att):
-                    if att in ["attributes", "scripts", "hitboxes", "hurtboxes"]:
-                        raise Exception("Cannot refrence {}".format(att))
-                    cmd[idx] = getattr(actor, att)
-                elif att in actor.attributes:
-                    cmd[idx] = actor.attributes[att]
-                else:
-                    cmd[idx] = None
+                _path = token.split(".")
+                path = deepcopy(_path)
+                ref = path.pop(0)
+                while path:
+                    if ref == "related" and related is not None:
+                        ref = related
+                    ref = a.get_actor(reference) if ref == "self" else a.get_actor(ref)
+                    if hasattr(ref, path[0]):
+                        ref = getattr(ref, path.pop(0))
+                    elif path[0] in ref.attributes:
+                        ref = ref.attributes[path.pop(0)]
+                    else:
+                        ref = None
+                        break
+                cmd[idx] = ref
             if token.startswith("inp"):
                 if a.get_actor(reference)._input_name is None:
                     cmd[idx] = 0 if token != "inpEVENTS" else []

@@ -1,0 +1,73 @@
+PULLY|0,0,0,0|False|
+START:0 pullytop 0,0
+PULLY00 pullytop 0,0
+PULLY10 pullymid 0,0
+PULLY20 bullybot 0,0
+WAIT00 pullytop 0,0
+WAIT10 pullymid 0,0
+WAIT20 bullybot 0,0
+ASC00 pullytop 0,0
+ASC10 pullymid 0,0
+ASC20 bullybot 0,0
+DES00 pullytop 0,0
+DES10 pullymid 0,0
+DES20 bullybot 0,0
+
+|START:0|
+set self platform 1
+set self state PULLY
+set self max_h self.h
+
+|PULLY:0|
+# pass
+
+|WAIT:0|
+set self calc 1
+for friend COLLIDE?
+    if friend.dangle_from == self.name
+       set self calc 0
+    endif
+endfor
+if self.calc
+   set self state DES
+   sedt self frame 0
+endif
+
+|DES:0|
+# pass
+
+|DES:3|
+if self.h < self.max_h
+   set self h self.h + 32
+   set self h min self.h self.max_h
+endif
+if self.h == self.max_h
+   set self state PULLY
+endif
+set self frame 0
+
+|ASC:0|
+# pass
+
+|ASC:3|
+if self.h > 64
+   set self h self.h - 32
+   set self h max 64 self.h
+endif
+if self.h <= 64
+   set self state WAIT
+endif
+set self frame 0
+
+|COLLIDE|
+set self calc self.state != DANGLE
+set self calc not self.dangle_from and self.calc
+if player in self.name and self.calc
+   if related.y + related.h - 32 < self.y
+      set self state DANGLE
+      set self frame 0
+      set self dangle_from related.name
+      set related state ASC
+      set related frame 0
+   endif
+endif
