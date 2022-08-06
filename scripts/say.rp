@@ -21,12 +21,6 @@ if self.frame == 0 and self.back
    set self.name + back timer len self.message + self.timer + 5
 endif
 
-set self calc len self.message - 1
-
-if self.calc == self.frame
-   goodbye
-endif
-
 set self calc self.message at self.frame == "^"
 
 if self.calc
@@ -41,5 +35,11 @@ if not self.calc
       set self.name + letter + self.frame timer self.timer
    endif
 set self x_off self.x_off + 16
+endif
+
+set self calc len self.message - 1
+
+if self.calc == self.frame
+   goodbye
 endif
 
