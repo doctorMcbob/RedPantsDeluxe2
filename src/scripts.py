@@ -100,7 +100,8 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 key = cmd.pop(0)
                 if key not in a.get_actor(reference).scripts:
                     raise Exception("Cannot exec {}. Does not exist.".format(key))
-                resolve(reference, a.get_actor(reference).scripts[key], world, logfunc=logfunc)
+                if resolve(reference, a.get_actor(reference).scripts[key], world, logfunc=logfunc) == 'goodbye':
+                    return 'goodbye'
 
             if verb == "print":
                 print(cmd.pop(0))
@@ -171,7 +172,8 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 actor.load_scripts(keyname)
                 actor.load_sprites(keyname)
                 if "START:0" in actor.scripts:
-                    resolve(reference, actor.scripts["START:0"], world, logfunc=logfunc)
+                    if resolve(reference, actor.scripts["START:0"], world, logfunc=logfunc) == 'goodbye':
+                        return 'goodbye'
 
             if verb == "remove":
                 l = cmd.pop(0)
@@ -204,7 +206,8 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 if actor_name not in world.actors:
                     world.actors.append(actor_name)
                 if "START:0" in actor.scripts:
-                    resolve(actor_name, actor.scripts["START:0"], world, logfunc=logfunc)
+                    if resolve(actor_name, actor.scripts["START:0"], world, logfunc=logfunc) == 'goodbye':
+                        return 'goodbye'
 
             if verb == "update":
                 world_ref = cmd.pop(0)
@@ -239,7 +242,9 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 
                 for value in target:
                     to_run = [str(value).join(s.split(key)) for s in miniscript]
-                    resolve(reference, to_run, world, related=related, logfunc=logfunc)
+                    if resolve(reference, to_run, world, related=related, logfunc=logfunc) == 'goodbye':
+                        return 'goodbye'
+
                     
         except Exception as e:
             logfunc("{} Error on line {}".format(reference, cmd_idx))

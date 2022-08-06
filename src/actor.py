@@ -254,7 +254,8 @@ class Actor(Rect):
         self.img = None
         script = self._index(self.scripts)
         if script is not None:
-            if scripts.resolve(self.name, script, world) == 'goodbye': return           
+            if scripts.resolve(self.name, script, world) == 'goodbye':
+                return     
             
         xflag, yflag = self.x_vel, self.y_vel
         if self.physics or self.tangible:
@@ -266,12 +267,14 @@ class Actor(Rect):
             if abs(self.x_vel) < 1:
                 self.x_vel = 0
             if "XCOLLISION" in self.scripts:
-                scripts.resolve(self.name, self.scripts["XCOLLISION"], world)
+                if scripts.resolve(self.name, self.scripts["XCOLLISION"], world) == 'goodbye':
+                    return
         if yflag != self.y_vel and int(self.y_vel) == 0:
             if abs(self.y_vel) < 1:
                 self.y_vel = 0
             if "YCOLLISION" in self.scripts:
-                scripts.resolve(self.name, self.scripts["YCOLLISION"], world)
+                if scripts.resolve(self.name, self.scripts["YCOLLISION"], world) == 'goodbye':
+                    return
 
         self.hit_check(world)
         self.frame += 1
@@ -389,7 +392,8 @@ class Actor(Rect):
             
     def collision_with(self, actor, world):
         if "COLLIDE" in self.scripts:
-            scripts.resolve(actor.name, self.scripts["COLLIDE"], world, related=self.name)
+            if scripts.resolve(actor.name, self.scripts["COLLIDE"], world, related=self.name) == 'goodbye':
+                return
 
     def hit_check(self, world):
         hurtboxes = self.get_hurtboxes()
@@ -407,4 +411,4 @@ class Actor(Rect):
     def hit(self, actor, world):
         if "HIT" in self.scripts:
             scripts.resolve(actor.name, self.scripts["HIT"], world, related=self.name)
-
+            
