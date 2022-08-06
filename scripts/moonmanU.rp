@@ -1,4 +1,4 @@
-]REDPANTSGUY|128,256,32,64|True|
+REDPANTSGUY|128,256,32,64|True|
 START:0 moonmanstand -16,0
 IDLE:0 moonmanstand -16,0
 RUNNING:0 moonmanrun0 -16,0
@@ -42,6 +42,12 @@ PUNCH:0 moonmanpunch0 -32,0
 PUNCH:4 moonmanpunch1 -16,0
 PUNCH:6 moonmanpunch2 -32,0
 PUNCH:8 moonmanpunch3 -16,0
+DANGLE:0 moonmandangle 0,-16
+
+|DANGLE:0|
+rebrand moonmanD
+set self state DANGLE
+exec DANGLE:0
 
 |START:0|
 set self state IDLE
@@ -503,6 +509,7 @@ if self.state == COIN or self.calc
 endif
 
 |checkAir|
+set self dangle_from 0
 if self.y_vel
    set self state AIRIAL
    set self frame 0

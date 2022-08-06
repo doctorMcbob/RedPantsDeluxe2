@@ -42,6 +42,22 @@ PUNCH:0 moonmanpunch0 -32,-32
 PUNCH:4 moonmanpunch1 -16,-32
 PUNCH:6 moonmanpunch2 -32,-32
 PUNCH:8 moonmanpunch3 -16,-32
+DANGLE:0 moonmandangle -32,-32
+
+|DANGLE:0|
+if self.dangle_from
+   set self x_vel 0
+   set self y_vel 0
+   set self y self.dangle_from.y + self.dangle_from.h - 32
+   set self x self.dangle_from.x
+
+   if A_DOWN in inpEVENTS
+      set self state AIRIAL
+      set self frame 0
+      set self y_vel self.jumpstrength
+   endif
+endif
+
 
 |START:0|
 set self state IDLE
@@ -503,6 +519,7 @@ if self.state == COIN or self.calc
 endif
 
 |checkAir|
+set self dangle_from 0
 if self.y_vel
    set self state AIRIAL
    set self frame 0

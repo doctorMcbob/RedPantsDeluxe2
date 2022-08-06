@@ -1,0 +1,47 @@
+ROBOT|0,0,0,0|False|
+START:0 robot0 0,0
+WAIT:0 robot0 0,0
+WAIT:3 robot1 0,0
+WAIT:6 robot0 0,0
+WAIT:9 robot1 0,0
+WAIT:12 robot0 0,0
+WAIT:15 robot1 0,0
+WAIT:18 robot0 0,0
+WAIT:21 robot1 0,0
+WAIT:24 robot0 0,0
+WAIT:27 robot1 0,0
+SHOOT:0 robotshoot0 0,0
+SHOOT:5 robotshoot1 0,0
+HITSTUN:0 robotexplode0 0,0
+HITSTUN:3 robotexplde1 0,0
+HITSTUN:6 robotexplode2 0,0
+
+|START:0|
+set self state WAIT
+set self frame 0
+set self bulletnumber 0
+set self direction 1
+hurtboxes robot
+
+|WAIT:30|
+set self state SHOOT
+set self frame 0
+
+|SHOOT:5|
+create robotbullet0 self.name + bullet + self.bulletnumber self.w / 2 + self.x  self.y + 32
+set self.name + bullet + self.bulletnumber creatorname self.name
+set self.name + bullet + self.bulletnumber direction self.direction
+set self bulletnumber self.bulletnumber + 1
+
+|SHOOT:6|
+# pass
+
+|SHOOT:10|
+set self state WAIT
+set self frame 0
+
+|HITSTUN:9|
+create coinbouncy0 self.name + coinbouncy + 0 self.w / 2 + self.x self.y
+create coinbouncy0 self.name + coinbouncy + 1 self.w / 2 + self.x self.y
+create coinbouncy0 self.name + coinbouncy + 2 self.w / 2 + self.x self.y
+goodbye

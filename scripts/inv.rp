@@ -11,6 +11,9 @@ set self coins 0
 set self bananas 0
 
 set self fighter_unlock 0
+set self antlers_unlock 0
+set self shoes_unlock 0
+set self moon_unlock 0
 
 set self breakroomlocked 1
 

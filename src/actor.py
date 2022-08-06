@@ -73,6 +73,10 @@ def get_actor(name):
 def get_actors():
     return ACTORS.values()
 
+def delete_actor(name):
+    if name in ACTORS:
+        ACTORS.pop(name)
+
 class Actor(Rect):
     def __init__(self, template):
         self.name = template["name"]
@@ -244,14 +248,14 @@ class Actor(Rect):
     def update(self, world):
         if self.updated:
             if (self.physics or self.tangible) and self.name in world.actors: self.collision_check(world)
-            returng
+            return
         self.updated = True
         
         self.img = None
         script = self._index(self.scripts)
         if script is not None:
-            scripts.resolve(self.name, script, world)
-
+            if scripts.resolve(self.name, script, world) == 'goodbye': return           
+            
         xflag, yflag = self.x_vel, self.y_vel
         if self.physics or self.tangible:
             self.collision_check(world)

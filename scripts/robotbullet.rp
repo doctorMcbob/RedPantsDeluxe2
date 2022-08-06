@@ -1,0 +1,42 @@
+BULLET|0,0,0,0|False|
+START:0 robobullet 0,0
+BULLET:0 robobullet 0,0
+
+
+|START:0|
+set self speed 8
+set self framelifespan 160
+set self state BULLET
+set self frame 0
+set self y_vel 8
+hitboxes bullet
+
+|BULLET:0|
+set self x self.direction * self.speed + self.x
+set self y self.y_vel + self.y
+set self framelifespan self.framelifespan - 1
+if self.framelifespan < 0
+   goodbye
+endif
+for _name COLLIDE?
+    if platform in _name
+       goodbye
+    endif
+endfor
+
+|BULLET:9|
+set self frame 5
+exec BULLET:0
+
+|HIT|
+if self.name != related.creatorname
+   set self state HITSTUN
+   set self frame 0
+   set self direction related.direction * -1
+   set self hit_x_vel 6 * related.direction
+   set self hit_y_vel -4
+   if self.can_die
+      set self state DEAD
+   endif
+endif
+

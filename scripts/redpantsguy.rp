@@ -263,12 +263,6 @@ if self.calc2
 endif
 exec applyGrav
 
-
-|AIRIAL:10|
-set self dangle_from 0
-exec AIRIAL:0
-set self frame 0
-
 |JUMPSQUAT:0|
 exec checkAir
 exec applyTraction
@@ -503,6 +497,7 @@ set self hit_x_vel 0
 set self hit_y_vel 0
 
 |checkAir|
+set self dangle_from 0
 if self.y_vel
    set self state AIRIAL
    set self frame 0

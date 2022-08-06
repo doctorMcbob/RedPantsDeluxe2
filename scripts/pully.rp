@@ -60,10 +60,10 @@ endif
 set self frame 0
 
 |COLLIDE|
-set self calc self.state != DANGLE
-set self calc not self.dangle_from and self.calc
+set self calc self.dangle_from != related.name
+set self calc self.state != DANGLE and self.calc
 if player in self.name and self.calc
-   if related.y + related.h - 32 < self.y
+   if related.y + related.h - 48 < self.y
       set self state DANGLE
       set self frame 0
       set self dangle_from related.name
@@ -71,3 +71,4 @@ if player in self.name and self.calc
       set related frame 0
    endif
 endif
+
