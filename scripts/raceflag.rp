@@ -1,0 +1,24 @@
+FLAG|0,0,0,0|False|
+START:0 flagdown -80,0
+WAIT:0 flagdown -80,0
+RACE:0 flagdown -80,0
+SHADOW:0 flagshadow0 -80,0
+SHADOW:6 flagshadow1 -80,0
+REDPANTS:0 flagredpants0 -80,0
+REDPANTS:6 flagredpants1 -80,0
+
+|START:0|
+set self direction 1
+set self state WAIT
+
+|COLLIDE|
+if related.state == RACE
+   if shadow in self.name
+      set related state SHADOW
+      set related frame 0
+   endif
+   if player in self.name
+      set related state REDPANTS
+      set related frame 0
+   endif
+endif

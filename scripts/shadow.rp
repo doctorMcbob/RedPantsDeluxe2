@@ -26,7 +26,6 @@ set self speed 9
 set self buffer 0
 
 |STAND:0|
-focus MAIN self
 set self frame 0
 set self x_vel 0
 set self state self.mode
