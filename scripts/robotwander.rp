@@ -19,7 +19,7 @@ HITSTUN:6 robotexplode2 0,0
 |START:0|
 set self state WANDER
 set self frame 0
-set self speed 3
+set self speed 4
 set self near self.x
 set self far self.x + self.w
 set self w 64
@@ -41,7 +41,6 @@ if self.direction == -1
 endif
 
 |WANDER:30|
-set self x_vel 0
 set self state SHOOT
 set self frame 0
 

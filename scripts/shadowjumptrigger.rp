@@ -12,7 +12,7 @@ set self frame 0
 |COLLIDE|
 if shadow in self.name
    if self.buffer == 0
-      set self state DOJUMP
+      set self y_vel self.jumpstr
    endif
    set self buffer self.buffer + 1
 endif

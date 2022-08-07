@@ -1,0 +1,53 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+LOOK:0 empty 0,0
+SAY:0 empty 0,0
+OVER:0 empty 0,0
+
+|START:0|
+set self state LOOK
+set self messages []
+add self.messages "YES ITS REALLY ME"
+add self.messages "I PROBABLY SHOULDNT HAVE  ^TOO MUCH SCREEN TIME  "
+add self.messages "MARIA  "
+set self messagecap len self.messages
+set self messageidx 0
+
+|LOOK:0|
+set self frame 0
+
+|SAY:100|
+set shadow0 state STAND
+set shadow0 frame 0
+if self.messageidx == self.messagecap
+   set shadow0 mode RUN
+   set self state OVER
+endif
+
+|SAY:145|
+set self state LOOK
+set self frame 0
+
+|OVER:0|
+goodbye
+
+|COLLIDE|
+if related.state == LOOK
+   if player in self.name
+      if related.messageidx < related.messagecap
+         set shadow0 state TALK
+         set shadow0 frame 0
+         set related state SAY
+         set related frame 0
+         create say0 shadowgreeting shadow0.x + 32 shadow0.y - 96
+         set shadowgreeting message related.messages at related.messageidx
+         set shadowgreeting timer 90
+         set related messageidx related.messageidx + 1
+         if related.messageidx == related.messagecap
+      	    set shadow0 state GRIMACE
+         endif
+         set shadowgreeting back backgroundsayL0
+      endif
+   endif
+endif
+

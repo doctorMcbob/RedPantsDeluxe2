@@ -53,7 +53,20 @@ class World(object):
                 Actor.update(self)
                 
     def get_actors(self):
-        return [actor.get_actor(a) for a in self.actors]
+        # weird but fixes editor bug
+        # old version:
+        # return [actor.get_actor(a) for a in self.actors]
+        ret = []
+        removal = []
+        for a in self.actors:
+            a_ = actor.get_actor(a)
+            if a_ is None:
+                removal.append(a)
+            else:
+                ret.append(a_)
+        for a in removal:
+            self.actors.remove(a)
+        return ret
 
     def draw(self, dest, frame, DEBUG=False):
         if self.background is not None:

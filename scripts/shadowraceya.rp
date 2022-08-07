@@ -1,0 +1,74 @@
+TRIGGER|0,0,0,0|False|
+START:0 empty 0,0
+LOOK:0 empty 0,0
+ACTIVATED:0 empty 0,0
+SAY:0 empty 0,0
+
+|START:0|
+set self state LOOK
+set self frame 0
+set self messages []
+add self.messages "WANNA RACE TO THE TOP"
+add self.messages "I BET MY COOL HOVER SHOES   ^THAT I WIN    "
+add self.messages "READYSETGO"
+set self messagecap len self.messages
+set self messageidx 0
+
+|LOOK:0|
+set self frame 0
+
+|ACTIVATED:0|
+set self frame 0
+
+|SAY:0|
+if self.messageidx == self.messagecap
+   if shadow0.buffer == 0
+      set shadow0 mode RUN
+      set shadow0 direction 1
+      set shadow0 state RUN
+      set shadow0 buffer shadow0.buffer + 1
+   endif
+endif
+
+|SAY:2|
+# pass
+
+|SAY:100|
+if self.messageidx != messagecap
+   set shadow0 state shadow0.mode
+   set shadow0 frame 0
+endif
+
+|SAY:145|
+set self state ACTIVATED
+set self frame 0
+if self.messageidx == self.messagecap
+   set self state LOOK
+   set self messageidx 0
+endif
+
+|COLLIDE|
+if related.state == LOOK
+   if shadow in self.name
+      if self.buffer == 0
+      	 set self mode STAND
+	 set self x_vel 0
+	 set related state ACTIVATED	 
+      endif
+      set self buffer 0
+   endif
+endif
+if related.state == ACTIVATED
+   if player in self.name
+      set shadow0 state TALK
+      set shadow0 frame 0
+      set related state SAY
+      set related frame 0
+      create say0 shadowgreeting shadow0.x + 32 shadow0.y - 96
+      set shadowgreeting message related.messages at related.messageidx
+      set shadowgreeting timer 90
+      set related messageidx related.messageidx + 1
+      set shadowgreeting back backgroundsayL0
+   endif
+endif
+
