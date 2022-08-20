@@ -1,0 +1,88 @@
+ARROW|0,0,0,0|False|
+START:0 arrowflat -32,0
+ARROW:0 arrowflat -32,0
+ARROW:0 arrowdown0 -32,-16
+ARROW:0 arrowdown1 -24,-24
+ARROW:0 arrowdown2 -12,-24
+ARROW:0 arrowup0 -32,0
+ARROW:0 arrowup1 -24,0
+ARROW:0 arrowup2 -12,0
+STOP:0 arrowflat -32,0
+
+|START:0|
+set self physics 1
+set self state ARROW
+set self frame 0
+set self grav 1
+hitboxes arrow
+
+|ARROW:0|
+set self choice 1
+if self.y_vel < -8 and self.choice
+   set self image arrowup2
+   set self choice 0
+endif
+if self.y_vel < -5 and self.choice
+   set self image arrowup1
+   set self choice 0
+endif
+if self.y_vel < -2 and self.choice
+   set self image arrowup0
+   set self choice 0
+endif
+if self.y_vel < 2 and self.choice
+   set self image arrowflat
+   set self choice 0
+endif
+if self.y_vel < 5 and self.choice
+   set self image arrowdown0
+   set self choice 0
+endif
+if self.y_vel < 8 and self.choice
+   set self image arrowdown1
+   set self choice 0
+endif
+if self.y_vel >= 8 and self.choice
+   set self image arrowdown2
+   set self choice 0
+endif
+img self.image
+exec applyGrav
+
+|STOP:0|
+img self.image
+set self x_vel 0
+set self y_vel 0
+
+|STOP:20|
+goodbye
+
+|HIT|
+set self calc pig in self.name
+if not self.calc
+   set related state STOP
+   set related frame 0
+   if self.can_die
+      set self state DEAD
+      set self frame 0
+   endif
+   if not self.can_die
+      set self state HITSTUN
+      set self frame 0
+      set self direction related.direction
+      set self hit_x_vel 5 * related.direction * -1
+      set self hit_y_vel -3
+   endif
+endif
+
+|XCOLLISION|
+set self state STOP
+set self frame 0
+
+|YCOLLISION|
+set self state STOP
+set self frame 0
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+

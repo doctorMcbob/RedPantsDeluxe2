@@ -1,0 +1,273 @@
+PIGMAN|0,0,0,0|True|
+START:0 pigmanstand0 -16,-16
+STAND:0 pigmanstand0 -16,-16
+STAND:5 pigmanstand1 -16,-16
+SCARE:0 pigmanscare0 -16,-16
+SCARE:8 pigmanscare1 -16,-16
+SCARE:11 pigmanscare2 -16,-16
+RUN:0 pigmanrun0 -16,-16
+RUN:2 pigmanrun1 -16,-16
+RUN:4 pigmanrun2 -16,-16
+RUN:6 pigmanrun3 -16,-16
+RUN:8 pigmanrun4 -16,-16
+RUN:10 pigmanrun5 -16,-16
+JUMPSTART:0 pigmanjumpstart0 -16,-16
+JUMPSTART:1 pigmanjumpstart1 -16,-16
+JUMPSTART:2 pigmanjumpstart2 -16,-16
+JUMP:0 pigmanjump0 -16,-16
+JUMP:2 pigmanjump1 -16,-16
+LAND:0 pigmanland0 -16,-16
+LAND:3 pigmanland1 -16,-16
+HITSTUN:0 pigmanbonk -16,-16
+BONK:0 pigmanbonk -16,-16
+BONKLAND:0 pigmanbonkland0 -16,-16
+BONKLAND:5 pigmanbonkland2 -16,-16
+SHOOTDRAW:0 pigmanshootdraw0 -16,-16
+SHOOTDRAW:3 pigmanshootdraw1 -16,-16
+SHOOTDRAW:6 pigmanshootdraw2 -16,-16
+SHOOTRELEASE:0 pigmanshoot0 -16,-16
+SHOOTRELEASE:2 pigmanshoot1 -16,-16
+SHOOTRELEASE:5 pigmanshoot2 -16,-16
+SHOOTDRAWUP:0 pigmanshootdrawup0 -16,-16
+SHOOTDRAWUP:3 pigmanshootdrawup1 -16,-16
+SHOOTDRAWUP:6 pigmanshootdrawup2 -16,-16
+SHOOTRELEASEUP:0 pigmanshootup0 -16,-16
+SHOOTRELEASEUP:2 pigmanshootup1 -16,-16
+SHOOTRELEASEUP:5 pigmanshootup2 -16,-16
+
+|START:0|
+set self frame 0
+set self state STAND
+set self limit 20
+set self neglimit self.limit * -1
+set self lookboxnumber 0
+set self arrownumber 0
+set self grav 1
+set self jumpstrength -6
+set self runspeed 7
+set self scared []
+hurtboxes pigman
+
+|STAND:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+for name self.scared
+   if player in name
+      set self state SCARE
+      set self frame 0
+      if self.x < name.x
+      	 set self direction -1
+      endif
+      if self.x > name.x
+      	 set self direction 1
+      endif
+   endif
+endfor
+if self.scared
+   set self scared []
+endif
+
+|STAND:9|
+set self frame 0
+exec lookNear
+exec lookFar
+exec STAND:0
+
+|SCARE:14|
+set self state RUN
+set self frame 0
+
+|RUN:0|
+set self x_vel self.runspeed * self.direction
+exec checkAir
+exec applyGrav
+
+|RUN:11|
+set self frame 0
+exec RUN:0
+if RAND? and RAND?
+   set self state JUMPSTART
+endif
+
+|JUMPSTART:0|
+exec checkAir
+exec applyGrav
+
+|JUMPSTART:4|
+set self state JUMP
+set self frame 0
+set self y_vel self.jumpstrength
+
+|JUMP:0|
+exec applyGrav
+
+|JUMP:3|
+set self frame 0
+exec JUMP:0
+
+|LAND:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|LAND:6|
+set self state STAND
+set self frame 0
+
+|BONK:0|
+exec applyGrav
+
+|BONKLAND:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|BONKLAND:8|
+set self state RUN
+set self direction self.direction * -1
+set self frame 0
+
+|SHOOTDRAW:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|SHOOTDRAW:10|
+exec SHOOTDRAW:0
+exec fireArrow
+set self state SHOOTRELEASE
+set self frame 0
+
+|SHOOTRELEASE:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|SHOOTRELEASE:10|
+exec SHOOTRELEASE:0
+set self state STAND
+set self frame 0
+
+|SHOOTDRAWUP:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|SHOOTDRAWUP:10|
+exec SHOOTDRAWUP:0
+exec fireArrowUp
+set self state SHOOTRELEASEUP
+set self frame 0
+
+|SHOOTRELEASEUP:0|
+set self x_vel 0
+exec checkAir
+exec applyGrav
+
+|SHOOTRELEASEUP:10|
+exec SHOOTRELEASEUP:0
+set self state STAND
+set self frame 0
+
+|XCOLLISION|
+if self state == RUN
+   set self state BONK
+   set self x_vel self.x_vel * -1
+   set self y_vel -4
+   set self frame 0
+endif
+if self.state == JUMP
+   set self state BONK
+   set self x_vel self.x_vel * -1
+   set self y_vel 4
+   set self frame 0
+endif
+
+|YCOLLISION|
+if self.state == BONK
+   set self state BONKLAND
+   set self frame 0
+endif
+if self.state == JUMP
+   set self state LAND
+   set self frame 0
+endif
+
+|HIT|
+set self state HITSTUN
+set self frame 0
+set self direction related.direction * -1
+set self hit_x_vel 8 * related.direction
+set self hit_y_vel -6
+
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self state BONK
+set self frame 0
+set self x_vel self.hit_x_vel
+set self y_vel self.hit_y_vel
+set self hit_x_vel 0
+set self hit_y_vel 0
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+if self.y_vel > self.limit
+   set self y_vel self.limit
+endif
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
+endif
+
+|checkAir|
+if self.y_vel
+   set self state JUMP
+   set self frame 0
+endif
+
+|lookNear|
+set self lookboxname self.name + lookbox + self.lookboxnumber
+set self lookboxnumber self.lookboxnumber + 1
+create hitbox0 self.lookboxname self.x - 256 self.y
+set self.lookboxname timer 10
+set self.lookboxname return self.name
+set self.lookboxname trigger scared
+set self.lookboxname w 512
+set self.lookboxname h 32
+
+|lookFar|
+# todo
+set self state SHOOTDRAWUP
+set self frame 0
+
+|fireArrow|
+set self arrowname self.name + arrow + self.arrownumber
+set self arrownumber self.arrownumber + 1
+if self.direction == 1
+   set self arrowx self.x + self.w
+endif
+if self.direction == -1
+   set self arrowx self.x
+endif
+create arrow0 self.arrowname self.arrowx self.y + 16
+set self.arrowname x_vel 18 * self.direction
+set self.arrowname y_vel -8
+set self.arrowname direction self.direction * -1
+
+|fireArrowUp|
+set self arrowname self.name + arrow + self.arrownumber
+set self arrownumber self.arrownumber + 1
+if self.direction == 1
+   set self arrowx self.x + self.w
+endif
+if self.direction == -1
+   set self arrowx self.x
+endif
+create arrow0 self.arrowname self.arrowx self.y
+set self.arrowname x_vel 18 * self.direction
+set self.arrowname y_vel -15
+set self.arrowname direction self.direction  * -1
+

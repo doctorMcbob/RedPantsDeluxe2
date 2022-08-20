@@ -238,7 +238,7 @@ class Actor(Rect):
 
         placeholder = Surface((self.w, self.h))
         placeholder.fill((1, 255, 1))
-        
+        print(self._index(self.sprites))
         return placeholder
 
     def get_offset(self):
