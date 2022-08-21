@@ -239,9 +239,34 @@ set self.lookboxname w 512
 set self.lookboxname h 32
 
 |lookFar|
-# todo
-set self state SHOOTDRAWUP
-set self frame 0
+set self target 0
+if inworld player10 
+   set self target player10
+endif
+if inworld player20
+   set self target player20
+endif
+if inworld player30
+   set self target player30
+endif
+if inworld player40
+   set self target player40
+endif
+if self.target
+   if self.target.x > self.x
+      set self direction 1
+   endif
+   if self.target.x < self.x
+      set self direction -1
+   endif
+   set self dist self.x - self.target.x
+   set self dist abs self.dist
+   set self state SHOOTDRAW
+   if self.dist > 330
+      set self state SHOOTDRAWUP
+   endif
+   set self frame 0
+endif
 
 |fireArrow|
 set self arrowname self.name + arrow + self.arrownumber

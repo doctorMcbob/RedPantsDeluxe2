@@ -58,7 +58,7 @@ def resolve(reference, script, world, related=None, logfunc=print):
 
         cmd = parse_tokens(script[cmd_idx], logfunc=logfunc)
         cmd = evaluate_literals(cmd, reference, world, related=related, logfunc=logfunc)
-        cmd = resolve_operators(cmd, logfunc=logfunc)
+        cmd = resolve_operators(cmd, world, logfunc=logfunc)
         # resolve command!
         try:
             verb = cmd.pop(0)
@@ -341,7 +341,7 @@ def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
             logfunc("Error evaluating {}... {}".format(token, e))
     return cmd
 
-def resolve_operators(cmd, logfunc=print):
+def resolve_operators(cmd, world, logfunc=print):
     evaluated = []
     idx = 0
     line = deepcopy(cmd)
@@ -372,6 +372,10 @@ def resolve_operators(cmd, logfunc=print):
             elif token == "exists":
                 check = cmd.pop(idx+1)
                 calculated = any(check in w.actors for w in worlds.get_worlds())
+                evaluated.append(calculated)
+            elif token == "inworld":
+                check = cmd.pop(idx+1)
+                calculated = check in world.actors 
                 evaluated.append(calculated)
             elif token == "range":
                 evaluated.append(list(range(int(cmd.pop(idx+1)))))
