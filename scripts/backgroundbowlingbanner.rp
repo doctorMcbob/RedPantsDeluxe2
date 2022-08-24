@@ -1,0 +1,15 @@
+PLAT|64,608,1024,64|False|
+PLATFORM00 bowlingbanner00 0,0
+PLATFORM01 bowlingbanner01 0,0
+PLATFORM02 bowlingbanner02 0,0
+PLATFORM10 bowlingbanner10 0,0
+PLATFORM11 bowlingbanner11 0,0
+PLATFORM12 bowlingbanner12 0,0
+PLATFORM20 bowlingbanner20 0,0
+PLATFORM21 bowlingbanner21 0,0
+PLATFORM22 bowlingbanner22 0,0
+
+|START:0|
+set self platform 1
+set self frame 0
+

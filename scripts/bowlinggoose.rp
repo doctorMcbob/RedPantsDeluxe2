@@ -1,0 +1,110 @@
+GOOSEBALL|0,0,0,0|True|
+START:0 gooseballlook0 -8,-16
+LOOK:0 gooseballlook0 -8,-16
+LOOK:30 gooseballlook1 -8,-16
+LOOK:34 gooseballlook2 -8,-16
+LOOK:64 gooseballlook1 -8,-16
+BALLSTART:0 gooseballchargestart0 -8,-16
+BALLSTART:6 gooseballchargestart1 -8,-16
+BALL:0 gooseballcharge0 -8,-16
+BALL:4 gooseballcharge1 -8,-16
+BONK:0 gooseballbonk -8,-16
+BONKLAND:0 gooseballbonkland0 -8,-16
+BONKLAND:4 gooseballbonkland1 -8,-16
+
+|START:0|
+set self frame 0
+set self state BALLSTART
+set self limit 25
+set self neglimit self.limit * -1
+set self grav 1
+set self last_y_vel 0
+set self second_last_y_vel 0
+set self hasfocus 1
+
+|LOOK:0|
+exec applyGrav
+
+|LOOK:68|
+set self frame 0
+
+|BALLSTART:0|
+exec BALL:0
+
+|BALLSTART:12|
+set self state BALL
+set self frame 0
+exec BALL:0
+
+|BALL:0|
+set self second_last_y_vel self.last_y_vel
+set self last_y_vel self.y_vel
+exec applyGrav
+
+|BALL:8|
+set self frame 0
+exec BALL:0
+
+|BONK:0|
+exec applyGrav
+
+|BONKLAND:0|
+set self x_vel 0
+exec applyGrav
+
+|BONKLAND:8|
+set self state LOOK
+set self frame 0
+
+|XCOLLISION|
+set self state BONK
+set self x_vel self.x_vel * -1
+set self y_vel 4
+set self frame 0
+
+|YCOLLISION|
+set self calc self.state != LOOK
+if self.state != BONK and self.calc
+   set self c1 abs self.last_y_vel * -1
+   set self c2 abs self.second_last_y_vel * -1
+   set self y_vel min self.c1 self.c2
+endif
+if self.state == BONK
+   set self state BONKLAND
+   set self frame 0
+endif
+
+|COLLIDE|
+if pin in self.name and related.hasfocus
+   focus bowlingman0.frame_name self
+   set related hasfocus 0
+endif
+
+|HIT|
+set self state HITSTUN
+set self frame 0
+set self direction related.direction * -1
+set self hit_x_vel 8 * related.direction
+set self hit_y_vel -6
+
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self state BONK
+set self frame 0
+set self x_vel self.hit_x_vel
+set self y_vel self.hit_y_vel
+set self hit_x_vel 0
+set self hit_y_vel 0
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+if self.y_vel > self.limit
+   set self y_vel self.limit
+endif
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
+endif
+

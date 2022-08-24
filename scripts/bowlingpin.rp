@@ -1,0 +1,69 @@
+PIN|0,0,0,0|True|
+START:0 pin0 0,-16
+STILL:0 pin0 0,-16
+FALLING:0 pin1 -16,-16
+FALLING:2 pin2 -16,-16
+FALLING:4 pin3 -26,-16
+FALLING:6 pin4 0,-16
+FALLING:8 pin5 -16,-16
+FALLING:10 pin6 -16,-16
+FALLING:12 pin7 -16,-16
+FALLING:14 pin0 0,-16
+LAND:0 pin6 -16,-16
+
+|START:0|
+set self state STILL
+set self frame 0
+set self grav 1
+set self traction 0.8 * -1
+
+|FALLING:0|]
+exec applyGrav
+
+|FALLING:16|
+exec FALLING:0
+set self frame 0
+
+|LAND:0|
+exec checkAir
+exec applyGrav
+exec applyTraction
+
+|LAND:20|
+goodbye
+
+|YCOLLISION|
+if self.state != LAND
+   set self state LAND
+   set self frame 0
+endif
+
+|COLLIDE|
+if related.state == STILL
+   set related state FALLING
+   set related frame 0
+   set related x_vel max self.x_vel related.x_vel
+   set related y_vel abs self.y_vel * -1
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+
+|checkAir|
+if self.y_vel != 0
+   set self state FALLING
+   set self frame 0
+endif
+
+|applyTraction|
+if self.x_vel != 0
+   if self.x_vel > 0
+      set self x_vel self.traction + self.x_vel
+   endif
+   if self.x_vel < 0
+      set self x_vel self.traction * -1 + self.x_vel
+   endif
+endif
+if abs self.x_vel / 1 == 0
+   set self x_vel 0
+endif
