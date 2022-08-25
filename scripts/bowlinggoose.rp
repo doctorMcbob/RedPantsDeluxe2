@@ -23,6 +23,10 @@ set self second_last_y_vel 0
 set self hasfocus 1
 
 |LOOK:0|
+if bowlingmanager0.state == WAIT
+   set bowlingmanager0 state TIMER
+   set bowlingmanager0 frame 0
+endif
 exec applyGrav
 
 |LOOK:68|
@@ -65,9 +69,11 @@ set self frame 0
 |YCOLLISION|
 set self calc self.state != LOOK
 if self.state != BONK and self.calc
-   set self c1 abs self.last_y_vel * -1
-   set self c2 abs self.second_last_y_vel * -1
-   set self y_vel min self.c1 self.c2
+   set self c1 self.last_y_vel * -1
+   set self c2 self.second_last_y_vel * -1
+   if min self.c1 self.c2 < 0
+      set self y_vel min self.c1 self.c2
+   endif
 endif
 if self.state == BONK
    set self state BONKLAND
@@ -76,8 +82,8 @@ endif
 
 |COLLIDE|
 if pin in self.name and related.hasfocus
-   focus bowlingman0.frame_name self
-   set related hasfocus 0
+   set bowlingmanager0 focus self.name
+   set bowlingmanager0 state BONK
 endif
 
 |HIT|

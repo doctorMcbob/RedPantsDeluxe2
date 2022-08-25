@@ -1,5 +1,6 @@
 PLAYER|0,0,0,0|True|
 START:0 bowlingmanstand -48,-32
+WAIT:0 bowlingmanstand -48,-32
 STAND:0 bowlingmanstand -48,-32
 RUNREADY:0 bowlingmanreadyrun0 -48,-32
 RUNREADY:4 bowlingmanreadyrun1 -48,-32
@@ -23,18 +24,17 @@ THROWHIGH:8 bowlingmanhighthrow2 -48,-32
 THROWHIGH:12 bowlingmanhighthrow3 -48,-32
 
 |START:0|
-set self frame_name MAIN
-set self _input_name PLAYER1
-set self state STAND
-set self speed 2
-set self minspeed 2
-set self maxspeed 10
+# set self frame_name MAIN
+# set self _input_name PLAYER1
+set self state WAIT
+set self speed 3
+set self minspeed 3
+set self maxspeed 12
 set self throw_angle 0
 set self cycles 0
 set self cycle_to_throw 3
 
 |STAND:0|
-focus self.frame_name self
 set self frame 0
 if inpRIGHT
    set self state RUNREADY
@@ -99,23 +99,11 @@ set bowlingball y_vel -30
 
 |THROWLOW:12|
 set self x_vel 0
-focus self.frame_name bowlingball
 
 |THROWMED:12|
 set self x_vel 0
-focus self.frame_name bowlingball
 
 |THROWHIGH:12|
-set self x_vel 0
-focus self.frame_name bowlingball
-
-|THROWLOW:13|
-set self x_vel 0
-
-|THROWMED:13|
-set self x_vel 0
-
-|THROWHIGH:13|
 set self x_vel 0
 
 |updateThrowState|

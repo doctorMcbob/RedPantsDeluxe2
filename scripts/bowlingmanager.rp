@@ -1,0 +1,56 @@
+MANAGER|0,0,0,0|False|
+START:0 empty 0,0
+START_ROLL:0 empty 0,0
+WAIT_FOR_THROW:0 empty 0,0
+WAIT:0 empty 0,0
+BONK:0 empty 0,0
+TIMER:0 empty 0,0
+
+|START:0|
+set self player_turn 0
+set self players []
+set self frames []
+set self bowler_start_x -848
+set self bowler_start_y 768
+
+set self bowler_say_x -848 - 64
+set self bowler_say_y 768 - 80
+
+# remove later, handle in bowling alley door
+add self.players PLAYER1
+add self.frames MAIN
+
+set self state START_ROLL
+
+|START_ROLL:0|
+set self calc len self.players
+set self player_turn self.player_turn % self.calc
+create bowlingman0 bowler self.bowler_start_x self.bowler_start_y
+set bowler _input_name self.players at self.player_turn
+set bowler state STAND
+set self player_turn self.player_turn + 1
+set self focus bowler
+exec focusOn
+set self state WAIT_FOR_THROW
+
+|WAIT_FOR_THROW:0|
+if THROW in bowler.state and bowler.frame == 12
+   set self focus bowlingball
+   exec focusOn
+   set self state WAIT
+endif
+
+|BONK:0|
+exec focusOn
+set self state WAIT
+set self frame 0
+
+|TIMER:60|
+set self state START_ROLL
+set self frame 0
+
+|focusOn|
+for frame self.frames
+   focus frame self.focus
+endfor
+
