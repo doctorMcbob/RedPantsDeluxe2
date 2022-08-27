@@ -43,6 +43,7 @@ PUNCH:4 moonmanpunch1 0,-16
 PUNCH:6 moonmanpunch2 0,-32
 PUNCH:8 moonmanpunch3 0,-16
 DANGLE:0 moonmandangle 0,-16
+INVISIBLE:0 empty 0,0
 
 |DANGLE:0|
 rebrand moonmanD

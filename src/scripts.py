@@ -161,8 +161,6 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 name = cmd.pop(0)
                 if name == "self": name = a.get_actor(reference).name
                 if name == "related": name = a.get_actor(related).name
-                if world is None:
-                    raise Exception("Invalid Place destination {}".format(world_ref))
                 if name in world.actors:
                     world.actors.remove(name)
 

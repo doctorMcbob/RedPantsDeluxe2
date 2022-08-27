@@ -21,6 +21,7 @@ set self grav 1
 set self last_y_vel 0
 set self second_last_y_vel 0
 set self hasfocus 1
+set self speed 4
 
 |LOOK:0|
 if bowlingmanager0.state == WAIT
@@ -41,6 +42,7 @@ set self frame 0
 exec BALL:0
 
 |BALL:0|
+set self x_vel self.speed
 set self second_last_y_vel self.last_y_vel
 set self last_y_vel self.y_vel
 exec applyGrav

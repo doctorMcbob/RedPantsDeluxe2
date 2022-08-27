@@ -64,6 +64,7 @@ AIRHADOKEN:4 fighterairfireball1 -16,0
 AIRHADOKEN:6 fighterairfireball2 -16,0
 HITSTUN:0 fighterbonk -32,0
 DANGLE:0 fighterdangle -32,0
+INVISIBLE:0 empty 0,0
 
 |DANGLE:0|
 if self.dangle_from

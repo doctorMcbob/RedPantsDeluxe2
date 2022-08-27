@@ -84,16 +84,19 @@ exec updateThrowState
 
 |THROWLOW:11|
 create bowlinggoose0 bowlingball self.x self.y
+set bowlingball speed self.speed * 2
 set bowlingball x_vel self.speed * 2
 set bowlingball y_vel -2
 
 |THROWMED:11|
 create bowlinggoose0 bowlingball self.x self.y
+set bowlingball speed self.speed * 1.5
 set bowlingball x_vel self.speed * 1.5
 set bowlingball y_vel -15
 
 |THROWHIGH:11|
 create bowlinggoose0 bowlingball self.x self.y
+set bowlingball speed self.speed
 set bowlingball x_vel self.speed
 set bowlingball y_vel -30
 

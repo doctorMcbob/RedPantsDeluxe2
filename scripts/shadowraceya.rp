@@ -39,7 +39,6 @@ endif
 set shadow0 state STAND
 set shadow0 mode STAND
 if self.messageidx2 == self.messagecap2
-   print "see yaaahh"
    goodbye
 endif
 

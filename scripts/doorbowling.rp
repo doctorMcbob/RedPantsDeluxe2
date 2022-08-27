@@ -1,0 +1,27 @@
+DOOR|0,0,0,0|False|
+START:0 door0 8,0
+DOOR:0 door0 8,0
+
+|START:0|
+set self state DOOR
+
+|DOOR:0|
+set self frame 0
+
+|COLLIDE|
+if self.door_key
+   if self.door_key + _DOWN in inpEVENTS
+      set self state INVISIBLE
+      set self tangible 0
+
+      view self.frame_name bowlingalley
+      add bowlingmanager0.players self._input_name
+      add bowlingmanager0.frames self.frame_name
+
+      set self respawnx self.x
+      set self respawny self.y
+
+      remove inpEVENTS self.door_key + _DOWN
+   endif
+endif
+

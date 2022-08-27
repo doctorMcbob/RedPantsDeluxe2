@@ -33,6 +33,7 @@ BURNOUTJUMP:6 burnoutjump2 -16,-16
 BURNOUTJUMP:9 burnoutjump3 -16,-16
 DEAD:0 redpantsdead -16,0
 HITSTUN:0 flaming7 -16,-16
+INVISIBLE:0 empty 0,0
 
 |START:0|
 set self state FLAMING

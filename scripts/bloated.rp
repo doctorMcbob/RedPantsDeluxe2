@@ -28,6 +28,7 @@ BONKLAND:0 bloatedbonkland0 -16,0
 BONKLAND:8 bloatedbonkland1 -16,0
 DEAD:0 redpantsdead -16,0
 HITSTUN:0 bloatedbonk -16,0
+INVISIBLE:0 empty 0,0
 
 |START:0|
 set self speed 3

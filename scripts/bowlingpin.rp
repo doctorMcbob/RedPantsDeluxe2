@@ -16,6 +16,7 @@ set self state STILL
 set self frame 0
 set self grav 1
 set self traction 0.8 * -1
+set self unscored 1
 
 |FALLING:0|]
 exec applyGrav
@@ -39,6 +40,10 @@ if self.state != LAND
 endif
 
 |COLLIDE|
+if related.unscored
+   set related unscored 0
+   set bowlingmanager0 score bowlingmanager0.score + 1
+endif
 if related.state == STILL
    set related state FALLING
    set related frame 0

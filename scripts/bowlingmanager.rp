@@ -8,21 +8,67 @@ TIMER:0 empty 0,0
 
 |START:0|
 set self player_turn 0
+set self rolls 2
 set self players []
 set self frames []
+set self setUps []
+set self pins []
+
 set self bowler_start_x -848
 set self bowler_start_y 768
 
 set self bowler_say_x -848 - 64
 set self bowler_say_y 768 - 80
+set self score 0
 
-# remove later, handle in bowling alley door
-add self.players PLAYER1
-add self.frames MAIN
+add self.setUps setUpOne
+add self.setUps setUpTwo
+add self.setUps setUpThree
+set self set_up_idx 0
 
-set self state START_ROLL
+set self state SET_UP
+
+|SET_UP:0|
+set self calc len self.setUps
+if self.set_up_idx < self.calc
+   exec self.setUps at self.set_up_idx
+   set self state START_ROLL
+   set self rolls 2
+endif
+set self set_up_idx self.set_up_idx + 1
+if self.set_up_idx > self.calc
+   # done
+   for frame self.frames
+      view frame bowlinglobby
+      if frame == MAIN
+      	 set player10 tangible 1
+	 set player10 state IDLE
+         focus frame player10
+      endif
+      if frame == MAIN2
+      	 set player20 tangible 1
+	 set player20 state IDLE
+      	 focus frame player20
+      endif
+      if frame == MAIN3
+      	 set player30 tangible 1
+	 set player30 state IDLE
+      	 focus frame player30
+      endif
+      if frame == MAIN4
+      	 set player40 tangible 1
+	 set player40 state IDLE
+      	 focus frame player40
+      endif
+   endfor
+   create bowlingmanager0 bowlingmanager0 self.x self.y
+endif
 
 |START_ROLL:0|
+set self rolls self.rolls - 1
+create say0 bowlingscore self.bowler_say_x self.bowler_say_y
+set bowlingscore message self.score + "  "
+set bowlingscore back backgroundsay0
 set self calc len self.players
 set self player_turn self.player_turn % self.calc
 create bowlingman0 bowler self.bowler_start_x self.bowler_start_y
@@ -46,11 +92,86 @@ set self state WAIT
 set self frame 0
 
 |TIMER:60|
-set self state START_ROLL
+set self state SET_UP
 set self frame 0
+if self.rolls
+   for pin self.pins
+      if inworld pin
+         set self state START_ROLL
+      endif
+   endfor
+endif
 
 |focusOn|
 for frame self.frames
    focus frame self.focus
 endfor
 
+|setUpOne|
+create bowlingpin0 pin0 320 720
+create bowlingpin0 pin1 368 752
+create bowlingpin0 pin2 368 688
+create bowlingpin0 pin3 416 784
+create bowlingpin0 pin4 416 656
+create bowlingpin0 pin5 416 720
+create bowlingpin0 pin6 464 800
+create bowlingpin0 pin7 464 640
+create bowlingpin0 pin8 496 752
+create bowlingpin0 pin9 496 688
+set self pins []
+add self.pins pin0
+add self.pins pin1
+add self.pins pin2
+add self.pins pin3
+add self.pins pin4
+add self.pins pin5
+add self.pins pin6
+add self.pins pin7
+add self.pins pin8
+add self.pins pin9
+
+|setUpTwo|
+create bowlingpin0 pin0 1040 800
+create bowlingpin0 pin1 1088 800
+create bowlingpin0 pin2 1136 800
+create bowlingpin0 pin3 1184 768
+create bowlingpin0 pin4 1232 736
+create bowlingpin0 pin5 1280 704
+create bowlingpin0 pin6 1328 672
+create bowlingpin0 pin7 1376 640
+create bowlingpin0 pin8 1424 640
+create bowlingpin0 pin9 1472 640
+set self pins []
+add self.pins pin0
+add self.pins pin1
+add self.pins pin2
+add self.pins pin3
+add self.pins pin4
+add self.pins pin5
+add self.pins pin6
+add self.pins pin7
+add self.pins pin8
+add self.pins pin9
+
+|setUpThree|
+create bowlingpin0 pin0 672 752
+create bowlingpin0 pin1 704 704
+create bowlingpin0 pin2 736 752
+create bowlingpin0 pin3 768 704
+create bowlingpin0 pin4 800 752
+create bowlingpin0 pin5 736 656
+create bowlingpin0 pin6 1152 704
+create bowlingpin0 pin7 1216 704
+create bowlingpin0 pin8 1280 704
+create bowlingpin0 pin9 1216 640
+set self pins []
+add self.pins pin0
+add self.pins pin1
+add self.pins pin2
+add self.pins pin3
+add self.pins pin4
+add self.pins pin5
+add self.pins pin6
+add self.pins pin7
+add self.pins pin8
+add self.pins pin9
