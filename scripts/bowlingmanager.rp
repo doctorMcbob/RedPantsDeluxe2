@@ -5,6 +5,7 @@ WAIT_FOR_THROW:0 empty 0,0
 WAIT:0 empty 0,0
 BONK:0 empty 0,0
 TIMER:0 empty 0,0
+SCAN:0 empty 0,0
 
 |START:0|
 set self player_turn 0
@@ -32,7 +33,8 @@ set self state SET_UP
 set self calc len self.setUps
 if self.set_up_idx < self.calc
    exec self.setUps at self.set_up_idx
-   set self state START_ROLL
+   set self state SCAN
+   set self frame 0
    set self rolls 2
 endif
 set self set_up_idx self.set_up_idx + 1
@@ -63,6 +65,20 @@ if self.set_up_idx > self.calc
    endfor
    create bowlingmanager0 bowlingmanager0 self.x self.y
 endif
+
+|SCAN:0|
+set self focus self
+exec focusOn
+set self x self.x + 8
+
+|SCAN:120|
+set self focus self
+exec focusOn
+set self x self.x - 8
+
+|SCAN:239|
+set self state START_ROLL
+set self frame 0
 
 |START_ROLL:0|
 set self rolls self.rolls - 1
@@ -97,7 +113,7 @@ set self frame 0
 if self.rolls
    for pin self.pins
       if inworld pin
-         set self state START_ROLL
+         set self state SCAN
       endif
    endfor
 endif

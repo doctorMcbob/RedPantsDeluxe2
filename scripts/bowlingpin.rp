@@ -40,15 +40,17 @@ if self.state != LAND
 endif
 
 |COLLIDE|
-if related.unscored
-   set related unscored 0
-   set bowlingmanager0 score bowlingmanager0.score + 1
-endif
-if related.state == STILL
-   set related state FALLING
-   set related frame 0
-   set related x_vel max self.x_vel related.x_vel
-   set related y_vel abs self.y_vel * -1
+if self.tangible
+   if related.unscored
+      set related unscored 0
+      set bowlingmanager0 score bowlingmanager0.score + 1
+   endif
+   if related.state == STILL
+      set related state FALLING
+      set related frame 0
+      set related x_vel max self.x_vel related.x_vel
+      set related y_vel abs self.y_vel * -1
+   endif
 endif
 
 |applyGrav|
