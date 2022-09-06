@@ -1,0 +1,29 @@
+SWITCH|0,0,0,0|False|
+START:0 empty 0,0
+ON:0 empty 0,0
+HITSTUN:0 empty 0,0
+OFF:0 empty 0,0
+
+|START:0|
+set self state OFF
+set self frame 0
+set self triggered 0
+hurtboxes switch
+
+|OFF:0|
+set self frame 0
+
+|HITSTUN:20|
+if not self.triggered
+   set self state ON
+   set castlegateplatform0 state RISING 
+endif
+if self.triggered
+   set self state OFF
+   set castlegateplatform0 state CASTLEGATE
+endif
+set self triggered not self.triggered
+
+|ON:0|
+set self frame 0
+

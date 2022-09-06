@@ -1,0 +1,45 @@
+PLAT|64,608,1024,64|True|
+CASTLEGATE00 castlegate00 0,0
+CASTLEGATE01 castlegate01 0,0
+CASTLEGATE02 castlegate02 0,0
+CASTLEGATE10 castlegate10 0,0
+CASTLEGATE11 castlegate11 0,0
+CASTLEGATE12 castlegate12 0,0
+CASTLEGATE20 castlegate20 0,0
+CASTLEGATE21 castlegate21 0,0
+CASTLEGATE22 castlegate22 0,0
+RISING00 castlegate00 0,0
+RISING01 castlegate01 0,0
+RISING02 castlegate02 0,0
+RISING10 castlegate10 0,0
+RISING11 castlegate11 0,0
+RISING12 castlegate12 0,0
+RISING20 castlegate20 0,0
+RISING21 castlegate21 0,0
+RISING22 castlegate22 0,0
+PLATFORM00 castlegate00 0,0
+PLATFORM01 castlegate01 0,0
+PLATFORM02 castlegate02 0,0
+PLATFORM10 castlegate10 0,0
+PLATFORM11 castlegate11 0,0
+PLATFORM12 castlegate12 0,0
+PLATFORM20 castlegate20 0,0
+PLATFORM21 castlegate21 0,0
+PLATFORM22 castlegate22 0,0
+
+|START:0|
+set self state CASTLEGATE
+set self platform 1
+set self frame 0
+
+|CASTLEGATE:0|
+set self frame 0
+
+|RISING:0|
+if self.h <= 64
+   set self state CASTLEGATE
+endif
+
+|RISING:30|
+set self h self.h - 32
+set self frame 0
