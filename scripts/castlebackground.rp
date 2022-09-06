@@ -1,0 +1,16 @@
+PLAT|64,608,1024,64|False|
+PLATFORM00 castlepiece00 0,0
+PLATFORM01 castlepiece01 0,0
+PLATFORM02 castlepiece02 0,0
+PLATFORM10 castlepiece10 0,0
+PLATFORM11 castlepiece11 0,0
+PLATFORM12 castlepiece12 0,0
+PLATFORM20 castlepiece20 0,0
+PLATFORM21 castlepiece21 0,0
+PLATFORM22 castlepiece22 0,0
+
+|START:0|
+set self platform 1
+set self frame 0
+back
+

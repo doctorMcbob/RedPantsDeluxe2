@@ -1,0 +1,18 @@
+PIGHERDER|0,0,0,0|False|
+START:0 pigherderstand -32,-16
+STAND:0 pigherderstand -32,-16
+THUMBSUP:0 pigherderstand -32,-16
+WELP:0 pigherderstand -32,-16
+
+|START:0|
+set self state STAND
+set self frame 0
+
+|THUMBSUP:120|
+set self state STAND
+set self frame 0
+
+|WELP:120|
+set self state STAND
+set self frame 0
+
