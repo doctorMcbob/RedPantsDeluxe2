@@ -1,7 +1,7 @@
 PIGMAN|0,0,0,0|True|
 START:0 pigmanstand0 -16,-16
 STAND:0 pigmanstand0 -16,-16
-STAND:5 pigmanstand1 -16,-16
+STAND:15 pigmanstand1 -16,-16
 SCARE:0 pigmanscare0 -16,-16
 SCARE:8 pigmanscare1 -16,-16
 SCARE:11 pigmanscare2 -16,-16
@@ -68,7 +68,7 @@ if self.scared
    set self scared []
 endif
 
-|STAND:9|
+|STAND:30|
 set self frame 0
 exec lookNear
 exec lookFar
