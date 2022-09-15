@@ -1,8 +1,20 @@
 SWITCH|0,0,0,0|False|
-START:0 empty 0,0
-ON:0 empty 0,0
-HITSTUN:0 empty 0,0
-OFF:0 empty 0,0
+START:0 switch0 0,0
+ON:0 switch0 0,0
+HITSTUN:0 switch0 0,0
+SWAPOFF:0 switch0 0,0
+SWAPOFF:3 switch1 0,0
+SWAPOFF:6 switch2 0,0
+SWAPOFF:9 switch3 0,0
+SWAPOFF:12 switch4 0,0
+SWAPOFF:15 switch5 0,0
+SWAPON:0 switch5 0,0
+SWAPON:3 switch4 0,0
+SWAPON:6 switch3 0,0
+SWAPON:9 switch2 0,0
+SWAPON:12 switch1 0,0
+SWAPON:15 switch0 0,0
+OFF:0 switch5 0,0
 
 |START:0|
 set self state OFF
@@ -10,20 +22,34 @@ set self frame 0
 set self triggered 0
 hurtboxes switch
 
+|SWAPON:18|
+set self state ON
+
+|SWAPOFF:18|
+set self state OFF
+
+|ON:0|
+set self frame 0
+
 |OFF:0|
 set self frame 0
 
-|HITSTUN:20|
+|HITSTUN:0|
+set self direction 1
+if OFF in self.state
+   img switch0
+endif
+if ON in self.state
+   switch5
+endif
 if not self.triggered
-   set self state ON
+   set self state SWAPON
    set castlegateplatform0 state RISING 
 endif
 if self.triggered
-   set self state OFF
+   set self state SWAPOFF
    set castlegateplatform0 state CASTLEGATE
 endif
 set self triggered not self.triggered
-
-|ON:0|
 set self frame 0
 
