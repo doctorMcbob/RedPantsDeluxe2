@@ -26,6 +26,12 @@ class Frame(object):
         self.world = worlds.get_world(world)
 
         self.focus = focus # can changed toggled with scripts
+        self.scrollbound = {
+            "left": None,
+            "top": None, 
+            "right": None, 
+            "bottom": None,
+        }
         
     def in_frame(self, actor):
         return Rect((self.scroll_x, self.scroll_y), (self.w, self.h)).colliderect(actor)
@@ -50,12 +56,17 @@ class Frame(object):
 
     def update(self):
         if self.focus is not None:
-            self.scroll_x = self.focus.x - self.w // 2
-            self.scroll_y = self.focus.y - self.h // 2
-        # world x_lock and y_lock are values that override the frames focus
-        # ie, no scroll worlds, scroll x only or scroll y only worlds
-        if self.world.x_lock is not None:
-            self.scroll_x = self.world.x_lock
-        if self.world.y_lock is not None:
-            self.scroll_y = self.world.y_lock
+            self.scroll_x = self.focus.x + (self.focus.w // 2) - self.w // 2
+            self.scroll_y = self.focus.y + (self.focus.h // 2) - self.h // 2
 
+        if self.scrollbound["left"] is not None:
+            if self.scroll_x < self.scrollbound["left"]: self.scroll_x = self.scrollbound["left"]
+
+        if self.scrollbound["right"] is not None:
+            if self.scroll_x + self.w > self.scrollbound["right"]: self.scroll_x = self.scrollbound["right"] - self.w
+
+        if self.scrollbound["top"] is not None:
+            if self.scroll_y < self.scrollbound["top"]: self.scroll_y = self.scrollbound["top"]
+
+        if self.scrollbound["bottom"] is not None:
+            if self.scroll_y + self.h > self.scrollbound["bottom"]: self.scroll_y = self.scrollbound["bottom"] - self.h

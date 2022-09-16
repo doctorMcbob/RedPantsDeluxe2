@@ -1,0 +1,19 @@
+FOCUSON|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self noWO 1
+set self state WAIT
+
+|WAIT:0|
+set self frame 0
+
+|COLLIDE|
+if self.frame_name
+   scrollbound self.frame_name left related.x
+   scrollbound self.frame_name right related.x + related.w
+   scrollbound self.frame_name top related.y
+   scrollbound self.frame_name bottom related.y + related.h
+endif
+

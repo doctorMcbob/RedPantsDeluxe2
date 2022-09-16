@@ -129,6 +129,14 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 actor = a.get_actor(reference) if actor == "self" else a.get_actor(actor)
                 frame.focus = actor
 
+            if verb == "scrollbound":
+                frame = frames.get_frame(cmd.pop(0))
+                direction = cmd.pop(0)
+                value = cmd.pop(0)
+                if value is not None:
+                    value = int(value)
+                frame.scrollbound[direction] = value
+                
             if verb == "view":
                 frame = frames.get_frame(cmd.pop(0))
                 newworld = worlds.get_world(cmd.pop(0))

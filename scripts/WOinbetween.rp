@@ -11,6 +11,7 @@ set self frame 0
 
 |COLLIDE|
 set self calc background in self.name
+set self calc self.noWO or self.calc
 if not self.calc
    if related.init
       place self related.A
