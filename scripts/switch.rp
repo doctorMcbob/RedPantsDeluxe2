@@ -21,6 +21,7 @@ set self state OFF
 set self frame 0
 set self triggered 0
 hurtboxes switch
+set self number self.name at -1
 
 |SWAPON:18|
 set self state ON
@@ -44,11 +45,11 @@ if ON in self.state
 endif
 if not self.triggered
    set self state SWAPON
-   set castlegateplatform0 state RISING 
+   set castlegateplatform + self.number state RISING 
 endif
 if self.triggered
    set self state SWAPOFF
-   set castlegateplatform0 state CASTLEGATE
+   set castlegateplatform + self.number state CASTLEGATE
 endif
 set self triggered not self.triggered
 set self frame 0

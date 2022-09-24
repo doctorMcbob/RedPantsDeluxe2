@@ -51,6 +51,7 @@ set self jumpatkymod -6
 hitboxes knight
 hurtboxes knight
 set self slashfxnumber 0
+set self w self.w + 1
 
 |LOOK:0|
 set self x_vel 0
