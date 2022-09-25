@@ -5,7 +5,9 @@ import os
 
 from src import inputs
 from src.editor import template_from_script, SCRIPT_LOCATION
+from src.utils import get_text_input
 from src import menu
+from src import scripts
 
 def set_up():
     pygame.init()
@@ -101,6 +103,22 @@ def run(G, noquit=False):
                 G["PRINTER"].save_em()
                 G["PRINTER"].make_gif()
                 G["PRINTER"].clear_em()
+
+        if "DEBUG" in G and G["DEBUG"]:
+            if any(["CONSOLEDEBUG" in inputs.get_state(state)["EVENTS"] for state in inputs.STATES]):
+                execute_console_command(G)
         
         G["CLOCK"].tick(30)
-        
+
+
+def execute_console_command(G):
+    cmd = get_text_input(G, (0, G["H"] - 32))
+    if cmd is None: return
+    if "REFERENCE" not in G:
+        G["REFERENCE"] = "player10"
+
+    if cmd.startswith("REF:"):
+        G["REFERENCE"] = cmd.split(":")[-1]
+    else:
+        scripts.resolve(G["REFERENCE"], cmd.splitlines(), G["FRAMES"].get_frame(list(G["FRAMEMAP"].keys())[0]).world)
+

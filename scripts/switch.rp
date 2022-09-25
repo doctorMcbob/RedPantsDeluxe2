@@ -21,7 +21,13 @@ set self state OFF
 set self frame 0
 set self triggered 0
 hurtboxes switch
-set self number self.name at -1
+set self number ""
+for char self.name
+    set self calc char in switch
+    if not self.calc
+       set self number self.number + char
+    endif
+endfor
 
 |SWAPON:18|
 set self state ON

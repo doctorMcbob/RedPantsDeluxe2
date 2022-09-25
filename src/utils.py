@@ -18,12 +18,12 @@ ALPHABET_KEY_MAP = {
     K_5: "5", K_6: "6", K_7: "7", K_8: "8", K_9: "9",
     K_PLUS: "+", K_MINUS: "-", K_SEMICOLON: ";", K_PERIOD:".",
     K_LEFTPAREN: "(", K_RIGHTPAREN: ")", K_COMMA: ",",
-    K_ASTERISK: "*", K_SLASH: "/"
+    K_ASTERISK: "*", K_SLASH: "/", K_QUOTE: "'",
 }
 ALPHABET_SHIFT_MAP = {
     K_0: ")", K_1: "!", K_2: "@", K_3: "#", K_4: "$",
     K_5: "%", K_6: "^", K_7: "&", K_8: "*", K_9: "(",
-    K_SEMICOLON: ":", K_MINUS:"_",
+    K_SEMICOLON: ":", K_MINUS:"_", K_QUOTE:'"',
 }
 
 def get_text_input(G, pos, numeric=False):

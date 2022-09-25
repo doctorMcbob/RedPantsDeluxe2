@@ -62,6 +62,7 @@ def update(noquit=False):
 
             if e.type == KEYDOWN:
                 if e.key == K_PERIOD: state["EVENTS"].append("CLIP")
+                if e.key == K_BACKQUOTE: state["EVENTS"].append("CONSOLEDEBUG")
                 if e.key == K_ESCAPE: return "QUIT" if noquit else sys.exit()
                 for key in inp_map:
                     if e.key == inp_map[key]:

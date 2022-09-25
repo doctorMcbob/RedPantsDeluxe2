@@ -280,9 +280,14 @@ def parse_tokens(cmd, logfunc=print):
                     token += cmd[idx]
                     idx += 1
 
+                if token == "":
+                    parsed.append(token)
+
+
             else:
                 token += cmd[idx]
             idx += 1
+
         if token:
             parsed.append(token)
         return parsed
