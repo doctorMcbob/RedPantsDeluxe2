@@ -49,9 +49,11 @@ class World(object):
     def update(self):
         for name in self.actors:
             Actor = actor.get_actor(name)
+            if Actor is None:
+                continue
             if not Actor.updated:
                 Actor.update(self)
-                
+
     def get_actors(self):
         # weird but fixes editor bug
         # old version:
