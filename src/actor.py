@@ -192,12 +192,20 @@ class Actor(Rect):
         return boxes
 
     def get_sprite(self):
+        # second half of this line is only for the editor, does not need to go into ports. same with flag buisness and state changing
         if self.platform or (("plat" in self.name or "background" in self.name) and self.state == "START"):
             flag = False
             if self.state == "START":
                 flag = True
                 self.state = "PLATFORM"
-            # dynamically drawing platfrms
+
+            key = "{}:{}:{},{}".format(self.name, self.state, self.w, self.h)
+            sprite = sprites.get_sprite(key)
+            if sprite is not None:
+                if flag:
+                    self.state = "START"
+                return sprite
+            
             surf = Surface((self.w, self.h))
             surf.fill((1, 255, 1))
             blitz = []
@@ -224,6 +232,7 @@ class Actor(Rect):
                     blitz.append((sprites.get_sprite(img), (x*32, y*32)))
             surf.blits(blitz)
             surf.set_colorkey((1, 255, 1))
+            sprites.set_sprite(key, surf)
             if flag:
                 self.state = "START"
             return surf

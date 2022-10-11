@@ -1,0 +1,105 @@
+DOMINO|0,0,0,0|False|
+START:0 empty 0,0
+PLACE:0 empty 0,0
+MOVE:0 empty 0,0
+WAIT:0 empty 0,0
+OFF:0 empty 0,0
+
+|START:0|
+set self L C
+set self R P
+set self piecenumber 0
+set self tangible 1
+set self state PLACE
+set self timermax 45
+set self timer self.timermax
+set self moveleft 0
+set self moveright 0
+set self swap 0
+
+|PLACE:0|
+set self tangible 1
+if COLLIDE?
+   print "the game is over :( you lose"
+   set pizzamanager0 state OVER
+   goodbye
+endif
+set self leftpiece self.name + piece + self.piecenumber
+create pizzapiece0 self.leftpiece self.x self.y
+set self piecenumber self.piecenumber + 1
+set self rightpiece self.name + piece + self.piecenumber
+create pizzapiece0 self.rightpiece self.x + 64 self.y
+set self piecenumber self.piecenumber + 1
+
+set self.leftpiece state self.L
+set self.rightpiece state self.R
+
+set self state MOVE
+set self frame 0
+
+|OFF:0|
+set self tangible 0
+
+|MOVE:0|
+# -- for testing --
+set self _input_name PLAYER1
+if LEFT_DOWN in inpEVENTS
+   set self moveleft 1
+endif
+if RIGHT_DOWN in inpEVENTS
+   set self moveright 1
+endif
+if DOWN_DOWN in inpEVENTS
+   set self movedown 1
+endif
+if A_DOWN in inpEVENTS
+   set self swap 1
+endif
+# -----------------
+if self.timer > 0
+   set self y_vel 0
+   set self timer self.timer - 1
+endif
+if self.timer <= 0
+   set self y_vel 32
+   set self timer self.timermax
+endif
+set self x_vel 0
+if self.moveleft
+   set self x_vel self.x_vel - 64
+   set self moveleft 0
+endif
+if self.moveright
+   set self x_vel self.x_vel + 64
+   set self moveright 0
+endif
+if self.movedown
+   set self y_vel self.y_vel + 64
+   set self movedown 0
+   set self timer self.timermax
+endif
+if self.swap
+   set self temp self.L
+   set self L self.R
+   set self R self.temp
+   set self temp self.leftpiece
+   set self leftpiece self.rightpiece
+   set self rightpiece self.temp
+   set self swap 0
+endif
+exec updatePiecePosition
+
+|updatePiecePosition|
+set self.leftpiece x self.x
+set self.leftpiece y self.y
+set self.rightpiece x self.x + 64
+set self.rightpiece y self.y
+
+|YCOLLISION|
+set self tangible 0
+set self.leftpiece tangible 1
+set self.rightpiece tangible 1
+set self state WAIT
+set self rightpiece None
+set self leftpiece None
+

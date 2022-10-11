@@ -1,0 +1,61 @@
+MANAGER|0,0,0,0|False|
+START:0 pizzaboard 0,0
+WAIT:0 pizzaboard 0,0
+CHECK:0 pizzaboard 0,0
+POST_CHECK:0 pizzaboard 0,0
+OVER:0 pizzaboard 0,0
+
+|START:0|
+set self direction -1
+set self state WAIT
+set self domino_start_x pizzadomino0.x
+set self domino_start_y pizzadomino0.y
+set self types []
+add self.types C
+add self.types P
+add self.types V
+set self pieces []
+set self orders []
+add self.orders pizzaorder0
+add self.orders pizzaorder1
+add self.orders pizzaorder2
+add self.orders pizzaorder3
+exec populateOrders
+
+|WAIT:0|
+set self do_check 0
+# -- for testing --
+focus MAIN self
+# -----------------
+if pizzadomino0.state == WAIT
+   set self state CHECK
+   set self frame 0
+   set pizzadomino0 state OFF
+   set  pizzadomino0 frame 0
+endif
+
+|CHECK:0|
+if self.do_check
+   set self do_check 0
+   set self state POST_CHECK
+   set self frame 0
+endif
+set self do_check 1
+
+|POST_CHECK:10|
+set self state WAIT
+set pizzadomino0 x self.domino_start_x
+set pizzadomino0 y self.domino_start_y
+set pizzadomino0 L choiceof self.types
+set pizzadomino0 R choiceof self.types
+set pizzadomino0 state PLACE
+set pizzadomino0 frame 0
+
+|populateOrders|
+for _name self.orders
+    set _name state POPULATE
+    set _name frame 0
+    set _name A choiceof self.types
+    set _name B choiceof self.types
+endfor
+

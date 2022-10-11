@@ -1,0 +1,43 @@
+ORDER|0,0,0,0|False|
+START:0 pizzacrust 0,0
+ORDER:0 pizzacrust 0,0
+POPULATE:0 pizzacrust 0,0
+OFF:0 empty 0,0
+
+|START:0|
+set self A P
+set self B V
+set self top_left self.name + piecetopleft
+set self top_right self.name + piecetopright
+set self bot_left self.name + piecebotleft
+set self bot_right self.name + piecebotright
+set self state OFF
+
+|POPULATE:0|
+create pizzapiece0 self.top_left self.x self.y
+create pizzapiece0 self.bot_left self.x self.y + 64
+create pizzapiece0 self.top_right self.x + 64 self.y
+create pizzapiece0 self.bot_right self.x + 64 self.y + 64
+
+set self.top_left state self.A
+set self.bot_left state self.A
+set self.top_right state self.B
+set self.bot_right state self.B
+
+front
+
+set self state ORDER
+
+|OFF:0|
+exec deactivate
+
+|OFF:1|
+break
+
+|deactivate|
+takeall self.top_left
+takeall self.top_right
+takeall self.bot_left
+takeall self.bot_right
+set self state OFF
+

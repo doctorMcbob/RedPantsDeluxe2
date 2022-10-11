@@ -8,7 +8,7 @@ import operator as ops
 
 from copy import deepcopy
 
-from random import randint
+from random import randint, choice
 
 import string
 
@@ -69,6 +69,10 @@ def resolve(reference, script, world, related=None, logfunc=print):
                         w.actors.remove(reference)
                 a.delete_actor(reference)
                 return 'goodbye'
+
+
+            if verb == "break":
+                return
             
             if verb == "set":
                 actor, att, value = cmd
@@ -171,6 +175,15 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 if name == "related": name = a.get_actor(related).name
                 if name in world.actors:
                     world.actors.remove(name)
+
+            if verb == "takeall":
+                name = cmd.pop()
+                if name == "self": name = a.get_actor(reference).name
+                if name == "related": name = a.get_actor(related).name
+                for w in worlds.get_worlds():
+                    if reference in w.actors:
+                        w.actors.remove(name)
+
 
             if verb == "rebrand":
                 keyname = cmd.pop(0)
@@ -362,6 +375,11 @@ def resolve_operators(cmd, world, logfunc=print):
             if token == "isframe":
                 frame = frames.get_frame(cmd.pop(idx+1))
                 evaluated.append(frame is not None)
+            elif token == "choiceof":
+                item = cmd.pop(idx+1)
+                if not type(item) == list:
+                    raise Exception("target of choice must be list, got {}".format(type(item)))
+                evaluated.append(choice(item))
             elif token == "len":
                 calculated = len(cmd.pop(idx+1))
                 evaluated.append(calculated)

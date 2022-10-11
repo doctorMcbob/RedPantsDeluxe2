@@ -40,6 +40,12 @@ def _load_spritesheet(filename, data, colorkey=(1, 255, 1)):
         SPRITES[name] = sprite
     return SPRITES
 
+def set_sprite(name, surf):
+    SPRITES[name] = surf
+    
+def get_sprites():
+    return list(SPRITES.keys())
+
 def get_sprite(name):
     return None if name not in SPRITES else SPRITES[name]
 

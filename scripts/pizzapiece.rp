@@ -1,0 +1,75 @@
+PIECE|0,0,0,0|False|
+START:0 empty 0,0
+C:0 pizzacheese 0,0
+P:0 pizzapepp 0,0
+V:0 pizzavegg 0,0
+
+|START:0|
+set self is_piece 1
+set self grav 1
+if domino in self.name
+   add pizzamanager0.pieces self.name
+endif
+set self pizza 0
+exec applyGrav
+
+|C:0|
+exec update
+
+|P:0|
+exec update
+
+|V:0|
+exec update
+
+|update|
+if self.tangible
+   if self.y_vel
+      set self is_piece 0
+   endif
+   if not self.y_vel
+      set self is_piece 1
+   endif
+   if not self.pizza and pizzamanager0.do_check
+      exec pizzaCheck
+   endif
+   exec applyGrav
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+
+|pizzaCheck|
+set self pizza 0
+set self _right 0
+set self _bottom 0
+set self _botrig 0
+
+set self x self.x + 64
+for _name COLLIDE?
+    if _name.is_piece and _name.tangible    
+       set self _right _name.state
+    endif
+endfor
+set self x self.x - 64
+
+set self y self.y + 64
+for _name COLLIDE?
+    if _name.is_piece and _name.tangible
+       set self _bottom _name.state
+    endif
+endfor
+set self y self.y - 64
+
+set self x self.x + 64
+set self y self.y + 64
+for _name COLLIDE?
+    if _name.is_piece and _name.tangible
+       set self _botrig _name.state
+    endif
+endfor
+set self y self.y - 64
+set self x self.x - 64
+
+set self pizza self.state + self._right + self._bottom + self._botrig
+
