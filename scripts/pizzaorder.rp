@@ -1,7 +1,7 @@
 ORDER|0,0,0,0|False|
-START:0 pizzacrust 0,0
-ORDER:0 pizzacrust 0,0
-POPULATE:0 pizzacrust 0,0
+START:0 pizzacrustorder 0,0
+ORDER:0 pizzacrustorder 0,0
+POPULATE:0 pizzacrustorder 0,0
 OFF:0 empty 0,0
 
 |START:0|
@@ -35,9 +35,16 @@ exec deactivate
 break
 
 |deactivate|
-takeall self.top_left
-takeall self.top_right
-takeall self.bot_left
-takeall self.bot_right
-set self state OFF
+if inworld self.top_left
+   take pizzagame self.top_left
+endif
+if inworld self.top_right
+   take pizzagame self.top_right
+endif
+if inworld self.bot_left
+   take pizzagame self.bot_left
+endif
+if inworld self.bot_right
+   take pizzagame self.bot_right
+endif
 

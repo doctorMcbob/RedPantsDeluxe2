@@ -21,6 +21,7 @@ add self.orders pizzaorder1
 add self.orders pizzaorder2
 add self.orders pizzaorder3
 exec populateOrders
+set self doAgain 0
 
 |WAIT:0|
 set self do_check 0
@@ -42,14 +43,18 @@ if self.do_check
 endif
 set self do_check 1
 
-|POST_CHECK:10|
-set self state WAIT
-set pizzadomino0 x self.domino_start_x
-set pizzadomino0 y self.domino_start_y
-set pizzadomino0 L choiceof self.types
-set pizzadomino0 R choiceof self.types
-set pizzadomino0 state PLACE
-set pizzadomino0 frame 0
+|POST_CHECK:27|
+exec doCheck
+if not self.doAgain
+   set self state WAIT
+   set pizzadomino0 x self.domino_start_x
+   set pizzadomino0 y self.domino_start_y
+   set pizzadomino0 L choiceof self.types
+   set pizzadomino0 R choiceof self.types
+   set pizzadomino0 state PLACE
+   set pizzadomino0 frame 0
+endif
+set self frame 0
 
 |populateOrders|
 for _name self.orders
@@ -57,5 +62,41 @@ for _name self.orders
     set _name frame 0
     set _name A choiceof self.types
     set _name B choiceof self.types
+endfor
+
+|doCheck|
+set self doAgain 0
+for _name self.pieces
+    set self calc _name.state == DEL
+    if "0" in _name.pizza or self.doAgain or self.calc
+        break
+    endif
+    set self A _name.pizza at 0
+    set self B _name.pizza at 1
+    set self C _name.pizza at 2
+    set self D _name.pizza at 3
+    set self calc1 self.A == self.B
+    set self calc1 self.C == self.D and self.calc1
+    set self calc2 self.A == self.C
+    set self calc2 self.B == self.D and self.calc2
+    if self.calc1 or self.calc2
+        for _order self.orders
+	    set self calc order + _order
+	    set self calc exists self.calc
+            if _order.state == OFF or self.doAgain or self.calc
+                break
+	    endif
+	    set self calc1 _order.A == self.A
+	    set self calc1 _order.B == self.D and self.calc1
+	    set self calc2 _order.A == self.D
+	    set self calc2 _order.B == self.A and self.calc2
+	    if self.calc1 or self.calc2
+	        set _order state OFF
+	        set _order frame 0
+		create pizzacrust0 order + _order _name.x _name.y
+		set self doAgain 1
+	    endif
+        endfor
+    endif
 endfor
 

@@ -1,0 +1,15 @@
+ORDER|0,0,0,0|False|
+START:0 pizzacrust 0,0
+CRUST:0 pizzacrust 0,0
+
+|START:0|
+set self state CRUST
+set self frame 0
+
+|CRUST:25|
+for _name COLLIDE?
+    set _name state DEL
+    set _name frame 0
+endfor
+goodbye
+

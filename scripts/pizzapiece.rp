@@ -3,6 +3,7 @@ START:0 empty 0,0
 C:0 pizzacheese 0,0
 P:0 pizzapepp 0,0
 V:0 pizzavegg 0,0
+DEL:0 empty 0,0
 
 |START:0|
 set self is_piece 1
@@ -22,6 +23,10 @@ exec update
 |V:0|
 exec update
 
+|DEL:0|
+remove pizzamanager0.pieces self.name
+goodbye
+
 |update|
 if self.tangible
    if self.y_vel
@@ -30,7 +35,7 @@ if self.tangible
    if not self.y_vel
       set self is_piece 1
    endif
-   if not self.pizza and pizzamanager0.do_check
+   if pizzamanager0.do_check
       exec pizzaCheck
    endif
    exec applyGrav
