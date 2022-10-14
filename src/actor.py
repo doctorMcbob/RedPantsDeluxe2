@@ -43,12 +43,9 @@ TEMPLATES = {}
 ACTORS = {}
 
 def swap_in(actors):
-    global TEMPLATES, ACTORS
-    TEMPLATES = {}
+    global ACTORS
     ACTORS = {}
 
-    for name in actors.keys():
-        TEMPLATES[name] = actors[name]
     for name in actors.keys():
         ACTORS[name] = Actor(actors[name])
 
@@ -82,34 +79,57 @@ class Actor(Rect):
         self.name = template["name"]
         # The rect that this class *is* should be considered as the ECB
         Rect.__init__(self, template["POS"], template["DIM"])
-        self.x_vel = 0
-        self.y_vel = 0
+        self.x_vel = template["x_vel"] if "x_vel" in template else 0
+        self.y_vel = template["y_vel"] if "y_vel" in template else 0
         
-        self.hurtboxes = {}
-        self.hitboxes = {}
-        self.attributes = {}
+        self.hurtboxes = {} if "hurtboxes" not in template else template["hurtboxes"]
+        self.hitboxes = {} if "hitboxes" not in template else template["hitboxes"]
+        self.attributes = {} if "attributes" not in template else template["attributes"]
         self.sprites = {}
-        self.img = None # scripts can overwrite the sprite
+        self.img = None if "img" not in template else template["img"]
 
         self.load_scripts(template["scripts"])
         self.load_sprites(template["sprites"])
         self.offsetkey = template["scripts"]
-        self._input_name = None # change in script
+        self._input_name = template["_input_name"] if "_input_name" in template else None 
 
-        self.state = "START"
-        self.frame = 0
-        self.direction = 1
-        self.rotation = 0
+        self.state = template["state"] if "state" in template else "START"
+        self.frame = template["frame"] if "frame" in template else 0
+        self.direction = template["direction"] if "direction" in template else 1
+        self.rotation = template["rotation"] if "rotation" in template else 0
         
-        self.platform = False # scripts will flip this for platform draw
-        
+        self.platform = False if "platform" not in template else template["platform"] 
         self.tangible = False if "tangible" not in template else template["tangible"]
-        self.physics = 0
-        self.updated = False
-        
+        self.physics = 0 if "physics" not in template else template["physics"]
+        self.updated = False if "updated" not in template else template["updated"]
+
+    def as_template(self):
+        return {
+            "name": self.name,
+            "POS": (self.x, self.y),
+            "DIM": (self.w, self.h),
+            "x_vel": self.x_vel,
+            "y_vel": self.y_vel,
+            "hurtboxes": self.hurtboxes,
+            "hitboxes": self.hitboxes,
+            "attributes": self.attributes,
+            "img": self.img,
+            "sprites": self.offsetkey,
+            "scripts": self.offsetkey,
+            "_input_name": self._input_name,
+            "state": self.state,
+            "frame": self.frame,
+            "direction": self.direction,
+            "rotation": self.rotation,
+            "platform": self.platform,
+            "tangible": self.tangible,
+            "physics": self.physics,
+            "updated": self.updated,
+        }
+
     def load_sprites(self, name):
         self.sprites = sprites.get_sprite_map(name)
-
+            
     def load_scripts(self, name):
         self.offsetkey = name
         self.scripts = scripts.get_script_map(name)
@@ -247,7 +267,7 @@ class Actor(Rect):
 
         placeholder = Surface((self.w, self.h))
         placeholder.fill((1, 255, 1))
-        print(self._index(self.sprites))
+        print(self.sprites)
         return placeholder
 
     def get_offset(self):
@@ -421,3 +441,4 @@ class Actor(Rect):
         if "HIT" in self.scripts:
             scripts.resolve(actor.name, self.scripts["HIT"], world, related=self.name)
             
+

@@ -15,6 +15,9 @@ def add_frame(name, world, size, position=(0, 0), focus=None):
 def get_frame(name):
     return FRAMES[name] if name in FRAMES else None
 
+def get_frames():
+    return list(FRAMES.values())
+
 class Frame(object):
     # focus should be an actor if not None
     def __init__(self, world, size, position=(0, 0), focus=None):

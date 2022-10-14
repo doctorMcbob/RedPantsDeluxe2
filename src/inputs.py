@@ -48,6 +48,12 @@ def add_state(name, inp_map=DEFAULT_MAP, joy=None):
 def get_state(name):
     return STATES[name] if name in STATES else None
 
+def get_state_keys():
+    return list(STATES.keys())
+
+def set_state(name, state):
+    STATES[name] = state
+
 def update_tas(TAS, frame, noquit=False):
     for state_name in TAS.keys():
         if state_name in STATES and frame in TAS[state_name]:

@@ -267,8 +267,10 @@ def resolve(reference, script, world, related=None, logfunc=print):
                     
         except Exception as e:
             logfunc("{} Error on line {}".format(reference, cmd_idx))
+            logfunc(cmd)
             for i, cmd in enumerate(script):
                 logfunc(("> " if i == cmd_idx else "") + "{} ".format(i) + cmd)
+            import traceback; print(traceback.format_exc())
             logfunc("Error resolving {}... {}".format(verb, e))
 
         cmd_idx += 1

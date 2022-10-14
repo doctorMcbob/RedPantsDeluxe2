@@ -767,6 +767,7 @@ def switch_worlds(G):
         WORLDS[choice] = deepcopy(WORLD_TEMPLATE)
         load_game()
     if not choice: return
+    WORLDS[choice]["name"] = choice
     G["WORLD"] = choice
     ACTOR_SCROLL["SCROLL"] = 0
 

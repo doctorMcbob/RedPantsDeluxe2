@@ -20,7 +20,7 @@ def swap_in(w):
     worlds = {}
 
     for name in w.keys():
-        worlds[name] = World(deepcopy(w[name]))
+        worlds[name] = World(w[name])
 
 def load():
     from src.lib import WORLDS as W
@@ -39,13 +39,24 @@ def get_worlds():
 
 class World(object):
     def __init__(self, template):
-        
+        self.name = "" if "name" not in template else template["name"]
         self.background = None if template["background"] is None else sprites.get_sprite(template["background"])
+        self.background_tag = template["background"]
         self.actors = template["actors"]
         self.x_lock = None if "x_lock" not in template else template["x_lock"]
         self.y_lock = None if "y_lock" not in template else template["y_lock"]
-        self.flagged_for_update = True
+        self.flagged_for_update = True if "flagged_for_update" not in template else template["flagged_for_update"]
 
+    def as_template(self):
+        return {
+            "name": self.name,
+            "background": self.background_tag,
+            "actors": self.actors,
+            "x_lock": self.x_lock,
+            "y_lock": self.y_lock,
+            "flagged_for_update": self.flagged_for_update,
+        }
+        
     def update(self):
         for name in self.actors:
             Actor = actor.get_actor(name)
