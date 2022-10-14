@@ -22,7 +22,7 @@ ROOT_PATH = Path('.')
 PATH_TO_TASES = ROOT_PATH / ("tas/" if "-o" not in sys.argv else "tas/" + sys.argv[sys.argv.index("-o") + 1])
 
 SAVE_STATES = {}
-HUD_LOCATION = (100, 100)
+HUD_LOCATION = {}
 CLICK_LOCK = False
 
 if not os.path.isdir(PATH_TO_TASES): os.mkdir(PATH_TO_TASES)
@@ -62,6 +62,7 @@ def set_up():
     G["TAS"] = {} if "-tas" not in sys.argv else get_tas(sys.argv[sys.argv.index("-tas")+1])
     if not G["TAS"]:
         for key in inputs.get_state_keys():
+            HUD_LOCATION[key] = 100, 100 * (int(key[-1]) - 1)
             G["TAS"][key] = {}
     G["FRAME"] = 0
 
@@ -157,59 +158,69 @@ def input_callback(G):
     clicks = pygame.mouse.get_pressed()
     if not clicks[0]: CLICK_LOCK = False
     if clicks[-1]:
-        HUD_LOCATION = pygame.mouse.get_pos()
+        mpos = pygame.mouse.get_pos()
+        for key in HUD_LOCATION.keys():
+            HUD_LOCATION[key] = mpos[0], mpos[1] + 100 * (int(key[-1])-1)
     draw(G)
-    update_input_deck(G, HUD_LOCATION, "PLAYER1")
-    draw_input_deck(G, HUD_LOCATION, "PLAYER1")
+    for key in inputs.get_state_keys():
+        update_input_deck(G, HUD_LOCATION[key], key, clicks)
+        draw_input_deck(G, HUD_LOCATION[key], key)
     inputs.update_tas(G["TAS"], G["FRAME"])
 
-def update_input_deck(G, pos, input_state_key):
+def update_input_deck(G, pos, input_state_key, clicks):
     global CLICK_LOCK
     if CLICK_LOCK: return
     mpos = pygame.mouse.get_pos()
-    clicks = pygame.mouse.get_pressed()
+    
     input_state = inputs.get_state(input_state_key)
     tas_events = G["TAS"][input_state_key][G["FRAME"]] if G["FRAME"] in G["TAS"][input_state_key] else []
     x, y = pos
-    CLICK_LOCK = clicks[0]
-    
+
     if pygame.Rect((x+32, y+64), (16, 16)).collidepoint(mpos) and clicks[0]:
+        CLICK_LOCK = clicks[0]
         if ("LEFT_UP" if input_state["LEFT"] else "LEFT_DOWN") not in tas_events:
             tas_events.append("LEFT_UP" if input_state["LEFT"] else "LEFT_DOWN")
         else:
             tas_events.remove("LEFT_UP" if input_state["LEFT"] else "LEFT_DOWN")
     if pygame.Rect((x+64, y+64), (16, 16)).collidepoint(mpos) and clicks[0]:
+        CLICK_LOCK = clicks[0]
         if ("RIGHT_UP" if input_state["RIGHT"] else "RIGHT_DOWN") not in tas_events:
             tas_events.append("RIGHT_UP" if input_state["RIGHT"] else "RIGHT_DOWN")
         else:
             tas_events.remove("RIGHT_UP" if input_state["RIGHT"] else "RIGHT_DOWN")
     if pygame.Rect((x+48, y+48), (16, 16)).collidepoint(mpos) and clicks[0]:
+        CLICK_LOCK = clicks[0]
         if ("UP_UP" if input_state["UP"] else "UP_DOWN") not in tas_events:
             tas_events.append("UP_UP" if input_state["UP"] else "UP_DOWN")
         else:
             tas_events.remove("UP_UP" if input_state["UP"] else "UP_DOWN")
     if pygame.Rect((x+48, y+80), (16, 16)).collidepoint(mpos) and clicks[0]:
+        CLICK_LOCK = clicks[0]
         if ("DOWN_UP" if input_state["DOWN"] else "DOWN_DOWN") not in tas_events:
             tas_events.append("DOWN_UP" if input_state["DOWN"] else "DOWN_DOWN")
         else:
             tas_events.remove("DOWN_UP" if input_state["DOWN"] else "DOWN_DOWN")
 
     if pygame.Rect((x+32+80, y+64), (16, 16)).collidepoint(mpos) and clicks[0]:
+        CLICK_LOCK = clicks[0]
         if ("A_UP" if input_state["A"] else "A_DOWN") not in tas_events:
             tas_events.append("A_UP" if input_state["A"] else "A_DOWN")
         else:
             tas_events.remove("A_UP" if input_state["A"] else "A_DOWN")
     if pygame.Rect((x+64+80, y+64), (16, 16)).collidepoint(mpos) and clicks[0]:
+        CLICK_LOCK = clicks[0]
         if ("X_UP" if input_state["X"] else "X_DOWN") not in tas_events:
             tas_events.append("X_UP" if input_state["X"] else "X_DOWN")
         else:
             tas_events.append("X_UP" if input_state["X"] else "X_DOWN")
     if pygame.Rect((x+48+80, y+48), (16, 16)).collidepoint(mpos) and clicks[0]:
+        CLICK_LOCK = clicks[0]
         if ("B_UP" if input_state["B"] else "B_DOWN") not in tas_events:
             tas_events.append("B_UP" if input_state["B"] else "B_DOWN")
         else:
             tas_events.remove("B_UP" if input_state["B"] else "B_DOWN")
     if pygame.Rect((x+48+80, y+80), (16, 16)).collidepoint(mpos) and clicks[0]:
+        CLICK_LOCK = clicks[0]
         if ("Y_UP" if input_state["Y"] else "Y_DOWN") not in tas_events:
             tas_events.append("Y_UP" if input_state["Y"] else "Y_DOWN")
         else:
@@ -224,7 +235,7 @@ def draw_input_deck(G, pos, input_state_key):
     pygame.draw.rect(G["SCREEN"], (255, 255, 255), pygame.Rect(pos, (256, 128)))
     x, y = pos
     G["SCREEN"].blit(G["HEL16"].render("frame: {}".format(G["FRAME"]), 0, (0,0,0)), (x, y))
-    G["SCREEN"].blit(G["HEL16"].render("TAS: {}".format(None if G["FRAME"] not in G["TAS"]["PLAYER1"] else G["TAS"]["PLAYER1"][G["FRAME"]]), 0, (0,0,0)), (x, y+16))
+    G["SCREEN"].blit(G["HEL16"].render("TAS: {}".format(None if G["FRAME"] not in G["TAS"][input_state_key] else G["TAS"][input_state_key][G["FRAME"]]), 0, (0,0,0)), (x, y+16))
     
     pygame.draw.rect(G["SCREEN"], (250, 50, 50) if input_state["LEFT"] else (200, 200, 200), pygame.Rect((x+32, y+64), (16, 16)))
     G["SCREEN"].blit(G["HEL16"].render("L", 0, (0,0,0)), (x+32, y+64))
@@ -259,8 +270,15 @@ def tas_er(G, noquit=False):
 
         if inp == pygame.K_RETURN:
             save_state(G)
-            
+
+        if inp == pygame.K_PERIOD:
+            if "PRINTER" in G:
+                G["PRINTER"].save_em()
+                G["PRINTER"].make_gif()
+                G["PRINTER"].clear_em()
+
         if inp == pygame.K_SPACE:
+            G["PRINTER"].save_surface(G["SCREEN"])
             return
 
         if inp == pygame.K_s and mods & pygame.KMOD_CTRL:
@@ -303,13 +321,6 @@ def run(G, noquit=False):
         G["SCREEN"].blits(blitz)
 
         pygame.display.update()
-        if "PRINTER" in G:
-            G["PRINTER"].save_surface(G["SCREEN"])
-            if any(["CLIP" in inputs.get_state(state)["EVENTS"] for state in inputs.STATES]):
-                G["PRINTER"].save_em()
-                G["PRINTER"].make_gif()
-                G["PRINTER"].clear_em()
-
         G["CLOCK"].tick(30)
 
 
