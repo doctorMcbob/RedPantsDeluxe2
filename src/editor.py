@@ -106,7 +106,7 @@ def load():
     HITBOXES = B.HITBOXES
     HURTBOXES = B.HURTBOXES
 
-def save():
+def save(noload=False):
     global SAVED
     with open("src/lib/WORLDS.py", "w+") as f:
         f.write("WORLDS = {}".format(repr(WORLDS)))
@@ -120,6 +120,7 @@ def save():
         f.write("HITBOXES = {}\nHURTBOXES = {}".format(repr(HITBOXES), repr(HURTBOXES)))
     
     SAVED = True
+    if noload: return
     load_game()
     
 def update_frames(G):

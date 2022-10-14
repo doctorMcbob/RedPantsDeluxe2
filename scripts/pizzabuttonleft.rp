@@ -1,0 +1,25 @@
+BUTTON|0,0,0,0|False|
+START:0 leftbutton0 0,0
+BUTTON:0 leftbutton0 0,0
+PRESS:0 leftbutton1 0,0
+HITSTUN:0 leftbutton1 0,0
+
+|START:0|
+set self state BUTTON
+set self frame 0
+set self _d -1
+hitboxes button
+hurtboxes button
+
+|HITSTUN:0|
+exec doAction
+set self direction self._d
+set self state PRESS
+set self frame 0
+
+|PRESS:20|
+set self state BUTTON
+
+|doAction|
+set pizzadomino0 moveleft 1
+

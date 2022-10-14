@@ -41,21 +41,6 @@ set self frame 0
 set self tangible 0
 
 |MOVE:0|
-# -- for testing --
-set self _input_name PLAYER1
-if LEFT_DOWN in inpEVENTS
-   set self moveleft 1
-endif
-if RIGHT_DOWN in inpEVENTS
-   set self moveright 1
-endif
-if DOWN_DOWN in inpEVENTS
-   set self movedown 1
-endif
-if A_DOWN in inpEVENTS
-   set self swap 1
-endif
-# -----------------
 if self.timer > 0
    set self y_vel 0
    set self timer self.timer - 1
