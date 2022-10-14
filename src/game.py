@@ -69,6 +69,9 @@ def run(G, noquit=False):
         blitz = []
         for name in G["FRAMEMAP"]:
             frame = G["FRAMES"].get_frame(name)
+            if not frame.active:
+                print('here')
+                continue
             frame.update()
             position = G["FRAMEMAP"][name]
             drawn = frame.drawn(DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn()

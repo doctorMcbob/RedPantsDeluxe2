@@ -35,6 +35,7 @@ class Frame(object):
             "right": None, 
             "bottom": None,
         }
+        self.active = True
         
     def in_frame(self, actor):
         return Rect((self.scroll_x, self.scroll_y), (self.w, self.h)).colliderect(actor)

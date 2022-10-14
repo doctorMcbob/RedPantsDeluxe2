@@ -231,7 +231,8 @@ def update_actors_bar(G, mpos, btn):
                     WORLDS[w]['actors'].remove(friend.name)
                 
             ACTORS.pop(friend.name)
-            world.actors.remove(friend.name)
+            if friend.name in world.actors:
+                world.actors.remove(friend.name)
             load_game()
 
         elif Rect((1168+8 + 100 + 100 + 100, (i+scroll) * seg_h + 4 + 32), (64, 20)).collidepoint(mpos) and btn in [0, 1]:
