@@ -48,6 +48,33 @@ def add_state(name, inp_map=DEFAULT_MAP, joy=None):
 def get_state(name):
     return STATES[name] if name in STATES else None
 
+def update_tas(TAS, frame, noquit=False):
+    for state_name in TAS.keys():
+        if state_name in STATES and frame in TAS[state_name]:
+            STATES[state_name]["EVENTS"] = TAS[state_name][frame]
+        else:
+            STATES[state_name]["EVENTS"] = []
+
+        for event in STATES[state_name]["EVENTS"]:
+            if event == "A_UP": STATES[state_name]["A"] = 0
+            elif event == "A_DOWN": STATES[state_name]["A"] = 1
+            elif event == "B_UP": STATES[state_name]["B"] = 0
+            elif event == "B_DOWN": STATES[state_name]["B"] = 1
+            elif event == "X_UP": STATES[state_name]["X"] = 0
+            elif event == "X_DOWN": STATES[state_name]["X"] = 1
+            elif event == "Y_UP": STATES[state_name]["Y"] = 0
+            elif event == "Y_DOWN": STATES[state_name]["Y"] = 1
+            elif event == "UP_UP": STATES[state_name]["UP"] = 0
+            elif event == "UP_DOWN": STATES[state_name]["UP"] = 1
+            elif event == "DOWN_UP": STATES[state_name]["DOWN"] = 0
+            elif event == "DOWN_DOWN": STATES[state_name]["DOWN"] = 1
+            elif event == "LEFT_UP": STATES[state_name]["LEFT"] = 0
+            elif event == "LEFT_DOWN": STATES[state_name]["LEFT"] = 1
+            elif event == "RIGHT_UP": STATES[state_name]["RIGHT"] = 0
+            elif event == "RIGHT_DOWN": STATES[state_name]["RIGHT"] = 1
+            if event == "QUIT":
+                return "QUIT" if noquit else sys.exit()
+            
 def update(noquit=False):
     for name in STATES.keys():
         STATES[name]["EVENTS"] = []

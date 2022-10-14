@@ -4,7 +4,6 @@ import sys
 import os
 
 from src import inputs
-from src.editor import template_from_script, SCRIPT_LOCATION
 from src.utils import get_text_input
 from src import menu
 from src import scripts
