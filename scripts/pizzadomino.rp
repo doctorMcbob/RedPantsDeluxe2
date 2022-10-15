@@ -20,9 +20,9 @@ set self swap 0
 |PLACE:0|
 set self tangible 1
 if COLLIDE?
-   print "the game is over :( you lose"
    set pizzamanager0 state OVER
-   goodbye
+   set self state OFF
+   break
 endif
 set self leftpiece self.name + piece + self.piecenumber
 create pizzapiece0 self.leftpiece self.x self.y
@@ -59,7 +59,7 @@ if self.moveright
    set self moveright 0
 endif
 if self.movedown
-   set self y_vel self.y_vel + 64
+   set self y_vel self.y_vel + 512
    set self movedown 0
    set self timer self.timermax
 endif

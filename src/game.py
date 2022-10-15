@@ -52,7 +52,7 @@ def run(G, noquit=False):
         if inputs.update(noquit) == "QUIT":
             return
 
-        worlds_for_updating = [G["FRAMES"].get_frame(name).world for name in G["FRAMEMAP"]]
+        worlds_for_updating = [frame.world for frame in G["FRAMES"].get_frames()]
 
         for world in G["WORLDS"].get_worlds():
 
@@ -67,13 +67,11 @@ def run(G, noquit=False):
             actor.updated = False
 
         blitz = []
-        for name in G["FRAMEMAP"]:
-            frame = G["FRAMES"].get_frame(name)
-            if not frame.active:
-                print('here')
+        for frame in G["FRAMES"].get_frames():
+            if not frame.active: 
                 continue
             frame.update()
-            position = G["FRAMEMAP"][name]
+            position = frame.pos
             drawn = frame.drawn(DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn()
             blitz.append((drawn, position))
 

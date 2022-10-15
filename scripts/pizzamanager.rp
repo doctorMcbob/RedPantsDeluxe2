@@ -22,18 +22,41 @@ add self.orders pizzaorder2
 add self.orders pizzaorder3
 exec populateOrders
 set self doAgain 0
+set self nextl choiceof self.types
+set self nextr choiceof self.types
 
 |WAIT:0|
 set self do_check 0
-# -- for testing --
-focus MAIN self
-# -----------------
+focus PIZZAGAME self
 if pizzadomino0.state == WAIT
    set self state CHECK
    set self frame 0
    set pizzadomino0 state OFF
-   set  pizzadomino0 frame 0
+   set pizzadomino0 frame 0
 endif
+
+|OVER:0|
+for piece_name self.pieces
+    set piece_name state DEL
+endfor
+killframe PIZZAGAME
+killframe PIZZAPOD
+
+if isframe MAIN
+    activate MAIN
+endif
+if isframe MAIN2
+    activate MAIN2
+endif
+if isframe MAIN3
+    activate MAIN3
+endif
+if isframe MAIN4
+    activate MAIN4
+endif
+
+exec START:0
+set pizzadomino0 state START
 
 |CHECK:0|
 if self.do_check
@@ -49,12 +72,24 @@ if not self.doAgain
    set self state WAIT
    set pizzadomino0 x self.domino_start_x
    set pizzadomino0 y self.domino_start_y
-   set pizzadomino0 L choiceof self.types
-   set pizzadomino0 R choiceof self.types
+   set pizzadomino0 L self.nextl
+   set pizzadomino0 R self.nextr
+   set self nextl choiceof self.types
+   set self nextr choiceof self.types
    set pizzadomino0 state PLACE
    set pizzadomino0 frame 0
 endif
 set self frame 0
+set self reset 1
+for order_name self.orders
+    if order_name.state != OFF
+       set self reset 0
+    endif
+endfor
+if self.reset
+   exec populateOrders
+   view PIZZAPOD pizzapod2
+endif
 
 |populateOrders|
 for _name self.orders

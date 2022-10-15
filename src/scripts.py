@@ -127,6 +127,22 @@ def resolve(reference, script, world, related=None, logfunc=print):
             if verb == "img":
                 a.get_actor(reference).img = cmd.pop(0)
 
+            if verb == "activate":
+                frame = frames.get_frame(cmd.pop(0))
+                frame.active = True
+
+            if verb == "deactivate":
+                frame = frames.get_frame(cmd.pop(0))
+                frame.active = False
+
+            if verb == "killframe":
+                name = cmd.pop(0)
+                frames.delete_frame(name)
+
+            if verb == "makeframe":
+                name, world, x, y, w, h = cmd
+                frames.add_frame(name, world, (w, h), (x, y))
+                
             if verb == "focus":
                 frame = frames.get_frame(cmd.pop(0))
                 actor = cmd.pop(0)

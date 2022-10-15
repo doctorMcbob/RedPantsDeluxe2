@@ -24,7 +24,9 @@ exec update
 exec update
 
 |DEL:0|
-remove pizzamanager0.pieces self.name
+if self.name in pizzamanager0.pieces
+   remove pizzamanager0.pieces self.name
+endif
 goodbye
 
 |update|

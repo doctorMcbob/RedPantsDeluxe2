@@ -1,0 +1,37 @@
+DOOR|0,0,0,0|False|
+START:0 door0 8,0
+DOOR:0 door0 8,0
+
+|START:0|
+set self state DOOR
+
+|DOOR:0|
+set self frame 0
+
+|COLLIDE|
+if self.door_key
+   if self.door_key + _DOWN in inpEVENTS
+
+      if isframe MAIN
+      	 deactivate MAIN
+      endif
+      if isframe MAIN2
+      	 deactivate MAIN2
+      endif
+      if isframe MAIN3
+      	 deactivate MAIN3
+      endif
+      if isframe MAIN4
+      	 deactivate MAIN4
+      endif
+
+      makeframe PIZZAGAME pizzagame 0 0 576 640
+      makeframe PIZZAPOD pizzapod 576 0 576 640      
+
+      set self respawnx self.x
+      set self respawny self.y
+
+      remove inpEVENTS self.door_key + _DOWN
+   endif
+endif
+

@@ -9,8 +9,9 @@ def clear():
     global FRAMES
     FRAMES = {}
 
-def add_frame(name, world, size, position=(0, 0), focus=None):
-    FRAMES[name] = Frame(world, size, position, focus)
+def add_frame(name, world, size, pos=(0, 0), position=(0, 0), focus=None):
+    FRAMES[name] = Frame(world, size, pos, position, focus)
+    return FRAMES[name]
 
 def get_frame(name):
     return FRAMES[name] if name in FRAMES else None
@@ -18,12 +19,15 @@ def get_frame(name):
 def get_frames():
     return list(FRAMES.values())
 
+def delete_frame(name):
+    return FRAMES.pop(name)
+
 class Frame(object):
     # focus should be an actor if not None
-    def __init__(self, world, size, position=(0, 0), focus=None):
-        self.scroll_x = position[0]
-        self.scroll_y = position[1]
-
+    def __init__(self, world, size, pos=(0, 0), scrollpos=(0, 0), focus=None):
+        self.scroll_x = scrollpos[0]
+        self.scroll_y = scrollpos[1]
+        self.pos = pos
         self.w, self.h = size
 
         self.world = worlds.get_world(world)

@@ -1,0 +1,18 @@
+FOCUSON|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self noWO 1
+set self state WAIT
+set self frame_name PIZZAPOD
+
+|WAIT:0|
+set self frame 0
+if isframe self.frame_name
+   scrollbound self.frame_name left self.x
+   scrollbound self.frame_name right self.x + self.w
+   scrollbound self.frame_name top self.y
+   scrollbound self.frame_name bottom self.y + self.h
+endif
+
