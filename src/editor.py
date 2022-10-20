@@ -56,6 +56,10 @@ SCRIPT_LOCATION = "scripts/"
 
 TEMPLATES = {}
 
+RECT_SCROLL = {
+    "EVENTS": [],
+}
+
 TEMPLATES_SCROLL = {
     "SCROLL": 0,
     "EVENTS": [],
@@ -252,6 +256,7 @@ def update_actors_bar(G, mpos, btn):
 
     
 def add_actor(G, pos, template_name):
+    G["ctx"] = CURSOR_SCROLLER
     if 'plat' in template_name:
         pos = pos[0] // 32 * 32, pos[1] // 32 * 32
         rect = input_rect(G, (0, 0, 100), cb=main_click_helper, snap=32, pos=pos)
@@ -523,6 +528,9 @@ def spritesheet_menu(G):
     while True:
         G["SCREEN"].fill((150, 150, 150))
         G["SCREEN"].blit(image, (SX, SY))
+        for key in sheet.keys():
+            pos, dim = sheet[key]
+            pygame.draw.rect(G["SCREEN"], (100, 0, 0), Rect((pos[0]+SX, pos[1]+SY), dim), width=1)
         G["SCREEN"].blit(drawn_spritesheet_data(G, sheet, idx), (1072-256, 0))
         G["SCREEN"].blit(G["HEL32"].render("{}, {}".format((CX, CY), corner), 0, (200, 0, 80)), (1072, 840-32))
         pygame.draw.rect(G["SCREEN"], (255, 0, 0), Rect(make_rect((SX+corner[0], SY+corner[1]) if corner else (SX+CX+16, SY+CY+16), (SX+CX, SY+CY))), width=2)
