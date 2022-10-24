@@ -465,7 +465,7 @@ def template_from_script(filename, name=None):
             scripts.parse_tokens(cmd)
             for cmd in cmds.splitlines()
         ]
-        actor_scripts[key] = script # cmds.splitlines()
+        actor_scripts[key] = list(filter(lambda n: bool(n), script))
         
 
     offsetkey = filename.split(".")[0]
