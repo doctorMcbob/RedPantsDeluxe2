@@ -11,6 +11,7 @@ from copy import deepcopy
 from random import randint, choice
 
 import string
+import traceback
 
 operators = {
     "+": ops.add,
@@ -51,14 +52,15 @@ def get_script_map(name):
 
 def resolve(reference, script, world, related=None, logfunc=print):
     cmd_idx = 0
+
     while cmd_idx < len(script):
-        if not script[cmd_idx].split() or script[cmd_idx].startswith("#"): # comments
+        cmd = script[cmd_idx]
+        if not cmd:
             cmd_idx += 1
             continue
-
-        cmd = parse_tokens(script[cmd_idx], logfunc=logfunc)
         cmd = evaluate_literals(cmd, reference, world, related=related, logfunc=logfunc)
         cmd = resolve_operators(cmd, world, logfunc=logfunc)
+
         # resolve command!
         try:
             verb = cmd.pop(0)
@@ -71,10 +73,10 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 return 'goodbye'
 
 
-            if verb == "break":
+            elif verb == "break":
                 return
             
-            if verb == "set":
+            elif verb == "set":
                 actor, att, value = cmd
                 if actor == "related" and related is not None:
                     actor = related
@@ -86,7 +88,7 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 else:
                     actor.attributes[att] = value
 
-            if verb == "if":
+            elif verb == "if":
                 conditional = cmd.pop(0)
                 if not conditional:
                     nest = 1
@@ -94,23 +96,23 @@ def resolve(reference, script, world, related=None, logfunc=print):
                         cmd_idx += 1
                         if cmd_idx >= len(script):
                             raise Exception("End of script while parsing if")
-                        if script[cmd_idx].split():
-                            if script[cmd_idx].split()[0] == "if":
+                        if script[cmd_idx]:
+                            if script[cmd_idx][0] == "if":
                                 nest += 1
-                            if script[cmd_idx].split()[0] == "endif":
+                            if script[cmd_idx][0] == "endif":
                                 nest -= 1
 
-            if verb == "exec":
+            elif verb == "exec":
                 key = cmd.pop(0)
                 if key not in a.get_actor(reference).scripts:
                     raise Exception("Cannot exec {}. Does not exist.".format(key))
                 if resolve(reference, a.get_actor(reference).scripts[key], world, logfunc=logfunc) == 'goodbye':
                     return 'goodbye'
 
-            if verb == "print":
+            elif verb == "print":
                 print(cmd.pop(0))
 
-            if verb == "back":
+            elif verb == "back":
                 if reference in world.actors:
                     me = world.actors.index(reference)
                     i = 0
@@ -119,37 +121,37 @@ def resolve(reference, script, world, related=None, logfunc=print):
                     if i < me:
                         world.actors.insert(i, world.actors.pop(me))
 
-            if verb == "front":
+            elif verb == "front":
                 if reference in world.actors and world.actors[-1] != reference:
                     me = world.actors.index(reference)
                     world.actors.append(world.actors.pop(me))
                 
-            if verb == "img":
+            elif verb == "img":
                 a.get_actor(reference).img = cmd.pop(0)
 
-            if verb == "activate":
+            elif verb == "activate":
                 frame = frames.get_frame(cmd.pop(0))
                 frame.active = True
 
-            if verb == "deactivate":
+            elif verb == "deactivate":
                 frame = frames.get_frame(cmd.pop(0))
                 frame.active = False
 
-            if verb == "killframe":
+            elif verb == "killframe":
                 name = cmd.pop(0)
                 frames.delete_frame(name)
 
-            if verb == "makeframe":
+            elif verb == "makeframe":
                 name, world, x, y, w, h = cmd
                 frames.add_frame(name, world, (w, h), (x, y))
                 
-            if verb == "focus":
+            elif verb == "focus":
                 frame = frames.get_frame(cmd.pop(0))
                 actor = cmd.pop(0)
                 actor = a.get_actor(reference) if actor == "self" else a.get_actor(actor)
                 frame.focus = actor
 
-            if verb == "scrollbound":
+            elif verb == "scrollbound":
                 frame = frames.get_frame(cmd.pop(0))
                 direction = cmd.pop(0)
                 value = cmd.pop(0)
@@ -157,12 +159,12 @@ def resolve(reference, script, world, related=None, logfunc=print):
                     value = int(value)
                 frame.scrollbound[direction] = value
                 
-            if verb == "view":
+            elif verb == "view":
                 frame = frames.get_frame(cmd.pop(0))
                 newworld = worlds.get_world(cmd.pop(0))
                 frame.world = newworld
 
-            if verb == "move":
+            elif verb == "move":
                 name = cmd.pop(0)
                 if name == "self": name = a.get_actor(reference).name
                 if name == "related": name = a.get_actor(related).name
@@ -172,7 +174,7 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 newworld = worlds.get_world(cmd.pop())
                 newworld.actors.append(name)
 
-            if verb == "place":
+            elif verb == "place":
                 name = cmd.pop(0)
                 if name == "self": name = a.get_actor(reference).name
                 if name == "related": name = a.get_actor(related).name
@@ -183,7 +185,7 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 if name not in world.actors:
                     world.actors.append(name)
                 
-            if verb == "take":
+            elif verb == "take":
                 world_ref = cmd.pop(0)
                 world = worlds.get_world(world_ref)
                 name = cmd.pop(0)
@@ -192,7 +194,7 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 if name in world.actors:
                     world.actors.remove(name)
 
-            if verb == "takeall":
+            elif verb == "takeall":
                 name = cmd.pop()
                 if name == "self": name = a.get_actor(reference).name
                 if name == "related": name = a.get_actor(related).name
@@ -201,7 +203,7 @@ def resolve(reference, script, world, related=None, logfunc=print):
                         w.actors.remove(name)
 
 
-            if verb == "rebrand":
+            elif verb == "rebrand":
                 keyname = cmd.pop(0)
                 actor = a.get_actor(reference)
                 actor.load_scripts(keyname)
@@ -210,29 +212,29 @@ def resolve(reference, script, world, related=None, logfunc=print):
                     if resolve(reference, actor.scripts["START:0"], world, logfunc=logfunc) == 'goodbye':
                         return 'goodbye'
 
-            if verb == "remove":
+            elif verb == "remove":
                 l = cmd.pop(0)
                 if type(l) is not list:
                     raise Exception("Could not remove from {}, not type list".format(l))
                 l.remove(cmd.pop(0))
 
-            if verb == "add":
+            elif verb == "add":
                 l = cmd.pop(0)
                 if type(l) is not list:
                     raise Exception("Could not remove from {}, not type list".format(l))
                 l.append(cmd.pop(0))
 
-            if verb == "hitboxes":
+            elif verb == "hitboxes":
                 keyname = cmd.pop(0)
                 actor = a.get_actor(reference)
                 actor.hitboxes = boxes.get_hitbox_map(keyname)
 
-            if verb == "hurtboxes":
+            elif verb == "hurtboxes":
                 keyname = cmd.pop(0)
                 actor = a.get_actor(reference)
                 actor.hurtboxes = boxes.get_hurtbox_map(keyname)
 
-            if verb == "create":
+            elif verb == "create":
                 template_name, actor_name, x, y = cmd
                 a.add_actor_from_template(actor_name, template_name, {
                     "name": actor_name, "POS": (int(x), int(y))
@@ -244,11 +246,11 @@ def resolve(reference, script, world, related=None, logfunc=print):
                     if resolve(actor_name, actor.scripts["START:0"], world, logfunc=logfunc) == 'goodbye':
                         return 'goodbye'
 
-            if verb == "update":
+            elif verb == "update":
                 world_ref = cmd.pop(0)
                 worlds.get_world(world_ref).flagged_for_update = True
 
-            if verb == "for": # gulp
+            elif verb == "for": # gulp
                 key = cmd.pop(0)
                 target = deepcopy(cmd.pop())
                 if not hasattr(target, '__iter__'):
@@ -260,9 +262,9 @@ def resolve(reference, script, world, related=None, logfunc=print):
                     cmd_idx += 1
                     if cmd_idx >= len(script):
                         raise Exception("End of script while parsing for")
-                    miniscript .append(script[cmd_idx])
+                    miniscript.append(script[cmd_idx])
 
-                    line = script[cmd_idx].split()
+                    line = script[cmd_idx]
 
                     if line:
                         if line[0] == "for":
@@ -273,10 +275,16 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 # pop off the final remaining endfor
                 miniscript.pop()
 
-                miniscript = miniscript
-                
                 for value in target:
-                    to_run = [str(value).join(s.split(key)) for s in miniscript]
+                    to_run = []
+                    for cmd in miniscript:
+                        _cmd = []
+                        for token in cmd:
+                            if key in token:
+                                token = str(value).join(token.split(key))
+                            _cmd.append(token)
+                        to_run.append(_cmd)
+
                     if resolve(reference, to_run, world, related=related, logfunc=logfunc) == 'goodbye':
                         return 'goodbye'
 
@@ -285,8 +293,8 @@ def resolve(reference, script, world, related=None, logfunc=print):
             logfunc("{} Error on line {}".format(reference, cmd_idx))
             logfunc(cmd)
             for i, cmd in enumerate(script):
-                logfunc(("> " if i == cmd_idx else "") + "{} ".format(i) + cmd)
-            import traceback; print(traceback.format_exc())
+                logfunc(("> " if i == cmd_idx else "") + "{} ".format(i),  cmd)
+            print(traceback.format_exc())
             logfunc("Error resolving {}... {}".format(verb, e))
 
         cmd_idx += 1
@@ -328,6 +336,8 @@ def parse_tokens(cmd, logfunc=print):
         return []
         
 def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
+    cmd = cmd[:]
+
     for idx in range(len(cmd)):
         token = cmd[idx]
         try:

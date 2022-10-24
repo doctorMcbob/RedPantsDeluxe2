@@ -93,7 +93,7 @@ def update(noquit=False):
             if e.type == QUIT:
                 return "QUIT" if noquit else sys.exit()
 
-            if e.type == KEYDOWN:
+            elif e.type == KEYDOWN:
                 if e.key == K_PERIOD: state["EVENTS"].append("CLIP")
                 if e.key == K_BACKQUOTE: state["EVENTS"].append("CONSOLEDEBUG")
                 if e.key == K_ESCAPE: return "QUIT" if noquit else sys.exit()
@@ -102,25 +102,25 @@ def update(noquit=False):
                         state[key] = 1
                         state["EVENTS"].append("{}_DOWN".format(key))
 
-            if e.type == KEYUP:
+            elif e.type == KEYUP:
                 for key in inp_map:
                     if e.key == inp_map[key]:
                         state[key] = 0
                         state["EVENTS"].append("{}_UP".format(key))
 
-            if e.type == JOYBUTTONDOWN and state["JOY"] is not None and e.instance_id == state["JOY"].get_instance_id():
+            elif e.type == JOYBUTTONDOWN and state["JOY"] is not None and e.instance_id == state["JOY"].get_instance_id():
                 for key in inp_map:
                     if e.button == inp_map[key]:
                         state[key] = 1
                         state["EVENTS"].append("{}_DOWN".format(key))
 
-            if e.type == JOYBUTTONUP and state["JOY"] is not None and e.instance_id == state["JOY"].get_instance_id():
+            elif e.type == JOYBUTTONUP and state["JOY"] is not None and e.instance_id == state["JOY"].get_instance_id():
                 for key in inp_map:
                     if e.button == inp_map[key]:
                         state[key] = 0
                         state["EVENTS"].append("{}_UP".format(key))
 
-            if e.type == JOYHATMOTION and state["JOY"] is not None and e.instance_id == state["JOY"].get_instance_id():
+            elif e.type == JOYHATMOTION and state["JOY"] is not None and e.instance_id == state["JOY"].get_instance_id():
                 dx, dy = state["JOY"].get_hat(e.hat)
 
                 if dy == 1:

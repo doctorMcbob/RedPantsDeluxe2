@@ -457,11 +457,16 @@ def template_from_script(filename, name=None):
         sprites[key] = sprite
         offsets[sprite] = offset
 
-    scripts = {}
+    actor_scripts = {}
     while segments:
         key = segments.pop(0)
         cmds = segments.pop(0)
-        scripts[key] = cmds.splitlines()
+        script = [
+            scripts.parse_tokens(cmd)
+            for cmd in cmds.splitlines()
+        ]
+        actor_scripts[key] = script # cmds.splitlines()
+        
 
     offsetkey = filename.split(".")[0]
     OFFSETS[offsetkey]= offsets
@@ -470,7 +475,7 @@ def template_from_script(filename, name=None):
     SPRITEMAPS[spritekey] = sprites
 
     scriptkey = filename.split(".")[0]
-    SCRIPTS[scriptkey] = scripts
+    SCRIPTS[scriptkey] = actor_scripts
     
     return {
         "name": name,
