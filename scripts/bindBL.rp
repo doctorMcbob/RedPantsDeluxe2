@@ -1,0 +1,66 @@
+FOCUSON|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self noWO 1
+set self state WAIT
+
+set self number ""
+for char self.name
+    set self calc char in bindBL
+    if not self.calc
+       set self number self.number + char
+    endif
+endfor
+set self TR bindTR + self.number
+set self t self.TR.top
+set self r self.TR.right
+
+|WAIT:0|
+exec p1update
+exec p2update
+
+|p2update|
+if exists player20
+   if player20.x < self.x
+      break
+   endif
+   if player20.y > self.bottom
+      break
+   endif
+   if player20.x > self.r
+      break
+   endif
+   if player20.y < self.t
+      break
+   endif
+   if isframe MAIN2
+      scrollbound MAIN2 left self.x
+      scrollbound MAIN2 bottom self.y + self.h
+      scrollbound MAIN2 top self.t
+      scrollbound MAIN2 right self.r
+   endif
+endif
+
+|p1update|
+if exists player10
+   if player10.x < self.x
+      break
+   endif
+   if player10.y > self.bottom
+      break
+   endif
+   if player10.x > self.r
+      break
+   endif
+   if player10.y < self.t
+      break
+   endif
+   if isframe MAIN 
+      scrollbound MAIN left self.x
+      scrollbound MAIN bottom self.y + self.h
+      scrollbound MAIN top self.t
+      scrollbound MAIN right self.r
+   endif
+endif

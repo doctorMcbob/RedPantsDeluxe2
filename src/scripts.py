@@ -3,6 +3,8 @@ from src import frames
 from src import actor as a
 from src import worlds
 from src import boxes
+from src import sounds
+from src import game
 
 import operator as ops
 
@@ -12,6 +14,7 @@ from random import randint, choice
 
 import string
 import traceback
+import sys
 
 operators = {
     "+": ops.add,
@@ -65,17 +68,25 @@ def resolve(reference, script, world, related=None, logfunc=print):
         try:
             verb = cmd.pop(0)
 
-            if verb == "goodbye":
+            if verb == "quit":
+                sys.exit()
+
+            elif verb == "goodbye":
                 for w in worlds.get_worlds():
                     if reference in w.actors:
                         w.actors.remove(reference)
                 a.delete_actor(reference)
                 return 'goodbye'
 
-
             elif verb == "break":
                 return
-            
+
+            elif verb == "reset":
+                game.load()
+
+            elif verb == "update_sticks":
+                inputs.update_sticks()
+
             elif verb == "set":
                 actor, att, value = cmd
                 if actor == "related" and related is not None:
@@ -131,11 +142,13 @@ def resolve(reference, script, world, related=None, logfunc=print):
 
             elif verb == "activate":
                 frame = frames.get_frame(cmd.pop(0))
-                frame.active = True
+                if frame is not None:
+                    frame.active = True
 
             elif verb == "deactivate":
                 frame = frames.get_frame(cmd.pop(0))
-                frame.active = False
+                if frame is not None:
+                    frame.active = False
 
             elif verb == "killframe":
                 name = cmd.pop(0)
@@ -144,7 +157,7 @@ def resolve(reference, script, world, related=None, logfunc=print):
             elif verb == "makeframe":
                 name, world, x, y, w, h = cmd
                 frames.add_frame(name, world, (w, h), (x, y))
-                
+
             elif verb == "focus":
                 frame = frames.get_frame(cmd.pop(0))
                 actor = cmd.pop(0)
@@ -250,6 +263,18 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 world_ref = cmd.pop(0)
                 worlds.get_world(world_ref).flagged_for_update = True
 
+            elif verb == "sfx":
+                sounds.play_sound(cmd.pop(0))
+
+            elif verb == "song":
+                sounds.play_song(cmd.pop(0))
+
+            elif verb == "sfxoff":
+                sounds.stop_sounds()
+
+            elif verb == "songoff":
+                sounds.stop_song()
+            
             elif verb == "for": # gulp
                 key = cmd.pop(0)
                 target = deepcopy(cmd.pop())
@@ -343,6 +368,8 @@ def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
         try:
             if token == "RAND?":
                 cmd[idx] = randint(0, 1)
+            if token == "song?":
+                cmd[idx] = sounds.get_song()
             if token == "COLLIDE?":
                 actor = a.get_actor(reference)
                 actors = list(filter(lambda actr:not (actr is actor), world.get_actors()[::-1]))
@@ -403,6 +430,19 @@ def resolve_operators(cmd, world, logfunc=print):
             if token == "isframe":
                 frame = frames.get_frame(cmd.pop(idx+1))
                 evaluated.append(frame is not None)
+            elif token == "hasframe":
+                world = worlds.get_world(cmd.pop(idx+1))
+                hasframe = False
+                for frame in frames.get_frames():
+                    if not frame.active: continue
+                    if frame.world == world:
+                        hasframe = True
+                        break
+                evaluated.append(hasframe)
+                    
+            elif token == "isinputstate":
+                inputstate = inputs.get_state(cmd.pop(idx+1))
+                evaluated.append(inputstate is not None)
             elif token == "choiceof":
                 item = cmd.pop(idx+1)
                 if not type(item) == list:

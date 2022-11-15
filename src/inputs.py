@@ -5,6 +5,7 @@ import sys
 
 from copy import deepcopy
 
+STICKS = []
 STATES = {}
 STATE_TEMPLATE = {
     "JOY"    : None,
@@ -31,12 +32,52 @@ DEFAULT_MAP = {
     "X"      : K_a,
     "Y"      : K_s,
 }
+
 DEFAULT_CONTROLLER_MAP = {
     "A"      : 0,
-    "B"      : 1,
+    "B"      : 3,
     "X"      : 2,
-    "Y"      : 3,
+    "Y"      : 1,
     "START"  : 10
+}
+
+MAPPED_CONTROLLERS = {
+    "Sony Interactive Entertainment Wireless Controller": deepcopy(DEFAULT_CONTROLLER_MAP),
+    "Xbox Series X Controller": {
+        "A"      : 0,
+        "B"      : 2,
+        "X"      : 1,
+        "Y"      : 3,
+        "START"  : 7,
+    },
+    "Xbox One S Controller": {
+        "A"      : 0,
+        "B"      : 3,
+        "X"      : 1,
+        "Y"      : 4,
+        "START"  : 7,
+    },
+    "Controller (Xbox for windows)": {
+        "A"      : 0,
+        "B"      : 2,
+        "X"      : 1,
+        "Y"      : 3,
+        "START"  : 7,
+    },
+    "Controller (Xbox for Windows)": {
+        "A"      : 0,
+        "B"      : 2,
+        "X"      : 1,
+        "Y"      : 3,
+        "START"  : 7,
+    },
+    "Nintendo Co., Ltd. Pro Controller": {
+        "A"      : 0,
+        "B"      : 2,
+        "X"      : 1,
+        "Y"      : 3,
+        "START"  : 7,
+    }
 }
 
 def add_state(name, inp_map=DEFAULT_MAP, joy=None):
@@ -53,6 +94,41 @@ def get_state_keys():
 
 def set_state(name, state):
     STATES[name] = state
+
+def set_defaults():
+    if "PLAYER2" in STATES:
+        STATES.pop("PLAYER2")
+    add_state("PLAYER1")
+    
+def update_sticks():
+    if "PLAYER2" in STATES: return
+    joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+    pygame.event.pump()
+
+    for joy in joysticks:
+        if not joy.get_init():
+            joy.init()
+        for btn in range(joy.get_numbuttons()):
+            if not joy.get_button(btn): continue
+            if joy not in STICKS:
+                if "PLAYER1" not in STATES or STATES["PLAYER1"]["JOY"] is None:
+                    name = "PLAYER1"
+                elif "PLAYER2" not in STATES:
+                    name = "PLAYER2"
+                else:
+                    return
+
+                if joy.get_name() in MAPPED_CONTROLLERS:                    
+                    controller_map = deepcopy(MAPPED_CONTROLLERS[joy.get_name()])
+                else:
+                    controller_map = deepcopy(DEFAULT_CONTROLLER_MAP)
+                    
+                STICKS.append(joy)
+                add_state(
+                    name,
+                    inp_map=controller_map,
+                    joy=joy)
+                print(f"added {name} with {joy.get_name()}")
 
 def update_tas(TAS, frame, noquit=False):
     for state_name in TAS.keys():

@@ -10,9 +10,10 @@ set self init 0
 set self frame 0
 
 |COLLIDE|
+if self.noWO
+   break
+endif
 if self.frame_name and related.init
    view self.frame_name related.to
-   set self respawnx self.x
-   set self respawny self.y
 endif
 

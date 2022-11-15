@@ -1,0 +1,45 @@
+LETTER|0,0,0,0|False|
+START:0 empty 0,0
+ASC:0 empty 0,0
+DESC:0 empty 0,0
+
+|START:0|
+set self frame 0
+set self letter " " + 32
+set self state ASC
+set self direction -1
+set self timer -1
+back
+
+|ASC:0|
+img self.letter
+if self.frame % 2 == 0
+   set self y self.y - 1
+endif
+exec updateTimer
+
+|ASC:4|
+exec ASC:0
+set self state DESC
+set self frame 0
+
+|DESC:0|
+img self.letter
+if self.frame % 2 == 0
+   set self y self.y + 1
+endif
+exec updateTimer
+
+|DESC:4|
+exec DESC:0
+set self state ASC
+set self frame 0
+
+|updateTimer|
+if self.timer != -1
+   if self.timer <= 0
+      goodbye
+   endif
+   set self timer self.timer - 1
+endif
+

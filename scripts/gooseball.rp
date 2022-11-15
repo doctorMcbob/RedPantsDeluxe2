@@ -221,7 +221,7 @@ set self.lookboxname h 32
 
 |checkCharge|
 for name self.seeleft
-   if player in name
+   if name.offsetkey == redpantsguy
       set self seeleft []
       set self direction -1
       set self state CHARGESTART
@@ -229,7 +229,7 @@ for name self.seeleft
    endif
 endfor
 for name self.seeright
-   if player in name
+   if name.offsetkey == redpantsguy
       set self seeright []
       set self direction 1
       set self state CHARGESTART

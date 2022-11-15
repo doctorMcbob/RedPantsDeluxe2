@@ -1,0 +1,63 @@
+SAY|0,0,0,0|False|
+START:0 empty 0,0
+SAY:0 empty 0,0
+
+|START:0|
+set self messages []
+add self.messages "ULTRA DELUXE TWO"
+add self.messages "  OR DIE TRYING "
+add self.messages " TAKES THE CAKE "
+add self.messages "THE GREAT ESCAPE"
+add self.messages "AND A BLUE SHIRT"
+add self.messages "BIG BALD BLUNDER"
+add self.messages "  MAKES IT BIG  "
+add self.messages " DOES SOME STUFF"
+add self.messages "AND THE BIG GAME"
+add self.messages "  DIRECTORS CUT "
+add self.messages "   DOES IT ALL  "
+add self.messages "HITS THE BIGTIME"
+add self.messages " HAZY MAZE DAVE "
+add self.messages "  NEVER FORGETS "
+add self.messages " STRIKES AGAIN  "
+add self.messages "ESCALATING ESCAPADES"
+
+set self message choiceof self.messages
+set self state SAY
+set self frame -1
+set self timer -1
+set self y_off 16
+set self x_off 16
+set self back 0
+
+|SAY:0|
+if self.frame == 0 and self.back
+   create self.back self.name + back self.x self.y
+   set self calc countof self.message "^"
+   set self calc2 self.calc + 1
+   set self.name + back w len self.message * 16 + 98 // self.calc2
+   set self.name + back h self.calc * 20 + 64
+   set self.name + back timer len self.message + self.timer + 5
+endif
+
+set self calc self.message at self.frame == "^"
+
+if self.calc
+   set self y_off self.y_off + 20
+   set self x_off 16
+endif
+
+if not self.calc
+   create letter320 self.name + letter + self.frame self.x + self.x_off self.y + self.y_off
+   set self.name + letter + self.frame letter self.message at self.frame + 32
+   if self.timer != -1
+      set self.name + letter + self.frame timer self.timer
+   endif
+set self x_off self.x_off + 32
+endif
+
+set self calc len self.message - 1
+
+if self.calc == self.frame
+   goodbye
+endif
+

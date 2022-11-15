@@ -29,7 +29,6 @@ from src import boxes
 from src import actor
 from src import worlds
 
-from src import editor_subs as subs # sub menu
 
 # # # # # # # #
 # Soft Layer  #
@@ -137,6 +136,7 @@ def update_frames(G):
 
 def set_up():
     pygame.init()
+    pygame.mixer.init()
     G = {}
     G["SCREEN"] = pygame.display.set_mode((1600, 1000))
     G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
@@ -267,7 +267,10 @@ def add_actor(G, pos, template_name):
     template = deepcopy(TEMPLATES[template_name])
     template["POS"], template["DIM"] = rect
     n = 0
-    while actor.get_actor("{}{}".format(template_name, n)) is not None: n += 1
+    
+    while actor.get_actor("{}{}".format(template_name, n)) is not None:
+        print(actor.get_actor("{}{}".format(template_name, n)))
+        n += 1
     name = "{}{}".format(template_name, n)
     template["name"] = name
     ACTORS[name] = template

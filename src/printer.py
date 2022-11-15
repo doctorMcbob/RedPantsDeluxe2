@@ -33,10 +33,10 @@ def save_surface(surf):
     if len(SAVED) >= GIF_SIZE:
         SAVED.pop(0)
 
-def save_em():
+def save_em(frame=0):
     global SAVED
     for i, surf in enumerate(SAVED):
-        pygame.image.save(surf, str(PATH_TO_DUMP/"{}.png".format(i)))
+        pygame.image.save(surf, str(PATH_TO_DUMP/"{}.png".format(i+frame)))
     SAVED = []
 
 def make_gif(filename=None, fps=FPS):
@@ -57,3 +57,7 @@ def clear_em():
         file_name = "{}.png".format(i)
         file_path = os.path.join(ROOT_PATH / PATH_TO_DUMP, file_name)
         os.remove(file_path)
+
+if __name__ == "__main__":
+    make_gif(input("filename: "))
+    print("Done.")

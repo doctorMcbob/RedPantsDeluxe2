@@ -25,6 +25,9 @@ def swap_in(w):
 def load():
     from src.lib import WORLDS as W
 
+    for name in list(worlds.keys()):
+        worlds.pop(name)
+
     for name in W.WORLDS.keys():
         worlds[name] = World(W.WORLDS[name])
 
@@ -42,7 +45,7 @@ class World(object):
         self.name = "" if "name" not in template else template["name"]
         self.background = None if template["background"] is None else sprites.get_sprite(template["background"])
         self.background_tag = template["background"]
-        self.actors = template["actors"]
+        self.actors = deepcopy(template["actors"])
         self.x_lock = None if "x_lock" not in template else template["x_lock"]
         self.y_lock = None if "y_lock" not in template else template["y_lock"]
         self.flagged_for_update = True if "flagged_for_update" not in template else template["flagged_for_update"]

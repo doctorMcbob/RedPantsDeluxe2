@@ -52,6 +52,9 @@ def swap_in(actors):
 def load():
     from src.lib import ACTORS as A
 
+    for key in list(ACTORS.keys()):
+        ACTORS.pop(key)
+
     for name in A.ACTORS.keys():
         TEMPLATES[name] = A.ACTORS[name]
     for name in A.ACTORS.keys():
@@ -267,7 +270,7 @@ class Actor(Rect):
 
         placeholder = Surface((self.w, self.h))
         placeholder.fill((1, 255, 1))
-        print(self.sprites)
+        print(self.state, self.sprites)
         return placeholder
 
     def get_offset(self):
@@ -289,6 +292,7 @@ class Actor(Rect):
         xflag, yflag = self.x_vel, self.y_vel
         if self.physics or self.tangible:
             self.collision_check(world)
+            
             self.x += int(self.x_vel)
             self.y += int(self.y_vel)
 
@@ -301,6 +305,7 @@ class Actor(Rect):
         if yflag != self.y_vel and int(self.y_vel) == 0:
             if abs(self.y_vel) < 1:
                 self.y_vel = 0
+
             if "YCOLLISION" in self.scripts:
                 if scripts.resolve(self.name, self.scripts["YCOLLISION"], world) == 'goodbye':
                     return

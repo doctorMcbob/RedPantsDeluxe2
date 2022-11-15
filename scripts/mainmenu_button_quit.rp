@@ -1,0 +1,56 @@
+BTN|0,0,0,0|False|
+START:0 quitbutton0 0,0
+NOTSELECTED:0 quitbutton0 0,0
+SELECTED:0 quitbutton1 0,0
+
+|START:0|
+set self state NOTSELECTED
+set self frame 0
+set self _input_name PLAYER1
+set self left_button 0
+set self right_button 0
+set self down_button mainmenu_button_singleplayer0
+set self up_button mainmenu_button_twoplayer0
+
+|SELECTED:5|
+if A_DOWN in inpEVENTS
+   exec press
+endif
+
+if LEFT_DOWN in inpEVENTS
+   if exists self.left_button
+      set self.left_button state SELECTED 
+      set self state NOTSELECTED
+      set self.left_button frame 0
+      break
+   endif
+endif
+if RIGHT_DOWN in inpEVENTS
+   if exists self.right_button
+      set self.right_button state SELECTED
+      set self state NOTSELECTED
+      set self.right_button frame 0
+      break
+   endif
+endif
+if DOWN_DOWN in inpEVENTS
+   if exists self.down_button
+      set self.down_button state SELECTED
+      set self state NOTSELECTED
+      set self.down_button frame 0
+      break
+   endif
+endif
+if UP_DOWN in inpEVENTS
+   if exists self.up_button
+      set self.up_button state SELECTED
+      set self state NOTSELECTED
+      set self.up_button frame 0
+      break
+   endif
+endif
+
+
+|press|
+quit
+

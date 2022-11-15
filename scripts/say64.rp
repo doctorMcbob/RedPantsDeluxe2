@@ -3,13 +3,13 @@ START:0 empty 0,0
 SAY:0 empty 0,0
 
 |START:0|
-set self message "YOU HAVE WON THE CURSE IS OVER"
+set self message "RED PANTS"
 set self state SAY
 set self frame -1
-set self timer 400
+set self timer -1
 set self y_off 16
 set self x_off 16
-set self back backgroundsay0
+set self back 0
 
 |SAY:0|
 if self.frame == 0 and self.back
@@ -29,12 +29,12 @@ if self.calc
 endif
 
 if not self.calc
-   create letter0 self.name + letter + self.frame self.x + self.x_off self.y + self.y_off
-   set self.name + letter + self.frame letter self.message at self.frame
+   create letter640 self.name + letter + self.frame self.x + self.x_off self.y + self.y_off
+   set self.name + letter + self.frame letter self.message at self.frame + 64
    if self.timer != -1
       set self.name + letter + self.frame timer self.timer
    endif
-set self x_off self.x_off + 16
+set self x_off self.x_off + 64
 endif
 
 set self calc len self.message - 1

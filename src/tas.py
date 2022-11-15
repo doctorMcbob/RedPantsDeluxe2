@@ -14,9 +14,14 @@ from src import actor
 from src import printer
 from src import scripts
 from src import boxes
+from src import sounds
 
 from copy import deepcopy
 from pathlib import Path
+
+import random
+
+random.seed(0 if "-s" not in sys.argv else sys.argv[sys.argv.index("-s")+1])
 
 ROOT_PATH = Path('.')
 PATH_TO_TASES = ROOT_PATH / ("tas/" if "-o" not in sys.argv else "tas/" + sys.argv[sys.argv.index("-o") + 1])
@@ -51,6 +56,9 @@ def set_up():
     worlds.load()
     actor.load()
     boxes.load()
+    printer.GIF_SIZE = 1000000000
+    if "-play" in sys.argv:
+        sounds.load()
 
     G["INPUTS"] = inputs
     G["FRAMES"] = frames
@@ -60,9 +68,9 @@ def set_up():
     G["DEBUG"] = "-d" in sys.argv
 
     G["TAS"] = {} if "-tas" not in sys.argv else get_tas(sys.argv[sys.argv.index("-tas")+1])
-    if not G["TAS"]:
-        for key in inputs.get_state_keys():
-            HUD_LOCATION[key] = 100, 100 * (int(key[-1]) - 1)
+    for key in inputs.get_state_keys():
+        HUD_LOCATION[key] = 100, 100 * (int(key[-1]) - 1)
+        if not G["TAS"]:
             G["TAS"][key] = {}
     G["FRAME"] = 0
 
@@ -146,10 +154,9 @@ def load_save_state(G, frame):
 
 def draw(G):
     blitz = []
-    for name in G["FRAMEMAP"]:
-        frame = G["FRAMES"].get_frame(name)
+    for frame in G["FRAMES"].get_frames():
         if not frame.active: continue
-        position = G["FRAMEMAP"][name]
+        position = frame.pos
         drawn = frame.drawn(DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn()
         blitz.append((drawn, position))
     G["SCREEN"].blits(blitz)
@@ -164,9 +171,10 @@ def input_callback(G):
             HUD_LOCATION[key] = mpos[0], mpos[1] + 100 * (int(key[-1])-1)
     draw(G)
     for key in inputs.get_state_keys():
+        if key not in HUD_LOCATION:
+            continue
         update_input_deck(G, HUD_LOCATION[key], key, clicks)
         draw_input_deck(G, HUD_LOCATION[key], key)
-    inputs.update_tas(G["TAS"], G["FRAME"])
 
 def update_input_deck(G, pos, input_state_key, clicks):
     global CLICK_LOCK
@@ -179,53 +187,140 @@ def update_input_deck(G, pos, input_state_key, clicks):
 
     if pygame.Rect((x+32, y+64), (16, 16)).collidepoint(mpos) and clicks[0]:
         CLICK_LOCK = clicks[0]
-        if ("LEFT_UP" if input_state["LEFT"] else "LEFT_DOWN") not in tas_events:
-            tas_events.append("LEFT_UP" if input_state["LEFT"] else "LEFT_DOWN")
+        if input_state["LEFT"]:
+            if "LEFT_DOWN" in tas_events:
+                tas_events.remove("LEFT_DOWN")
+            if "LEFT_UP" in tas_events:
+                tas_events.remove("LEFT_UP")
+            else:
+                tas_events.append("LEFT_UP")
         else:
-            tas_events.remove("LEFT_UP" if input_state["LEFT"] else "LEFT_DOWN")
+            if "LEFT_UP" in tas_events:
+                tas_events.remove("LEFT_UP")
+            if "LEFT_DOWN" in tas_events:
+                tas_events.remove("LEFT_DOWN")
+            else:
+                tas_events.append("LEFT_DOWN")
+
     if pygame.Rect((x+64, y+64), (16, 16)).collidepoint(mpos) and clicks[0]:
         CLICK_LOCK = clicks[0]
-        if ("RIGHT_UP" if input_state["RIGHT"] else "RIGHT_DOWN") not in tas_events:
-            tas_events.append("RIGHT_UP" if input_state["RIGHT"] else "RIGHT_DOWN")
+        if input_state["RIGHT"]:
+            if "RIGHT_UP" in tas_events:
+                tas_events.remove("RIGHT_DOWN")
+            if "RIGHT_DOWN" in tas_events:
+                tas_events.remove("RIGHT_UP")
+            else:
+                tas_events.append("RIGHT_UP")
         else:
-            tas_events.remove("RIGHT_UP" if input_state["RIGHT"] else "RIGHT_DOWN")
+            if "RIGHT_UP" in tas_events:
+                tas_events.remove("RIGHT_UP")
+            if "RIGHT_DOWN" in tas_events:
+                tas_events.remove("RIGHT_DOWN")
+            else:
+                tas_events.append("RIGHT_DOWN")
+
     if pygame.Rect((x+48, y+48), (16, 16)).collidepoint(mpos) and clicks[0]:
         CLICK_LOCK = clicks[0]
-        if ("UP_UP" if input_state["UP"] else "UP_DOWN") not in tas_events:
-            tas_events.append("UP_UP" if input_state["UP"] else "UP_DOWN")
+        if input_state["UP"]:
+            if "UP_DOWN" in tas_events:
+                tas_events.remove("UP_DOWN")
+            if "UP_UP" in tas_events:
+                tas_events.remove("UP_UP")
+            else:
+                tas_events.append("UP_UP")
         else:
-            tas_events.remove("UP_UP" if input_state["UP"] else "UP_DOWN")
+            if "UP_UP" in tas_events:
+                tas_events.remove("UP_UP")
+            if "UP_DOWN" in tas_events:
+                tas_events.remove("UP_DOWN")
+            else:
+                tas_events.append("UP_DOWN")
+
     if pygame.Rect((x+48, y+80), (16, 16)).collidepoint(mpos) and clicks[0]:
         CLICK_LOCK = clicks[0]
-        if ("DOWN_UP" if input_state["DOWN"] else "DOWN_DOWN") not in tas_events:
-            tas_events.append("DOWN_UP" if input_state["DOWN"] else "DOWN_DOWN")
+        if input_state["DOWN"]:
+            if "DOWN_DOWN" in tas_events:
+                tas_events.remove("DOWN_DOWN")
+            if "DOWN_UP" in tas_events:
+                tas_events.remove("DOWN_UP")
+            else:
+                tas_events.append("DOWN_UP")
         else:
-            tas_events.remove("DOWN_UP" if input_state["DOWN"] else "DOWN_DOWN")
+            if "DOWN_UP" in tas_events:
+                tas_events.remove("DOWN_UP")
+            if "DOWN_DOWN" in tas_events:
+                tas_events.remove("DOWN_DOWN")
+            else:
+                tas_events.append("DOWN_DOWN")
 
     if pygame.Rect((x+32+80, y+64), (16, 16)).collidepoint(mpos) and clicks[0]:
         CLICK_LOCK = clicks[0]
-        if ("A_UP" if input_state["A"] else "A_DOWN") not in tas_events:
-            tas_events.append("A_UP" if input_state["A"] else "A_DOWN")
+        if input_state["A"]:
+            if "A_DOWN" in tas_events:
+                tas_events.remove("A_DOWN")
+            if "A_UP" in tas_events:
+                tas_events.remove("A_UP")
+            else:
+                tas_events.append("A_UP")
         else:
-            tas_events.remove("A_UP" if input_state["A"] else "A_DOWN")
+            if "A_UP" in tas_events:
+                tas_events.remove("A_UP")
+            if "A_DOWN" in tas_events:
+                tas_events.remove("A_DOWN")
+            else:
+                tas_events.append("A_DOWN")
+
     if pygame.Rect((x+64+80, y+64), (16, 16)).collidepoint(mpos) and clicks[0]:
         CLICK_LOCK = clicks[0]
-        if ("X_UP" if input_state["X"] else "X_DOWN") not in tas_events:
-            tas_events.append("X_UP" if input_state["X"] else "X_DOWN")
+        if input_state["X"]:
+            if "X_DOWN" in tas_events:
+                tas_events.remove("X_DOWN")
+            if "X_UP" in tas_events:
+                tas_events.remove("X_UP")
+            else:
+                tas_events.append("X_UP")
         else:
-            tas_events.append("X_UP" if input_state["X"] else "X_DOWN")
+            if "X_UP" in tas_events:
+                tas_events.remove("X_UP")
+            if "X_DOWN" in tas_events:
+                tas_events.remove("X_DOWN")
+            else:
+                tas_events.append("X_DOWN")
+
     if pygame.Rect((x+48+80, y+48), (16, 16)).collidepoint(mpos) and clicks[0]:
         CLICK_LOCK = clicks[0]
-        if ("B_UP" if input_state["B"] else "B_DOWN") not in tas_events:
-            tas_events.append("B_UP" if input_state["B"] else "B_DOWN")
+        if input_state["B"]:
+            if "B_DOWN" in tas_events:
+                tas_events.remove("B_DOWN")
+            if "B_UP" in tas_events:
+                tas_events.remove("B_UP")
+            else:
+                tas_events.append("B_UP")
         else:
-            tas_events.remove("B_UP" if input_state["B"] else "B_DOWN")
+            if "B_UP" in tas_events:
+                tas_events.remove("B_UP")
+            if "B_DOWN" in tas_events:
+                tas_events.remove("B_DOWN")
+            else:
+                tas_events.append("B_DOWN")
+
     if pygame.Rect((x+48+80, y+80), (16, 16)).collidepoint(mpos) and clicks[0]:
         CLICK_LOCK = clicks[0]
-        if ("Y_UP" if input_state["Y"] else "Y_DOWN") not in tas_events:
-            tas_events.append("Y_UP" if input_state["Y"] else "Y_DOWN")
+        if input_state["DOWN"]:
+            if "Y_UP" in tas_events:
+                tas_events.remove("Y_DOWN")
+            if "Y_DOWN" in tas_events:
+                tas_events.remove("Y_UP")
+            else:
+                tas_events.append("Y_UP")
         else:
-            tas_events.remove("Y_UP" if input_state["Y"] else "Y_DOWN")
+            if "Y_UP" in tas_events:
+                tas_events.remove("Y_UP")
+            if "Y_DOWN" in tas_events:
+                tas_events.remove("Y_DOWN")
+            else:
+                tas_events.append("Y_DOWN")
+
 
     if tas_events and G["FRAME"] not in G["TAS"][input_state_key]:
         G["TAS"][input_state_key][G["FRAME"]] = tas_events
@@ -255,11 +350,56 @@ def draw_input_deck(G, pos, input_state_key):
     G["SCREEN"].blit(G["HEL16"].render("B", 0, (0,0,0)), (x+48+80, y+48))
     pygame.draw.rect(G["SCREEN"], (250, 50, 50) if input_state["Y"] else (200, 200, 200), pygame.Rect((x+48+80, y+80), (16, 16)))
     G["SCREEN"].blit(G["HEL16"].render("Y", 0, (0,0,0)), (x+48+80, y+80))
-    
+
+def make_tas_gif(G, noquit=False):
+    while True:
+        if inputs.update_tas(G["TAS"], G["FRAME"], noquit) == "QUIT":
+            G["PRINTER"].make_gif()
+            G["PRINTER"].clear_em()
+            return
+        G["FRAME"] += 1
+
+        worlds_for_updating = [frame.world for frame in filter(lambda f: f.active, G["FRAMES"].get_frames())]
+
+        for world in G["WORLDS"].get_worlds():
+
+            if world not in worlds_for_updating and world.flagged_for_update:
+                worlds_for_updating.append(world)
+
+        for world in worlds_for_updating:
+            world.flagged_for_update = False
+            world.update()
+
+        for actor in  G["ACTOR"].get_actors():
+            actor.updated = False
+
+        blitz = []
+
+        for frame in G["FRAMES"].get_frames():
+            if not frame.active:
+                continue
+            frame.update()
+            position = frame.pos
+            drawn = frame.drawn(DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn()
+            blitz.append((drawn, position))
+
+        G["SCREEN"].blits(blitz)
+        G["PRINTER"].save_surface(G["SCREEN"])
+        if G["FRAME"] % 30 == 0:
+            G["PRINTER"].save_em(G["FRAME"])
+        pygame.display.update()
+
 def tas_er(G, noquit=False):
     while True:
         inp = expect_input(cb=input_callback, args=G)
         mods = pygame.key.get_mods()
+        if inp == pygame.K_SPACE:
+            G["PRINTER"].save_surface(G["SCREEN"])
+            return 0
+
+        if inp == pygame.K_RIGHT:
+            return 10
+
         if inp == pygame.QUIT or (mods & pygame.KMOD_SHIFT and inp == pygame.K_ESCAPE):
             return "QUIT" if noquit else sys.exit()
 
@@ -288,16 +428,22 @@ def tas_er(G, noquit=False):
                 save_tas(filename, G["TAS"])
         
 def run(G, noquit=False):
+    if "-g" in sys.argv:
+        return make_tas_gif(G, noquit)
+    
+    timer = 0
     while True:
         exits = False
-        if "-play" not in sys.argv:
-            exits = tas_er(G) == "QUIT"
-    
-        if inputs.update_tas(G["TAS"], G["FRAME"], noquit) == "QUIT" or exits:
+        if "-play" not in sys.argv and timer <= 0:
+            timer = tas_er(G) - 1
+        else:
+            timer -= 1
+        
+        if inputs.update_tas(G["TAS"], G["FRAME"], noquit) == "QUIT" or timer == "QUIT":
             return
         G["FRAME"] += 1
 
-        worlds_for_updating = [G["FRAMES"].get_frame(name).world for name in G["FRAMEMAP"]]
+        worlds_for_updating = [frame.world for frame in filter(lambda f: f.active, G["FRAMES"].get_frames())]
 
         for world in G["WORLDS"].get_worlds():
 
@@ -312,18 +458,20 @@ def run(G, noquit=False):
             actor.updated = False
 
         blitz = []
-        for name in G["FRAMEMAP"]:
-            frame = G["FRAMES"].get_frame(name)
-            if not frame.active: continue
+
+        for frame in G["FRAMES"].get_frames():
+            if not frame.active:
+                continue
             frame.update()
-            position = G["FRAMEMAP"][name]
+            position = frame.pos
             drawn = frame.drawn(DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn()
             blitz.append((drawn, position))
 
         G["SCREEN"].blits(blitz)
 
         pygame.display.update()
-        G["CLOCK"].tick(30)
+        if "-play" in sys.argv:
+            G["CLOCK"].tick(30)
 
 
 def execute_console_command(G):

@@ -48,11 +48,11 @@ class Frame(object):
         return (position[0] - self.scroll_x, position[1] - self.scroll_y)
 
     def drawn(self, DEBUG=False):
-        resize = self.w < 800 and self.h < 500
+        resize = self.w < 800 or self.h < 500
         if resize:
             self.w *= 2
             self.h *= 2
-            self.update()
+            self.update(resize)
         
         surf = Surface((self.w, self.h))
         self.world.draw(surf, self, DEBUG=DEBUG)
@@ -62,19 +62,23 @@ class Frame(object):
             return pygame.transform.smoothscale(surf, (int(self.w), int(self.h)))
         return surf
 
-    def update(self):
+    def update(self, resize=False):
         if self.focus is not None:
             self.scroll_x = self.focus.x + (self.focus.w // 2) - self.w // 2
             self.scroll_y = self.focus.y + (self.focus.h // 2) - self.h // 2
 
         if self.scrollbound["left"] is not None:
-            if self.scroll_x < self.scrollbound["left"]: self.scroll_x = self.scrollbound["left"]
+            if self.scroll_x < self.scrollbound["left"]:
+                self.scroll_x = self.scrollbound["left"]
 
         if self.scrollbound["right"] is not None:
-            if self.scroll_x + self.w > self.scrollbound["right"]: self.scroll_x = self.scrollbound["right"] - self.w
+            if self.scroll_x + self.w > self.scrollbound["right"]:
+                self.scroll_x = self.scrollbound["right"] - self.w
 
         if self.scrollbound["top"] is not None:
-            if self.scroll_y < self.scrollbound["top"]: self.scroll_y = self.scrollbound["top"]
+            if self.scroll_y < self.scrollbound["top"]:
+                self.scroll_y = self.scrollbound["top"]
 
         if self.scrollbound["bottom"] is not None:
-            if self.scroll_y + self.h > self.scrollbound["bottom"]: self.scroll_y = self.scrollbound["bottom"] - self.h
+            if self.scroll_y + self.h > self.scrollbound["bottom"]:
+                self.scroll_y = self.scrollbound["bottom"] - self.h

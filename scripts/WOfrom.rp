@@ -10,6 +10,9 @@ set self init 0
 set self frame 0
 
 |COLLIDE|
+if self.noWO
+   break
+endif
 if related.init
    take related.from self
 endif

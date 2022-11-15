@@ -6,6 +6,8 @@ import sys
 from copy import deepcopy
 
 from src.inputs import DEFAULT_MAP, DEFAULT_CONTROLLER_MAP
+from src import inputs
+from src import frames
 
 def run_controller_menu(G, cb=lambda *args: None, args=None, noquit=False):
     joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
@@ -42,8 +44,7 @@ def run_controller_menu(G, cb=lambda *args: None, args=None, noquit=False):
                 if joy not in registered:
                     registered.append(joy)
                     players.append(deepcopy(DEFAULT_CONTROLLER_MAP))
-                    print(len(players))
-                    G["INPUTS"].add_state(
+                    inputs.add_state(
                         "PLAYER{}".format(len(players)), inp_map=players[-1], joy=joy)
                 elif btn == DEFAULT_CONTROLLER_MAP["START"]: inmenu = False
 
@@ -57,27 +58,12 @@ def run_controller_menu(G, cb=lambda *args: None, args=None, noquit=False):
             if keys[key] and "key" not in registered or force:
                 registered.append("key")
                 players.append(deepcopy(DEFAULT_MAP))
-                G["INPUTS"].add_state(
+                inputs.add_state(
                     "PLAYER{}".format(len(players)), inp_map=players[-1])
 
         if "key" in registered and keys[DEFAULT_MAP["START"]]:
             inmenu = False
 
-    if len(players) == 1:
-        G["FRAMES"].add_frame("MAIN", G["ROOT"], (G["W"], G["H"]), pos=(0, 0))
+    frames.add_frame("BOOT", G["ROOT"], (G["W"], G["H"]), pos=(0, 0))
 
-    elif len(players) == 2:
-        G["FRAMES"].add_frame("MAIN", G["ROOT"], (G["W"]//2, G["H"]), pos=(0, 0))
-        G["FRAMES"].add_frame("MAIN2", G["ROOT"], (G["W"]//2, G["H"]), pos=(G["W"]//2, 0))
-
-    elif len(players) == 3:
-        G["FRAMES"].add_frame("MAIN", G["ROOT"], (G["W"], G["H"]//2), pos=(0, 0))
-        G["FRAMES"].add_frame("MAIN2", G["ROOT"], (G["W"]//2, G["H"]//2), pos=(0, G["H"] // 2),)
-        G["FRAMES"].add_frame("MAIN3", G["ROOT"], (G["W"]//2, G["H"]//2), pos=(G["W"] // 2, G["H"] // 2))
-
-    elif len(players) >= 4:
-        G["FRAMES"].add_frame("MAIN", G["ROOT"], (G["W"]//2, G["H"]//2), pos=(0, 0))
-        G["FRAMES"].add_frame("MAIN2", G["ROOT"], (G["W"]//2, G["H"]//2), pos=(G["W"] // 2, 0))
-        G["FRAMES"].add_frame("MAIN3", G["ROOT"], (G["W"]//2, G["H"]//2), pos=(0, G["H"] // 2))
-        G["FRAMES"].add_frame("MAIN4", G["ROOT"], (G["W"]//2, G["H"]//2), pos=(G["W"] // 2, G["H"] // 2))
 
