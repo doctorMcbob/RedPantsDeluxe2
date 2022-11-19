@@ -1,0 +1,32 @@
+DEATH|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+LEFT:0 empty 0,0
+PAUSE_LEFT:0 empty 0,0
+PAUSE_WAIT:0 empty 0,0
+
+|START:0|
+set self state WAIT
+
+|PAUSE_LEFT:120|
+set self state LEFT
+
+|PAUSE_WAIT:120|
+set self state WAIT
+
+|COLLIDE|
+if self.name == dragon0
+   if related.state == WAIT
+      set self x_vel 0
+      set self y_vel 0
+      set related state PAUSE_LEFT
+      set related frame 0
+   endif
+   if related.state == LEFT
+      set self x_vel self.speed
+      set self y_vel 0
+      set related state PAUSE_WAIT
+      set related frame 0
+   endif
+endif
+
