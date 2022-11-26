@@ -1,0 +1,91 @@
+PLATFORM|0,0,0,0|False|
+OFF00 empty 0,0
+OFF01 empty 0,0
+OFF02 empty 0,0
+OFF10 empty 0,0
+OFF11 empty 0,0
+OFF12 empty 0,0
+OFF20 empty 0,0
+OFF21 empty 0,0
+OFF22 empty 0,0
+PLATFORM00 empty 0,0
+PLATFORM01 empty 0,0
+PLATFORM02 empty 0,0
+PLATFORM10 empty 0,0
+PLATFORM11 empty 0,0
+PLATFORM12 empty 0,0
+PLATFORM20 empty 0,0
+PLATFORM21 empty 0,0
+PLATFORM22 empty 0,0
+SPAWN00 dragonplatphasing00 0,0
+SPAWN01 dragonplatphasing01 0,0
+SPAWN02 dragonplatphasing02 0,0
+SPAWN10 dragonplatphasing10 0,0
+SPAWN11 dragonplatphasing11 0,0
+SPAWN12 dragonplatphasing12 0,0
+SPAWN20 dragonplatphasing20 0,0
+SPAWN21 dragonplatphasing21 0,0
+SPAWN22 dragonplatphasing22 0,0
+PLAT00 dragonplat00 0,0
+PLAT01 dragonplat01 0,0
+PLAT02 dragonplat02 0,0
+PLAT10 dragonplat10 0,0
+PLAT11 dragonplat11 0,0
+PLAT12 dragonplat12 0,0
+PLAT20 dragonplat20 0,0
+PLAT21 dragonplat21 0,0
+PLAT22 dragonplat22 0,0
+DESPAWN00 dragonplatphasing00 0,0
+DESPAWN01 dragonplatphasing01 0,0
+DESPAWN02 dragonplatphasing02 0,0
+DESPAWN10 dragonplatphasing10 0,0
+DESPAWN11 dragonplatphasing11 0,0
+DESPAWN12 dragonplatphasing12 0,0
+DESPAWN20 dragonplatphasing20 0,0
+DESPAWN21 dragonplatphasing21 0,0
+DESPAWN22 dragonplatphasing22 0,0
+
+|START:0|
+set self platform 1
+set self state OFF
+set self frame 0
+set self target dragon0
+set self spawn_distance 512
+
+|OFF:0|
+if self.target.state == SLEEP
+   break
+endif
+exec calculateDist
+if self.dist < self.spawn_distance
+   if self.dist > 0
+      set self state SPAWN
+      set self frame 0
+   endif
+endif
+
+|SPAWN:8|
+if not COLLIDE?
+   set self state PLAT
+   set self tangible 1
+endif
+
+|PLAT:0|
+exec calculateDist
+set self calc self.dist > self.spawn_distance
+if self.dist <= 0 or self.calc
+   set self state DESPAWN
+   set self frame 0
+   set self tangible 0
+endif
+
+|DESPAWN:8|
+set self state OFF
+
+|calculateDist|
+set self dist 0
+set self dl self.target.x + self.target.w
+if self.x > self.dl
+   set self dist self.x - self.dl
+endif
+

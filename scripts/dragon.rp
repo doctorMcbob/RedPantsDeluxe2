@@ -6,12 +6,21 @@ FLY:0 dragonfly0 -128,-128
 FLY:6 dragonfly1 -128,-128
 FLY:14 dragonfly2 -128,-128
 FLY:20 dragonfly3 -128,-128
+RESET:0 empty 0,0
 
 |START:0|
 set self direction -1
 set self state SLEEP
+set self frame 0
 set self physics 1
-set self speed 3
+set self x_vel 0
+set self y_vel 0
+set self speed 4
+
+|RESET:0|
+set self x -27696
+set self y 10096
+exec START:0
 
 |AWAKE:30|
 set self state FLY
