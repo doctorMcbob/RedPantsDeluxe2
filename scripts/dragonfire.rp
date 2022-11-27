@@ -1,0 +1,37 @@
+FIREBALL|0,0,0,0|False|
+START:0 empty 0,0
+FIRE:0 dragonfire0 0,-24
+FIRE:3 dragonfire1 0,-24
+FIRE:6 dragonfire2 0,-24
+FIRE:9 dragonfire3 0,-24
+FIRE:12 dragonfire4 0,-24
+FIRE:15 dragonfire5 0,-24
+FIRE:18 dragonfire6 0,-24
+FIRE:21 dragonfire7 0,-24
+
+|START:0|
+set self state FIRE
+hitboxes dragonfireball1
+set self counter 5
+set self direction -1
+
+|FIRE:0|
+set self x self.x + self.x_vel
+set self y self.y + self.y_vel
+
+|FIRE:24|
+exec FIRE:0
+set self frame 8
+set self counter self.counter - 1
+if self.counter <= 0
+   goodbye
+endif
+
+|HIT|
+if player in self.name
+   if self.hat != enflamed
+      rebrand enflamed
+      set self hat enflamed
+   endif
+endif
+

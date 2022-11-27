@@ -1,0 +1,21 @@
+DEATH|0,0,0,0|False|
+START:0 empty 0,0
+SHOOT:0 empty 0,0
+PAUSE:0 empty 0,0
+
+|START:0|
+set self state SHOOT
+
+|PAUSE:120|
+set self state SHOOT
+
+|COLLIDE|
+if self.name == dragon0
+   if related.state == SHOOT
+      set self state SHOOT_DOWN
+      set self frame 0
+      set related state PAUSE
+      set related frame 0
+   endif
+endif
+

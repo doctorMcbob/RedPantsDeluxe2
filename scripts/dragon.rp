@@ -7,6 +7,16 @@ FLY:6 dragonfly1 -128,-128
 FLY:14 dragonfly2 -128,-128
 FLY:20 dragonfly3 -128,-128
 RESET:0 empty 0,0
+SHOOT_DOWN:0 dragonblastlow0 -128,-128
+SHOOT_DOWN:12 dragonblastlow1 -128,-128
+SHOOT_DOWN:18 dragonblastlow2 -128,-128
+SHOOT_DOWN:106 dragonblastlow1 -128,-128
+SHOOT_DOWN:112 dragonblastlow0 -128,-128
+SHOOT:0 dragonblast0 -128,-128
+SHOOT:12 dragonblast1 -128,-128
+SHOOT:18 dragonblast2 -128,-128
+SHOOT:106 dragonblast1 -128,-128
+SHOOT:112 dragonblast0 -128,-128
 
 |START:0|
 set self direction -1
@@ -16,6 +26,33 @@ set self physics 1
 set self x_vel 0
 set self y_vel 0
 set self speed 4
+set self firenumber 0
+
+|SHOOT_DOWN:18|
+set self fireball self.name + fireball + self.firenumber
+set self firenumber self.firenumber + 1
+create dragonfire0 self.fireball self.x + self.w + 64 self.w / 2 + self.y
+set self.fireball x_vel self.x_vel
+set self.fireball y_vel self.y_vel
+
+|SHOOT_DOWN:19|
+
+|SHOOT_DOWN:124|
+set self state FLY
+set self frame 0
+
+|SHOOT:18|
+set self fireball self.name + fireball + self.firenumber
+set self firenumber self.firenumber + 1
+create dragonfire0 self.fireball self.x + self.w + 64 self.y + 32
+set self.fireball x_vel self.x_vel
+set self.fireball y_vel self.y_vel
+
+|SHOOT:19|
+
+|SHOOT:124|
+set self state FLY
+set self frame 0
 
 |RESET:0|
 set self x -27696
