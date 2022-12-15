@@ -1,0 +1,42 @@
+BALL|0,0,0,0|False|
+START:0 empty 0,0
+BALL:0 cannonball0 0,0
+BALL:2 cannonball1 0,0
+BALL:4 cannonball2 0,0
+BALL:6 cannonball3 0,0
+BALL:8 cannonball4 0,0
+BALL:10 cannonball5 0,0
+SPLODE:0 cannonballsplode0 0,0
+SPLODE:2 cannonballsplode1 0,0
+SPLODE:4 cannonballsplode2 0,0
+SPLODE:6 cannonballsplode3 0,0
+SPLODE:8 cannonballsplode4 0,0
+
+|START:0|
+set self speed 8
+set self state BALL
+set self frame 0
+set self physics 1
+set self rising 1
+set self _right 1
+set self counter 10
+
+|BALL:11|
+set self frame 0
+set self counter self.counter - 1
+if self.counter < 0
+   set self state SPLODE
+endif
+set self frame 0
+
+|SPLODE:11|
+goodbye
+
+|XCOLLISION|
+set self _right self._right * -1
+set self x_vel self.speed * self._right
+
+|YCOLLISION|
+set self rising self.rising * -1
+set self y_vel self.speed * self.rising
+

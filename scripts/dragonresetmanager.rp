@@ -12,4 +12,5 @@ if inworld player10
 endif
 if self.reset
    set dragon0 state RESET
+   set dgn_countdown_spawnpl0 state RESET
 endif

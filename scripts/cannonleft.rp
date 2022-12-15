@@ -1,0 +1,52 @@
+CANNON|0,0,0,0|False|
+START:0 cannonwait 0,0
+WAIT:0 cannonwait 0,0
+FUSE:0  cannonfuse0 0,0
+FUSE:3  cannonfuse1 0,0
+FUSE:6  cannonfuse2 0,0
+FUSE:9  cannonfuse3 0,0
+FUSE:12  cannonfuse4 0,0
+FUSE:15  cannonfuse5 0,0
+FUSE:18  cannonfuse6 0,0
+FIRE:0  cannonfire0 0,0
+FIRE:4  cannonfire1 0,-16
+FIRE:6  cannonfire2 0,0
+
+|START:0|
+set self direction -1
+set self count 0
+
+|FUSE:21|
+exec shootBall
+set self state FIRE
+set self frame 0
+
+|FIRE:30|
+set self state WAIT
+set self frame 0
+
+|COLLIDE|
+if related.state == FUSE
+   break
+endif
+if related.state == FIRE
+   break
+endif
+if self.hat == enflamed
+   set related state FUSE
+   set related frame 0
+endif
+
+|shootBall|
+set self cannonballname self.name + cannonball + self.count
+create cannonball0 self.cannonballname self.x - 32 self.y - 32
+set self.cannonballname x_vel self.cannonballname.speed * self.direction
+set self.cannonballname y_vel 0 - self.cannonballname.speed
+set self.cannonballname direction self.direction
+set self.cannonballname _right 1
+
+set self cannonblastname self.name + cannonblase + self.count
+create cannonblast0 self.cannonblastname self.x - 32 self.y - 32
+set self.cannonblastname direction self.direction
+
+set self count self.count + 1

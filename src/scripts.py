@@ -366,6 +366,8 @@ def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
     for idx in range(len(cmd)):
         token = cmd[idx]
         try:
+            if token == "WORLD?":
+                cmd[idx] = world.name
             if token == "RAND?":
                 cmd[idx] = randint(0, 1)
             if token == "song?":

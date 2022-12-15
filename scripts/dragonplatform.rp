@@ -44,6 +44,15 @@ DESPAWN12 dragonplatphasing12 0,0
 DESPAWN20 dragonplatphasing20 0,0
 DESPAWN21 dragonplatphasing21 0,0
 DESPAWN22 dragonplatphasing22 0,0
+WARN00 dragonplatwarning00 0,0
+WARN01 dragonplatwarning01 0,0
+WARN02 dragonplatwarning02 0,0
+WARN10 dragonplatwarning10 0,0
+WARN11 dragonplatwarning11 0,0
+WARN12 dragonplatwarning12 0,0
+WARN20 dragonplatwarning20 0,0
+WARN21 dragonplatwarning21 0,0
+WARN22 dragonplatwarning22 0,0
 
 |START:0|
 set self platform 1
@@ -71,6 +80,14 @@ if not COLLIDE?
 endif
 
 |PLAT:0|
+exec calculateDist
+set self calc self.dist > self.spawn_distance
+if self.dist <= 64 or self.calc
+   set self state WARN
+   set self frame 0
+endif
+
+|WARN:0|
 exec calculateDist
 set self calc self.dist > self.spawn_distance
 if self.dist <= 0 or self.calc

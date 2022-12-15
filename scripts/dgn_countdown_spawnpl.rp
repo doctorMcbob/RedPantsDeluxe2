@@ -1,0 +1,57 @@
+MANAGER|0,0,0,0|False|
+START:0 empty 0,0
+COUNT:0 empty 0,0
+OFF:0 empty 0,0
+TIMER:0 empty 0,0
+RESET:0 empty 0,0
+
+|START:0|
+set self counter 3
+set self state COUNT
+set self platformtype platforcastle0
+set self number ""
+for char self.name
+    set self calc char in dgn_countdown_spawnpl
+    if not self.calc
+       set self number self.number + char
+    endif
+endfor
+set self spawnplat spawnpl + self.number
+set self px self.spawnplat.x
+set self py self.spawnplat.y
+set self ph self.spawnplat.h
+set self pw self.spawnplat.w
+set self plname self.name + spawnedplat
+
+|RESET:0|
+exec START:0
+
+|TIMER:2|
+if self.counter <= 0
+   exec spawnPlat
+   set dragon0 x_vel dragon0.speed
+   set dragon0 y_vel 0 - dragon0.speed
+   set self state OFF
+endif
+
+|TIMER:3|
+
+|TIMER:120|
+set self state COUNT
+set self frame 0
+
+|COLLIDE|
+if self.name != dragon0
+   break
+endif
+if related.state == COUNT
+   set related state TIMER
+   set related frame 0
+   set related counter related.counter - 1
+endif
+
+|spawnPlat|
+create self.platformtype self.plname self.px self.py
+set self.plname w self.pw
+set self.plname h self.ph
+

@@ -1,0 +1,21 @@
+FLAG|0,0,0,0|False|
+START:0 respawnflag0 0,0
+FLAG:0 respawnflag0 0,0
+FLAG:3 respawnflag1 0,0
+FLAG:6 respawnflag2 0,0
+FLAG:9 respawnflag3 0,0
+
+|START:0|
+set self state FLAG
+set self frame 0
+
+|FLAG:12|
+set self frame -1
+
+|COLLIDE|
+if player in self.name
+   set self respawnx related.x
+   set self respawny related.y
+   set self respawnworld WORLD?
+endif
+

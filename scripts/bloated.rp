@@ -196,8 +196,14 @@ endif
 |DEAD:45|
 set self state IDLE
 set self frame 0
+exec respawn
+
+|respawn|
 set self x self.respawnx
 set self y self.respawny
+view self.frame_name self.respawnworld
+move self.name self.respawnworld
+set self can_die 1
 
 |BONKLAND:0|
 set self x_vel 0

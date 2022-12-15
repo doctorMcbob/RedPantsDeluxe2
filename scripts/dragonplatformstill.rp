@@ -1,0 +1,19 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 dragonplat00 0,0
+PLATFORM01 dragonplat01 0,0
+PLATFORM02 dragonplat02 0,0
+PLATFORM10 dragonplat10 0,0
+PLATFORM11 dragonplat11 0,0
+PLATFORM12 dragonplat12 0,0
+PLATFORM20 dragonplat20 0,0
+PLATFORM21 dragonplat21 0,0
+PLATFORM22 dragonplat22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0
+set self touched 0
+
+|PLATFORM:0|
+set self frame 0

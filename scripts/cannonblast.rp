@@ -1,0 +1,15 @@
+BLAST|0,0,0,0|False|
+START:0 empty 0,0
+BLAST:0 cannonblast0 0,0
+BLAST:2 cannonblast1 0,0
+BLAST:4 cannonblast2 0,0
+BLAST:6 cannonblast3 0,0
+BLAST:8 cannonblast4 0,0
+BLAST:10 cannonblast5 0,0
+
+|START:0|
+set self state BLAST
+set self frame 0
+
+|BLAST:12|
+goodbye

@@ -153,8 +153,14 @@ endif
 set self state FIRERUN
 set self frame 0
 set self can_die 1
+exec respawn
+
+|respawn|
 set self x self.respawnx
 set self y self.respawny
+view self.frame_name self.respawnworld
+move self.name self.respawnworld
+set self can_die 1
 
 |HITSTUN:0|
 set self x_vel 0
