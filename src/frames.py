@@ -48,7 +48,7 @@ class Frame(object):
         return (position[0] - self.scroll_x, position[1] - self.scroll_y)
 
     def drawn(self, DEBUG=False):
-        resize = self.w < 800 or self.h < 500
+        resize = self.w < 800 and self.h < 500
         if resize:
             self.w *= 2
             self.h *= 2
