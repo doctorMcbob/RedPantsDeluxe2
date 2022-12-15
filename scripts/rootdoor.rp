@@ -13,8 +13,7 @@ if self.door_key
    if self.door_key + _DOWN in inpEVENTS
       move self root
       view self.frame_name root
-      set self respawnx self.x
-      set self respawny self.y
+
       remove inpEVENTS self.door_key + _DOWN
    endif
 endif

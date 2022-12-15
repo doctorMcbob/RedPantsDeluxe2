@@ -14,8 +14,7 @@ if self.door_key
    if self.door_key + _DOWN in inpEVENTS
       move self world2
       view self.frame_name world2
-      set self respawnx self.x
-      set self respawny self.y
+
       remove inpEVENTS self.door_key + _DOWN
    endif
 endif

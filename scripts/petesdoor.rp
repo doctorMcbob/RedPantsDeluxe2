@@ -28,8 +28,7 @@ if self.door_key
       makeframe PIZZAGAME pizzagame 0 0 576 640
       makeframe PIZZAPOD pizzapod 576 0 576 640      
 
-      set self respawnx self.x
-      set self respawny self.y
+
 
       remove inpEVENTS self.door_key + _DOWN
    endif

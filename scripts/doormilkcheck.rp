@@ -20,6 +20,7 @@ if self.door_key
       	 view self.frame_name related.destination
       	 set self respawnx self.x
       	 set self respawny self.y
+set self respawnworld WORLD?
       	 remove inpEVENTS self.door_key + _DOWN
       endif
    endif

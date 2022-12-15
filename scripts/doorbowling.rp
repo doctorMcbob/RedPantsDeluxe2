@@ -18,8 +18,7 @@ if self.door_key
       add bowlingmanager0.players self._input_name
       add bowlingmanager0.frames self.frame_name
 
-      set self respawnx self.x
-      set self respawny self.y
+
 
       remove inpEVENTS self.door_key + _DOWN
    endif
