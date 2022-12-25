@@ -274,7 +274,15 @@ def resolve(reference, script, world, related=None, logfunc=print):
 
             elif verb == "songoff":
                 sounds.stop_song()
-            
+
+            elif verb == "offsetbgscrollx":
+                world_ref = cmd.pop(0)
+                worlds.get_world(world_ref).background_xscroll += float(cmd.pop(0))
+                
+            elif verb == "offsetbgscrolly":
+                world_ref = cmd.pop(0)
+                worlds.get_world(world_ref).background_yscroll += float(cmd.pop(0))
+                
             elif verb == "for": # gulp
                 key = cmd.pop(0)
                 target = deepcopy(cmd.pop())

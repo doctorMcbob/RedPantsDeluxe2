@@ -49,7 +49,9 @@ class World(object):
         self.x_lock = None if "x_lock" not in template else template["x_lock"]
         self.y_lock = None if "y_lock" not in template else template["y_lock"]
         self.flagged_for_update = True if "flagged_for_update" not in template else template["flagged_for_update"]
-
+        self.background_xscroll = 0
+        self.background_yscroll = 0
+        
     def as_template(self):
         return {
             "name": self.name,
@@ -57,6 +59,8 @@ class World(object):
             "actors": self.actors,
             "x_lock": self.x_lock,
             "y_lock": self.y_lock,
+            "backgroundscroll_x": self.background_xscroll,
+            "backgroundscroll_y": self.background_yscroll,
             "flagged_for_update": self.flagged_for_update,
         }
         
@@ -89,11 +93,10 @@ class World(object):
             blitz = []
             for y in range((dest.get_height() // self.background.get_height())+2):
                 y =  y*self.background.get_height()
-                y -= (frame.scroll_y // 2) % self.background.get_height()
+                y -= (frame.scroll_y // 2 + self.background_yscroll) % self.background.get_height()
                 for x in range((dest.get_width() // self.background.get_width())+2):
                     x = x * self.background.get_width()
-                    x -= (frame.scroll_x // 2) % self.background.get_width()
-
+                    x -= (frame.scroll_x // 2 + self.background_xscroll) % self.background.get_width()
                     blitz.append((self.background, (x, y)))
             dest.blits(blitz)
         else:

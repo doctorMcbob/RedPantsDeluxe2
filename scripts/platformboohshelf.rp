@@ -1,0 +1,15 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 platform2400 0,0
+PLATFORM01 platform2401 0,0
+PLATFORM02 platform2402 0,0
+PLATFORM10 platform2410 0,0
+PLATFORM11 platform2411 0,0
+PLATFORM12 platform2412 0,0
+PLATFORM20 platform2420 0,0
+PLATFORM21 platform2421 0,0
+PLATFORM22 platform2422 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0

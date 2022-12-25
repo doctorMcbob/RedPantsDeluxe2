@@ -1,0 +1,16 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 trainwheels00 0,0
+PLATFORM01 trainwheels01 0,0
+PLATFORM02 trainwheels02 0,0
+PLATFORM10 trainwheels10 0,0
+PLATFORM11 trainwheels11 0,0
+PLATFORM12 trainwheels12 0,0
+PLATFORM20 trainwheels20 0,0
+PLATFORM21 trainwheels21 0,0
+PLATFORM22 trainwheels22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0
+

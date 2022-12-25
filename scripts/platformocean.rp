@@ -1,0 +1,15 @@
+PLAT|66,608,1026,66|False|
+PLATFORM00 ocean00 0,0
+PLATFORM01 ocean01 0,0
+PLATFORM02 ocean02 0,0
+PLATFORM10 ocean10 0,0
+PLATFORM11 ocean11 0,0
+PLATFORM12 ocean12 0,0
+PLATFORM20 ocean20 0,0
+PLATFORM21 ocean21 0,0
+PLATFORM22 ocean22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0

@@ -1,0 +1,22 @@
+SHIFTER|0,0,0,0|False|
+START:0 empty 0,0
+SHIFT:0 empty 0,0
+
+|START:0|
+set self number ""
+for char self.name
+    set self calc char in shifter
+    if not self.calc
+       set self number self.number + char
+    endif
+endfor
+
+set self endname shifterend + self.number
+
+set self target_x self.endname.x
+
+set self state SHIFT
+
+|COLLIDE|
+set self x related.target_x
+

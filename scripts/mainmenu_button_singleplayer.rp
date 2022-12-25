@@ -53,7 +53,7 @@ endif
 
 
 |press|
-#makeframe MAIN dungeon2 0 0 1152 640
+#makeframe MAIN desert1 0 0 1152 640
 makeframe MAIN redpantshouseroot 0 0 1152 640
 deactivate ROOT
 

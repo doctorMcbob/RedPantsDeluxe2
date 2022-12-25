@@ -1,0 +1,18 @@
+PLAT|64,608,1024,64|False|
+TRACK00 railroad00 0,0
+TRACK01 railroad01 0,0
+TRACK02 railroad02 0,0
+TRACK10 railroad10 0,0
+TRACK11 railroad11 0,0
+TRACK12 railroad12 0,0
+TRACK20 railroad20 0,0
+TRACK21 railroad21 0,0
+TRACK22 railroad22 0,0
+
+|START:0|
+set self state TRACK
+set self platform 1
+set self physics 1
+set self frame 0
+set self x_vel -8
+

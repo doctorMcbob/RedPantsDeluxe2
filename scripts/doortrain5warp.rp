@@ -1,0 +1,29 @@
+DOOR|0,0,0,0|False|
+START:0 door0 0,0
+DOOR:0 door0 0,0
+
+|START:0|
+set self state DOOR
+set self destination trainride5
+set self position_x 10864
+set self position_y -1968
+
+|DOOR:0|
+set self frame 0
+
+|COLLIDE|
+if self.door_key
+   if self.door_key + _DOWN in inpEVENTS
+      move self related.destination
+      view self.frame_name related.destination
+
+      set self calcx related.x - self.x
+      set self calcy related.y - self.y
+
+      set self x related.position_x - self.calcx
+      set self y related.position_y - self.calcy
+
+      remove inpEVENTS self.door_key + _DOWN
+   endif
+endif
+

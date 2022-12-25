@@ -1,0 +1,61 @@
+WALKOFF|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+# to is _left, from is _right
+set self _left swamp0
+set self _right graveyard1
+set self offset_left 128
+set self offset_right 128
+
+create WOinbetween0 self.name + inbetween self.x + 32 self.y
+set self.name + inbetween w self.w - 64
+set self.name + inbetween h self.h
+
+create WOfrom0 self.name + from0 self.x self.y
+set self.name + from0 w 32
+set self.name + from0 h self.h
+
+create WOfrom0 self.name + from1 self.x + self.w - 32 self.y
+set self.name + from1 w 32
+set self.name + from1 h self.h
+
+create WOto0 self.name + to0 self.x + self.offset_right self.y
+set self.name + to0 w 32
+set self.name + to0 h self.h
+
+create WOto0 self.name + to1 self.x + self.w - self.offset_left - 32 self.y
+set self.name + to1 w 32
+set self.name + to1 h self.h
+
+set self.name + inbetween A self._right
+set self.name + inbetween B self._left
+
+set self.name + from0 from self._right
+set self.name + from1 from self._left
+
+set self.name + to1 to self._right
+set self.name + to0 to self._left
+
+set self.name + inbetween init 1
+set self.name + from0 init 1
+set self.name + from1 init 1
+set self.name + to0 init 1
+set self.name + to1 init 1
+
+place self.name + inbetween self._right
+place self.name + inbetween self._left
+
+place self.name + from0 self._right
+place self.name + from0 self._left
+
+place self.name + from1 self._right
+place self.name + from1 self._left
+
+place self.name + to0 self._right
+place self.name + to0 self._left
+
+place self.name + to1 self._right
+place self.name + to1 self._left
+
+goodbye
