@@ -1,0 +1,13 @@
+FX|0,0,0,0|False|
+START:0 empty 0,0
+SPLASH:0 splash0 0,0
+SPLASH:3 splash1 0,0
+SPLASH:6 splash2 0,0
+
+|START:0|
+set self state SPLASH
+set self frame 0
+
+|SPLASH:7|
+goodbye
+

@@ -1,0 +1,16 @@
+FX|0,0,0,0|False|
+START:0 empty 0,0
+BUBBLE:0 bubble0 0,0
+BUBBLE:2 bubble1 0,0
+BUBBLE:4 bubble0 0,0
+BUBBLE:6 bubble1 0,0
+BUBBLE:8 bubble2 0,0
+
+|START:0|
+set self physics 1
+set self y_vel -3
+set self state BUBBLE
+set self frame 0
+
+|BUBBLE:16|
+goodbye

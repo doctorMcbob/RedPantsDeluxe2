@@ -29,6 +29,12 @@ BONKLAND:8 bloatedbonkland1 -16,0
 DEAD:0 redpantsdead -16,0
 HITSTUN:0 bloatedbonk -16,0
 INVISIBLE:0 empty 0,0
+DROWN:0 empty 0,0
+
+|DROWN:45|
+set self state IDLE
+self self frame 0
+exec respawn
 
 |START:0|
 set self speed 3

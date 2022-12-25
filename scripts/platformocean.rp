@@ -13,3 +13,6 @@ PLATFORM22 ocean22 0,0
 set self state PLATFORM
 set self platform 1
 set self frame 0
+set self tangible 0
+
+

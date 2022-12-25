@@ -44,6 +44,13 @@ PUNCH:6 moonmanpunch2 -32,0
 PUNCH:8 moonmanpunch3 -16,0
 DANGLE:0 moonmandangle 0,-16
 INVISIBLE:0 empty 0,0
+DROWN:0 empty 0,0
+
+|DROWN:45|
+set self state IDLE
+self self frame 0
+exec respawn
+
 
 |DANGLE:0|
 rebrand moonmanD
@@ -162,7 +169,6 @@ endif
 set self frame 0
 
 |LONGJUMPSTART:0|
-exec checkAir
 exec applyTraction
 exec applyGrav
 
@@ -277,7 +283,6 @@ endif
 exec applyGrav
 
 |JUMPSQUAT:0|
-exec checkAir
 exec applyTraction
 exec applyGrav
 
@@ -376,7 +381,6 @@ set self direction self.direction * -1
 set self x_vel self.walljumpoff * self.direction * -1
 
 |FLIPSQUAT:0|
-exec checkAir
 exec applyTraction
 exec applyGrav
 

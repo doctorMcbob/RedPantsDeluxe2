@@ -48,6 +48,13 @@ PUNCH:6 antlerpunch2 -32,-16
 PUNCH:8 antlerpunch3 -32,-16
 DANGLE:0 antlerdangle -48,-16
 INVISIBLE:0 empty 0,0
+DROWN:0 empty 0,0
+
+|DROWN:45|
+set self state IDLE
+self self frame 0
+exec respawn
+
 
 |DANGLE:0|
 if self.dangle_from
@@ -170,7 +177,6 @@ endif
 set self frame 0
 
 |LONGJUMPSTART:0|
-exec checkAir
 exec applyTraction
 exec applyGrav
 
@@ -276,7 +282,6 @@ endif
 exec applyGrav
 
 |JUMPSQUAT:0|
-exec checkAir
 exec applyTraction
 exec applyGrav
 
@@ -430,7 +435,6 @@ set self direction self.direction * -1
 set self x_vel self.walljumpoff * self.direction
 
 |FLIPSQUAT:0|
-exec checkAir
 exec applyTraction
 exec applyGrav
 

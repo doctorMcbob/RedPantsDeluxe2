@@ -34,6 +34,12 @@ BURNOUTJUMP:9 burnoutjump3 -16,-16
 DEAD:0 redpantsdead -16,0
 HITSTUN:0 flaming7 -16,-16
 INVISIBLE:0 empty 0,0
+DROWN:0 empty 0,0
+
+|DROWN:45|
+set self state IDLE
+self self frame 0
+exec respawn
 
 |START:0|
 set self state FLAMING
@@ -105,7 +111,6 @@ set self hat 0
 rebrand self.base
 
 |JUMPSQUAT:0|
-exec checkAir
 exec applyGrav
 
 |JUMPSQUAT:4|

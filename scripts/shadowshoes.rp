@@ -44,6 +44,13 @@ PUNCH:6 shadowpunch2 -32,0
 PUNCH:8 shadowpunch3 -16,0
 DANGLE:0 shadowdangle -16,0
 INVISIBLE:0 empty 0,0
+DROWN:0 empty 0,0
+
+|DROWN:45|
+set self state IDLE
+self self frame 0
+exec respawn
+
 
 |DANGLE:0|
 if self.dangle_from
@@ -162,7 +169,6 @@ endif
 set self frame 0
 
 |LONGJUMPSTART:0|
-exec checkAir
 exec applyTraction
 
 |LONGJUMPSTART:2|
@@ -265,7 +271,6 @@ endif
 exec applyGrav
 
 |JUMPSQUAT:0|
-exec checkAir
 exec applyTraction
 
 |JUMPSQUAT:6|
@@ -360,7 +365,6 @@ set self direction self.direction * -1
 set self x_vel self.walljumpoff * self.direction
 
 |FLIPSQUAT:0|
-exec checkAir
 exec applyTraction
 
 |FLIPSQUAT:6|

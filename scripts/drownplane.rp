@@ -1,0 +1,20 @@
+DEATH|0,0,0,0|False|
+START:0 empty 0,0
+
+|COLLIDE|
+if self.can_die
+   if self.state == DROWN
+      break
+   endif
+   set self state DEAD
+   set self frame 0
+   if player in self.name
+      set self state DROWN
+      set self x_vel 0
+      set self y_vel 0
+      create splash0 self.name + splash self.x self.y 
+      create bubble0 self.name + bubble0 self.x self.y 
+
+   endif
+endif
+
