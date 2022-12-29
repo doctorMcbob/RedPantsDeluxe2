@@ -1,0 +1,19 @@
+GUY|0,0,0,0|False|
+START:0 empty -32,-48
+STAND:0 moonstand0 -32,-48
+STAND:8 moonstand1 -32,-48
+DANCE:0 moondance0 -32,-48
+DANCE:8 moondance1 -32,-48
+DANCE:16 moondance2 -32,-48
+DANCE:24 moondance1 -32,-48
+
+
+|START:0|
+set self state DANCE
+set self frame 0
+
+|STAND:10|
+set self frame 0
+
+|DANCE:32|
+set self frame 0

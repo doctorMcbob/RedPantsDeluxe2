@@ -252,6 +252,7 @@ endif
 if inworld player40
    set self target player40
 endif
+
 if self.target
    if self.target.x > self.x
       set self direction 1

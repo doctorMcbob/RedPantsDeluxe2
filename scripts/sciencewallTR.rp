@@ -1,0 +1,33 @@
+SCI|0,0,0,0|False|
+START:0 sciTR0 0,0
+EMPTY:0 sciTR2 0,0
+BLINK:0 sciTR0 0,0
+BLINK:4 sciTR2 0,0
+BLINK:8 sciTR0 0,0
+BLINK:12 sciTR2 0,0
+BLINK:16 sciTR0 0,0
+BLINK:20 sciTR2 0,0
+FOUND:0 sciTR0 0,0
+FOUND:20 sciTR1 0,0
+
+|START:0|
+set self state EMPTY
+set self frame 0
+set self direction -1
+
+|EMPTY:0|
+if inv0.scienceTR
+   set self state FOUND
+   set self frame 0
+endif
+
+|EMPTY:120|
+set self state BLINK
+set self frame 0
+
+|FOUND:24|
+set self frame 0
+
+|BLINK:24|
+set self state EMPTY
+set self frame 0

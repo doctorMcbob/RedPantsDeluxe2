@@ -1,0 +1,11 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+SCROLL:0 empty 0,0
+
+|START:0|
+set self vel -32
+set self state SCROLL
+
+|SCROLL:0|
+offsetbgscrolly WORLD? self.vel
+

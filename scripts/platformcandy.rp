@@ -8,27 +8,9 @@ PLATFORM12 platform2712 0,0
 PLATFORM20 platform2720 0,0
 PLATFORM21 platform2721 0,0
 PLATFORM22 platform2722 0,0
-TOUCHED00 touched2700 0,0
-TOUCHED01 touched2701 0,0
-TOUCHED02 touched2702 0,0
-TOUCHED10 touched2710 0,0
-TOUCHED11 touched2711 0,0
-TOUCHED12 touched2712 0,0
-TOUCHED20 touched2720 0,0
-TOUCHED21 touched2721 0,0
-TOUCHED22 touched2722 0,0
 
 |START:0|
 set self state PLATFORM
 set self platform 1
 set self frame 0
-set self touched 0
 
-|PLATFORM:0|
-if self.touched > 0
-    set self state TOUCHED
-endif
-set self frame 0
-
-|TOUCHED:0|
-set self frame 0

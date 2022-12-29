@@ -1,0 +1,16 @@
+FOCUSON|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self noWO 1
+set self state WAIT
+
+|WAIT:0|
+set self frame 0
+
+|COLLIDE|
+if self.grav
+   set self grav 1
+endif
+

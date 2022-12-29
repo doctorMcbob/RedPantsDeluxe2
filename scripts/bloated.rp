@@ -319,6 +319,19 @@ if self.y_vel < self.neglimit
    set self y_vel self.neglimit
 endif
 
+if abs self.y_vel < 1
+   if self.y_vel > 0
+      if self.grav > 0
+         set self y_vel 1
+      endif
+   endif
+   if self.y_vel < 0
+      if self.grav < 0
+         set self y_vel -1
+      endif
+   endif
+endif
+
 |checkFart|
 if B_DOWN in inpEVENTS
    set self state JUMPING

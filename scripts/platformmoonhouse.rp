@@ -1,0 +1,34 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 platfornmoonhouse00 0,0
+PLATFORM01 platfornmoonhouse01 0,0
+PLATFORM02 platfornmoonhouse02 0,0
+PLATFORM10 platfornmoonhouse10 0,0
+PLATFORM11 platfornmoonhouse11 0,0
+PLATFORM12 platfornmoonhouse12 0,0
+PLATFORM20 platfornmoonhouse20 0,0
+PLATFORM21 platfornmoonhouse21 0,0
+PLATFORM22 platfornmoonhouse22 0,0
+TOUCHED00 touchedmoonhouse00 0,0
+TOUCHED01 touchedmoonhouse01 0,0
+TOUCHED02 touchedmoonhouse02 0,0
+TOUCHED10 touchedmoonhouse10 0,0
+TOUCHED11 touchedmoonhouse11 0,0
+TOUCHED12 touchedmoonhouse12 0,0
+TOUCHED20 touchedmoonhouse20 0,0
+TOUCHED21 touchedmoonhouse21 0,0
+TOUCHED22 touchedmoonhouse22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0
+set self touched 0
+
+|PLATFORM:0|
+if self.touched > 0
+    set self state TOUCHED
+endif
+set self frame 0
+
+|TOUCHED:0|
+set self frame 0

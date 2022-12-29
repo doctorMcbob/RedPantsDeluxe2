@@ -1,0 +1,15 @@
+PLAT|64,608,1024,64|False|
+PLATFORM00 greybackground00 0,0
+PLATFORM01 greybackground01 0,0
+PLATFORM02 greybackground02 0,0
+PLATFORM10 greybackground10 0,0
+PLATFORM11 greybackground11 0,0
+PLATFORM12 greybackground12 0,0
+PLATFORM20 greybackground20 0,0
+PLATFORM21 greybackground21 0,0
+PLATFORM22 greybackground22 0,0
+
+|START:0|
+set self platform 1
+set self frame 0
+

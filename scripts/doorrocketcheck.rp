@@ -1,0 +1,26 @@
+DOOR|0,0,0,0|False|
+START:0 door0 8,0
+DOOR:0 door0 8,0
+
+|START:0|
+set self state DOOR
+set self destination rocket
+
+|DOOR:0|
+set self frame 0
+
+|COLLIDE|
+if self.door_key
+   if self.door_key + _DOWN in inpEVENTS
+      set self calc inv0.scienceTR and inv0.scienceBR or self.calc and inv0.scienceTL and inv0.scienceBL
+      if not self.calc
+      	 create lockicon0 related.name + lockicon related.x + 24 related.y
+      endif
+      if self.calc
+      	 move self related.destination
+      	 view self.frame_name related.destination
+      	 remove inpEVENTS self.door_key + _DOWN
+      endif
+   endif
+endif
+

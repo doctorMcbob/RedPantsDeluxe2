@@ -62,10 +62,10 @@ set self calc pig in self.name
 if not self.calc
    set related state STOP
    set related frame 0
-   if self.can_die
-      set self state DEAD
-      set self frame 0
-   endif
+#   if self.can_die
+#      set self state DEAD
+#      set self frame 0
+#   endif
    if not self.can_die
       set self state HITSTUN
       set self frame 0

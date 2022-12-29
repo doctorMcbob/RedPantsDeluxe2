@@ -3,6 +3,9 @@ START:0 empty 0,0
 INV:0 empty 0,0
 
 |START:0|
+# disable me
+set self cheater_mode 1
+
 set self state INV
 set self frame 0
 
@@ -10,13 +13,34 @@ set self collected []
 set self coins 0
 set self bananas 0
 
+set self scienceTR 0
+set self scienceTL 0
+set self scienceBR 0
+set self scienceBL 0
+
 set self fighter_unlock 0
 set self antlers_unlock 0
 set self shoes_unlock 0
 set self moon_unlock 0
 
 set self breakroomlocked 1
+set self moonhouselocked 1
+set self moonhousebacklocked 1
 
-|INV:0|
-set self frame 0
+if self.cheater_mode
+   # CHEATER MODE
+   set self scienceTR 1
+   set self scienceTL 1
+   set self scienceBR 1
+   set self scienceBL 1
+
+   set self fighter_unlock 1
+   set self antlers_unlock 1
+   set self shoes_unlock 1
+   set self moon_unlock 1
+
+   set self breakroomlocked 0
+   set self moonhouselocked 0
+   set self moonhousebacklocked 0
+endif
 

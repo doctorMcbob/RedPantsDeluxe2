@@ -1,0 +1,15 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 rocketwallred00 0,0
+PLATFORM01 rocketwallred01 0,0
+PLATFORM02 rocketwallred02 0,0
+PLATFORM10 rocketwallred10 0,0
+PLATFORM11 rocketwallred11 0,0
+PLATFORM12 rocketwallred12 0,0
+PLATFORM20 rocketwallred20 0,0
+PLATFORM21 rocketwallred21 0,0
+PLATFORM22 rocketwallred22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0

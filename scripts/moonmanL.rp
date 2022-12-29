@@ -74,7 +74,9 @@ set self airspeedcontrol 12
 set self negairspeedcontrol self.airspeedcontrol * -1
 set self negspeed self.speed * -1
 set self neglimit self.limit * -1
-set self grav 1
+if not self.grav
+   set self grav 1
+endif
 set self slideflipxmod 3
 set self slideflipstrength 24
 set self longjumpystrength 9
@@ -513,6 +515,7 @@ if self.state == PLATFORM
 endif
 set self calc self.state == BANANA
 set self calc self.state == CHEESE or self.calc
+set self calc self.state == COLLECTABLE or self.calc
 if self.state == COIN or self.calc
    set self collected 1
 endif
@@ -531,6 +534,19 @@ if self.x_vel > self.limit
 endif
 if self.x_vel < self.neglimit
    set self x_vel self.neglimit
+endif
+
+if abs self.x_vel < 1
+   if self.x_vel > 0
+      if self.grav < 0
+         set self x_vel 1
+      endif
+   endif
+   if self.x_vel < 0
+      if self.grav > 0
+         set self x_vel -1
+      endif
+   endif
 endif
 
 |applyTraction|

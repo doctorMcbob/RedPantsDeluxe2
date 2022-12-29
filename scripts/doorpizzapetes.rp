@@ -1,0 +1,21 @@
+DOOR|0,0,0,0|False|
+START:0 door0 0,0
+DOOR:0 door0 0,0
+
+|START:0|
+set self state DOOR
+set self destination pizzapetes
+
+|DOOR:0|
+set self frame 0
+
+|COLLIDE|
+if self.door_key
+   if self.door_key + _DOWN in inpEVENTS
+      move self related.destination
+      view self.frame_name related.destination
+
+      remove inpEVENTS self.door_key + _DOWN
+   endif
+endif
+

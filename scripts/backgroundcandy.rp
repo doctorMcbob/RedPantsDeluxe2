@@ -1,0 +1,16 @@
+PLAT|64,608,1024,64|False|
+PLATFORM00 backgroundcandy00 0,0
+PLATFORM01 backgroundcandy01 0,0
+PLATFORM02 backgroundcandy02 0,0
+PLATFORM10 backgroundcandy10 0,0
+PLATFORM11 backgroundcandy11 0,0
+PLATFORM12 backgroundcandy12 0,0
+PLATFORM20 backgroundcandy20 0,0
+PLATFORM21 backgroundcandy21 0,0
+PLATFORM22 backgroundcandy22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0
+
