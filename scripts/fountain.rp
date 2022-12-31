@@ -1,0 +1,6 @@
+FINAL|0,0,0,0|False|
+START:0 fountain 0,0
+LOOK:0 fountain 0,0
+
+|START:0|
+set self state LOOK

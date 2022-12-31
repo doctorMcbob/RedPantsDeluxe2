@@ -20,7 +20,7 @@ if player in self.name
    if self.hat != antlers
       if related.state == HAT
          rebrand antlers
-         set self hat anlers
+         set self hat antlers
       endif
    endif
 endif

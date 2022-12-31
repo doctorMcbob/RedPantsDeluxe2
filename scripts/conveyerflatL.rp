@@ -1,0 +1,20 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 conveyerflat00 0,0
+PLATFORM01 conveyerflat01 0,0
+PLATFORM02 conveyerflat02 0,0
+PLATFORM10 conveyerflat10 0,0
+PLATFORM11 conveyerflat11 0,0
+PLATFORM12 conveyerflat12 0,0
+PLATFORM20 conveyerflat20 0,0
+PLATFORM21 conveyerflat21 0,0
+PLATFORM22 conveyerflat22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0
+
+|COLLIDE|
+print self.name + " " + related.name
+set self x_vel self.x_vel - 1
+

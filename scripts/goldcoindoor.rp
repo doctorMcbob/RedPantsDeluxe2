@@ -1,0 +1,7 @@
+FINAL|0,0,0,0|False|
+START:0 coindoor0 0,0
+CLOSED:0 coindoor0 0,0
+OPEN:0 coindoor1 0,0
+
+|START:0|
+set self state CLOSED
