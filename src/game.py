@@ -28,7 +28,7 @@ def set_up():
     H = 640 if "-h" not in sys.argv else int(sys.argv[sys.argv.index("-h")+1])
     G = {"W":W,"H":H}
     G["SCREEN"] = pygame.display.set_mode((W, H)) if "-f" not in sys.argv else pygame.display.set_mode((W, H), pygame.FULLSCREEN)
-    pygame.display.set_caption("Rage of the Blind Witch")
+    pygame.display.set_caption("Red Pants")
     G["HEL32"] = pygame.font.SysFont("Helvetica", 32)
     G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
     G["SCREEN"].fill((255, 255, 255))

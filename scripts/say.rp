@@ -3,10 +3,10 @@ START:0 empty 0,0
 SAY:0 empty 0,0
 
 |START:0|
-set self message "YOU HAVE WON THE CURSE IS OVER"
+set self message "WESLEYS COOL SITE DOT COM"
 set self state SAY
 set self frame -1
-set self timer 400
+set self timer 140
 set self y_off 16
 set self x_off 16
 set self back backgroundsay0

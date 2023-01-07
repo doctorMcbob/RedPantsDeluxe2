@@ -1,0 +1,16 @@
+PLAT|64,608,1024,64|False|
+PLATFORM00 backgroundbathroom00 0,0
+PLATFORM01 backgroundbathroom01 0,0
+PLATFORM02 backgroundbathroom02 0,0
+PLATFORM10 backgroundbathroom10 0,0
+PLATFORM11 backgroundbathroom11 0,0
+PLATFORM12 backgroundbathroom12 0,0
+PLATFORM20 backgroundbathroom20 0,0
+PLATFORM21 backgroundbathroom21 0,0
+PLATFORM22 backgroundbathroom22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0
+

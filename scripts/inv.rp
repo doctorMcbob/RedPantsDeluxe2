@@ -4,7 +4,7 @@ INV:0 empty 0,0
 
 |START:0|
 # disable me
-set self cheater_mode 1
+set self cheater_mode 0
 
 set self state INV
 set self frame 0
@@ -27,6 +27,13 @@ set self breakroomlocked 1
 set self moonhouselocked 1
 set self moonhousebacklocked 1
 set self workshoplocked 1
+
+set self gcmilk 0
+set self gcpizza 0
+set self gcdragon 0
+set self gcwitch 0
+set self gcmoon 0
+set self gcsanta 0
 
 if self.cheater_mode
    # CHEATER MODE

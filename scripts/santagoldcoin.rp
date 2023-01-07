@@ -1,0 +1,12 @@
+SHOW|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+SHOW:0 gcsanta 0,0
+
+|START:0|
+set self state WAIT
+
+|WAIT:0|
+if inv0.gcsanta
+   set self state SHOW
+endif
