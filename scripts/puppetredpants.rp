@@ -315,7 +315,7 @@ exec checkAir
 exec applyTraction
 exec applyGrav
 # bufferable Pog?
-if inpA
+if RAND? and RAND? and RAND?
    set self state ROLLOUT
    set self frame 0
    set self y_vel self.rolloutstrength

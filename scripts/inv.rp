@@ -51,5 +51,13 @@ if self.cheater_mode
    set self moonhouselocked 0
    set self moonhousebacklocked 0
    set self workshoplocked 0
+
+
+   set self gcmilk 1
+   set self gcpizza 1
+   set self gcdragon 1
+   set self gcwitch 1
+   set self gcmoon 1
+   set self gcsanta 1
 endif
 

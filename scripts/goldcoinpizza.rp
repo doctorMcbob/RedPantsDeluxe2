@@ -1,0 +1,36 @@
+COIN|0,0,0,0|False|
+START:0 gcpizza 0,0
+COIN:0 gcpizza 0,0
+COIN:4 gcside 0,0
+COIN:8 gcback 0,0
+COIN:12 gcside 0,0
+OFF:0 empty 0,0
+
+|START:0|
+set self state OFF
+set self frame 0
+set self collected 0
+
+|COIN:0|
+if self.collected
+   set self state COLLECT
+   set self frame 0
+endif
+
+|COIN:16|
+set self frame 0
+exec COIN:0
+
+|COLLECT:0|
+set self y self.y - 3
+
+|COLLECT:20|
+goodbye
+
+|COLLIDE|
+if player in self.name
+   if related.name in inv0.collected == 0
+      add inv0.collected related.name
+      set inv0 gcpizza 1
+   endif
+endif
