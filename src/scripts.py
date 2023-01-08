@@ -461,6 +461,12 @@ def resolve_operators(cmd, world, logfunc=print):
             elif token == "len":
                 calculated = len(cmd.pop(idx+1))
                 evaluated.append(calculated)
+            elif token == "int":
+                calculated = int(cmd.pop(idx+1))
+                evaluated.append(calculated)
+            elif token == "str":
+                calculated = str(cmd.pop(idx+1))
+                evaluated.append(calculated)
             elif token == "countof":
                 calculated = cmd.pop(idx+1).count(cmd.pop(idx+1))
                 evaluated.append(calculated)
@@ -491,6 +497,8 @@ def resolve_operators(cmd, world, logfunc=print):
                 if token != "at":
                     if (type(left) == str and type(right) == int) or (type(right) == str and type(left) == int):
                         left, right = str(left), str(right)
+                else:
+                    right = int(right)
                 calculated = operators[token](left, right)
                 evaluated.append(calculated)
             else:

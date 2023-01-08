@@ -7,9 +7,8 @@ DANCE:8 moondance1 -32,-48
 DANCE:16 moondance2 -32,-48
 DANCE:24 moondance1 -32,-48
 
-
 |START:0|
-set self state DANCE
+set self state STAND
 set self frame 0
 
 |STAND:10|

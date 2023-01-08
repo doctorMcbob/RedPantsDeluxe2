@@ -272,19 +272,19 @@ if not self.calc1 nor self.calc2
    if self.x_vel + self.airdrift < self.speed and inpRIGHT
       set self x_vel self.x_vel + self.airdrift
    endif
-   if LEFT_DOWN in inpEVENTS
-      rebrand moonmanL
-   endif
-   if UP_DOWN in inpEVENTS
-      rebrand moonmanU
-   endif
-   if RIGHT_DOWN in inpEVENTS
-      rebrand moonmanR
-   endif
    if B_DOWN in inpEVENTS
       set self state DIVESTART
       set self frame 0
    endif
+endif
+if LEFT_DOWN in inpEVENTS
+   rebrand moonmanL
+endif
+if UP_DOWN in inpEVENTS
+   rebrand moonmanU
+endif
+if RIGHT_DOWN in inpEVENTS
+   rebrand moonmanR
 endif
 if self.calc1
    img moonmanjump2

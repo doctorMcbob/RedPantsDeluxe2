@@ -341,6 +341,7 @@ exec applyTraction
 exec applyGrav
 
 |BONKLAND:25|
+set self direction self.direction * -1
 set self state IDLE
 set self frame 0
 
@@ -406,6 +407,7 @@ if self.state == ROLLOUT or self.calc1
    set self state BONK
    set self x_vel self.bonkstrength * self.direction * -1
    set self frame 0
+   break
 endif
 set self calc1 self.state == SLIDEFLIP
 if self.state == AIRIAL or self.calc1
@@ -417,7 +419,9 @@ if self.state == AIRIAL or self.calc1
    if self.x_vel < 0
       set self direction -1
    endif
+   break
 endif
+set self direction self.direction * -1
 
 |YCOLLISION|
 set self calc1 self.state == ROLLOUT

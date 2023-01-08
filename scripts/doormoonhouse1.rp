@@ -12,10 +12,10 @@ set self frame 0
 |COLLIDE|
 if self.door_key
    if self.door_key + _DOWN in inpEVENTS
-      if inv0.breakroomlocked
+      if inv0.moonhousebacklocked
       	 create lockicon0 related.name + lockicon related.x + 24 related.y
       endif
-      if not inv0.breakroomlocked
+      if not inv0.moonhousebacklocked
       	 move self related.destination
       	 view self.frame_name related.destination
 

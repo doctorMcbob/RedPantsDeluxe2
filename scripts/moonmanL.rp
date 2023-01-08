@@ -261,25 +261,25 @@ if not self.calc1 nor self.calc2
    if self.y_vel + self.airdrift < self.speed and inpDOWN
       set self y_vel self.y_vel + self.airdrift
    endif
-   if UP_DOWN in inpEVENTS
-      rebrand moonmanU
-   endif
-   if RIGHT_DOWN in inpEVENTS
-      rebrand moonmanR
-   endif
-   if DOWN_DOWN in inpEVENTS
-      rebrand moonmanD
-   endif
    if B_DOWN in inpEVENTS
       set self state DIVESTART
       set self frame 0
    endif
 endif
+if UP_DOWN in inpEVENTS
+      rebrand moonmanU
+endif
+if RIGHT_DOWN in inpEVENTS
+   rebrand moonmanR
+endif
+if DOWN_DOWN in inpEVENTS
+   rebrand moonmanD
+endif
 if self.calc1
-   img moonmanjump2
+   img moonmanjump0
 endif
 if self.calc2
-   img moonmanjump0
+   img moonmanjump2
 endif
 exec applyGrav
 
@@ -419,7 +419,7 @@ set self calc1 self.state == DIVELAND or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1
 if self.state == ROLLOUT or self.calc1
    set self state BONK
-   set self x_vel self.bonkstrength * self.direction * -1
+   set self y_vel self.bonkstrength * self.direction * -1
    set self frame 0
 endif
 set self calc1 self.state == SLIDEFLIP
