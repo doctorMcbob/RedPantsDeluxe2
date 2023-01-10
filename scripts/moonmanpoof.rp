@@ -1,0 +1,23 @@
+MILK|0,0,0,0|False|
+START:0 moonpoof0 0,0
+POOF:0 moonpoof0 0,0
+POOF:3 moonpoof1 0,0
+POOF:6 moonpoof2 0,0
+POOF:9 moonpoof3 0,0
+POOF:12 moonpoof4 0,0
+POOF:15 moonpoof5 0,0
+POOF:18 moonpoof4 0,0
+POOF:21 moonpoof5 0,0
+POOF:24 moonpoof4 0,0
+POOF:27 moonpoof3 0,0
+POOF:30 moonpoof2 0,0
+POOF:33 moonpoof1 0,0
+POOF:36 moonpoof0 0,0
+
+
+|START:0|
+set self state POOF
+set self frame 0
+
+|POOF:39|
+goodbye

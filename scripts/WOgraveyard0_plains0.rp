@@ -4,7 +4,7 @@ START:0 empty 0,0
 |START:0|
 # to is _left, from is _right
 set self _left graveyard0
-set self _right plains0
+set self _right plains2
 set self offset_left 128
 set self offset_right 128
 

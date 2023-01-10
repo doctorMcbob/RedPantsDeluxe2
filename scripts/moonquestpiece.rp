@@ -1,0 +1,77 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+LOOK:0 empty 0,0
+FOUND:0 empty 0,0
+OFF:0 empty 0,0
+
+|START:0|
+set self messages []
+add self.messages "ZOINKS"
+add self.messages "GEE WONKLERS"
+add self.messages "WHOS WHATSTHA"
+add self.messages "DOINK"
+add self.messages "WELCOME IN"
+
+set self state OFF
+set self number ""
+for char self.name
+    set self calc char in moonquestpiece
+    if not self.calc
+       set self number self.number + char
+    endif
+endfor
+
+set self calc int self.number + 1
+set self calc str self.calc
+set self next moonquestpiece + self.calc
+set self location moonquestlocation + self.number
+set self nextlocation moonquestlocation + self.calc
+if self.number == 0
+   set self state LOOK
+   set moonmanguy0 x self.location.x
+   set moonmanguy0 y self.location.y
+endif
+
+|FOUND:2|
+exec onFind
+
+|FOUND:3|
+#pass
+
+|FOUND:35|
+if exists self.nextlocation
+   create moonmanpoof0 moonpooffrom self.location.x - 32 self.location.y - 48
+   set moonpooffrom rotation moonmanguy0.rotation
+   create moonmanpoof0 moonpoofto self.nextlocation.x - 32 self.nextlocation.y - 48
+   set moonpoofto rotation moonmanguy0.rotation + 90
+   break
+endif
+set inv0 moonhouselocked 0
+
+|FOUND:36|
+#pass
+
+|FOUND:60|
+if exists self.next
+   set self.next state LOOK
+endif
+if exists self.nextlocation
+   set moonmanguy0 rotation moonmanguy0.rotation + 90
+   set moonmanguy0 x self.nextlocation.x
+   set moonmanguy0 y self.nextlocation.y
+endif
+goodbye
+
+|COLLIDE|
+if related.state == LOOK
+   if player in self.name
+      set related state FOUND
+      set related frame 0
+   endif
+endif
+
+|onFind|
+create say0 moonmanmessage self.x self.y
+set moonmanmessage message self.messages at self.number
+set moonmanmessage back backgroundsay0
+

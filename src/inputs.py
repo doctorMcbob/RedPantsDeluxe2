@@ -101,7 +101,6 @@ def set_defaults():
     add_state("PLAYER1")
     
 def update_sticks():
-    if "PLAYER2" in STATES: return
     joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
     pygame.event.pump()
 
@@ -113,8 +112,15 @@ def update_sticks():
             if joy not in STICKS:
                 if "PLAYER1" not in STATES or STATES["PLAYER1"]["JOY"] is None:
                     name = "PLAYER1"
-                elif "PLAYER2" not in STATES:
+                    add_state("PLAYER2", inp_map=deepcopy(DEFAULT_MAP))
+                elif "PLAYER2" not in STATES or STATES["PLAYER2"]["JOY"] is None:
                     name = "PLAYER2"
+                    add_state("PLAYER3", inp_map=deepcopy(DEFAULT_MAP))
+                elif "PLAYER3" not in STATES or STATES["PLAYER3"]["JOY"] is None:
+                    name = "PLAYER3"
+                    add_state("PLAYER4", inp_map=deepcopy(DEFAULT_MAP))
+                elif "PLAYER4" not in STATES or STATES["PLAYER4"]["JOY"] is None:
+                    name = "PLAYER4"
                 else:
                     return
 
