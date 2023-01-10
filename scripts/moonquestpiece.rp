@@ -47,7 +47,7 @@ if exists self.nextlocation
    break
 endif
 set inv0 moonhouselocked 0
-
+set moonmanguy0 state DANCE
 |FOUND:36|
 #pass
 
