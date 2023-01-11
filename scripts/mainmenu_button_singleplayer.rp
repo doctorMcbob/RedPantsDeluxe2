@@ -14,7 +14,9 @@ set self up_button mainmenu_button_quit0
 set self direction -1
 
 |SELECTED:2|
-update_sticks
+if self.frame % 10 == 3
+   update_sticks
+endif
 if A_DOWN in inpEVENTS
    exec press
 endif
