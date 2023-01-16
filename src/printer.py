@@ -23,7 +23,7 @@ SAVED = []
 START = None
 
 FPS = 30
-GIF_SIZE = FPS * 6
+GIF_SIZE = FPS * 8
 
 def save_surface(surf):
     w, h = (surf.get_width(), surf.get_height())

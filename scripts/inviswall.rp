@@ -9,3 +9,7 @@ set self frame 0
 |WALL:0|
 set self frame 0
 
+|COLLIDE|
+if CELL in self.name
+   goodbye
+endif

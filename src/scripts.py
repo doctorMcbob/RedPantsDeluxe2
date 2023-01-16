@@ -51,7 +51,7 @@ def load():
         SCRIPTS[name] = S.SCRIPTS[name]
 
 def get_script_map(name):
-    return SCRIPTS[name] if name in SCRIPTS else None
+    return deepcopy(SCRIPTS[name]) if name in SCRIPTS else None
 
 def resolve(reference, script, world, related=None, logfunc=print):
     cmd_idx = 0
@@ -99,6 +99,13 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 else:
                     actor.attributes[att] = value
 
+            elif verb == "reassign":
+                actor, oldkey, newkey = cmd
+                if actor == "related" and related is not None:
+                    actor = related
+                actor = a.get_actor(reference) if actor == "self" else a.get_actor(actor)
+                actor.scripts[newkey] = actor.scripts.pop(oldkey)
+                    
             elif verb == "if":
                 conditional = cmd.pop(0)
                 if not conditional:
