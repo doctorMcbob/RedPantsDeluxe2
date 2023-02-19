@@ -62,7 +62,7 @@ def resolve(reference, script, world, related=None, logfunc=print):
             cmd_idx += 1
             continue
         cmd = evaluate_literals(cmd, reference, world, related=related, logfunc=logfunc)
-        cmd = resolve_operators(cmd, world, logfunc=logfunc)
+        cmd = resolve_operators(cmd, world, logfunc=logfunc, actor=reference)
 
         # resolve command!
         try:
@@ -437,7 +437,7 @@ def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
             logfunc("Error evaluating {}... {}".format(token, e))
     return cmd
 
-def resolve_operators(cmd, world, logfunc=print):
+def resolve_operators(cmd, world, logfunc=print, actor=None):
     evaluated = []
     idx = 0
     line = deepcopy(cmd)
@@ -511,6 +511,7 @@ def resolve_operators(cmd, world, logfunc=print):
             else:
                 evaluated.append(token)
         except Exception as e:
+            print(actor)
             logfunc(line)
             logfunc("Error applying operators {}... {}".format(token, e))
         idx += 1

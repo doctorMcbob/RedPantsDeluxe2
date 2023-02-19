@@ -1,0 +1,11 @@
+AUTOMATA|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+set self rules []
+add self.rules "000_1_____"
+add self.rules "100_0_____"
+add self.rules "011_0_____"
+add self.rules "010_0_____"
+add self.rules "001_0_____"
+

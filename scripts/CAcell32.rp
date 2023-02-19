@@ -1,0 +1,99 @@
+AUTOMATA|0,0,0,0|False|
+START:0 CAwhite32 0,0
+ON:0 CAblack32 0,0
+OFF:0 CAwhite32 0,0
+
+|START:0|
+back
+set self state OFF
+if RAND? and RAND? and RAND?
+   set self state ON
+endif
+
+set self check_frame 15
+
+|ONCHECK|
+exec checkRule
+
+|ONEMPTY|
+
+|ON:30|
+set self state self.next_state
+set self frame 0
+
+|OFFCHECK|
+exec checkRule
+
+|OFFEMPTY|
+
+
+|OFF:30|
+set self state self.next_state
+set self frame 0
+
+|checkRule|
+set self status 0
+
+if exists self.TL
+   if self.TL.state == ON
+      set self status self.status + 1
+   endif
+endif
+
+if exists self.T
+   if self.T.state == ON
+      set self status self.status + 2
+   endif
+endif
+
+if exists self.TR
+   if self.TR.state == ON
+      set self status self.status + 4
+   endif
+endif
+
+if exists self.L
+   if self.L.state == ON
+      set self status self.status + 8
+   endif
+endif
+
+if self.state == ON
+   set self status self.status + 16
+endif
+
+if exists self.R
+   if self.R.state == ON
+      set self status self.status + 32
+   endif
+endif
+
+if exists self.BL
+   if self.BL.state == ON
+      set self status self.status + 64
+   endif
+endif
+
+if exists self.B
+   if self.B.state == ON
+      set self status self.status + 128
+   endif
+endif
+
+if exists self.BR
+   if self.BR.state == ON
+      set self status self.status + 256
+   endif
+endif
+
+set self next_state OFF
+if CArule0.rule at self.status == "1"
+   set self next_state ON
+endif
+
+|COLLIDE|
+if player in self.name and RAND? and RAND?
+   set related state ON
+   img empty
+   back
+endif

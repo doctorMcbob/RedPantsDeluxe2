@@ -1,0 +1,42 @@
+AUTOMATA|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+set self PW 16
+
+set self _w self.w / self.PW
+set self _h self.h / self.PW
+
+for WX range self._w
+   set self WM1 WX - 1 % self._w
+   set self WP1 WX + 1 % self._w
+   set self WM1 str self.WM1
+   set self WP1 str self.WP1
+   for HY range self._h
+       set self HM1 HY - 1 % self._h
+       set self HP1 HY + 1 % self._h
+       set self HM1 str self.HM1
+       set self HP1 str self.HP1
+       set self _cellname self.name + CELL + WX + ":" + HY
+       create CAcell + self.PW + 0 self._cellname self.PW * WX + self.x self.PW * HY + self.y
+
+       set self p1 WX + HY % 28 + 1
+       set self p2 WX + HY % 28 + 2
+       reassign self._cellname "ONCHECK" "ON:" + self.p1
+       reassign self._cellname "ONEMPTY" "ON:" + self.p2
+       reassign self._cellname "OFFCHECK" "OFF:" + self.p1
+       reassign self._cellname "OFFEMPTY" "OFF:" + self.p2
+
+       set self._cellname TL self.name + CELL + self.WM1 + ":" + self.HM1
+       set self._cellname T self.name + CELL + WX + ":" + self.HM1
+       set self._cellname TR self.name + CELL + self.WP1 + ":" + self.HM1
+       set self._cellname L self.name + CELL + self.WM1 + ":" + HY
+       set self._cellname R self.name + CELL + self.WP1 + ":" + HY
+       set self._cellname BL self.name + CELL + self.WM1 + ":" + self.HP1
+       set self._cellname B self.name + CELL + WX + ":" + self.HP1
+       set self._cellname BR self.name + CELL + self.WP1 + ":" + self.HP1
+   endfor
+endfor
+
+goodbye
+

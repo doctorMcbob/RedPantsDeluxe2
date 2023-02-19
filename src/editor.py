@@ -17,7 +17,7 @@ import sys
 import os
 
 from copy import deepcopy
-
+from pprint import pformat
 from src.utils import *
 
 from src import game
@@ -112,15 +112,15 @@ def load():
 def save(noload=False):
     global SAVED
     with open("src/lib/WORLDS.py", "w+") as f:
-        f.write("WORLDS = {}".format(repr(WORLDS)))
+        f.write("WORLDS = {}".format(pformat(WORLDS)))
     with open("src/lib/SPRITESHEETS.py", "w+") as f:
-        f.write("SPRITESHEETS = {}\nSPRITEMAPS = {}\nOFFSETS = {}".format(repr(SPRITESHEETS), repr(SPRITEMAPS), repr(OFFSETS)))
+        f.write("SPRITESHEETS = {}\nSPRITEMAPS = {}\nOFFSETS = {}".format(pformat(SPRITESHEETS), pformat(SPRITEMAPS), pformat(OFFSETS)))
     with open("src/lib/ACTORS.py", "w+") as f:
-        f.write("ACTORS = {}".format(repr(ACTORS)))
+        f.write("ACTORS = {}".format(pformat(ACTORS)))
     with open("src/lib/SCRIPTS.py", "w+") as f:
-        f.write("SCRIPTS = {}".format(repr(SCRIPTS)))
+        f.write("SCRIPTS = {}".format(pformat(SCRIPTS)))
     with open("src/lib/BOXES.py", "w+") as f:
-        f.write("HITBOXES = {}\nHURTBOXES = {}".format(repr(HITBOXES), repr(HURTBOXES)))
+        f.write("HITBOXES = {}\nHURTBOXES = {}".format(pformat(HITBOXES), pformat(HURTBOXES)))
     
     SAVED = True
     if noload: return
