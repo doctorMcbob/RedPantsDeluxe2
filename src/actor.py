@@ -355,7 +355,6 @@ class Actor(Rect):
             Y += 24
             dest.blit(surf, (16, 16))
 
-
     def collision_check(self, world):
         actors = list(filter(lambda actor:actor is not None and not (actor is self), world.get_actors()))
         tangibles = list(filter(lambda actor: actor is not None and actor.tangible, actors))
@@ -366,28 +365,28 @@ class Actor(Rect):
             self.collision_with(actors[hit], world)
             actors[hit].collision_with(self, world)
         
-        if self.name not in world.actors:
-            # If the actor has moved to a different world we need to do hit collision against actors in that world
-            for w in worlds.get_worlds():
-                if self.name in w.actors:
-                    actors = list(filter(
-                        lambda actor: actor is not None and not (actor is self), w.get_actors()
-                    ))
-                    tangibles = list(filter(
-                        lambda actor: actor is not None and actor.tangible, actors
-                    ))
-                    if not self.tangible:
-                        tangibles = list(filter(
-                            lambda actor: actor is not None and actor.tangible and actor.platform, actors
-                        ))
-                    break
+        # if self.name not in world.actors:
+        #     # If the actor has moved to a different world we need to do hit collision against actors in that world
+        #     for w in worlds.get_worlds():
+        #         if self.name in w.actors:
+        #             actors = list(filter(
+        #                 lambda actor: actor is not None and not (actor is self), w.get_actors()
+        #             ))
+        #             tangibles = list(filter(
+        #                 lambda actor: actor is not None and actor.tangible, actors
+        #             ))
+        #             if not self.tangible:
+        #                 tangibles = list(filter(
+        #                     lambda actor: actor is not None and actor.tangible and actor.platform, actors
+        #                 ))
+        #             break
 
         # X axis
         if self.x_vel:
             direction = 1 if self.x_vel < 0 else -1
             for n in range(int(self.x_vel) // self.w):
                 if self.move(self.w*n, 0).collidelist(tangibles) != -1:
-                    self.x_vel = (self.w*n) + (self.x_vel % self.w)
+                    self.x_vel -= (self.w*n)
                     break
 
             hits = self.move(int(self.x_vel), 0).collidelistall(tangibles)
@@ -403,7 +402,7 @@ class Actor(Rect):
             direction = 1 if self.y_vel < 0 else -1
             for n in range(int(self.y_vel) // self.h):
                 if self.move(0, self.h*n).collidelist(tangibles) != -1:
-                    self.y_vel = (self.h*n) + (self.y_vel % self.h)
+                    self.y_vel -= (self.h*n)
                     break
 
             hits = self.move(0, int(self.y_vel)).collidelistall(tangibles)
@@ -422,8 +421,7 @@ class Actor(Rect):
                 else:
                     if self.x_vel != 0: self.x_vel += 1 if self.x_vel < 0 else -1
                     if self.y_vel != 0: self.y_vel += 1 if self.y_vel < 0 else -1
-                
-            
+                         
     def collision_with(self, actor, world):
         if "COLLIDE" in self.scripts:
             if scripts.resolve(actor.name, self.scripts["COLLIDE"], world, related=self.name) == 'goodbye':

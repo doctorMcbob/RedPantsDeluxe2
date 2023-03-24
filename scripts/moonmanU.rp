@@ -48,7 +48,7 @@ DROWN:0 empty 0,0
 
 |DROWN:45|
 set self state IDLE
-self self frame 0
+set self frame 0
 exec respawn
 
 
@@ -112,7 +112,7 @@ endif
 
 |DEAD:45|
 set self state IDLE
-self self frame 0
+set self frame 0
 exec respawn
 
 |respawn|
@@ -128,7 +128,7 @@ exec checkAir
 if self.x_vel != 0
    set self state SLIDE
 endif
-If self.y_vel == 0
+if self.y_vel == 0
    if not inpLEFT and inpRIGHT
       set self state RUNNING
       set self frame 0

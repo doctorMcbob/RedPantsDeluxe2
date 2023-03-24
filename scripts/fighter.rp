@@ -69,7 +69,7 @@ DROWN:0 empty 0,0
 
 |DROWN:45|
 set self state IDLE
-self self frame 0
+set self frame 0
 exec respawn
 
 
@@ -142,7 +142,7 @@ endif
 
 |DEAD:45|
 set self state IDLE
-self self frame 0
+set self frame 0
 exec respawn
 
 |respawn|
@@ -548,7 +548,6 @@ set self frame 0
 exec applyGrav
 
 |TATSUFLIP:8|
-applyGrav
 exec AIRIAL:0
 
 |SHORYUSTART:7|

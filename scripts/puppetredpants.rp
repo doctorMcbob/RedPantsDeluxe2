@@ -48,7 +48,7 @@ DROWN:0 empty 0,0
 
 |DROWN:45|
 set self state IDLE
-self self frame 0
+set self frame 0
 exec respawn
 
 |DANGLE:0|
@@ -112,7 +112,7 @@ endif
 
 |DEAD:45|
 set self state IDLE
-self self frame 0
+set self frame 0
 exec respawn
 
 |respawn|

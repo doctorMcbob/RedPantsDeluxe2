@@ -48,7 +48,7 @@ DROWN:0 empty 0,0
 
 |DROWN:45|
 set self state IDLE
-self self frame 0
+set self frame 0
 exec respawn
 
 
@@ -77,7 +77,7 @@ set self divestrength 14
 set self rolloutstrength -8
 set self bonkstrength 2
 set self walljumpstrength -12
-3set self walljumpoff 10
+set self walljumpoff 10
 set self airdrift 0.7
 set self traction 0.6 * -1
 set self limit 20
@@ -122,7 +122,7 @@ endif
 
 |DEAD:45|
 set self state IDLE
-self self frame 0
+set self frame 0
 exec respawn
 
 |respawn|

@@ -30,7 +30,7 @@ for friend COLLIDE?
 endfor
 if self.calc
    set self state DES
-   sedt self frame 0
+   set self frame 0
 endif
 
 |DES:0|

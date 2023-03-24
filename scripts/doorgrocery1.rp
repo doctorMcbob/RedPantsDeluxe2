@@ -5,7 +5,7 @@ DOOR:0 door0 8,0
 |START:0|
 set self state DOOR
 set self destination grocery1
-g
+
 |DOOR:0|
 set self frame 0
 

@@ -47,7 +47,7 @@ if OFF in self.state
    img switch0
 endif
 if ON in self.state
-   switch5
+   img switch5
 endif
 if not self.triggered
    set self state SWAPON

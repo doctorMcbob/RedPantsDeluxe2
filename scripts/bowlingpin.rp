@@ -18,7 +18,7 @@ set self grav 1
 set self traction 0.8 * -1
 set self unscored 1
 
-|FALLING:0|]
+|FALLING:0|
 exec applyGrav
 
 |FALLING:16|
