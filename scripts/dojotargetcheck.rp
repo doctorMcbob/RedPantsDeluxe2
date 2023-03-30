@@ -15,9 +15,11 @@ if self.frame == 1
    exec onCheck
    set self pass 1
    for number range 31
-       if exists targetnumber
-       	  set self pass 0
-       endif
+      set self calc target + number
+      if exists self.calc
+         set self pass 0
+	 break
+      endif
    endfor
    if self.pass
       exec onPass

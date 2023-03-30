@@ -134,7 +134,8 @@ def build():
 
     print(f"Running Makefile at {MAKEFILE_PATH}")
     make_result = subprocess.run(
-        ['make', '-f', str(MAKEFILE_PATH), f'C_DIR={str(C_PATH)}', f'BUILD_DIR={str(BUILD_TO)}'], capture_output=True, text=True)
+        ['make', '-f', str(MAKEFILE_PATH), f'C_DIR={str(C_PATH)}', f'BUILD_DIR={str(BUILD_TO)}'],
+        capture_output=True, text=True)
 
     # Check for errors
     if make_result.returncode != 0:
