@@ -1,4 +1,4 @@
-WORLDS = {None: {'actors': [], 'background': None, 'x_lock': None, 'y_lock': None},
+WORLDS = {
  'CAworld': {'actors': ['goldcoindoor0',
                         'doorfountain0',
                         'inviswall16',

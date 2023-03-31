@@ -4,11 +4,12 @@
 # include "sprites.h"
 # include "utlist.h"
 # include "uthash.h"
+# include "stringmachine.h"
 
 World* worlds = NULL;
 
-void add_world(const char* name,
-	       char* background,
+void add_world(int name,
+	       int background,
 	       int x_lock,
 	       int y_lock) {
   struct World *w;
@@ -17,8 +18,8 @@ void add_world(const char* name,
     exit(-1);
   }
   w->actors = NULL;
-  strcpy(w->name, name);
-  strcpy(w->background, background);
+  w->name = name;
+  w->background = background;
   if (x_lock)
     w->x_lock = x_lock;
   if (y_lock)
@@ -27,12 +28,12 @@ void add_world(const char* name,
   w->background_y_scroll = 0;
   w->flagged_for_update = 1;
 
-  HASH_ADD_STR(worlds, name, w);
+  HASH_ADD_INT(worlds, name, w);
 }
 
-World* get_world(const char* name) {
+World* get_world(int name) {
   struct World *w;
-  HASH_FIND_STR(worlds, name, w);
+  HASH_FIND_INT(worlds, &name, w);
   if (w) {
     return w;
   } else {
@@ -40,26 +41,26 @@ World* get_world(const char* name) {
   }
 }
 
-void add_actor_to_world(const char* worldkey, const char* actorname) {
+void add_actor_to_world(int worldkey, int actorname) {
   struct World *w;
   w = get_world(worldkey);
   if (!w) {
-    printf("World %s not found when adding actor %s\n", worldkey, actorname);
+    printf("World %s not found when adding actor %s\n", get_string(worldkey), get_string(actorname));
     return;
   }
   struct ActorEntry *ae;
   ae = malloc(sizeof(ActorEntry));
-  strcpy(ae->actorKey, actorname);
+  ae->actorKey = actorname;
 
   DL_APPEND(w->actors, ae);
 }
 
-int update_world(char* worldKey, int debug) {
+int update_world(int worldKey) {
   struct World *w;
   w = get_world(worldKey);
   struct ActorEntry *ae, *tmp;
   DL_FOREACH_SAFE(w->actors, ae, tmp) {
-    if (update_actor(ae->actorKey, worldKey, debug) == -1) return -1;
+    if (update_actor(ae->actorKey, worldKey) == -1) return -1;
   }
   return 0;
 }
@@ -105,17 +106,17 @@ void draw_world(World* world, SDL_Renderer* rend, const char* frameKey) {
   }
 };
 
-int world_has(World *world, char *actorKey) {
+int world_has(World *world, int actorKey) {
   ActorEntry *ae;
-  DL_FOREACH(worlds->actors, ae) {
-    if (strcmp(ae->actorKey, actorKey) == 0) {
+  DL_FOREACH(world->actors, ae) {
+    if (ae->actorKey == actorKey) {
       return 1;
     }
   }
   return 0;
 }
 
-int exists(char* actorKey) {
+int exists(int actorKey) {
   struct World *w, *tmp;
   HASH_ITER(hh, worlds, w, tmp) {
     if (world_has(w, actorKey)) return 1;

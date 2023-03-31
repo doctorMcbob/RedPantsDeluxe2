@@ -1,9 +1,10 @@
 #include "utlist.h"
 #include "uthash.h"
+#include "worlds.h"
+#include "actors.h"
 
-#ifndef SPRITES_LOAD
-#define SPRITES_LOAD 1
-
+#ifndef SCRIPTS_LOAD
+#define SCRIPTS_LOAD 1
 // Define Literal Types
 #define NONE 0
 #define INT 1
@@ -103,75 +104,21 @@
 #define ENDFOR 37
 #define PRINT 38
 #define UPDATE_STICKS 39
-
-typedef struct Script {
-  int scriptKey;
-  struct Statement* statements;
-  UT_hash_handle hh;
-} Script;
-
-typedef struct SyntaxNode {
-  int type;
-  union {
-    int i;
-    float f;
-    char *s;
-  } data;
-  struct SyntaxNode* next;
-  struct SyntaxNode* prev;
-} SyntaxNode;
-
-typedef struct Statement {
-  int verb;
-  struct SyntaxNode* params;
-  struct SyntaxNode* buffer;
-  struct SyntaxNode* script;
-  struct Statement* next;
-  struct Statement* prev;
-} Statement;
-
 typedef struct ScriptMapEntry {
-  int scriptKey;
-  char state[32];
+  int state;
   int frame;
-  struct ScriptMapEntry* next;
-  struct ScriptMapEntry* prev;
+  int scriptIdx;
+  struct ScriptMapEntry *next;
+  struct ScriptMapEntry *prev;
 } ScriptMapEntry;
 
 typedef struct ScriptMap {
-  char name[32];
+  int key;
   struct ScriptMapEntry* entries;
-  UT_hash_handle hh;
 } ScriptMap;
 
-typedef struct ListTypeEntry {
-  int listKey;
-  struct SyntaxNode* head;
-  UT_hash_handle hh;
-} ListTypeEntry;
-
-void add_script(int scriptKey);
-Script* get_script(int scriptKey);
-void add_statement_to_script(int scriptKey, Statement* statement);
-Statement* new_statement(int verb);
-SyntaxNode* new_syntax_node(int type);
-void add_node_to_statement(Statement* statement, SyntaxNode* node);
-void add_script_map(const char* name);
-ScriptMap* get_script_map(const char* name);
-void add_script_to_script_map(const char* name, char* state, int frame, int scriptKey);
-int resolve_script(int scriptKey, char* worldKey, char* selfActorKey, char* relatedActorKey, int debug);
-void clean_statement(Statement* statement);
-void evaluate_literals(Statement* statement,
-		       char* worldKey,
-		       char* selfActorKey,
-		       char* relatedActorKey);
-void resolve_operators(Statement* statement,
-		       char* worldKey,
-		       char* selfActorKey,
-		       char* relatedActorKey);
-void free_SyntaxNode(SyntaxNode* del);
-SyntaxNode* copy_SyntaxNode(SyntaxNode* orig);
-int add_list();
-ListTypeEntry* get_list(int listKey);
-void clear_list(int listKey);
+void add_script_map(int key);
+void add_script_to_script_map(int key, int stateStringKey, int frame, int scriptIdx);
+ScriptMap* get_script_map(int key);
+int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world);
 #endif

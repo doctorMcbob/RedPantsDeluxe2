@@ -7,14 +7,15 @@
 # include "worlds.h"
 # include "frames.h"
 # include "scripts.h"
+# include "stringmachine.h"
 # include <math.h>
 
 Actor* actors = NULL;
 Actor* templates = NULL;
 
-Actor* get_actor(const char* name) {
+Actor* get_actor(int name) {
   struct Actor *a;
-  HASH_FIND_STR(actors, name, a);
+  HASH_FIND_INT(actors, &name, a);
   if (a) {
     return a;
   } else {
@@ -29,20 +30,20 @@ void actors_reset_updated() {
     }
 }
 
-void add_actor(const char* name,
+void add_actor(int name,
 	       int x,
 	       int y,
 	       int w,
 	       int h,
 	       int x_vel,
 	       int y_vel,
-	       char* hurtboxkey,
-	       char* hitboxkey,
-	       char* scriptmapkey,
-	       char* spritemapkey,
-	       char* img,
-	       char* inputKey,
-	       char* state,
+	       int hurtboxkey,
+	       int hitboxkey,
+	       int scriptmapkey,
+	       int spritemapkey,
+	       int img,
+	       int inputKey,
+	       int state,
 	       int frame,
 	       int direction,
 	       int rotation,
@@ -66,7 +67,7 @@ void add_actor(const char* name,
   ecb->w = w;
   ecb->h = h;
   a->ECB = ecb;
-  strcpy(a->name, name);
+  a->name = name;
   if (x_vel)
     a->x_vel = x_vel;
   else
@@ -75,24 +76,22 @@ void add_actor(const char* name,
     a->y_vel = y_vel;
   else
     a->y_vel = 0;
-  if (hurtboxkey)
-    strcpy(a->hurtboxkey, hurtboxkey);
-  if (hitboxkey)
-    strcpy(a->hitboxkey, hitboxkey);
-  if (spritemapkey)
-    strcpy(a->spritemapkey, spritemapkey);
-  if (scriptmapkey)
-    strcpy(a->scriptmapkey, scriptmapkey);
+  
+  a->hurtboxkey= hurtboxkey;
+  
+  a->hitboxkey= hitboxkey;
+    
+  a->spritemapkey = spritemapkey;
+  
+  a->scriptmapkey = scriptmapkey;
+  a->img = -1;
 
-  a->img = NULL;
+  a->_input_name = inputKey;
 
-  if (inputKey)
-    strcpy(a->_input_name, inputKey);
-
-  if (state)
-    strcpy(a->state, state);
+  if (state > 0)
+    a->state =  state;
   else
-    strcpy(a->state, "START");
+    a->state = index_string("START");
 
   if (frame)
     a->frame = frame;
@@ -129,7 +128,7 @@ void add_actor(const char* name,
   else
     a->updated = 0;
 
-  HASH_ADD_STR(actors, name, a);
+  HASH_ADD_INT(actors, name, a);
 }
 
 void copy_actor(Actor* copy,  Actor *a) {
@@ -137,19 +136,16 @@ void copy_actor(Actor* copy,  Actor *a) {
   a->ECB->y = copy->ECB->y;
   a->ECB->w = copy->ECB->w;
   a->ECB->h = copy->ECB->h;
-  strcpy(a->name, copy->name);
+  a->name = copy->name;
   a->x_vel = copy->x_vel;
   a->y_vel = copy->y_vel;
-  strcpy(a->hurtboxkey, copy->hurtboxkey);
-  strcpy(a->hitboxkey, copy->hitboxkey);
-  strcpy(a->spritemapkey, copy->spritemapkey);
-  strcpy(a->scriptmapkey, copy->scriptmapkey);
-  if (a->img != NULL) {
-    free(a->img);
-  }
-  a->img = NULL;
-  strcpy(a->_input_name, copy->_input_name);
-  strcpy(a->state, copy->state);
+  a->hurtboxkey = copy->hurtboxkey;
+  a->hitboxkey = copy->hitboxkey;
+  a->spritemapkey = copy->spritemapkey;
+  a->scriptmapkey = copy->scriptmapkey;
+  a->img = -1;
+  a->_input_name = copy->_input_name;
+  a->state = copy->state;
   a->frame = copy->frame;
   a->direction = copy->direction;
   a->rotation = copy->rotation;
@@ -173,12 +169,12 @@ void add_template(Actor* copy) {
   a->ECB = ecb;
   copy_actor(copy, a);
   
-  HASH_ADD_STR(templates, name, a);
+  HASH_ADD_INT(templates, name, a);
 }
 
-void add_actor_from_templatekey(char* templateKey) { // TODO add name parameter (doy)
+void add_actor_from_templatekey(int templateKey) {
   struct Actor *copy;
-  HASH_FIND_STR(templates, templateKey, copy);
+  HASH_FIND_INT(templates, &templateKey, copy);
   struct Actor *a;
   a = malloc(sizeof(Actor));
   if (!a) {
@@ -192,12 +188,12 @@ void add_actor_from_templatekey(char* templateKey) { // TODO add name parameter 
   a->ECB = ecb;
   copy_actor(copy, a);
   
-  HASH_ADD_STR(actors, name, a);
+  HASH_ADD_INT(actors, name, a);
 }
 
-void add_template_from_actorkey(char* actorKey) {
+void add_template_from_actorkey(int actorKey) {
   struct Actor *copy;
-  HASH_FIND_STR(actors, actorKey, copy);
+  HASH_FIND_INT(actors, &actorKey, copy);
   struct Actor *a;
   a = malloc(sizeof(Actor));
   if (!a) {
@@ -211,15 +207,14 @@ void add_template_from_actorkey(char* actorKey) {
   a->ECB = ecb;
   copy_actor(copy, a);
   
-  HASH_ADD_STR(templates, name, a);
+  HASH_ADD_INT(templates, name, a);
 }
 
-int collision_with(Actor *a1, Actor *a2, char *worldKey, int debug) {
-  char *scriptName = "COLLIDE";
-
+int collision_with(Actor *a1, Actor *a2, World* world) {
+  int scriptName = index_string("COLLIDE");
   int scriptKey = find_script_from_map(a1, scriptName);
-  if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, worldKey, a2->name, a1->name, debug);
+  if (scriptKey > 0) {
+    int resolution = resolve_script(scriptKey,  a1, a2, world);
     if (resolution < 0) return resolution;
   }
   return 0;
@@ -234,15 +229,15 @@ SDL_Rect* move(SDL_Rect* rect, int dx, int dy) {
   return new;
 }
 
-int collision_check(Actor *actor, World* world, int debug) {
+int collision_check(Actor *actor, World* world) {
   ActorEntry *ae;
   DL_FOREACH(world->actors, ae) {
-    if (strcmp(actor->name, ae->actorKey) == 0) continue;
+    if (actor->name == ae->actorKey) continue;
     Actor *actor2 = get_actor(ae->actorKey);
     if (SDL_HasIntersection(actor->ECB, actor2->ECB)) {
-      int resolution = collision_with(actor, actor2, world->name, debug);
+      int resolution = collision_with(actor, actor2, world);
       if (resolution < 0) return resolution;
-      int resolution2 = collision_with(actor2, actor, world->name, debug);
+      int resolution2 = collision_with(actor2, actor, world);
       if (resolution2 < 0) return resolution2;
     }
   }
@@ -253,7 +248,7 @@ int collision_check(Actor *actor, World* world, int debug) {
       ActorEntry *ae2;
       int exit = 0;
       DL_FOREACH(world->actors, ae2) {
-        if (strcmp(actor->name, ae2->actorKey) == 0) continue;
+        if (actor->name == ae2->actorKey) continue;
         Actor *actor2 = get_actor(ae2->actorKey);
         if (!actor2->tangible) continue;
         if (SDL_HasIntersection(move(actor->ECB, actor->ECB->w * i, 0), actor2->ECB)) {
@@ -267,13 +262,13 @@ int collision_check(Actor *actor, World* world, int debug) {
 
     ActorEntry *ae2;
     DL_FOREACH(world->actors, ae2) {
-      if (strcmp(actor->name, ae2->actorKey) == 0) continue;
+      if (actor->name == ae2->actorKey) continue;
       Actor *actor2 = get_actor(ae2->actorKey);
       if (!actor2->tangible) continue;
       if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, 0), actor2->ECB)) {
-        int resolution3 = collision_with(actor, actor2, world->name, debug);
+        int resolution3 = collision_with(actor, actor2, world);
         if (resolution3 < 0) return resolution3;
-        int resolution4 = collision_with(actor2, actor, world->name, debug);
+        int resolution4 = collision_with(actor2, actor, world);
         if (resolution4 < 0) return resolution4;
       }
     }
@@ -283,7 +278,7 @@ int collision_check(Actor *actor, World* world, int debug) {
       check = 1;
       ActorEntry *ae3;
       DL_FOREACH(world->actors, ae3) {
-        if (strcmp(actor->name, ae3->actorKey) == 0) continue;
+        if (actor->name == ae3->actorKey) continue;
         Actor *actor3 = get_actor(ae3->actorKey);
         if (!actor3->tangible) continue;
         if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, 0), actor3->ECB)) {
@@ -302,7 +297,7 @@ int collision_check(Actor *actor, World* world, int debug) {
       ActorEntry *ae2;
       int exit = 0;
       DL_FOREACH(world->actors, ae2) {
-        if (strcmp(actor->name, ae2->actorKey) == 0) continue;
+        if (actor->name == ae2->actorKey) continue;
         Actor *actor2 = get_actor(ae2->actorKey);
         if (!actor2->tangible) continue;
         if (SDL_HasIntersection(move(actor->ECB, 0, actor->ECB->h * i), actor2->ECB)) {
@@ -316,13 +311,13 @@ int collision_check(Actor *actor, World* world, int debug) {
 
     ActorEntry *ae2;
     DL_FOREACH(world->actors, ae2) {
-      if (strcmp(actor->name, ae2->actorKey) == 0) continue;
+      if (actor->name == ae2->actorKey) continue;
       Actor *actor2 = get_actor(ae2->actorKey);
       if (!actor2->tangible) continue;
       if (SDL_HasIntersection(move(actor->ECB, 0, actor->y_vel), actor2->ECB)) {
-        int resolution3 = collision_with(actor, actor2, world->name, debug);
+        int resolution3 = collision_with(actor, actor2, world);
         if (resolution3 < 0) return resolution3;
-        int resolution4 = collision_with(actor2, actor, world->name, debug);
+        int resolution4 = collision_with(actor2, actor, world);
         if (resolution4 < 0) return resolution4;
       }
     }
@@ -332,7 +327,7 @@ int collision_check(Actor *actor, World* world, int debug) {
       check = 1;
       ActorEntry *ae3;
       DL_FOREACH(world->actors, ae3) {
-        if (strcmp(actor->name, ae3->actorKey) == 0) continue;
+        if (actor->name == ae3->actorKey) continue;
         Actor *actor3 = get_actor(ae3->actorKey);
         if (!actor3->tangible) continue;
         if (SDL_HasIntersection(move(actor->ECB, 0, actor->y_vel), actor3->ECB)) {
@@ -352,7 +347,7 @@ int collision_check(Actor *actor, World* world, int debug) {
     while (check == 0) {
       check = 1;
       DL_FOREACH(world->actors, ae4) {
-        if (strcmp(actor->name, ae4->actorKey) == 0) continue;
+        if (actor->name == ae4->actorKey) continue;
         Actor *actor4 = get_actor(ae4->actorKey);
         if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, actor->y_vel), actor4->ECB)) {
           check = 0;
@@ -368,23 +363,23 @@ int collision_check(Actor *actor, World* world, int debug) {
       }
     }
   }
-
+  
   return 0;
 }
 
-int find_script_from_map(Actor* actor, char* scriptName) {
+int find_script_from_map(Actor* actor, int scriptName) {
   ScriptMap *sm = get_script_map(actor->scriptmapkey);
   ScriptMapEntry *sme;
 
   DL_FOREACH(sm->entries, sme) {
-    if (strcmp(sme->state, scriptName) == 0) {
-      return sme->scriptKey;
+    if (sme->state == scriptName) {
+      return sme->scriptIdx;
     }
   };
   return -1;
 }
 
-int update_actor(char* actorKey, char* worldKey, int debug) {
+int update_actor(int actorKey, int worldKey) {
   Actor *actor = get_actor(actorKey);
   if (!actor) return 0;
   
@@ -392,27 +387,21 @@ int update_actor(char* actorKey, char* worldKey, int debug) {
   if (!world) return 0;
   if (actor->updated) {
     if ((actor->physics || actor->tangible) && world_has(world, actorKey)) {
-      collision_check(actor, world, debug);
+      collision_check(actor, world);
     }
     return 0;
   }
   actor->updated = 1;
-
-  if (actor->img != NULL) {
-      free(actor->img);
-      actor->img = NULL;
-  }
-
+  actor->img = -1;
+  
   int scriptKey = get_script_for_actor(actor);
   if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, worldKey, actorKey, NULL, debug);
-
+    int resolution = resolve_script(scriptKey, actor, NULL, world);
     if (resolution < 0) return resolution;
   }
-if (strcmp(actor->name, "puppetredpantsguy")) printf("red pants guy!: mid %f\n", actor->y_vel);
   float x_flag = actor->x_vel, y_flag = actor->y_vel;
   if (actor->physics || actor->tangible) {
-    collision_check(actor, world, debug);
+    collision_check(actor, world);
     actor->ECB->x += floor(actor->x_vel);
     actor->ECB->y += floor(actor->y_vel);
   }
@@ -420,25 +409,24 @@ if (strcmp(actor->name, "puppetredpantsguy")) printf("red pants guy!: mid %f\n",
   if (x_flag != actor->x_vel && floor(actor->x_vel) == 0) {
     actor->x_vel = 0;
 
-    char *scriptName = "XCOLLISION";
+    int scriptName = index_string("XCOLLISION");
 
     int scriptKey = find_script_from_map(actor, scriptName);
     if (scriptKey != -1) {
-      int resolution = resolve_script(scriptKey, worldKey, actor->name, NULL, debug);
+    int resolution = resolve_script(scriptKey, actor, NULL, world);
       if (resolution < 0) return resolution;
     }
   }
   if (y_flag != actor->y_vel && floor(actor->y_vel) == 0) {
     actor->y_vel = 0;
 
-    char *scriptName = "YCOLLISION";
+    int scriptName = index_string("YCOLLISION");
 
     int scriptKey = find_script_from_map(actor, scriptName);
     if (scriptKey != -1) {
-      int resolution = resolve_script(scriptKey, worldKey, actor->name, NULL, debug);
-      if (resolution < 0) return resolution;
+    int resolution = resolve_script(scriptKey, actor, NULL, world);
+    if (resolution < 0) return resolution;
     }
-    if (strcmp(actor->name, "puppetredpantsguy")) printf("red pants guy!: end %f\n", actor->y_vel);
   }
   
   actor->frame += 1;
@@ -452,7 +440,7 @@ int get_script_for_actor(Actor* actor) {
   ScriptMapEntry *best, *sme;
   best = NULL;
     DL_FOREACH(sm->entries, sme) {
-    if (strcmp(actor->state, sme->state) != 0) continue;
+    if (actor->state == sme->state) continue;
     if (actor->frame < sme->frame) continue;
     if (best) {
       if (sme->frame < best->frame) continue;
@@ -462,14 +450,14 @@ int get_script_for_actor(Actor* actor) {
   if (!best) {
     return -1;
   }
-  return best->scriptKey;
+  return best->scriptIdx;
 }
 
 Sprite* get_sprite_for_actor(Actor* actor) {
   if (actor->platform) {
     return NULL;
   }
-  if (actor->img != NULL) {
+  if (actor->img >= 0) {
     return get_sprite(actor->img);
   }
 
@@ -479,7 +467,7 @@ Sprite* get_sprite_for_actor(Actor* actor) {
   SpriteMapEntry *best, *sme;
   best = NULL;
   DL_FOREACH(sm->entries, sme) {
-    if (strcmp(actor->state, sme->state) != 0) continue;
+    if (actor->state != sme->state) continue;
     if (actor->frame < sme->frame) continue;
     if (best) {
       if (sme->frame < best->frame)
@@ -502,16 +490,16 @@ void _draw_platform(SDL_Renderer* rend, Actor* actor) {
   char key00[32],key01[32],key02[32],
        key10[32],key11[32],key12[32],
        key20[32],key21[32],key22[32];
-
-  sprintf(key00, "%s%i%i", actor->state, 0, 0);
-  sprintf(key01, "%s%i%i", actor->state, 0, 1);
-  sprintf(key02, "%s%i%i", actor->state, 0, 2);
-  sprintf(key10, "%s%i%i", actor->state, 1, 0);
-  sprintf(key11, "%s%i%i", actor->state, 1, 1);
-  sprintf(key12, "%s%i%i", actor->state, 1, 2);
-  sprintf(key20, "%s%i%i", actor->state, 2, 0);
-  sprintf(key21, "%s%i%i", actor->state, 2, 1);
-  sprintf(key22, "%s%i%i", actor->state, 2, 2);
+  
+  sprintf(key00, "%s%i%i", get_string(actor->state), 0, 0);
+  sprintf(key01, "%s%i%i", get_string(actor->state), 0, 1);
+  sprintf(key02, "%s%i%i", get_string(actor->state), 0, 2);
+  sprintf(key10, "%s%i%i", get_string(actor->state), 1, 0);
+  sprintf(key11, "%s%i%i", get_string(actor->state), 1, 1);
+  sprintf(key12, "%s%i%i", get_string(actor->state), 1, 2);
+  sprintf(key20, "%s%i%i", get_string(actor->state), 2, 0);
+  sprintf(key21, "%s%i%i", get_string(actor->state), 2, 1);
+  sprintf(key22, "%s%i%i", get_string(actor->state), 2, 2);
   
   Sprite *s00, *s01, *s02,
          *s10, *s11, *s12,
@@ -519,39 +507,39 @@ void _draw_platform(SDL_Renderer* rend, Actor* actor) {
   
   SpriteMapEntry *sme;
   DL_FOREACH(sm->entries, sme) {
-    if (strcmp(sme->state, key00) == 0) {
+    if (strcmp(get_string(sme->state), key00) == 0) {
       s00 = get_sprite(sme->spriteKey);
       continue;
     }
-    if (strcmp(sme->state, key01) == 0) {
+    if (strcmp(get_string(sme->state), key01) == 0) {
       s01 = get_sprite(sme->spriteKey);
       continue;
     }
-    if (strcmp(sme->state, key02) == 0) {
+    if (strcmp(get_string(sme->state), key02) == 0) {
       s02 = get_sprite(sme->spriteKey);
       continue;
     }
-    if (strcmp(sme->state, key10) == 0) {
+    if (strcmp(get_string(sme->state), key10) == 0) {
       s10 = get_sprite(sme->spriteKey);
       continue;
     }
-    if (strcmp(sme->state, key11) == 0) {
+    if (strcmp(get_string(sme->state), key11) == 0) {
       s11 = get_sprite(sme->spriteKey);
       continue;
     }
-    if (strcmp(sme->state, key12) == 0) {
+    if (strcmp(get_string(sme->state), key12) == 0) {
       s12 = get_sprite(sme->spriteKey);
       continue;
     }
-    if (strcmp(sme->state, key20) == 0) {
+      if (strcmp(get_string(sme->state), key20) == 0) {
       s20 = get_sprite(sme->spriteKey);
       continue;
     }
-    if (strcmp(sme->state, key21) == 0) {
+      if (strcmp(get_string(sme->state), key21) == 0) {
       s21 = get_sprite(sme->spriteKey);
       continue;
     }
-    if (strcmp(sme->state, key22) == 0) {
+      if (strcmp(get_string(sme->state), key22) == 0) {
       s22 = get_sprite(sme->spriteKey);
     }
   }
@@ -590,6 +578,7 @@ void draw_actor(SDL_Renderer* rend, Actor* actor, const char* frameKey) {
   if (actor->platform) {
     return _draw_platform(rend, actor);
   }
+
   Sprite *s;
   s = get_sprite_for_actor(actor);
   if (s == NULL) return;
@@ -609,4 +598,3 @@ void draw_actor(SDL_Renderer* rend, Actor* actor, const char* frameKey) {
   
   SDL_RenderCopy(rend, s->image, &src, &dest);
 }
-

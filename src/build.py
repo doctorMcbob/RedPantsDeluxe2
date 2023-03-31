@@ -17,6 +17,14 @@ MAKEFILE_PATH = Path('./c_src/Makefile')
 if not os.path.isdir(C_PATH): raise IOError("Could not find /c_src directory")
 if not os.path.isdir(BUILD_TO): os.mkdir(BUILD_TO)
 
+LITERAL_TYPES = {
+    "int": 1,
+    "float": 2,
+    "string": 3,
+    "operator": 4,
+    "dot": 5,
+}
+
 LITERAL_KEYWORDS = {
     "None": 0,
     "RAND?": 6,
@@ -114,22 +122,27 @@ VERBS = {
     "print": 38,
     "update_sticks": 39,
 }
+UNIQUE_FLOATS = []
+UNIQUE_STRINGS = []
+STRING_INDEXERS = {}
+SCRIPT_MAP_TO_INT = {}
+SPRITE_MAP_TO_INT = {}
 
 def build():
     print("Building Script Data...")
     make_script_data()
     print("    ...Done")
-    print("Building Script Data...")
-    make_actor_data()
-    print("    ...Done")
-    print("Building Script Data...")
+    print("Building Sprite Data...")
     make_spritesheet_data()
     print("    ...Done")
-    print("Building Script Data...")
+    print("Building Box Data...")
     make_box_data()
     print("    ...Done")
-    print("Building Script Data...")
+    print("Building World Data...")
     make_world_data()
+    print("    ...Done")
+    print("Building Actor Data...")
+    make_actor_data()
     print("    ...Done")
 
     print(f"Running Makefile at {MAKEFILE_PATH}")
@@ -144,89 +157,215 @@ def build():
         print("Build finished.")
 
 def make_script_data():
-    script_data_dot_c = _convert_scripts(SCRIPTS)
+    string_data_dot_c, string_data_dot_h =  _intern_strings(SCRIPTS)
+    float_data_dot_c, float_data_dot_h =_intern_floats(SCRIPTS)
+    script_data_dot_c, script_data_dot_h = _convert_scripts(SCRIPTS)
     with open(C_PATH / "scriptdata.c", "w+") as f:
         f.write(script_data_dot_c)
+    with open(C_PATH / "scriptdata.h", "w+") as f:
+        f.write(script_data_dot_h)
+
+    with open(C_PATH / "stringdata.c", "w+") as f:
+        f.write(string_data_dot_c)
+    with open(C_PATH / "stringdata.h", "w+") as f:
+        f.write(string_data_dot_h)
+
+    with open(C_PATH / "floatdata.c", "w+") as f:
+        f.write(float_data_dot_c)
+    with open(C_PATH / "floatdata.h", "w+") as f:
+        f.write(float_data_dot_h)
+
+def _intern_strings(SCRIPTS):
+    for scriptMap in SCRIPTS:
+        for key in SCRIPTS[scriptMap]:
+            state, frame = key.split(":") if ":" in key else (key, "0")
+            if state not in UNIQUE_STRINGS: UNIQUE_STRINGS.append(state)
+            for statement in SCRIPTS[scriptMap][key]:
+                for token in statement:
+                    if not token or token.isspace() or token.startswith("#"): continue
+                    if token in VERBS: continue
+                    if token in OPERATORS: continue
+                    try:
+                        int(token)
+                        continue
+                    except ValueError:
+                        try:
+                            float(token)
+                            continue
+                        except ValueError:
+                            if "." in token:
+                                for t in token.split("."):
+                                    if t not in UNIQUE_STRINGS:
+                                        UNIQUE_STRINGS.append(t)
+                            else:
+                                if token not in UNIQUE_STRINGS:
+                                    UNIQUE_STRINGS.append(token)
+
+    for name in ACTORS.ACTORS.keys():
+        if name not in UNIQUE_STRINGS:
+            UNIQUE_STRINGS.append(name)
+
+    for filename in SPRITESHEETS.SPRITESHEETS.keys():
+        for name in SPRITESHEETS.SPRITESHEETS[filename].keys():
+            if name not in UNIQUE_STRINGS:
+                UNIQUE_STRINGS.append(name)
+
+    for key in SPRITESHEETS.SPRITEMAPS:
+        if key not in UNIQUE_STRINGS:
+            UNIQUE_STRINGS.append(key)
+
+    for key in SPRITESHEETS.OFFSETS.keys():
+        if key not in UNIQUE_STRINGS:
+            UNIQUE_STRINGS.append(key)
+        if type(SPRITESHEETS.OFFSETS[key]) == dict:
+            for name in SPRITESHEETS.OFFSETS[key].keys():
+                if name not in UNIQUE_STRINGS:
+                    UNIQUE_STRINGS.append(name)
+
+
+    for key in SPRITESHEETS.SPRITEMAPS:
+        spritemap = SPRITESHEETS.SPRITEMAPS[key]
+        if "\\" in key: continue
+        if key not in UNIQUE_STRINGS:
+            UNIQUE_STRINGS.append(key)
+        for index in spritemap:
+            spritekey = spritemap[index]
+            if "\\" in spritekey: continue
+            state, frame = index.split(":") if ":" in index else (index, "0")
+            if spritekey not in UNIQUE_STRINGS:
+                UNIQUE_STRINGS.append(spritekey)
+            if state not in UNIQUE_STRINGS:
+                UNIQUE_STRINGS.append(state)
+
+
+    for string in UNIQUE_STRINGS:
+        if "\\" in string:
+            print("here:", string)
+    UNIQUE_STRINGS.sort()
+    string_data_dot_c = "#include \"stringmachine.h\"\n"
+    string_data_dot_c += "const char* STRINGS[] = {\n  \"" + "\",\n  \"".join(UNIQUE_STRINGS) + "\"\n};\n"
+    string_data_dot_c += "const int STRING_LENS[] = {\n  " + ",\n  ".join(str(len(v)) for v in UNIQUE_STRINGS) + "\n}\n;"
+    string_data_dot_c += "void load_string_indexers() {\n"
+    for idx, token in enumerate(UNIQUE_STRINGS):
+        if token[0:2] not in STRING_INDEXERS:
+            STRING_INDEXERS[token[0:2]] = idx
+            string_data_dot_c += f"  add_indexer(\"{token[0:2]}\", {idx});\n"
+    string_data_dot_c += "}\n"
+    
+    string_data_dot_h = f"""
+#ifndef STRING_DATA_LOAD
+#define STRING_DATA_LOAD 1
+
+const char* STRINGS[{len(UNIQUE_STRINGS)}];
+int STRING_LENS[{len(UNIQUE_STRINGS)}];
+int NUM_STRINGS = {len(UNIQUE_STRINGS)};
+#endif
+"""
+    return string_data_dot_c, string_data_dot_h
+
+def _intern_floats(SCRIPTS): 
+    for scriptMap in SCRIPTS:
+        for key in SCRIPTS[scriptMap]:
+            for statement in SCRIPTS[scriptMap][key]:
+                for token in statement:
+                    try:
+                        int(token)
+                        continue
+                    except ValueError:
+                        try:
+                            f = float(token)
+                            if f not in UNIQUE_FLOATS:
+                                UNIQUE_FLOATS.append(f)
+                        except ValueError:
+                            continue
+    UNIQUE_FLOATS.sort()
+
+    float_data_dot_c = "const float FLOATS[] = {\n  " + ",\n  ".join(str(v) for v in UNIQUE_FLOATS) + "\n};"
+    float_data_dot_h = f"""
+#ifndef FLOAT_DATA_LOAD
+#define FLOAT_DATA_LOAD 1
+
+const float FLOATS[{len(UNIQUE_FLOATS)}];
+int NUM_FLOATS = {len(UNIQUE_FLOATS)};
+#endif
+"""
+    return float_data_dot_c, float_data_dot_h
+
 
 def _convert_scripts(SCRIPTS):
+    current_key = 0
+    scripts = []
     script_data_dot_c = """// Generated with python from the red pants engine
-    #include "scripts.h"
+#include "scripts.h"
 
-    void scripts_load() {
-    """
-
-    scriptKey = 0
-    for mapKey in SCRIPTS.keys():
-        script_data_dot_c += f"\n"
-        script_data_dot_c += f"    add_script_map(\"{mapKey}\");\n"
-        for key in SCRIPTS[mapKey]:
+void scripts_load() {
+"""
+    scriptMap_idx = 0
+    for scriptMap in SCRIPTS:
+        SCRIPT_MAP_TO_INT[scriptMap] = scriptMap_idx
+        scriptMap_idx += 1
+        script_data_dot_c += f"    add_script_map({scriptMap_idx});\n"
+        for key in SCRIPTS[scriptMap]:
             state, frame = key.split(":") if ":" in key else (key, "0")
-            script_data_dot_c += f"\n    add_script({scriptKey});\n"
-            script_data_dot_c += f"    add_script_to_script_map(\"{mapKey}\", \"{state}\", {frame}, {scriptKey});\n"
-            for i, statement in enumerate(SCRIPTS[mapKey][key]):
+            state_idx = UNIQUE_STRINGS.index(state)
+            script_data_dot_c += f"    add_script_to_script_map({scriptMap_idx}, {state_idx}, {frame}, {current_key});\n"
+            for statement in SCRIPTS[scriptMap][key]:
                 if not statement: continue
                 verb = statement[0]
                 if verb.startswith("#"): continue
                 if verb not in VERBS:
-                    print(f"The lost verb: {verb}")
-                    print(mapKey, key, statement)
+                    print("Lost verb: ", verb)
+                    print(scriptMap, key, statement)
                     continue
-                script_data_dot_c += f"""
-        //{verb} {statement}
-        Statement* s{scriptKey}_{i} = new_statement({VERBS[verb]});
-        add_statement_to_script({scriptKey}, s{scriptKey}_{i});\n"""
-
-                for j, token in enumerate(statement[1:]):
+                scripts.append(VERBS[verb])
+                for token in statement[1:]:
                     if token in OPERATORS:
-                        script_data_dot_c += f"""
-        SyntaxNode* sn{scriptKey}_{i}_{j} = new_syntax_node(OPERATOR);
-        sn{scriptKey}_{i}_{j}->data.i = {OPERATORS[token]};\n"""
+                        scripts.append(LITERAL_TYPES["operator"])
+                        scripts.append(OPERATORS[token])
                     elif token in LITERAL_KEYWORDS:
-                        script_data_dot_c += f"""
-        SyntaxNode* sn{scriptKey}_{i}_{j} = new_syntax_node({LITERAL_KEYWORDS[token]});\n"""
+                        scripts.append(LITERAL_KEYWORDS[token])
                     else:
                         try:
-                            int(token)
-                            script_data_dot_c += f"""
-        SyntaxNode* sn{scriptKey}_{i}_{j} = new_syntax_node(INT);
-        sn{scriptKey}_{i}_{j}->data.i = {token};\n"""
+                            ti = int(token)
+                            scripts.append(LITERAL_TYPES["int"])
+                            scripts.append(ti)
                         except ValueError:
                             try:
-                                float(token)
-                                script_data_dot_c += f"""
-        SyntaxNode* sn{scriptKey}_{i}_{j} = new_syntax_node(FLOAT);
-        sn{scriptKey}_{i}_{j}->data.f = {token};\n"""
+                                tf = float(token)
+                                if tf not in UNIQUE_FLOATS:
+                                    raise TypeError(f"Float not found {tf}")
+                                scripts.append(LITERAL_TYPES["float"])
+                                scripts.append(UNIQUE_FLOATS.index(tf))
                             except ValueError:
+                                if not token or token.isspace(): continue
                                 if "." in token:
-                                    script_data_dot_c += f"""
-        SyntaxNode* sn{scriptKey}_{i}_{j}_;\n"""
-                                    words = token.split(".");
-                                    first = words.pop(0);
-                                    script_data_dot_c += f"""
-        sn{scriptKey}_{i}_{j}_ = new_syntax_node(STRING);
-        sn{scriptKey}_{i}_{j}_->data.s = (char*)malloc({len(first) + 1});
-        strncpy(sn{scriptKey}_{i}_{j}_->data.s, "{first}", {len(first) + 1});
-        add_node_to_statement(s{scriptKey}_{i}, sn{scriptKey}_{i}_{j}_);\n"""
-                                    for word in words:
-                                        script_data_dot_c += f"""
-        sn{scriptKey}_{i}_{j}_ = new_syntax_node(DOT);
-        add_node_to_statement(s{scriptKey}_{i}, sn{scriptKey}_{i}_{j}_);               
-        sn{scriptKey}_{i}_{j}_ = new_syntax_node(STRING);
-        sn{scriptKey}_{i}_{j}_->data.s = (char*)malloc({len(word) + 1});
-        strncpy(sn{scriptKey}_{i}_{j}_->data.s, "{word}", {len(word) + 1});
-        add_node_to_statement(s{scriptKey}_{i}, sn{scriptKey}_{i}_{j}_);\n"""
-                                    continue
+                                    dot_seperated = token.split(".")
+                                    while dot_seperated:
+                                        t = dot_seperated.pop(0)
+                                        if t not in UNIQUE_STRINGS:
+                                            raise TypeError(f"String not found {t}")
+                                        scripts.append(LITERAL_TYPES["string"])
+                                        scripts.append(UNIQUE_STRINGS.index(t))
+                                        if dot_seperated:
+                                            scripts.append(LITERAL_TYPES["dot"])
+                                else:
+                                    if token not in UNIQUE_STRINGS:
+                                        raise TypeError(f"String not found {token}")
+                                    scripts.append(LITERAL_TYPES["string"])
+                                    scripts.append(UNIQUE_STRINGS.index(token))
+                current_key = len(scripts)
+    script_data_dot_c += "}\nint SCRIPTS[] = {" + ", ".join(str(v) for v in scripts) + "};"
+    script_data_dot_h = f"""// generated by red pants engine
 
-                                script_data_dot_c += f"""
-        SyntaxNode* sn{scriptKey}_{i}_{j} = new_syntax_node(STRING);
-        sn{scriptKey}_{i}_{j}->data.s = (char*)malloc({len(token) + 1});
-        strncpy(sn{scriptKey}_{i}_{j}->data.s, "{token}", {len(token) + 1});\n"""
+#ifndef SCRIPT_DATA_LOAD
+#define SCPRIT_DATA_LOAD 1
 
-                    script_data_dot_c += f"    add_node_to_statement(s{scriptKey}_{i}, sn{scriptKey}_{i}_{j});\n"
-            scriptKey += 1
-    script_data_dot_c += "}\n"
-    return script_data_dot_c
+#define SCRIPT_MAP_SIZE {scriptMap_idx}
 
+#endif
+"""
+    return script_data_dot_c, script_data_dot_h
+        
 def make_actor_data():
     actordata_dot_c = _convert_actors(ACTORS)
     with open(C_PATH / "actordata.c", "w+") as f:
@@ -247,7 +386,7 @@ def _convert_actors(ACTORS):
     for name in ACTORS.ACTORS.keys():
         template = ACTORS.ACTORS[name]
         a = actor.Actor(template)
-        actordata_dot_c += f"    add_actor(\"{template['name']}\", {a.x}, {a.y}, {a.w}, {a.h}, {a.x_vel}, {a.y_vel}, NULL, NULL, \"{template['scripts']}\", \"{template['sprites']}\", NULL, {a._input_name if a._input_name else 'NULL'}, \"{a.state}\", {a.frame}, {a.direction}, {a.rotation}, {int(a.platform)}, {int(a.tangible)}, {int(a.physics)}, {int(a.updated)});\n"
+        actordata_dot_c += f"    add_actor({UNIQUE_STRINGS.index(template['name'])}, {a.x}, {a.y}, {a.w}, {a.h}, {a.x_vel}, {a.y_vel}, -1, -1, {SCRIPT_MAP_TO_INT[template['scripts']]}, {UNIQUE_STRINGS.index(template['sprites'])}, -1, {UNIQUE_STRINGS.index(a._input_name) if a._input_name else -1}, {UNIQUE_STRINGS.index(a.state)}, {a.frame}, {a.direction}, {a.rotation}, {int(a.platform)}, {int(a.tangible)}, {int(a.physics)}, {int(a.updated)});\n"
 
     actordata_dot_c += "}\n"
     return actordata_dot_c
@@ -266,15 +405,15 @@ def _convert_spritesheets(SPRITESHEETS):
     """
 
     for filename in SPRITESHEETS.SPRITESHEETS.keys():
-        names = list(SPRITESHEETS.SPRITESHEETS[filename].keys())
-        xs    = [SPRITESHEETS.SPRITESHEETS[filename][name][0][0] for name in names]
-        ys    = [SPRITESHEETS.SPRITESHEETS[filename][name][0][1] for name in names]
-        ws    = [SPRITESHEETS.SPRITESHEETS[filename][name][1][0] for name in names]
-        hs    = [SPRITESHEETS.SPRITESHEETS[filename][name][1][1] for name in names]
+        names = list(UNIQUE_STRINGS.index(v) for v in SPRITESHEETS.SPRITESHEETS[filename].keys())
+        xs    = [SPRITESHEETS.SPRITESHEETS[filename][name][0][0] for name in SPRITESHEETS.SPRITESHEETS[filename].keys()]
+        ys    = [SPRITESHEETS.SPRITESHEETS[filename][name][0][1] for name in SPRITESHEETS.SPRITESHEETS[filename].keys()]
+        ws    = [SPRITESHEETS.SPRITESHEETS[filename][name][1][0] for name in SPRITESHEETS.SPRITESHEETS[filename].keys()]
+        hs    = [SPRITESHEETS.SPRITESHEETS[filename][name][1][1] for name in SPRITESHEETS.SPRITESHEETS[filename].keys()]
         length = len(names)
         name = filename.split(".")[0]
 
-        spritesheets_dot_c += f"    const char* {name}names[{length}] = " + "{" + repr(names)[1:-1].replace("'", '"') + "};\n"
+        spritesheets_dot_c += f"    int {name}names[{length}] = " + "{" + ", ".join(str(v) for v in names) + "};\n"
         spritesheets_dot_c += f"    int {name}xs[{length}] = " + "{" + ", ".join(str(v) for v in xs) + "};\n"
         spritesheets_dot_c += f"    int {name}ys[{length}] = " + "{" + ", ".join(str(v) for v in ys) + "};\n"
         spritesheets_dot_c += f"    int {name}ws[{length}] = " + "{" + ", ".join(str(v) for v in ws) + "};\n"
@@ -291,23 +430,23 @@ def _convert_spritesheets(SPRITESHEETS):
             for name in SPRITESHEETS.OFFSETS[key].keys():
                 if name in keys: continue
                 x, y = SPRITESHEETS.OFFSETS[key][name]
-                spritesheets_dot_c += f"    add_offset(\"{name}\", {x}, {y});\n"
+                spritesheets_dot_c += f"    add_offset({UNIQUE_STRINGS.index(name)}, {x}, {y});\n"
                 keys.add(name)
         else:
             if key in keys: continue
             x, y = SPRITESHEETS.OFFSETS[key]
-            spritesheets_dot_c += f"    add_offset(\"{key}\", {x}, {y});\n"
+            spritesheets_dot_c += f"    add_offset({UNIQUE_STRINGS.index(key)}, {x}, {y});\n"
             keys.add(key)
 
     for key in SPRITESHEETS.SPRITEMAPS:
         if "\\" in key: continue
         spritemap = SPRITESHEETS.SPRITEMAPS[key]
-        spritesheets_dot_c += f"    add_sprite_map(\"{key}\");\n"
+        spritesheets_dot_c += f"    add_sprite_map({UNIQUE_STRINGS.index(key)});\n"
         for index in spritemap:
             spritekey = spritemap[index]
             if "\\" in spritekey: continue
             state, frame = index.split(":") if ":" in index else (index, "0")
-            spritesheets_dot_c += f"    add_to_sprite_map(\"{key}\", \"{state}\", {frame}, \"{spritekey}\");\n"
+            spritesheets_dot_c += f"    add_to_sprite_map({UNIQUE_STRINGS.index(key)}, {UNIQUE_STRINGS.index(state)}, {frame}, {UNIQUE_STRINGS.index(spritekey)});\n"
 
     spritesheets_dot_c += "}\n"
     return spritesheets_dot_c
@@ -382,9 +521,9 @@ def _convert_worlds():
         background = WORLDS[name]["background"]
         x_lock = WORLDS[name]["x_lock"]
         y_lock = WORLDS[name]["y_lock"]
-        worlddata_dot_c += f"    add_world(\"{name}\", \"{background}\", {x_lock if x_lock is not None else 0}, {y_lock if y_lock is not None else 0});\n"
+        worlddata_dot_c += f"    add_world({UNIQUE_STRINGS.index(name)}, {UNIQUE_STRINGS.index(background)}, {x_lock if x_lock is not None else 0}, {y_lock if y_lock is not None else 0});\n"
         for actor in WORLDS[name]["actors"]:
-            worlddata_dot_c += f"    add_actor_to_world(\"{name}\", \"{actor}\");\n"
+            worlddata_dot_c += f"    add_actor_to_world({UNIQUE_STRINGS.index(name)}, {UNIQUE_STRINGS.index(actor)});\n"
 
     worlddata_dot_c += "}\n"
     return worlddata_dot_c

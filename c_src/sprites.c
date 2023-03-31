@@ -12,7 +12,7 @@ https://github.com/troydhanson/uthash/blob/master/src/utlist.h
 # include "uthash.h"
 # include "utlist.h"
 # include "sprites.h"
-
+# include "stringmachine.h"
 # include <SDL2/SDL.h>
 # include <SDL2/SDL_image.h>
 
@@ -39,32 +39,32 @@ void sprites_taredown() {
   }
 }
 
-void add_sprite_map(const char* name) {
+void add_sprite_map(int name) {
   struct SpriteMap *sm;
   sm = malloc(sizeof(SpriteMap));
   if (sm == NULL) {
     exit(-1);
   }
-  strcpy(sm->name, name);
+  sm->name = name;
   sm->entries = NULL;
-  HASH_ADD_STR(spritemaps, name, sm);
+  HASH_ADD_INT(spritemaps, name, sm);
 }
 
-SpriteMap* get_sprite_map(const char* name) {
+SpriteMap* get_sprite_map(int name) {
   struct SpriteMap *sm;
 
-  HASH_FIND_STR(spritemaps, name, sm);
+  HASH_FIND_INT(spritemaps, &name, sm);
   if (sm) {
     return sm;
   }
   return NULL;
 }
 
-void add_to_sprite_map(const char* name, const char* state, int frame, const char* spriteKey) {
+void add_to_sprite_map(int name, int state, int frame, int spriteKey) {
   struct SpriteMap *sm;
   sm = get_sprite_map(name);
   if (sm == NULL) {
-    printf("No sprite map %s\n", name);
+    printf("No sprite map %s\n", get_string(name));
     return;
   }
   
@@ -73,28 +73,28 @@ void add_to_sprite_map(const char* name, const char* state, int frame, const cha
   if (sme == NULL) {
     exit(-1);
   }
-  strcpy(sme->state, state);
+  sme->state = state;
   sme->frame = frame;
-  strcpy(sme->spriteKey, spriteKey);
+  sme->spriteKey = spriteKey;
 
   DL_APPEND(sm->entries, sme);
 }
 
-void add_sprite(const char* name, SDL_Texture* image) {
+void add_sprite(int name, SDL_Texture* image) {
   struct Sprite *s;
   s = malloc(sizeof(Sprite));
   if (s == NULL) {
     exit(-1);
   }
-  strcpy(s->name, name);
+  s->name = name;
   s->image = image;
-  HASH_ADD_STR(sprites, name, s);
+  HASH_ADD_INT(sprites, name, s);
 }
 
-Sprite* get_sprite(const char* name) {
+Sprite* get_sprite(int name) {
   struct Sprite *s;
 
-  HASH_FIND_STR(sprites, name, s);
+  HASH_FIND_INT(sprites, &name, s);
   if (s) {
     return s;
   } else {
@@ -102,7 +102,7 @@ Sprite* get_sprite(const char* name) {
   }
 }
 
-void add_offset(const char* name, int x, int y) {
+void add_offset(int name, int x, int y) {
   struct Sprite *s;
   s = get_sprite(name);
   if (s) {
@@ -121,7 +121,7 @@ SDL_Surface* load_image(const char* filename) {
 
 void load_spritesheet(SDL_Renderer* rend,
 		      const char* filename,
-		      const char* names[],
+		      int names[],
 		      int xs[],
 		      int ys[],
 		      int ws[],

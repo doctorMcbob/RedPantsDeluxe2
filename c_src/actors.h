@@ -1,30 +1,30 @@
 # include <SDL2/SDL.h>
 # include "uthash.h"
 # include "sprites.h"
-# include "scripts.h"
 
 #ifndef ACTORS_DEF
 # define ACTORS_DEF 1
 
 typedef struct Attribute {
-  char name[32];
-  SyntaxNode* value;
+  int name;
+  int type;
+  int value;
   UT_hash_handle hh;
 } Attribute;
 
 typedef struct Actor {
-  char name[32];
+  int name;
   SDL_Rect* ECB;
 
   float x_vel;
   float y_vel;
-  char hurtboxkey[32];
-  char hitboxkey[32];
-  char spritemapkey[32];
-  char scriptmapkey[32];
-  char *img;
-  char _input_name[32];
-  char state[32];
+  int hurtboxkey;
+  int hitboxkey;
+  int spritemapkey;
+  int scriptmapkey;
+  int img;
+  int _input_name;
+  int state;
   int frame;
   int direction;
   int rotation;
@@ -38,21 +38,21 @@ typedef struct Actor {
   UT_hash_handle hh;
 } Actor;
 
-Actor* get_actor(const char* name);
-void add_actor(const char* name,
+Actor* get_actor(int name);
+void add_actor(int name,
 	       int x,
 	       int y,
 	       int w,
 	       int h,
 	       int x_vel,
 	       int y_vel,
-	       char* hurtboxkey,
-	       char* hitboxkey,
-	       char* scriptMapKey,
-	       char* spriteMapKey,
-	       char* img,
-	       char* inputKey,
-	       char* state,
+	       int hurtboxkey,
+	       int hitboxkey,
+	       int scriptMapKey,
+	       int spritemapkey,
+	       int img,
+	       int inputKey,
+	       int state,
 	       int frame,
 	       int direction,
 	       int rotation,
@@ -62,12 +62,12 @@ void add_actor(const char* name,
 	       int updated);
 void copy_actor(Actor* copy,  Actor *a);
 void add_template(Actor* copy);
-void add_actor_from_templatekey(char* templateKey);
-void add_template_from_actorkey(char* actorKey);
-int update_actor(char* actorKey, char* worldKey, int debug);
+void add_actor_from_templatekey(int templateKey);
+void add_template_from_actorkey(int actorKey);
+int update_actor(int actorKey, int worldKey);
 Sprite* get_sprite_for_actor(Actor* actor);
 void draw_actor(SDL_Renderer* rend, Actor* actor, const char* frameKey);
 int get_script_for_actor(Actor* actor);
 void actors_reset_updated();
-int find_script_from_map(Actor* actor, char* scriptName);
+int find_script_from_map(Actor* actor, int scriptName);
 #endif

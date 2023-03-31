@@ -16,6 +16,7 @@ I will be using uthash.h as my dictionary implementation
 # include "scripts.h"
 # include "worlds.h"
 # include "frames.h"
+# include "stringmachine.h"
 # include <string.h>
 # include <stdio.h>
 #include <stdlib.h>
@@ -33,6 +34,8 @@ void actor_load();
 void world_load();
 void boxes_load();
 void scripts_load();
+void load_string_indexers();
+
 int main (int argc, char *argv[]) {
   int debug = 0;
   for (int i = 1; i < argc; i++) {
@@ -42,7 +45,6 @@ int main (int argc, char *argv[]) {
   }
 
   srand(time(NULL));
-  add_list(); // 0 is reserved system list (for range and input events)
 
   if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -73,23 +75,24 @@ int main (int argc, char *argv[]) {
       SDL_Quit();
       return 1;
     }
-
+  load_string_indexers();
   spritesheet_load(rend);
   actor_load();
   world_load();
   boxes_load();
   scripts_load();
-  
+
   add_input_state("PLAYER1", NULL);
 
-  add_frame("MAIN", get_world("root"), NULL, 0, 0, W, H);
+  add_frame("MAIN", get_world(index_string("root")), NULL, 0, 0, W, H);
   
   while (input_update() != -1) {
     SDL_RenderClear(rend);
 
-    if (update_world("root", debug) == -1) {
+    if (update_world(index_string("root")) == -1) {
       break;
     };
+
     draw_frame(rend, "MAIN");
     
     actors_reset_updated();

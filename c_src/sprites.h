@@ -7,7 +7,7 @@
 #define SPRITES_DEF 1
 
 typedef struct Sprite {
-  char name[32];
+  int name;
   SDL_Texture* image;
   int offx;
   int offy;
@@ -15,33 +15,33 @@ typedef struct Sprite {
 } Sprite;
 
 typedef struct SpriteMapEntry {
-  char state[32];
+  int state;
   int frame;
-  char spriteKey[32];
+  int spriteKey;
   struct SpriteMapEntry* next;
   struct SpriteMapEntry* prev;
 } SpriteMapEntry;
 
 typedef struct SpriteMap {
-  char name[32];
+  int name;
   struct SpriteMapEntry* entries;
   UT_hash_handle hh;
 } SpriteMap;
 
-void add_sprite(const char* name, SDL_Texture* image);
-Sprite* get_sprite(const char* name);
-void add_offset(const char* name, int x, int y);
+void add_sprite(int name, SDL_Texture* image);
+Sprite* get_sprite(int name);
+void add_offset(int name, int x, int y);
 SDL_Surface* load_image(const char* filename);
 void load_spritesheet(SDL_Renderer* rend,
 		      const char* filename,
-		      const char* names[],
+		      int names[],
 		      int xs[],
 		      int ys[],
 		      int ws[],
 		      int hs[],
 		      int count);
-void add_sprite_map(const char* name);
-SpriteMap* get_sprite_map(const char* name);
-void add_to_sprite_map(const char* name, const char* state, int frame, const char* spriteKey);
+void add_sprite_map(int name);
+SpriteMap* get_sprite_map(int name);
+void add_to_sprite_map(int name, int state, int frame, int spriteKey);
 void sprites_taredown();
 #endif

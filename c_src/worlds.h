@@ -5,14 +5,14 @@
 #define WORLDS_DEF 1
 
 typedef struct ActorEntry {
-  char actorKey[32];
+  int actorKey;
   struct ActorEntry* next;
   struct ActorEntry* prev;
 } ActorEntry;
 
 typedef struct World {
-  char name[32];
-  char background[32];
+  int name;
+  int background;
   ActorEntry* actors;
   int x_lock;
   int y_lock;
@@ -22,15 +22,15 @@ typedef struct World {
   UT_hash_handle hh;
 } World;
 
-void add_world(const char* name,
-	       char* background,
+void add_world(int name,
+	       int background,
 	       int x_lock,
 	       int y_lock);
-World* get_world(const char* name);
-void add_actor_to_world(const char* worldkey, const char* actorname);
-int update_world(char* worldKey, int debug);
+World* get_world(int name);
+void add_actor_to_world(int worldkey, int actorname);
+int update_world(int worldKey);
 void draw_world(World* world, SDL_Renderer* rend, const char* frameKey);
-int exists(char* actorKey);
-int world_has(World *world, char *actorKey);
+int exists(int actorKey);
+int world_has(World *world, int actorKey);
 # endif
 

@@ -29,5 +29,5 @@ Frame* get_frame(const char* name);
 int in_frame(const char* frameKey, Actor* actor);
 void draw_frame(SDL_Renderer* rend, const char* name);
 void update_frame(const char* frameKey);
-int has_frame(char* worldKey);
+int has_frame(int worldKey);
 #endif

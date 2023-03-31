@@ -2,6 +2,7 @@
 #include "worlds.h"
 #include "actors.h"
 #include "frames.h"
+#include "stringmachine.h"
 # include <SDL2/SDL.h>
 
 Frame* frames = NULL;
@@ -99,10 +100,10 @@ void update_frame(const char* frameKey) {
   }
 }
 
-int has_frame(char* worldKey) {
+int has_frame(int worldKey) {
   Frame *f, *tmp;
   HASH_ITER(hh, frames, f, tmp) {
-    if (strcmp(worldKey, f->world->name) == 0) return 1;
+    if (worldKey == f->world->name) return 1;
   }
   return 0;
 }
