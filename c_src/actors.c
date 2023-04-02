@@ -440,7 +440,7 @@ int get_script_for_actor(Actor* actor) {
   ScriptMapEntry *best, *sme;
   best = NULL;
     DL_FOREACH(sm->entries, sme) {
-    if (actor->state == sme->state) continue;
+    if (actor->state != sme->state) continue;
     if (actor->frame < sme->frame) continue;
     if (best) {
       if (sme->frame < best->frame) continue;
@@ -450,6 +450,7 @@ int get_script_for_actor(Actor* actor) {
   if (!best) {
     return -1;
   }
+
   return best->scriptIdx;
 }
 

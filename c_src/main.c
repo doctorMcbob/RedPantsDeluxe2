@@ -46,11 +46,10 @@ int main (int argc, char *argv[]) {
 
   srand(time(NULL));
 
-  if (SDL_Init(SDL_INIT_VIDEO) != 0)
-    {
-      printf("Error initializing SDL2: %s\n", SDL_GetError());
-      return 1;
-    }
+  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    printf("Error initializing SDL2: %s\n", SDL_GetError());
+    return 1;
+  }
 
   SDL_Window* screen = SDL_CreateWindow("Long way to the top, if you wanna make a game engine",
 					SDL_WINDOWPOS_CENTERED,
@@ -58,37 +57,33 @@ int main (int argc, char *argv[]) {
 					W,
 					H,
 					0);
-  if (!screen)
-    {
-      printf("error creating window: %s\n", SDL_GetError());
-      SDL_Quit();
-      return 1;
-    }
+  if (!screen) {
+    printf("error creating window: %s\n", SDL_GetError());
+    SDL_Quit();
+    return 1;
+  }
 
   Uint32 render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
   SDL_Renderer* rend = SDL_CreateRenderer(screen, -1, render_flags);
   
-  if (!rend)
-    {
-      printf("error creating renderer: %s\n", SDL_GetError());
-      SDL_DestroyWindow(screen);
-      SDL_Quit();
-      return 1;
-    }
+  if (!rend) {
+    printf("error creating renderer: %s\n", SDL_GetError());
+    SDL_DestroyWindow(screen);
+    SDL_Quit();
+    return 1;
+  }
   load_string_indexers();
   spritesheet_load(rend);
   actor_load();
   world_load();
   boxes_load();
   scripts_load();
-
   add_input_state("PLAYER1", NULL);
-
+  
   add_frame("MAIN", get_world(index_string("root")), NULL, 0, 0, W, H);
   
   while (input_update() != -1) {
     SDL_RenderClear(rend);
-
     if (update_world(index_string("root")) == -1) {
       break;
     };

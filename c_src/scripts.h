@@ -104,6 +104,7 @@
 #define ENDFOR 37
 #define PRINT 38
 #define UPDATE_STICKS 39
+
 typedef struct ScriptMapEntry {
   int state;
   int frame;
