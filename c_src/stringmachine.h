@@ -1,5 +1,5 @@
 #ifndef STRING_MACHINE_LOAD
-#define STRING_MACHINE_LOAD 1
+#define STRING_MACHINE_LOAD
 
 typedef struct StringIndexer {
   char key[3];
@@ -9,7 +9,10 @@ typedef struct StringIndexer {
 } StringIndexer;
 
 void add_indexer(char* key, int idx);
-const char* get_string(int idx);
+char* get_string(int idx);
 int index_string(char* string);
+int add_string(char* string);
+int concat_strings(char* str1, char* str2);
+char *int_to_string(int num);
+char *float_to_string(float num);
 #endif
-

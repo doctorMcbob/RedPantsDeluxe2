@@ -237,9 +237,13 @@ def _intern_strings(SCRIPTS):
                 UNIQUE_STRINGS.append(state)
 
     UNIQUE_STRINGS.sort()
-    string_data_dot_c = "#include \"stringmachine.h\"\n"
+    string_data_dot_c = "#include \"stringmachine.h\"\n#include <stddef.h>\n"
+    string_data_dot_c += "const char** D_STRINGS = NULL;\n"
+    string_data_dot_c += f"int NUM_STRINGS = {len(UNIQUE_STRINGS)};\n"
+    string_data_dot_c += "int DYNAMIC_STRINGS = 0;\n"
     string_data_dot_c += "const char* STRINGS[] = {\n  \"" + "\",\n  \"".join(UNIQUE_STRINGS) + "\"\n};\n"
-    string_data_dot_c += "const int STRING_LENS[] = {\n  " + ",\n  ".join(str(len(v)) for v in UNIQUE_STRINGS) + "\n}\n;"
+    string_data_dot_c += "const int STRING_LENS[] = {\n  " + ",\n  ".join(str(len(v)) for v in UNIQUE_STRINGS) + "\n};\n"
+    
     string_data_dot_c += "void load_string_indexers() {\n"
     for idx, token in enumerate(UNIQUE_STRINGS):
         if token[0:2] not in STRING_INDEXERS:
@@ -252,11 +256,34 @@ def _intern_strings(SCRIPTS):
 #ifndef STRING_DATA_LOAD
 #define STRING_DATA_LOAD 1
 
-const char* STRINGS[{len(UNIQUE_STRINGS)}];
-const char** D_STRINGS = NULL;
-int STRING_LENS[{len(UNIQUE_STRINGS)}];
-int NUM_STRINGS = {len(UNIQUE_STRINGS)};
-int DYNAMIC_STRINGS = 0;
+#define SELF {UNIQUE_STRINGS.index("self")}
+#define RELATED {UNIQUE_STRINGS.index("related")}
+#define XCOLLISION {UNIQUE_STRINGS.index("XCOLLISION")}
+#define YCOLLISION {UNIQUE_STRINGS.index("YCOLLISION")}
+#define X {UNIQUE_STRINGS.index("x")}
+#define Y {UNIQUE_STRINGS.index("y")}
+#define W {UNIQUE_STRINGS.index("w")}
+#define H {UNIQUE_STRINGS.index("h")}
+#define TOP {UNIQUE_STRINGS.index("top")}
+#define LEFT {UNIQUE_STRINGS.index("left")}
+#define BOTTOM {UNIQUE_STRINGS.index("bottom")}
+#define RIGHT {UNIQUE_STRINGS.index("right")}
+#define NAME {UNIQUE_STRINGS.index("name")}
+#define STATE {UNIQUE_STRINGS.index("state")}
+#define FRAME {UNIQUE_STRINGS.index("frame")}
+#define X_VEL {UNIQUE_STRINGS.index("x_vel")}
+#define Y_VEL {UNIQUE_STRINGS.index("y_vel")}
+#define DIRECTION {UNIQUE_STRINGS.index("direction")}
+#define ROTATION {UNIQUE_STRINGS.index("rotation")}
+#define TANGIBLE {UNIQUE_STRINGS.index("tangible")}
+#define PHYSICS {UNIQUE_STRINGS.index("physics")}
+#define PLATFORM {UNIQUE_STRINGS.index("platform")}
+
+extern const char* STRINGS[{len(UNIQUE_STRINGS)}];
+extern const char** D_STRINGS;
+extern int STRING_LENS[{len(UNIQUE_STRINGS)}];
+extern int NUM_STRINGS;
+extern int DYNAMIC_STRINGS;
 #endif
 """
     return string_data_dot_c, string_data_dot_h

@@ -1,4 +1,6 @@
+#ifndef STRING_DATA_LOAD
 #include "stringdata.h"
+#endif
 #include "stringmachine.h"
 
 #include <stddef.h>
@@ -10,20 +12,26 @@
 
 StringIndexer* indexers = NULL;
 
-void concat_strings(int idx1, int idx2) {
-    const char* str1 = STRINGS[idx1];
-    const char* str2 = STRINGS[idx2];
+int add_string(char* string) {
+    DYNAMIC_STRINGS++;
+    D_STRINGS = (const char**)realloc(D_STRINGS, DYNAMIC_STRINGS * sizeof(const char*));
+    D_STRINGS[DYNAMIC_STRINGS-1] = string;
+    add_indexer(string, NUM_STRINGS+DYNAMIC_STRINGS-1);
+    return NUM_STRINGS+DYNAMIC_STRINGS-1;
+}
+
+int concat_strings(char* str1, char* str2) {
     int len1 = strlen(str1);
     int len2 = strlen(str2);
     int total_len = len1 + len2 + 1;
     char* concat_str = (char*)malloc(total_len);
     strcpy(concat_str, str1);
     strcat(concat_str, str2);
-
-    DYNAMIC_STRINGS++;
-    D_STRINGS = (const char**)realloc(D_STRINGS, DYNAMIC_STRINGS * sizeof(const char*));
-    D_STRINGS[DYNAMIC_STRINGS-1] = concat_str;
-    add_indexer(concat_str, NUM_STRINGS+DYNAMIC_STRINGS-1);
+    int idx = index_string(concat_str);
+    if (idx == -1)
+      return add_string(concat_str);
+    free(concat_str);
+    return idx;
 }
 
 StringIndexer* _get_last() {
@@ -33,10 +41,10 @@ StringIndexer* _get_last() {
   return si;
 }
 
-const char* get_string(int idx) {
+char* get_string(int idx) {
   if (idx < 0) return NULL;
-  if (idx < NUM_STRINGS) return STRINGS[idx];
-  if (idx < NUM_STRINGS + DYNAMIC_STRINGS) return D_STRINGS[idx - NUM_STRINGS];
+  if (idx < NUM_STRINGS) return (char* )STRINGS[idx];
+  if (idx < NUM_STRINGS + DYNAMIC_STRINGS) return (char *)D_STRINGS[idx - NUM_STRINGS];
   return NULL;
 }
 
@@ -76,3 +84,47 @@ int index_string(char* string) {
   return -1;
 }
 
+char *int_to_string(int num) {
+    int temp = num;
+    int digits = 0;
+    
+    // Count the number of digits in the number
+    while (temp != 0) {
+        digits++;
+        temp /= 10;
+    }
+    
+    // Allocate enough memory to store the string representation of the number
+    char *str = malloc((digits + 1) * sizeof(char));
+    
+    // Convert the number to a string
+    sprintf(str, "%d", num);
+    
+    return str;
+}
+
+
+char *float_to_string(float num) {
+    int digits_before_decimal = 0;
+    int digits_after_decimal = 0;
+    
+    // Count the number of digits before and after the decimal point in the number
+    int temp = (int)num; // Cast to int to ignore the decimal part
+    while (temp != 0) {
+        digits_before_decimal++;
+        temp /= 10;
+    }
+    temp = (int)(num * 1000000) % 1000000; // Get the decimal part and convert it to integer
+    while (temp != 0) {
+        digits_after_decimal++;
+        temp /= 10;
+    }
+    
+    // Allocate enough memory to store the string representation of the number
+    char *str = malloc((digits_before_decimal + digits_after_decimal + 2) * sizeof(char));
+    
+    // Convert the number to a string
+    sprintf(str, "%.6f", num);
+    
+    return str;
+}
