@@ -62,7 +62,7 @@ ScriptMap* get_script_map(int key) {
   return (key>512 || key<0) ? NULL : SCRIPT_MAPS[key];
 }
 
-void resolve_operators() {
+void resolve_operators(int statement) {
   int bufferPointer = 0;
   int paramPointer = 0;
   while (bufferPointer < 512 && BUFFER[bufferPointer] != -1) {
@@ -72,15 +72,18 @@ void resolve_operators() {
       switch (operatorType) {
       case PLUS: {
 	if (paramPointer == 0) {
+	  print_statement(statement);
 	  printf("Cannot + without left hand side\n");
 	  break;
 	}
+
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+2];
-	int rightValue = BUFFER[bufferPointer+3];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
 	
 	if (rightType == -1) {
+	  print_statement(statement);
 	  printf("Cannot + without right hand side\n");
 	  break;
 	}
@@ -159,6 +162,7 @@ void resolve_operators() {
 	  break;
 	}
 	default: {
+	  print_statement(statement);
 	  printf("Failed to + types %i + %i\n", leftType, rightType);
 	  break;
 	}
@@ -167,15 +171,18 @@ void resolve_operators() {
       }
       case MINUS: {
 	if (paramPointer == 0) {
+	  print_statement(statement);
 	  printf("Cannot - without left hand side\n");
 	  break;
 	}
-	int leftType = PARAMS[paramPointer-2]; // -2 type, -1 value, @ paramPointer
+
+	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+2]; // @ bufferPointer, +1 value, +2 type, +3 value
-	int rightValue = BUFFER[bufferPointer+3];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
 	
 	if (rightType == -1) {
+	  print_statement(statement);
 	  printf("Cannot - without right hand side\n");
 	  break;
 	}
@@ -208,6 +215,7 @@ void resolve_operators() {
 	  break;
 	}
 	default: {
+	  print_statement(statement);
 	  printf("Failed to - types %i - %i\n", leftType, rightType);
 	  break;
 	}
@@ -216,15 +224,18 @@ void resolve_operators() {
       }
       case MULT: {
 	if (paramPointer == 0) {
+	  print_statement(statement);
 	  printf("Cannot * without left hand side\n");
 	  break;
 	}
+	
 	int leftType = PARAMS[paramPointer-2]; // -2 type, -1 value, @ paramPointer
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+2]; // @ bufferPointer, +1 value, +2 type, +3 value
-	int rightValue = BUFFER[bufferPointer+3];
+	int rightType = BUFFER[bufferPointer+1]; // @ bufferPointer, +1 value, +2 type, +3 value
+	int rightValue = BUFFER[bufferPointer+2];
 	
 	if (rightType == -1) {
+	  print_statement(statement);
 	  printf("Cannot * without right hand side\n");
 	  break;
 	}
@@ -257,6 +268,7 @@ void resolve_operators() {
 	  break;
 	}
 	default: {
+	  print_statement(statement);
 	  printf("Failed to - types %i * %i\n", leftType, rightType);
 	  break;
 	}
@@ -304,15 +316,13 @@ void resolve_operators() {
 
 int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
   int executionPointer = scriptIdx;
-  printf("Resolving script for %s\n", get_string(self->name));
   while (SCRIPTS[executionPointer] != -2000) {
     _clear();
     clear_float_buffer();
     int verb = SCRIPTS[executionPointer];
     // for each statement in script
-    printf("Statement:\n  ");
-    print_statement(executionPointer);
     int bufferPointer = 0;
+    int statement = executionPointer;
     while (SCRIPTS[executionPointer] != -1000) {
       // evaluate literals
       executionPointer++;
@@ -345,6 +355,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
       }
       case DOT: {
 	if (bufferPointer < 2) {
+	  print_statement(statement);
 	  printf("Could not . with no left hand side\n");
 	  break;
 	}
@@ -354,6 +365,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	int rightValue = SCRIPTS[++executionPointer];
 
 	if (rightType != STRING || leftType != STRING) {
+	  print_statement(statement);
 	  printf("Dot must be string . string, got %i . %i\n", leftType, rightType);
 	  break;
 	}
@@ -432,11 +444,19 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	  BUFFER[bufferPointer-1] = push_float(a->y_vel);
 	  break;
 	default: {
-	  // todo, attribute map
+	  Attribute* attr;
+	  HASH_FIND_INT(a->attributes, &rightValue, attr);
+	  if (attr == NULL) {
+	    BUFFER[bufferPointer-2] = INT;
+	    BUFFER[bufferPointer-1] = 0;
+	  } else {
+	    BUFFER[bufferPointer-2] = attr->type;
+	    BUFFER[bufferPointer-1] = attr->type == FLOAT ?
+	      push_float(attr->value.f) : attr->value.i;
+	  }	  
 	}
 	}
 	break;
-	/**/
       }
       case LIST: {}
       case INP_A: {}
@@ -451,12 +471,8 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
       case INP_EVENTS: {}
       }
     }
-    printf("Buffer:\n  ");
-    print_buffer();
     // resolve operators
-    resolve_operators();
-    printf("Params:\n  ");
-    print_params();
+    resolve_operators(statement);
     // resolve verb
     switch (verb) {
     case QUIT: {
@@ -466,7 +482,111 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
     case GOODBYE: {}
     case BREAK: {}
     case RESET: {}
-    case SET: {}
+    case SET: {
+      int nameType = PARAMS[0];
+      int nameValue = PARAMS[1];
+      int attrType = PARAMS[2];
+      int attrValue = PARAMS[3];
+      int valueType = PARAMS[4];
+      int valueValue = PARAMS[5];
+      if (nameType != STRING || attrType != STRING || valueType == -1) {
+	print_statement(statement);
+	printf("Missing or Incorrect Parameter for SET\n");
+	break;
+      }
+
+      Actor* a;
+      if (nameValue == SELF) a = self;
+      else if (nameValue == RELATED) a = related;
+      else a = get_actor(nameValue);
+      if (a == NULL) {
+	print_statement(statement);
+	printf("Could not find actor %s for SET\n", get_string(nameValue));
+	break;
+      }
+      switch (valueValue) {
+      case NAME:
+	if (valueType != STRING) break;
+	a->name = valueValue;
+	break;
+      case STATE:
+	if (valueType != STRING) break;
+	a->state = valueValue;
+	break;
+      case X: 
+	if (valueType != INT) break;
+	a->ECB->x = valueValue;
+	break;
+      case Y:
+	if (valueType != INT) break;
+	a->ECB->y = valueValue;
+	break;
+      case W:
+	if (valueType != INT) break;
+	a->ECB->w = valueValue;
+	break;
+      case H:
+	if (valueType != INT) break;
+	a->ECB->h = valueValue;
+	break;
+      case TOP:
+	if (valueType != INT) break;
+	a->ECB->y = valueValue;
+	break;
+      case LEFT:
+	if (valueType != INT) break;
+	a->ECB->x = valueValue;
+	break;
+      case BOTTOM:
+	if (valueType != INT) break;
+	a->ECB->y = valueValue - a->ECB->h;
+	break;
+      case RIGHT:
+	if (valueType != INT) break;
+	a->ECB->x = valueValue - a->ECB->w;
+	break;
+      case DIRECTION:
+	if (valueType != INT) break;
+	a->direction = valueValue;
+	break;
+      case PLATFORM:
+	if (valueType != INT) break;
+	a->platform = valueValue;
+	break;
+      case ROTATION:
+	if (valueType != INT) break;
+	a->rotation = valueValue;
+	break;
+      case TANGIBLE:
+	if (valueType != INT) break;
+	a->tangible = valueValue;
+	break;
+      case PHYSICS:
+	if (valueType != INT) break;
+	a->physics = valueValue;
+	break;
+      case X_VEL:
+	if (valueType != FLOAT) break;
+	a->x_vel = get_float(valueValue);
+	break;
+      case Y_VEL:
+	if (valueType != FLOAT) break;
+	a->y_vel = get_float(valueValue);
+	break;
+      default: {
+	Attribute* attr;
+	HASH_FIND_INT(a->attributes, &attrValue, attr);
+	if (attr == NULL) {
+	  attr = malloc(sizeof(Attribute));
+	  HASH_ADD_INT(a->attributes, name, attr);
+	}
+	attr->name = attrValue;
+	attr->type = valueType;
+	if (attr->type == FLOAT) attr->value.f = get_float(valueValue);
+	else attr->value.i = valueValue;
+      }
+      }
+    }
     case REASSIGN: {}
     case IF: {}
     case ENDIF: {}
@@ -506,7 +626,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
     
     executionPointer++;
   }
-  printf("End of Script\n");
+
   return 0;
 }
 

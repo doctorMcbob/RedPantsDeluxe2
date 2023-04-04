@@ -8,7 +8,10 @@
 typedef struct Attribute {
   int name;
   int type;
-  int value;
+  union {
+    int i;
+    float f;
+  } value;
   UT_hash_handle hh;
 } Attribute;
 
