@@ -4,6 +4,8 @@
 #include "actors.h"
 #include "worlds.h"
 #include "debug.h"
+#include "inputs.h"
+#include "math.h"
 #include "stringmachine.h"
 #include "floatmachine.h"
 #ifndef STRING_DATA_LOAD
@@ -104,6 +106,12 @@ void resolve_operators(int statement) {
 	  char *s = int_to_string(leftValue);
 	  char *s2 = get_string(rightValue);
 	  int i = concat_strings(s, s2);
+	  if (i == -1) {
+	    print_statement(statement);
+	    printf("Failed Concat %s %s\n", s, s2);
+		free(s);
+	    break;
+	  }
 	  PARAMS[paramPointer-2] = STRING;
 	  PARAMS[paramPointer-1] = i;
 	  free(s);
@@ -129,6 +137,12 @@ void resolve_operators(int statement) {
 	  char *s = float_to_string(f);
 	  char *s2 = get_string(rightValue);
 	  int i = concat_strings(s, s2);
+	  if (i == -1) {
+	    print_statement(statement);
+	    printf("Failed Concat %s %s\n", s, s2);
+		free(s);
+	    break;
+	  }
 	  PARAMS[paramPointer-2] = STRING;
 	  PARAMS[paramPointer-1] = i;
 	  free(s);
@@ -138,9 +152,15 @@ void resolve_operators(int statement) {
 	  char *s = get_string(leftValue);
 	  char *s2 = int_to_string(rightValue);
 	  int i = concat_strings(s, s2);
+	  if (i == -1) {
+	    print_statement(statement);
+	    printf("Failed Concat %s %s\n", s, s2);
+		free(s2);
+	    break;
+	  }
 	  PARAMS[paramPointer-2] = STRING;
 	  PARAMS[paramPointer-1] = i;
-	  free(s);
+	  free(s2);
 	  break;
 	}
 	case (STRING + 3*FLOAT): {
@@ -148,15 +168,26 @@ void resolve_operators(int statement) {
 	  float f = get_float(rightValue);
 	  char *s2 = float_to_string(f);
 	  int i = concat_strings(s, s2);
+	  if (i == -1) {
+	    print_statement(statement);
+	    printf("Failed Concat %s %s\n", s, s2);
+		free(s2);
+	    break;
+	  }
 	  PARAMS[paramPointer-2] = STRING;
 	  PARAMS[paramPointer-1] = i;
-	  free(s);
+	  free(s2);
 	  break;
 	}
 	case (STRING + 3*STRING): {
 	  char *s = get_string(leftValue);
 	  char *s2 = get_string(rightValue);
 	  int i = concat_strings(s, s2);
+	  if (i == -1) {
+	    print_statement(statement);
+	    printf("Failed Concat %s %s\n", s, s2);
+	    break;
+	  }
 	  PARAMS[paramPointer-2] = STRING;
 	  PARAMS[paramPointer-1] = i;
 	  break;
@@ -269,22 +300,536 @@ void resolve_operators(int statement) {
 	}
 	default: {
 	  print_statement(statement);
-	  printf("Failed to - types %i * %i\n", leftType, rightType);
+	  printf("Failed to * types %i * %i\n", leftType, rightType);
 	  break;
 	}
 	}
 	break;
       }
-      case FLOORDIV: {}
-      case FLOATDIV: {}
-      case MOD: {}
-      case POW: {}
-      case EQUALS: {}
-      case LESSTHAN: {}
-      case MORETHAN: {}
-      case LESSEQUAL: {}
-      case MOREEQUAL: {}
-      case NOTEQUAL: {}
+      case FLOORDIV: {
+      	if (paramPointer == 0) {
+	  print_statement(statement);
+	  printf("Cannot // without left hand side\n");
+	  break;
+	}
+	
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot // without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue / rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue / (int)f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (int)f / rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (int)f / (int)f2;
+	  break;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to // types %i // %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
+      case FLOATDIV: {
+	if (paramPointer == 0) {
+	  print_statement(statement);
+	  printf("Cannot / without left hand side\n");
+	  break;
+	}
+	
+	int leftType = PARAMS[paramPointer-2]; // -2 type, -1 value, @ paramPointer
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1]; // @ bufferPointer, +1 value, +2 type, +3 value
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot / without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  int i = push_float((float)leftValue / rightValue);
+	  PARAMS[paramPointer-2] = FLOAT;
+	  PARAMS[paramPointer-1] = i;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  int i = push_float((float)leftValue / f);
+	  PARAMS[paramPointer-2] = FLOAT;
+	  PARAMS[paramPointer-1] = i;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  int i = push_float(f / rightValue);
+	  PARAMS[paramPointer-2] = FLOAT;
+	  PARAMS[paramPointer-1] = i;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  int i = push_float(f / f2);
+	  PARAMS[paramPointer-2] = FLOAT;
+	  PARAMS[paramPointer-1] = i;
+	  break;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to / types %i / %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
+      case MOD: {
+      	if (paramPointer == 0) {
+	  print_statement(statement);
+	  printf("Cannot %% without left hand side\n");
+	  break;
+	}
+	
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot %% without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue % rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue % (int)f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (int)f % rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (int)f % (int)f2;
+	  break;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to %% types %i %% %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
+      case POW: {
+      	if (paramPointer == 0) {
+	  print_statement(statement);
+	  printf("Cannot ** without left hand side\n");
+	  break;
+	}
+	
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot ** without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = pow(leftValue, rightValue);
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = pow(leftValue, f);
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = pow(f, rightValue);
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = pow(f, f2);
+	  break;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to ** types %i ** %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
+      case EQUALS: {
+      	if (paramPointer == 0) {
+	  print_statement(statement);
+	  printf("Cannot == without left hand side\n");
+	  break;
+	}
+	
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot == without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue == rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (float)leftValue == f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f == (float)rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f == f2;
+	  break;
+	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue == rightValue;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to == types %i == %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
+      case LESSTHAN: {
+      	if (paramPointer == 0) {
+	  print_statement(statement);
+	  printf("Cannot < without left hand side\n");
+	  break;
+	}
+	
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot < without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue < rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (float)leftValue < f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f < (float)rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f < f2;
+	  break;
+	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue < rightValue;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to < types %i < %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
+      case MORETHAN: {
+	if (paramPointer == 0) { 
+	  print_statement(statement);
+	  printf("Cannot > without left hand side\n");
+	}	
+		
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot > without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue > rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (float)leftValue > f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f > (float)rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f > f2;
+	  break;
+	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue > rightValue;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to > types %i > %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
+      case LESSEQUAL: {
+	if (paramPointer == 0) { 
+	  print_statement(statement);
+	  printf("Cannot <= without left hand side\n");
+	}	
+		
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot <= without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue <= rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (float)leftValue <= f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f <= (float)rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f <= f2;
+	  break;
+	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue <= rightValue;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to <= types %i <= %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
+      case MOREEQUAL: {
+	if (paramPointer == 0) { 
+	  print_statement(statement);
+	  printf("Cannot >= without left hand side\n");
+	}
+		
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot >= without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue >= rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (float)leftValue >= f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f >= (float)rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f >= f2;
+	  break;
+	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue >= rightValue;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to >= types %i >= %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
+      case NOTEQUAL: {
+	if (paramPointer == 0) { 
+	  print_statement(statement);
+	  printf("Cannot != without left hand side\n");
+	}
+		
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[bufferPointer+1];
+	int rightValue = BUFFER[bufferPointer+2];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot != without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue != rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = (float)leftValue != f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f != (float)rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f != f2;
+	  break;
+	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue != rightValue;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to != types %i != %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+      }
       case AND: {}
       case OR: {}
       case NOT: {}
@@ -312,7 +857,6 @@ void resolve_operators(int statement) {
     }
   }
 }
-
 
 int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
   int executionPointer = scriptIdx;
@@ -383,11 +927,11 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	  BUFFER[bufferPointer-2] = STRING;
 	  BUFFER[bufferPointer-1] = a->state;
 	  break;
-	case X:
+	case _X:
 	  BUFFER[bufferPointer-2] = INT;
 	  BUFFER[bufferPointer-1] = a->ECB->x;	  
 	  break;
-	case Y:
+	case _Y:
 	  BUFFER[bufferPointer-2] = INT;
 	  BUFFER[bufferPointer-1] = a->ECB->y;
 	  break;
@@ -458,11 +1002,53 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	}
 	break;
       }
-      case LIST: {}
-      case INP_A: {}
-      case INP_B: {}
-      case INP_X: {}
-      case INP_Y: {}
+      case LIST: {
+		// TODO: implement lists
+	  }
+      case INP_A: {
+		struct InputState *is = get_input_state(self->_input_name);
+		if (is == NULL) {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = 0;
+		} else {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = is->A;
+		}
+		break;
+	  }
+      case INP_B: {
+		struct InputState *is = get_input_state(self->_input_name);
+		if (is == NULL) {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = 0;
+		} else {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = is->B;
+		}
+		break;
+	  }
+      case INP_X: {
+		struct InputState *is = get_input_state(self->_input_name);
+		if (is == NULL) {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = 0;
+		} else {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = is->X;
+		}
+		break;
+	  }
+      case INP_Y: {
+		struct InputState *is = get_input_state(self->_input_name);
+		if (is == NULL) {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = 0;
+		} else {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = is->Y;
+		}
+		break;
+	  }
       case INP_LEFT: {}
       case INP_UP: {}
       case INP_RIGHT: {}
@@ -504,7 +1090,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	printf("Could not find actor %s for SET\n", get_string(nameValue));
 	break;
       }
-      switch (valueValue) {
+      switch (attrValue) {
       case NAME:
 	if (valueType != STRING) break;
 	a->name = valueValue;
@@ -513,11 +1099,11 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	if (valueType != STRING) break;
 	a->state = valueValue;
 	break;
-      case X: 
+      case _X: 
 	if (valueType != INT) break;
 	a->ECB->x = valueValue;
 	break;
-      case Y:
+      case _Y:
 	if (valueType != INT) break;
 	a->ECB->y = valueValue;
 	break;
@@ -578,12 +1164,11 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	HASH_FIND_INT(a->attributes, &attrValue, attr);
 	if (attr == NULL) {
 	  attr = malloc(sizeof(Attribute));
+	  attr->name = attrValue;
 	  HASH_ADD_INT(a->attributes, name, attr);
 	}
-	attr->name = attrValue;
 	attr->type = valueType;
 	if (attr->type == FLOAT) attr->value.f = get_float(valueValue);
-	else attr->value.i = valueValue;
       }
       }
     }

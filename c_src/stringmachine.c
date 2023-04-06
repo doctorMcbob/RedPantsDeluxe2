@@ -11,22 +11,27 @@
 #include "utlist.h"
 
 StringIndexer* indexers = NULL;
+DynamicString* dynamic_strings = NULL;
 
 int add_string(char* string) {
     DYNAMIC_STRINGS++;
-    D_STRINGS = (const char**)realloc(D_STRINGS, DYNAMIC_STRINGS * sizeof(const char*));
-    D_STRINGS[DYNAMIC_STRINGS-1] = string;
+    DynamicString *ds = malloc(sizeof(DynamicString));
+    ds->string = string;
+    DL_APPEND(dynamic_strings, ds);
     add_indexer(string, NUM_STRINGS+DYNAMIC_STRINGS-1);
     return NUM_STRINGS+DYNAMIC_STRINGS-1;
 }
 
 int concat_strings(char* str1, char* str2) {
+    printf("concat %s %s\n", str1, str2);
+    if (str1 == NULL || str2 == NULL) return -1;
     int len1 = strlen(str1);
     int len2 = strlen(str2);
     int total_len = len1 + len2 + 1;
     char* concat_str = (char*)malloc(total_len);
     strcpy(concat_str, str1);
     strcat(concat_str, str2);
+    printf("concat %s %s to %s \n", str1, str2, concat_str);
     int idx = index_string(concat_str);
     if (idx == -1)
       return add_string(concat_str);
@@ -44,7 +49,15 @@ StringIndexer* _get_last() {
 char* get_string(int idx) {
   if (idx < 0) return NULL;
   if (idx < NUM_STRINGS) return (char* )STRINGS[idx];
-  if (idx < NUM_STRINGS + DYNAMIC_STRINGS) return (char *)D_STRINGS[idx - NUM_STRINGS];
+  if (idx < NUM_STRINGS + DYNAMIC_STRINGS) {
+    DynamicString *ds;
+    int d_idx = idx - NUM_STRINGS;
+    DL_FOREACH(dynamic_strings, ds) {
+      if (d_idx-- != 0) continue;
+      return ds->string;
+    }
+  }
+
   return NULL;
 }
 
@@ -71,14 +84,31 @@ int index_string(char* string) {
   DL_FOREACH(indexers, si) {
     if (si->key[0] != string[0]) continue;
     if (len > 1 && si->key[1] != string[1]) continue;
+
     int starter = si->idx;
     int tocheck = si->next != NULL ? si->next->idx - starter : NUM_STRINGS - starter;
+
     for (int i = 0; i < tocheck; i++) {
-      if (starter + 1 < NUM_STRINGS + DYNAMIC_STRINGS) {
-	if (strcmp(STRINGS[starter + i], string) == 0) return starter + i;
+      if (starter + i < NUM_STRINGS) {
+      	if (strcmp(STRINGS[starter + i], string) == 0)
+          return starter + i;
       } else {
-	if (strcmp(D_STRINGS[(starter + i) - NUM_STRINGS], string) == 0) return starter + i;
-      }  
+        DynamicString *ds;
+        int d_idx = starter + i - NUM_STRINGS;
+        int depth = d_idx;
+        DL_FOREACH(dynamic_strings, ds) {
+          if (d_idx-- != 0) continue;
+          int count = 0;
+          if (count < tocheck) {
+            count++;
+            if (strcmp(ds->string, string) == 0)
+              return starter + depth + count;
+          } else {
+            break;
+          }
+        }
+        break;
+      }
     }
   }
   return -1;
@@ -87,19 +117,19 @@ int index_string(char* string) {
 char *int_to_string(int num) {
     int temp = num;
     int digits = 0;
-    
+
     // Count the number of digits in the number
     while (temp != 0) {
         digits++;
         temp /= 10;
     }
-    
+
     // Allocate enough memory to store the string representation of the number
     char *str = malloc((digits + 1) * sizeof(char));
-    
+
     // Convert the number to a string
     sprintf(str, "%d", num);
-    
+
     return str;
 }
 
@@ -107,7 +137,7 @@ char *int_to_string(int num) {
 char *float_to_string(float num) {
     int digits_before_decimal = 0;
     int digits_after_decimal = 0;
-    
+
     // Count the number of digits before and after the decimal point in the number
     int temp = (int)num; // Cast to int to ignore the decimal part
     while (temp != 0) {
@@ -119,12 +149,12 @@ char *float_to_string(float num) {
         digits_after_decimal++;
         temp /= 10;
     }
-    
+
     // Allocate enough memory to store the string representation of the number
     char *str = malloc((digits_before_decimal + digits_after_decimal + 2) * sizeof(char));
-    
+
     // Convert the number to a string
     sprintf(str, "%.6f", num);
-    
+
     return str;
 }

@@ -8,6 +8,12 @@ typedef struct StringIndexer {
   struct StringIndexer *prev;
 } StringIndexer;
 
+typedef struct DynamicString {
+  char* string;
+  struct DynamicString *next;
+  struct DynamicString *prev;
+} DynamicString;
+
 void add_indexer(char* key, int idx);
 char* get_string(int idx);
 int index_string(char* string);

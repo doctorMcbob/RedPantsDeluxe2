@@ -44,7 +44,7 @@ typedef struct InputState {
 } InputState; 
 
 typedef struct InputHashNode {
-  char name[32];
+  int name;
   InputState* data;
   UT_hash_handle hh;
 } InputHashNode;
@@ -62,12 +62,12 @@ typedef struct KeyMap {
 } KeyMap;
 
 typedef struct KeyHashNode {
-  char name[32];
+  int name;
   KeyMap* keymap;
   UT_hash_handle hh;
 } KeyHashNode;
 
-void add_input_state(const char* name, SDL_Joystick* joy);
-InputState* get_input_state(const char* name);
+void add_input_state(int name, SDL_Joystick* joy);
+InputState* get_input_state(int name);
 int input_update();
 #endif

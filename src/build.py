@@ -238,7 +238,6 @@ def _intern_strings(SCRIPTS):
 
     UNIQUE_STRINGS.sort()
     string_data_dot_c = "#include \"stringmachine.h\"\n#include <stddef.h>\n"
-    string_data_dot_c += "const char** D_STRINGS = NULL;\n"
     string_data_dot_c += f"int NUM_STRINGS = {len(UNIQUE_STRINGS)};\n"
     string_data_dot_c += "int DYNAMIC_STRINGS = 0;\n"
     string_data_dot_c += "const char* STRINGS[] = {\n  \"" + "\",\n  \"".join(UNIQUE_STRINGS) + "\"\n};\n"
@@ -260,8 +259,8 @@ def _intern_strings(SCRIPTS):
 #define RELATED {UNIQUE_STRINGS.index("related")}
 #define XCOLLISION {UNIQUE_STRINGS.index("XCOLLISION")}
 #define YCOLLISION {UNIQUE_STRINGS.index("YCOLLISION")}
-#define X {UNIQUE_STRINGS.index("x")}
-#define Y {UNIQUE_STRINGS.index("y")}
+#define _X {UNIQUE_STRINGS.index("x")}
+#define _Y {UNIQUE_STRINGS.index("y")}
 #define W {UNIQUE_STRINGS.index("w")}
 #define H {UNIQUE_STRINGS.index("h")}
 #define TOP {UNIQUE_STRINGS.index("top")}
@@ -280,7 +279,6 @@ def _intern_strings(SCRIPTS):
 #define PLATFORM {UNIQUE_STRINGS.index("platform")}
 
 extern const char* STRINGS[{len(UNIQUE_STRINGS)}];
-extern const char** D_STRINGS;
 extern int STRING_LENS[{len(UNIQUE_STRINGS)}];
 extern int NUM_STRINGS;
 extern int DYNAMIC_STRINGS;

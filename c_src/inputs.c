@@ -26,7 +26,7 @@
 InputHashNode* input_states = NULL;
 KeyHashNode* key_maps = NULL;
 
-void add_input_state(const char* name, SDL_Joystick* joy) {
+void add_input_state(int name, SDL_Joystick* joy) {
   struct InputHashNode *is;
   is = malloc(sizeof(InputHashNode));
   if (is == NULL) {
@@ -69,19 +69,19 @@ void add_input_state(const char* name, SDL_Joystick* joy) {
     key_map->START = SDLK_RETURN;
    
     km->keymap = key_map;
-    strcpy(km->name, name);
-    HASH_ADD_STR(key_maps, name, km);
+	km->name = name;
+    HASH_ADD_INT(key_maps, name, km);
   }
-  strcpy(is->name, name);
+  is->name = name;
   is->data = input_state;
   
-  HASH_ADD_STR(input_states, name, is);
+  HASH_ADD_INT(input_states, name, is);
 }
 
-InputState* get_input_state(const char* name) {
+InputState* get_input_state(int name) {
   struct InputHashNode *is;
 
-  HASH_FIND_STR(input_states, name, is);
+  HASH_FIND_INT(input_states, &name, is);
   if (is) {
     return is->data;
   } else {
@@ -111,9 +111,9 @@ int input_update() {
 	KeyHashNode *km, *tmp;
 	HASH_ITER(hh, key_maps, km, tmp) {
 	  InputHashNode* inputNode;
-	  HASH_FIND_STR(input_states, km->name, inputNode);
-	  if (!inputNode) {
-	    printf("Unfortunately there was no input state with the name %s", km->name);
+	  HASH_FIND_INT(input_states, &km->name, inputNode);
+	  if (inputNode=NULL) {
+	    printf("Unfortunately there was no input state with the name %i", km->name);
 	    continue;
 	  }
 	  
@@ -167,9 +167,9 @@ int input_update() {
 	KeyHashNode *km, *tmp;
 	HASH_ITER(hh, key_maps, km, tmp) {
 	  InputHashNode* inputNode;
-	  HASH_FIND_STR(input_states, km->name, inputNode);
+	  HASH_FIND_INT(input_states, &km->name, inputNode);
 	  if (!inputNode) {
-	    printf("Unfortunately there was no input state with the name %s", km->name);
+	    printf("Unfortunately there was no input state with the name %i", km->name);
 	    continue;
 	  }
 	  
