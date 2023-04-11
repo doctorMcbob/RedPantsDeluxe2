@@ -60,7 +60,7 @@ int update_world(int worldKey) {
   w = get_world(worldKey);
   struct ActorEntry *ae, *tmp;
   DL_FOREACH_SAFE(w->actors, ae, tmp) {
-    if (update_actor(ae->actorKey, worldKey) == -1) return -1;
+    if (update_actor(ae->actorKey, worldKey) == -2) return -2;
   }
   return 0;
 }

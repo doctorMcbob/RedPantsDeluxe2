@@ -8,6 +8,7 @@
 #include "math.h"
 #include "stringmachine.h"
 #include "floatmachine.h"
+#include "lists.h"
 #ifndef STRING_DATA_LOAD
 #include "stringdata.h"
 #endif
@@ -20,6 +21,8 @@ void print_buffer() {
   int bp = 0;
   printf("%i", BUFFER[bp]);
   while (bp < 512 && BUFFER[bp] != -1) {
+    bp++;
+    printf(", %i", BUFFER[bp]);
     bp++;
     printf(", %i", BUFFER[bp]);
   }
@@ -68,6 +71,10 @@ void resolve_operators(int statement) {
   int bufferPointer = 0;
   int paramPointer = 0;
   while (bufferPointer < 512 && BUFFER[bufferPointer] != -1) {
+	printf("\nbufferPointer: %i : ", bufferPointer);
+	print_buffer();
+	printf("paramPointer: %i : ", paramPointer);
+	print_params();
     int type = BUFFER[bufferPointer++];
     if (type == OPERATOR) {
       int operatorType = BUFFER[bufferPointer];
@@ -81,8 +88,8 @@ void resolve_operators(int statement) {
 
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -209,8 +216,8 @@ void resolve_operators(int statement) {
 
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -262,8 +269,8 @@ void resolve_operators(int statement) {
 	
 	int leftType = PARAMS[paramPointer-2]; // -2 type, -1 value, @ paramPointer
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1]; // @ bufferPointer, +1 value, +2 type, +3 value
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer]; // @ bufferPointer, +1 value, +2 type, +3 value
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -315,8 +322,8 @@ void resolve_operators(int statement) {
 	
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -365,8 +372,8 @@ void resolve_operators(int statement) {
 	
 	int leftType = PARAMS[paramPointer-2]; // -2 type, -1 value, @ paramPointer
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1]; // @ bufferPointer, +1 value, +2 type, +3 value
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer]; // @ bufferPointer, +1 value, +2 type, +3 value
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -419,8 +426,8 @@ void resolve_operators(int statement) {
 	
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -469,8 +476,8 @@ void resolve_operators(int statement) {
 	
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -511,7 +518,7 @@ void resolve_operators(int statement) {
 	break;
       }
       case EQUALS: {
-      	if (paramPointer == 0) {
+	if (paramPointer == 0) {
 	  print_statement(statement);
 	  printf("Cannot == without left hand side\n");
 	  break;
@@ -519,8 +526,8 @@ void resolve_operators(int statement) {
 	
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -573,8 +580,8 @@ void resolve_operators(int statement) {
 	
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -626,8 +633,8 @@ void resolve_operators(int statement) {
 		
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -679,8 +686,8 @@ void resolve_operators(int statement) {
 		
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -732,8 +739,8 @@ void resolve_operators(int statement) {
 		
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -785,8 +792,8 @@ void resolve_operators(int statement) {
 		
 	int leftType = PARAMS[paramPointer-2];
 	int leftValue = PARAMS[paramPointer-1];
-	int rightType = BUFFER[bufferPointer+1];
-	int rightValue = BUFFER[bufferPointer+2];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
 	
 	if (rightType == -1) {
 	  print_statement(statement);
@@ -830,21 +837,366 @@ void resolve_operators(int statement) {
 	}
 	break;
       }
-      case AND: {}
-      case OR: {}
-      case NOT: {}
-      case NOR: {}
-      case IN: {}
-      case AT: {}
+      case AND: {
+	if (paramPointer == 0) { 
+	  print_statement(statement);
+	  printf("Cannot and without left hand side\n");
+	}
+		
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot and without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue && rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue && f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f && rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f && f2;
+	  break;
+	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = strlen(get_string(leftValue)), l2 = strlen(get_string(rightValue));
+	  PARAMS[paramPointer-1] = l1 && l2;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to and types %i and %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+	  }
+      case OR: {
+	if (paramPointer == 0) { 
+	  print_statement(statement);
+	  printf("Cannot or without left hand side\n");
+	}
+
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot or without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue || rightValue;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue || f;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f || rightValue;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f || f2;
+	  break;
+	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = strlen(get_string(leftValue)), l2 = strlen(get_string(rightValue));
+	  PARAMS[paramPointer-1] = l1 || l2;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to or types %i or %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+	  }
+      case NOT: {
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot and without right hand side\n");
+	  break;
+	}
+	switch (rightType) {
+	case (INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = rightValue == 0;
+	  break;
+	}
+	case (FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f == 0;
+	  break;
+	}
+	case (STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  char* s = get_string(rightValue);
+	  PARAMS[paramPointer-1] = s[0] == "\0";
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to not type %i\n", rightType);
+	  break;
+	}
+	}
+	break;
+	  }
+      case NOR: {
+	if (paramPointer == 0) { 
+	  print_statement(statement);
+	  printf("Cannot nor without left hand side\n");
+	}
+		
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot nor without right hand side\n");
+	  break;
+	}
+	switch (leftType + 3*rightType) {
+	case (INT + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue && rightValue == 0;
+	  break;
+	}
+	case (INT + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue && f == 0;
+	  break;
+	}
+	case (FLOAT + 3*INT): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f && rightValue == 0;
+	  break;
+	}
+	case (FLOAT + 3*FLOAT): {
+	  float f = get_float(leftValue);
+	  float f2 = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = f && f2 == 0;
+	  break;
+	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = strlen(get_string(leftValue)), l2 = strlen(get_string(rightValue));
+	  PARAMS[paramPointer-1] = l1 && l2 == 0;
+	}
+	default: {
+	  print_statement(statement);
+	  printf("Failed to nor types %i nor %i\n", leftType, rightType);
+	  break;
+	}
+	}
+	break;
+	  }
+      case IN: {
+	if (paramPointer == 0) { 
+	  print_statement(statement);
+	  printf("Cannot and without left hand side\n");
+	}
+		
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot and without right hand side\n");
+	  break;
+	}
+	if (rightType != STRING && rightType != LIST) { 
+	  print_statement(statement);
+	  printf("Cannot in with non-string or list\n");
+	  break;
+	}
+	if (rightType == LIST) {
+		int i = in_list(rightValue, leftType, leftValue);
+		PARAMS[paramPointer-2] = INT;
+		PARAMS[paramPointer-1] = i;
+	} else {
+		switch (leftType) {
+			case INT: {
+				char *s1 = int_to_string(leftValue), *s2 = get_string(rightValue);
+				int i = strstr(s2, s1) != NULL;
+				PARAMS[paramPointer-2] = INT;
+				PARAMS[paramPointer-1] = i;
+				free(s1);
+				break;
+			}
+			case FLOAT: {
+				float f = get_float(leftValue);
+				char *s1 = float_to_string(f), *s2 = get_string(rightValue);
+				int i = strstr(s2, s1) != NULL;
+				PARAMS[paramPointer-2] = INT;
+				PARAMS[paramPointer-1] = i;
+				free(s1);
+				break;
+			}
+			case STRING: {
+				char *s1 = get_string(leftValue), *s2 = get_string(rightValue);
+				int i = strstr(s2, s1) != NULL;
+				PARAMS[paramPointer-2] = INT;
+				PARAMS[paramPointer-1] = i;
+				break;
+			}
+			default: {
+				print_statement(statement);
+				printf("Cannot in with types %i in %i\n", leftType, rightType);
+				break;
+			}
+		}
+	}
+	break;
+	  }
+      case AT: {
+	if (paramPointer == 0) {
+	  print_statement(statement);
+	  printf("Cannot at without left hand side\n");
+	  break;
+	}
+
+	int leftType = PARAMS[paramPointer-2];
+	int leftValue = PARAMS[paramPointer-1];
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
+
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot at without right hand side\n");
+	  break;
+	}
+	if (rightType != STRING && rightType != LIST) { 
+	  print_statement(statement);
+	  printf("Cannot at with non-string or list\n");
+	  break;
+	}
+	if (leftType != INT) {
+	  print_statement(statement);
+	  printf("Cannot at with non-int\n");
+	  break;
+	}
+	if (rightType == LIST) {
+		ListNode *ln = get_from_list(rightValue, leftValue);
+		if (ln != NULL) {
+			PARAMS[paramPointer-2] = ln->type;
+			PARAMS[paramPointer-1] = ln->value;
+		}
+	} else {
+		char *s = get_string(rightValue);
+		int len = strlen(s);
+		if (leftValue < len) {
+			PARAMS[paramPointer-2] = STRING;
+			PARAMS[paramPointer-1] = add_string(s[leftValue]);
+		}
+	}
+	  }
       case CASTINT: {}
       case CASTSTR: {}
       case MIN: {}
-      case MAX: {}
-      case LEN: {}
+      case MAX: {
+		  break;
+	  }
+      case LEN: {
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
+
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot len without right hand side\n");
+	  break;
+	}
+	if (rightType != STRING && rightType != LIST) { 
+	  print_statement(statement);
+	  printf("Cannot len with non-string or list\n");
+	  break;
+	}
+	if (rightType == LIST) {
+		int len = len_list(rightValue);
+		PARAMS[paramPointer++] = INT;
+		PARAMS[paramPointer++] = len;
+	} else {
+		char *s = get_string(rightValue);
+		int len = strlen(s);
+		PARAMS[paramPointer++] = INT;
+		PARAMS[paramPointer++] = len;
+	}
+	  }
       case COUNTOF: {}
       case EXISTS: {}
-      case HASFRAME: {}
-      case CHOICEOF: {}
+      case HASFRAME: {
+		break;
+	  }
+      case CHOICEOF: {
+		int rightType = BUFFER[++bufferPointer];
+		int rightValue = BUFFER[++bufferPointer];
+		if (rightType != LIST) {
+		  print_statement(statement);
+		  printf("Cannot choiceof with non-list\n");
+		  break;
+		}
+		int len = len_list(rightValue);
+		if (len == -1) {
+		  print_statement(statement);
+		  printf("choiceof found no list\n");
+		  break;
+		}
+		int i = rand() % len;
+		printf("CHOICEOF: %i\n", i);
+		ListNode *ln = get_from_list(rightValue, i);
+		if (ln == NULL) {
+		  print_statement(statement);
+		  printf("choiceof found no list\n");
+		  break;
+		}
+		printf("CHOICEOF: %i %i\n", ln->type, ln->value);
+		PARAMS[paramPointer++] = ln->type;
+		PARAMS[paramPointer++] = ln->value;
+	  }
       case ISFRAME: {}
       case ABS: {}
       case RANGE: {}
@@ -862,6 +1214,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
   int executionPointer = scriptIdx;
   while (SCRIPTS[executionPointer] != -2000) {
     _clear();
+	print_statement(executionPointer);
     clear_float_buffer();
     int verb = SCRIPTS[executionPointer];
     // for each statement in script
@@ -947,7 +1300,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	  BUFFER[bufferPointer-2] = INT;
 	  BUFFER[bufferPointer-1] = a->ECB->y;
 	  break;
-	case LEFT:
+	case _LEFT:
 	  BUFFER[bufferPointer-2] = INT;
 	  BUFFER[bufferPointer-1] = a->ECB->x;
 	  break;
@@ -955,7 +1308,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	  BUFFER[bufferPointer-2] = INT;
 	  BUFFER[bufferPointer-1] = a->ECB->y + a->ECB->h;
 	  break;
-	case RIGHT:
+	case _RIGHT:
 	  BUFFER[bufferPointer-2] = INT;
 	  BUFFER[bufferPointer-1] = a->ECB->x + a->ECB->w;
 	  break;
@@ -1003,7 +1356,9 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	break;
       }
       case LIST: {
-		// TODO: implement lists
+		BUFFER[bufferPointer++] = LIST;
+		BUFFER[bufferPointer++] = add_list();
+		break;
 	  }
       case INP_A: {
 		struct InputState *is = get_input_state(self->_input_name);
@@ -1049,25 +1404,86 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 		}
 		break;
 	  }
-      case INP_LEFT: {}
-      case INP_UP: {}
-      case INP_RIGHT: {}
-      case INP_DOWN: {}
-      case INP_START: {}
-      case INP_EVENTS: {}
+      case INP_LEFT: {
+		struct InputState *is = get_input_state(self->_input_name);
+		if (is == NULL) {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = 0;
+		} else {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = is->LEFT;
+		}
+		break;
+	  }
+      case INP_UP: {
+		struct InputState *is = get_input_state(self->_input_name);
+		if (is == NULL) {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = 0;
+		} else {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = is->UP;
+		}
+		break;
+	  }
+      case INP_RIGHT: {
+		struct InputState *is = get_input_state(self->_input_name);
+		if (is == NULL) {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = 0;
+		} else {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = is->RIGHT;
+		}
+		break;
+	  }
+      case INP_DOWN: {
+		struct InputState *is = get_input_state(self->_input_name);
+		if (is == NULL) {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = 0;
+		} else {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = is->DOWN;
+		}
+		break;
+	  }
+      case INP_START: {
+		struct InputState *is = get_input_state(self->_input_name);
+		if (is == NULL) {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = 0;
+		} else {
+		  BUFFER[bufferPointer++] = INT;
+		  BUFFER[bufferPointer++] = is->START;
+		}
+		break;
+	  }
+      case INP_EVENTS: {
+		// TODO: implement input events in list
+	  }
       }
     }
     // resolve operators
     resolve_operators(statement);
+	  printf("B ");
+	  print_buffer();
+	  printf("P ");
+	  print_params();
     // resolve verb
     switch (verb) {
     case QUIT: {
       return -2;
-      break;
     }
-    case GOODBYE: {}
-    case BREAK: {}
-    case RESET: {}
+    case GOODBYE: {
+	  return -1;
+	}
+    case BREAK: {
+	  return 0;
+	}
+    case RESET: {
+		break;
+	}
     case SET: {
       int nameType = PARAMS[0];
       int nameValue = PARAMS[1];
@@ -1075,6 +1491,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
       int attrValue = PARAMS[3];
       int valueType = PARAMS[4];
       int valueValue = PARAMS[5];
+
       if (nameType != STRING || attrType != STRING || valueType == -1) {
 	print_statement(statement);
 	printf("Missing or Incorrect Parameter for SET\n");
@@ -1089,6 +1506,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	print_statement(statement);
 	printf("Could not find actor %s for SET\n", get_string(nameValue));
 	break;
+
       }
       switch (attrValue) {
       case NAME:
@@ -1119,7 +1537,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	if (valueType != INT) break;
 	a->ECB->y = valueValue;
 	break;
-      case LEFT:
+      case _LEFT:
 	if (valueType != INT) break;
 	a->ECB->x = valueValue;
 	break;
@@ -1127,7 +1545,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	if (valueType != INT) break;
 	a->ECB->y = valueValue - a->ECB->h;
 	break;
-      case RIGHT:
+      case _RIGHT:
 	if (valueType != INT) break;
 	a->ECB->x = valueValue - a->ECB->w;
 	break;
@@ -1169,30 +1587,94 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
 	}
 	attr->type = valueType;
 	if (attr->type == FLOAT) attr->value.f = get_float(valueValue);
+	else attr->value.i = valueValue;
       }
       }
+	  break;
     }
-    case REASSIGN: {}
-    case IF: {}
-    case ENDIF: {}
-    case EXEC: {}
-    case BACK: {}
-    case FRONT: {}
-    case IMG: {}
-    case ACTIVATE: {}
-    case DEACTIVATE: {}
-    case KILLFRAME: {}
-    case MAKEFRAME: {}
-    case FOCUS: {}
-    case SCROLLBOUND: {}
-    case VIEW: {}
-    case MOVE: {}
-    case PLACE: {}
-    case TAKE: {}
-    case TAKEALL: {}
-    case REBRAND: {}
-    case REMOVE: {}
-    case ADD: {}
+    case REASSIGN: {
+		break;
+	}
+    case IF: {
+		break;
+	}
+    case ENDIF: {
+		break;
+	}
+    case EXEC: {
+		break;
+	}
+    case BACK: {
+		break;
+	}
+    case FRONT: {
+		break;
+	}
+    case IMG: {
+		break;
+	}
+    case ACTIVATE: {
+		break;
+	}
+    case DEACTIVATE: {
+		break;
+	}
+    case KILLFRAME: {
+		break;
+	}
+    case MAKEFRAME: {
+		break;
+	}
+    case FOCUS: {
+		break;
+	}
+    case SCROLLBOUND: {
+		break;
+	}
+    case VIEW: {
+		break;
+	}
+    case MOVE: {
+		break;
+	}
+    case PLACE: {
+		break;
+	}
+    case TAKE: {
+		break;
+	}
+    case TAKEALL: {
+		break;
+	}
+    case REBRAND: {
+		break;
+	}
+    case REMOVE: {
+		int listType = PARAMS[0];
+		int listValue = PARAMS[1];
+		int valueType = PARAMS[2];
+		int valueValue = PARAMS[3];
+		if (listType != LIST) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for REMOVE\n");
+		  break;
+		}
+		remove_from_list(listValue, valueType, valueValue);
+		break;
+	}
+    case ADD: {
+		int listType = PARAMS[0];
+		int listValue = PARAMS[1];
+		int valueType = PARAMS[2];
+		int valueValue = PARAMS[3];
+		if (listType != LIST) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for ADD\n");
+		  break;
+		}
+		add_to_list(listValue, valueType, valueValue);
+		break;
+	}
     case HITBOXES: {}
     case HURTBOXES: {}
     case CREATE: {}
@@ -1208,7 +1690,6 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
     case PRINT:{}
     case UPDATE_STICKS: {}
     }
-    
     executionPointer++;
   }
 

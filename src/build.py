@@ -264,9 +264,9 @@ def _intern_strings(SCRIPTS):
 #define W {UNIQUE_STRINGS.index("w")}
 #define H {UNIQUE_STRINGS.index("h")}
 #define TOP {UNIQUE_STRINGS.index("top")}
-#define LEFT {UNIQUE_STRINGS.index("left")}
+#define _LEFT {UNIQUE_STRINGS.index("left")}
 #define BOTTOM {UNIQUE_STRINGS.index("bottom")}
-#define RIGHT {UNIQUE_STRINGS.index("right")}
+#define _RIGHT {UNIQUE_STRINGS.index("right")}
 #define NAME {UNIQUE_STRINGS.index("name")}
 #define STATE {UNIQUE_STRINGS.index("state")}
 #define FRAME {UNIQUE_STRINGS.index("frame")}

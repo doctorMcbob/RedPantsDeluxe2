@@ -14,6 +14,8 @@ StringIndexer* indexers = NULL;
 DynamicString* dynamic_strings = NULL;
 
 int add_string(char* string) {
+    int i = index_string(string);
+    if (i != -1) return i;
     DYNAMIC_STRINGS++;
     DynamicString *ds = malloc(sizeof(DynamicString));
     ds->string = string;
@@ -23,7 +25,6 @@ int add_string(char* string) {
 }
 
 int concat_strings(char* str1, char* str2) {
-    printf("concat %s %s\n", str1, str2);
     if (str1 == NULL || str2 == NULL) return -1;
     int len1 = strlen(str1);
     int len2 = strlen(str2);
@@ -31,7 +32,6 @@ int concat_strings(char* str1, char* str2) {
     char* concat_str = (char*)malloc(total_len);
     strcpy(concat_str, str1);
     strcat(concat_str, str2);
-    printf("concat %s %s to %s \n", str1, str2, concat_str);
     int idx = index_string(concat_str);
     if (idx == -1)
       return add_string(concat_str);
