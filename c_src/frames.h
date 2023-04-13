@@ -6,7 +6,7 @@
 #define FRAME_LOAD 1
 
 typedef struct Frame {
-  char name[32];
+  int name;
   int scroll_x;
   int scroll_y;
   SDL_Rect* rect;
@@ -24,10 +24,10 @@ typedef struct Frame {
   UT_hash_handle hh;
 } Frame;
 
-void add_frame(const char* name, World* world, Actor* focus, int x, int y, int w, int h);
-Frame* get_frame(const char* name);
-int in_frame(const char* frameKey, Actor* actor);
-void draw_frame(SDL_Renderer* rend, const char* name);
-void update_frame(const char* frameKey);
+void add_frame(int name, World* world, Actor* focus, int x, int y, int w, int h);
+Frame* get_frame(int name);
+int in_frame(int frameKey, Actor* actor);
+void draw_frame(SDL_Renderer* rend, int name);
+void update_frame(int frameKey);
 int has_frame(int worldKey);
 #endif

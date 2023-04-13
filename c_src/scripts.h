@@ -121,5 +121,5 @@ typedef struct ScriptMap {
 void add_script_map(int key);
 void add_script_to_script_map(int key, int stateStringKey, int frame, int scriptIdx);
 ScriptMap* get_script_map(int key);
-int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world);
+int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int debug);
 #endif

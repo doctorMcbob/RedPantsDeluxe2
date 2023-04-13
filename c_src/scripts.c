@@ -9,6 +9,7 @@
 #include "stringmachine.h"
 #include "floatmachine.h"
 #include "lists.h"
+#include "frames.h"
 #ifndef STRING_DATA_LOAD
 #include "stringdata.h"
 #endif
@@ -67,14 +68,16 @@ ScriptMap* get_script_map(int key) {
   return (key>512 || key<0) ? NULL : SCRIPT_MAPS[key];
 }
 
-void resolve_operators(int statement) {
+void resolve_operators(int statement, int debug) {
   int bufferPointer = 0;
   int paramPointer = 0;
   while (bufferPointer < 512 && BUFFER[bufferPointer] != -1) {
-	printf("\nbufferPointer: %i : ", bufferPointer);
-	print_buffer();
-	printf("paramPointer: %i : ", paramPointer);
-	print_params();
+	if (debug) {
+		printf("\nbufferPointer: %i : ", bufferPointer);
+		print_buffer();
+		printf("paramPointer: %i : ", paramPointer);
+		print_params();
+	}
     int type = BUFFER[bufferPointer++];
     if (type == OPERATOR) {
       int operatorType = BUFFER[bufferPointer];
@@ -1135,11 +1138,135 @@ void resolve_operators(int statement) {
 		}
 	}
 	  }
-      case CASTINT: {}
-      case CASTSTR: {}
-      case MIN: {}
-      case MAX: {
-		  break;
+      case CASTINT: {
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
+	
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot int without right hand side\n");
+	  break;
+	}
+	
+	switch (rightType) {
+	case INT: {
+	  break;
+	}
+	case FLOAT: {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer++] = INT;
+	  PARAMS[paramPointer++] = (int) f;
+	  break;
+	}
+	case STRING: {
+	  char *s = get_string(rightValue);
+	  PARAMS[paramPointer++] = INT;
+	  PARAMS[paramPointer++] = atoi(s);
+	  break;
+	}
+	}
+
+	break;
+	  }
+      case CASTSTR: {
+	int rightType = BUFFER[++bufferPointer];
+	int rightValue = BUFFER[++bufferPointer];
+
+	if (rightType == -1) {
+	  print_statement(statement);
+	  printf("Cannot str without right hand side\n");
+	  break;
+	}
+
+	switch (rightType) {
+	case INT: {
+	  PARAMS[paramPointer++] = STRING;
+	  PARAMS[paramPointer++] = add_string(int_to_string(rightValue));
+	  break;
+	}
+	case FLOAT: {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer++] = STRING;
+	  PARAMS[paramPointer++] = add_string(float_to_string(f));
+	  break;
+	}
+	case STRING: {
+	  PARAMS[paramPointer++] = STRING;
+	  PARAMS[paramPointer++] = rightValue;
+	  break;
+	}
+	}
+	break;
+	  }
+      case MIN: {
+	int aType = BUFFER[++bufferPointer];
+	int aValue = BUFFER[++bufferPointer];
+	int bType = BUFFER[++bufferPointer];
+	int bValue = BUFFER[++bufferPointer];
+
+	if (aType == -1 || bType == -1) {
+	  print_statement(statement);
+	  printf("Cannot min without right hand side\n");
+	  break;
+	}
+
+	if (aType != INT && aType != FLOAT) {
+	  print_statement(statement);
+	  printf("Cannot min with non-int or float\n");
+	  break;
+	}
+
+	if (bType != INT && bType != FLOAT) {
+	  print_statement(statement);
+	  printf("Cannot min with non-int or float\n");
+	  break;
+	}
+
+	if (aType == INT && bType == INT) {
+	  PARAMS[paramPointer++] = INT;
+	  PARAMS[paramPointer++] = aValue < bValue ? aValue : bValue;
+	} else {
+	  float a = aType == INT ? (float) aValue : get_float(aValue);
+	  float b = bType == INT ? (float) bValue : get_float(bValue);
+	  PARAMS[paramPointer++] = FLOAT;
+	  PARAMS[paramPointer++] = push_float(a < b ? a : b);
+	}
+	break;
+	  }
+	  case MAX: {
+	int aType = BUFFER[++bufferPointer];
+	int aValue = BUFFER[++bufferPointer];
+	int bType = BUFFER[++bufferPointer];
+	int bValue = BUFFER[++bufferPointer];
+
+	if (aType == -1 || bType == -1) {
+	  print_statement(statement);
+	  printf("Cannot max without right hand side\n");
+	  break;
+	}
+
+	if (aType != INT && aType != FLOAT) {
+	  print_statement(statement);
+	  printf("Cannot max with non-int or float\n");
+	  break;
+	}
+
+	if (bType != INT && bType != FLOAT) {
+	  print_statement(statement);
+	  printf("Cannot max with non-int or float\n");
+	  break;
+	}
+
+	if (aType == INT && bType == INT) {
+	  PARAMS[paramPointer++] = INT;
+	  PARAMS[paramPointer++] = aValue > bValue ? aValue : bValue;
+	} else {
+	  float a = aType == INT ? (float) aValue : get_float(aValue);
+	  float b = bType == INT ? (float) bValue : get_float(bValue);
+	  PARAMS[paramPointer++] = FLOAT;
+	  PARAMS[paramPointer++] = push_float(a > b ? a : b);
+	}
+	break;
 	  }
       case LEN: {
 	int rightType = BUFFER[++bufferPointer];
@@ -1197,7 +1324,24 @@ void resolve_operators(int statement) {
 		PARAMS[paramPointer++] = ln->type;
 		PARAMS[paramPointer++] = ln->value;
 	  }
-      case ISFRAME: {}
+      case ISFRAME: {
+		int rightType = BUFFER[++bufferPointer];
+		int rightValue = BUFFER[++bufferPointer];
+
+		if (rightType == -1) {
+		  print_statement(statement);
+		  printf("Cannot isframe without right hand side\n");
+		  break;
+		}
+
+		if (rightType != STRING) {
+		  print_statement(statement);
+		  printf("Cannot isframe with non-string\n");
+		  break;
+		}
+
+		Frame *f = get_frame(rightValue);
+	  }
       case ABS: {}
       case RANGE: {}
       case INWORLD: {}
@@ -1210,11 +1354,14 @@ void resolve_operators(int statement) {
   }
 }
 
-int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
+int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int debug) {
   int executionPointer = scriptIdx;
   while (SCRIPTS[executionPointer] != -2000) {
+	if (debug) {
+		printf("Resolving for self %s\n", get_string(self->name));
+		print_statement(executionPointer);
+	}
     _clear();
-	print_statement(executionPointer);
     clear_float_buffer();
     int verb = SCRIPTS[executionPointer];
     // for each statement in script
@@ -1465,11 +1612,13 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world) {
       }
     }
     // resolve operators
-    resolve_operators(statement);
+    resolve_operators(statement, debug);
+	if (debug) {
 	  printf("B ");
 	  print_buffer();
 	  printf("P ");
 	  print_params();
+	}
     // resolve verb
     switch (verb) {
     case QUIT: {

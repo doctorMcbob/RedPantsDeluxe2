@@ -8,6 +8,7 @@
 # include "frames.h"
 # include "scripts.h"
 # include "stringmachine.h"
+# include "stringdata.h"
 # include <math.h>
 
 Actor* actors = NULL;
@@ -210,11 +211,11 @@ void add_template_from_actorkey(int actorKey) {
   HASH_ADD_INT(templates, name, a);
 }
 
-int collision_with(Actor *a1, Actor *a2, World* world) {
+int collision_with(Actor *a1, Actor *a2, World* world, int debug) {
   int scriptName = index_string("COLLIDE");
   int scriptKey = find_script_from_map(a1, scriptName);
   if (scriptKey > 0) {
-    int resolution = resolve_script(scriptKey,  a1, a2, world);
+    int resolution = resolve_script(scriptKey,  a1, a2, world, debug);
     if (resolution < 0) return resolution;
   }
   return 0;
@@ -229,15 +230,15 @@ SDL_Rect* move(SDL_Rect* rect, int dx, int dy) {
   return new;
 }
 
-int collision_check(Actor *actor, World* world) {
+int collision_check(Actor *actor, World* world, int debug) {
   ActorEntry *ae;
   DL_FOREACH(world->actors, ae) {
     if (actor->name == ae->actorKey) continue;
     Actor *actor2 = get_actor(ae->actorKey);
     if (SDL_HasIntersection(actor->ECB, actor2->ECB)) {
-      int resolution = collision_with(actor, actor2, world);
+      int resolution = collision_with(actor, actor2, world, debug);
       if (resolution < 0) return resolution;
-      int resolution2 = collision_with(actor2, actor, world);
+      int resolution2 = collision_with(actor2, actor, world, debug);
       if (resolution2 < 0) return resolution2;
     }
   }
@@ -266,9 +267,9 @@ int collision_check(Actor *actor, World* world) {
       Actor *actor2 = get_actor(ae2->actorKey);
       if (!actor2->tangible) continue;
       if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, 0), actor2->ECB)) {
-        int resolution3 = collision_with(actor, actor2, world);
+        int resolution3 = collision_with(actor, actor2, world, debug);
         if (resolution3 < 0) return resolution3;
-        int resolution4 = collision_with(actor2, actor, world);
+        int resolution4 = collision_with(actor2, actor, world, debug);
         if (resolution4 < 0) return resolution4;
       }
     }
@@ -315,9 +316,9 @@ int collision_check(Actor *actor, World* world) {
       Actor *actor2 = get_actor(ae2->actorKey);
       if (!actor2->tangible) continue;
       if (SDL_HasIntersection(move(actor->ECB, 0, actor->y_vel), actor2->ECB)) {
-        int resolution3 = collision_with(actor, actor2, world);
+        int resolution3 = collision_with(actor, actor2, world, debug);
         if (resolution3 < 0) return resolution3;
-        int resolution4 = collision_with(actor2, actor, world);
+        int resolution4 = collision_with(actor2, actor, world, debug);
         if (resolution4 < 0) return resolution4;
       }
     }
@@ -379,7 +380,7 @@ int find_script_from_map(Actor* actor, int scriptName) {
   return -1;
 }
 
-int update_actor(int actorKey, int worldKey) {
+int update_actor(int actorKey, int worldKey, int debug) {
   Actor *actor = get_actor(actorKey);
   if (!actor) return 0;
   
@@ -387,7 +388,7 @@ int update_actor(int actorKey, int worldKey) {
   if (!world) return 0;
   if (actor->updated) {
     if ((actor->physics || actor->tangible) && world_has(world, actorKey)) {
-      collision_check(actor, world);
+      collision_check(actor, world, debug);
     }
     return 0;
   }
@@ -396,12 +397,12 @@ int update_actor(int actorKey, int worldKey) {
   
   int scriptKey = get_script_for_actor(actor);
   if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, actor, NULL, world);
+    int resolution = resolve_script(scriptKey, actor, NULL, world, debug);
     if (resolution < 0) return resolution;
   }
   float x_flag = actor->x_vel, y_flag = actor->y_vel;
   if (actor->physics || actor->tangible) {
-    collision_check(actor, world);
+    collision_check(actor, world, debug);
     actor->ECB->x += floor(actor->x_vel);
     actor->ECB->y += floor(actor->y_vel);
   }
@@ -409,22 +410,22 @@ int update_actor(int actorKey, int worldKey) {
   if (x_flag != actor->x_vel && floor(actor->x_vel) == 0) {
     actor->x_vel = 0;
 
-    int scriptName = index_string("XCOLLISION");
+    int scriptName = XCOLLISION;
 
     int scriptKey = find_script_from_map(actor, scriptName);
     if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, actor, NULL, world);
+    int resolution = resolve_script(scriptKey, actor, NULL, world, debug);
       if (resolution < 0) return resolution;
     }
   }
   if (y_flag != actor->y_vel && floor(actor->y_vel) == 0) {
     actor->y_vel = 0;
 
-    int scriptName = index_string("YCOLLISION");
+    int scriptName = YCOLLISION;
 
     int scriptKey = find_script_from_map(actor, scriptName);
     if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, actor, NULL, world);
+    int resolution = resolve_script(scriptKey, actor, NULL, world, debug);
     if (resolution < 0) return resolution;
     }
   }
@@ -575,7 +576,7 @@ void _draw_platform(SDL_Renderer* rend, Actor* actor) {
   }
 }
 
-void draw_actor(SDL_Renderer* rend, Actor* actor, const char* frameKey) {
+void draw_actor(SDL_Renderer* rend, Actor* actor, int frameKey) {
   if (actor->platform) {
     return _draw_platform(rend, actor);
   }

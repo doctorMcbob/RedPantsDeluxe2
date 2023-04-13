@@ -55,12 +55,12 @@ void add_actor_to_world(int worldkey, int actorname) {
   DL_APPEND(w->actors, ae);
 }
 
-int update_world(int worldKey) {
+int update_world(int worldKey, int debug) {
   struct World *w;
   w = get_world(worldKey);
   struct ActorEntry *ae, *tmp;
   DL_FOREACH_SAFE(w->actors, ae, tmp) {
-    if (update_actor(ae->actorKey, worldKey) == -2) return -2;
+    if (update_actor(ae->actorKey, worldKey, debug) == -2) return -2;
   }
   return 0;
 }
@@ -92,7 +92,7 @@ void _draw_background(World* world, SDL_Renderer* rend) {
   }
 }
 
-void draw_world(World* world, SDL_Renderer* rend, const char* frameKey) {
+void draw_world(World* world, SDL_Renderer* rend, int frameKey) {
   _draw_background(world, rend);
 
   struct ActorEntry *ae;

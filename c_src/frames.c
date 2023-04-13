@@ -7,13 +7,13 @@
 
 Frame* frames = NULL;
 
-void add_frame(const char* name, World* world, Actor* focus, int x, int y, int w, int h) {
+void add_frame(int name, World* world, Actor* focus, int x, int y, int w, int h) {
   struct Frame *f;
   f = malloc(sizeof(Frame));
   if (f == NULL) {
     exit(-1);
   }
-  strcpy(f->name, name);
+  f->name = name;
   SDL_Rect* rect;
   rect = malloc(sizeof(SDL_Rect));
   rect->x = x;
@@ -23,12 +23,12 @@ void add_frame(const char* name, World* world, Actor* focus, int x, int y, int w
   f->rect = rect;
   f->world = world;
   f->focus = focus;
-  HASH_ADD_STR(frames, name, f);
+  HASH_ADD_INT(frames, name, f);
 }
 
-Frame* get_frame(const char* name){
+Frame* get_frame(int name){
   struct Frame* f;
-  HASH_FIND_STR(frames, name, f);
+  HASH_FIND_INT(frames, &name, f);
   if (f) {
     return f;
   } else {
@@ -46,7 +46,7 @@ SDL_Rect* scrolled(SDL_Rect* rect, Frame* frame) {
   return r;
 }
 
-int in_frame(const char* frameKey, Actor* actor) {
+int in_frame(int frameKey, Actor* actor) {
   Frame* frame = get_frame(frameKey);
   if (!frame) return 0;
 
@@ -56,13 +56,14 @@ int in_frame(const char* frameKey, Actor* actor) {
     return 0;
 }
 
-void draw_frame(SDL_Renderer* rend, const char* name) {
+void draw_frame(SDL_Renderer* rend, int name) {
   struct Frame* f;
   f = get_frame(name);
   Uint32 format;
   SDL_Texture* render_target = SDL_GetRenderTarget(rend);
   SDL_QueryTexture(render_target, &format, NULL, NULL, NULL);
-  SDL_Texture* frame_buffer = SDL_CreateTexture(rend, format, SDL_TEXTUREACCESS_TARGET, f->rect->w, f->rect->h);
+  SDL_Texture* frame_buffer = SDL_CreateTexture(
+    rend, format, SDL_TEXTUREACCESS_TARGET, f->rect->w, f->rect->h);
 
   SDL_SetRenderTarget(rend, frame_buffer);
   
@@ -76,7 +77,7 @@ void draw_frame(SDL_Renderer* rend, const char* name) {
   SDL_DestroyTexture(frame_buffer);
 }
 
-void update_frame(const char* frameKey) {
+void update_frame(int frameKey) {
   Frame* f = get_frame(frameKey);
   if (f->focus != NULL) {
     f->scroll_x = f->focus->ECB->x + f->focus->ECB->w / 2 - f->rect->w / 2;

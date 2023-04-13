@@ -28,8 +28,8 @@ void add_world(int name,
 	       int y_lock);
 World* get_world(int name);
 void add_actor_to_world(int worldkey, int actorname);
-int update_world(int worldKey);
-void draw_world(World* world, SDL_Renderer* rend, const char* frameKey);
+int update_world(int worldKey, int debug);
+void draw_world(World* world, SDL_Renderer* rend, int frameKey);
 int exists(int actorKey);
 int world_has(World *world, int actorKey);
 # endif

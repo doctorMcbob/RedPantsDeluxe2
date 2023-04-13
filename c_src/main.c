@@ -80,16 +80,16 @@ int main (int argc, char *argv[]) {
   scripts_load();
   add_input_state(index_string("PLAYER1"), NULL);
   
-  add_frame("MAIN", get_world(index_string("root")), NULL, 0, 0, W, H);
+  add_frame(index_string("MAIN"), get_world(index_string("root")), NULL, 0, 0, W, H);
   
   while (input_update() != -1) {
     SDL_RenderClear(rend);
     
-    if (update_world(index_string("root")) == -1) {
+    if (update_world(index_string("root"), debug) == -1) {
       break;
     };
     
-    draw_frame(rend, "MAIN");
+    draw_frame(rend, index_string("MAIN"));
     
     actors_reset_updated();
     SDL_RenderPresent(rend);
