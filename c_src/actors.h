@@ -65,7 +65,7 @@ void add_actor(int name,
 	       int updated);
 void copy_actor(Actor* copy,  Actor *a);
 void add_template(Actor* copy);
-void add_actor_from_templatekey(int templateKey);
+Actor* add_actor_from_templatekey(int templateKey, int name);
 void add_template_from_actorkey(int actorKey);
 int update_actor(int actorKey, int worldKey, int debug);
 Sprite* get_sprite_for_actor(Actor* actor);
@@ -73,4 +73,5 @@ void draw_actor(SDL_Renderer* rend, Actor* actor, int frameKey);
 int get_script_for_actor(Actor* actor);
 void actors_reset_updated();
 int find_script_from_map(Actor* actor, int scriptName);
+void free_actor(Actor* actor);
 #endif

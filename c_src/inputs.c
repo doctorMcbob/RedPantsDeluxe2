@@ -111,8 +111,8 @@ int input_update() {
 	KeyHashNode *km, *tmp;
 	HASH_ITER(hh, key_maps, km, tmp) {
 	  InputHashNode* inputNode;
-	  HASH_FIND_INT(input_states, &km->name, inputNode);
-	  if (inputNode=NULL) {
+	  HASH_FIND_INT(input_states, &(km->name), inputNode);
+	  if (inputNode == NULL || inputNode->data == NULL) {
 	    printf("Unfortunately there was no input state with the name %i", km->name);
 	    continue;
 	  }

@@ -173,9 +173,13 @@ void add_template(Actor* copy) {
   HASH_ADD_INT(templates, name, a);
 }
 
-void add_actor_from_templatekey(int templateKey) {
+Actor* add_actor_from_templatekey(int templateKey, int name) {
   struct Actor *copy;
   HASH_FIND_INT(templates, &templateKey, copy);
+  if (copy == NULL) {
+    printf("Template %s not found\n", get_string(templateKey));
+    return NULL;
+  }
   struct Actor *a;
   a = malloc(sizeof(Actor));
   if (!a) {
@@ -188,8 +192,10 @@ void add_actor_from_templatekey(int templateKey) {
   }
   a->ECB = ecb;
   copy_actor(copy, a);
-  
+  a->name = name;
+
   HASH_ADD_INT(actors, name, a);
+  return a;
 }
 
 void add_template_from_actorkey(int actorKey) {
@@ -429,7 +435,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
     if (resolution < 0) return resolution;
     }
   }
-  
+
   actor->frame += 1;
 
   return 0;
@@ -599,4 +605,23 @@ void draw_actor(SDL_Renderer* rend, Actor* actor, int frameKey) {
   src.h = dest.h;
   
   SDL_RenderCopy(rend, s->image, &src, &dest);
+}
+
+void free_actor(Actor* actor) {
+  HASH_DEL(actors, actor);
+
+  Attribute *attr, *tmp;
+
+  HASH_ITER(hh, actor->attributes, attr, tmp) {
+    if (attr->type == LIST) {
+      remove_owner(attr->value.i);
+    }
+    HASH_DEL(actor->attributes, attr);
+    free(attr);
+  }
+
+  if (actor->ECB) {
+    free(actor->ECB);
+  }
+  free(actor);
 }

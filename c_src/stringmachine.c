@@ -21,6 +21,7 @@ int add_string(char* string) {
     ds->string = string;
     DL_APPEND(dynamic_strings, ds);
     add_indexer(string, NUM_STRINGS+DYNAMIC_STRINGS-1);
+    printf("{add_string(%s) = %d}", string, NUM_STRINGS+DYNAMIC_STRINGS-1);
     return NUM_STRINGS+DYNAMIC_STRINGS-1;
 }
 
@@ -32,7 +33,9 @@ int concat_strings(char* str1, char* str2) {
     char* concat_str = (char*)malloc(total_len);
     strcpy(concat_str, str1);
     strcat(concat_str, str2);
+    printf("{concat_strings(%s, %s) = %s", str1, str2, concat_str);
     int idx = index_string(concat_str);
+    printf(" at %i}", idx);
     if (idx == -1)
       return add_string(concat_str);
     free(concat_str);
@@ -57,7 +60,7 @@ char* get_string(int idx) {
       return ds->string;
     }
   }
-
+  printf("{get_string(%d) out of bounds}", idx);
   return NULL;
 }
 

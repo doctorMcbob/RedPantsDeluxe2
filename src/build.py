@@ -181,7 +181,7 @@ def _intern_strings(SCRIPTS):
             if state not in UNIQUE_STRINGS: UNIQUE_STRINGS.append(state)
             for statement in SCRIPTS[scriptMap][key]:
                 for token in statement:
-                    if not token or token.isspace() or token.startswith("#"): continue
+                    if token.startswith("#"): continue
                     if token in VERBS: continue
                     if token in OPERATORS: continue
                     try:
@@ -236,6 +236,47 @@ def _intern_strings(SCRIPTS):
             if state not in UNIQUE_STRINGS:
                 UNIQUE_STRINGS.append(state)
 
+    if "A_DOWN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("A_DOWN")
+    if "A_UP" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("A_UP")
+    if "B_DOWN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("B_DOWN")
+    if "B_UP" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("B_UP")
+    if "X_DOWN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("X_DOWN")
+    if "X_UP" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("X_UP")
+    if "Y_DOWN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("Y_DOWN")
+    if "Y_UP" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("Y_UP")
+    if "LEFT_DOWN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("LEFT_DOWN")
+    if "LEFT_UP" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("LEFT_UP")
+    if "UP_DOWN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("UP_DOWN")
+    if "UP_UP" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("UP_UP")
+    if "RIGHT_DOWN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("RIGHT_DOWN")
+    if "RIGHT_UP" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("RIGHT_UP")
+    if "DOWN_DOWN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("DOWN_DOWN")
+    if "DOWN_UP" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("DOWN_UP")
+    if "START_DOWN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("START_DOWN")
+    if "START_UP" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("START_UP")
+    if "_input_name" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("_input_name")
+    if "" not in UNIQUE_STRINGS:
+        print("WARNING: Empty string not found in UNIQUE_STRINGS")
+        UNIQUE_STRINGS.append("")
     UNIQUE_STRINGS.sort()
     string_data_dot_c = "#include \"stringmachine.h\"\n#include <stddef.h>\n"
     string_data_dot_c += f"int NUM_STRINGS = {len(UNIQUE_STRINGS)};\n"
@@ -277,6 +318,26 @@ def _intern_strings(SCRIPTS):
 #define TANGIBLE {UNIQUE_STRINGS.index("tangible")}
 #define PHYSICS {UNIQUE_STRINGS.index("physics")}
 #define PLATFORM {UNIQUE_STRINGS.index("platform")}
+#define  _A_UP {UNIQUE_STRINGS.index("A_UP")}
+#define  _A_DOWN {UNIQUE_STRINGS.index("A_DOWN")}
+#define  _B_UP {UNIQUE_STRINGS.index("B_UP")}
+#define  _B_DOWN {UNIQUE_STRINGS.index("B_DOWN")}
+#define  _X_UP {UNIQUE_STRINGS.index("X_UP")}
+#define  _X_DOWN {UNIQUE_STRINGS.index("X_DOWN")}
+#define  _Y_UP {UNIQUE_STRINGS.index("Y_UP")}
+#define  _Y_DOWN {UNIQUE_STRINGS.index("Y_DOWN")}
+#define  _LEFT_UP {UNIQUE_STRINGS.index("LEFT_UP")}
+#define  _LEFT_DOWN {UNIQUE_STRINGS.index("LEFT_DOWN")}
+#define  _UP_UP {UNIQUE_STRINGS.index("UP_UP")}
+#define  _UP_DOWN {UNIQUE_STRINGS.index("UP_DOWN")}
+#define  _RIGHT_UP {UNIQUE_STRINGS.index("RIGHT_UP")}
+#define  _RIGHT_DOWN {UNIQUE_STRINGS.index("RIGHT_DOWN")}
+#define  _DOWN_UP {UNIQUE_STRINGS.index("DOWN_UP")}
+#define  _DOWN_DOWN {UNIQUE_STRINGS.index("DOWN_DOWN")}
+#define  _START_UP {UNIQUE_STRINGS.index("START_UP")}
+#define  _START_DOWN {UNIQUE_STRINGS.index("START_DOWN")}
+#define _INPUT_NAME {UNIQUE_STRINGS.index("_input_name")}
+#define EMPTY {UNIQUE_STRINGS.index("")}
 
 extern const char* STRINGS[{len(UNIQUE_STRINGS)}];
 extern int STRING_LENS[{len(UNIQUE_STRINGS)}];
@@ -361,7 +422,6 @@ void scripts_load() {
                                 scripts.append(LITERAL_TYPES["float"])
                                 scripts.append(UNIQUE_FLOATS.index(tf))
                             except ValueError:
-                                if not token or token.isspace(): continue
                                 if "." in token:
                                     dot_seperated = token.split(".")
                                     while dot_seperated:
@@ -416,6 +476,7 @@ void actor_load() {
         template = ACTORS.ACTORS[name]
         a = actor.Actor(template)
         actordata_dot_c += f"    add_actor({UNIQUE_STRINGS.index(template['name'])}, {a.x}, {a.y}, {a.w}, {a.h}, {a.x_vel}, {a.y_vel}, -1, -1, {SCRIPT_MAP_MAP[template['scripts']]}, {UNIQUE_STRINGS.index(template['sprites'])}, -1, {UNIQUE_STRINGS.index(a._input_name) if a._input_name else -1}, {UNIQUE_STRINGS.index(a.state)}, {a.frame}, {a.direction}, {a.rotation}, {int(a.platform)}, {int(a.tangible)}, {int(a.physics)}, {int(a.updated)});\n"
+        actordata_dot_c += f"    add_template_from_actorkey({UNIQUE_STRINGS.index(template['name'])});\n"
 
     actordata_dot_c += "}\n"
     return actordata_dot_c

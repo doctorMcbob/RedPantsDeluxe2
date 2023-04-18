@@ -16,7 +16,7 @@
 #define QWORLD 7
 #define QSONG 8
 #define QCOLLIDE 9
-#define LIST  10
+#define LIST 10
 #define INP_A 11
 #define INP_B 12
 #define INP_X 13
@@ -105,7 +105,8 @@
 #define PRINT 38
 #define UPDATE_STICKS 39
 
-typedef struct ScriptMapEntry {
+typedef struct ScriptMapEntry
+{
   int state;
   int frame;
   int scriptIdx;
@@ -113,13 +114,14 @@ typedef struct ScriptMapEntry {
   struct ScriptMapEntry *prev;
 } ScriptMapEntry;
 
-typedef struct ScriptMap {
+typedef struct ScriptMap
+{
   int key;
-  struct ScriptMapEntry* entries;
+  struct ScriptMapEntry *entries;
 } ScriptMap;
 
 void add_script_map(int key);
 void add_script_to_script_map(int key, int stateStringKey, int frame, int scriptIdx);
-ScriptMap* get_script_map(int key);
-int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int debug);
+ScriptMap *get_script_map(int key);
+int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world, int debug);
 #endif

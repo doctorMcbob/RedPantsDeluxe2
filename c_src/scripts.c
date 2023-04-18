@@ -68,14 +68,14 @@ ScriptMap* get_script_map(int key) {
   return (key>512 || key<0) ? NULL : SCRIPT_MAPS[key];
 }
 
-void resolve_operators(int statement, int debug) {
+void resolve_operators(int statement, World* world, int debug) {
   int bufferPointer = 0;
   int paramPointer = 0;
   while (bufferPointer < 512 && BUFFER[bufferPointer] != -1) {
 	if (debug) {
-		printf("\nbufferPointer: %i : ", bufferPointer);
+		printf("\n   bufferPointer: %i : ", bufferPointer);
 		print_buffer();
-		printf("paramPointer: %i : ", paramPointer);
+		printf("   paramPointer : %i : ", paramPointer);
 		print_params();
 	}
     int type = BUFFER[bufferPointer++];
@@ -99,6 +99,7 @@ void resolve_operators(int statement, int debug) {
 	  printf("Cannot + without right hand side\n");
 	  break;
 	}
+	printf("+ types %i + %i\n", leftType, rightType);
 	switch (leftType + 3*rightType) {
 	case (INT + 3*INT): {
 	  PARAMS[paramPointer-2] = INT;
@@ -161,6 +162,7 @@ void resolve_operators(int statement, int debug) {
 	case (STRING + 3*INT): {
 	  char *s = get_string(leftValue);
 	  char *s2 = int_to_string(rightValue);
+	  printf("concat i i %s + %s\n", s, s2);
 	  int i = concat_strings(s, s2);
 	  if (i == -1) {
 	    print_statement(statement);
@@ -193,6 +195,7 @@ void resolve_operators(int statement, int debug) {
 	  char *s = get_string(leftValue);
 	  char *s2 = get_string(rightValue);
 	  int i = concat_strings(s, s2);
+	  printf("concat s s (%i) %s + (%i) %s = (%i) %s\n", leftValue, s, rightValue, s2, i, get_string(i));
 	  if (i == -1) {
 	    print_statement(statement);
 	    printf("Failed Concat %s %s\n", s, s2);
@@ -1113,30 +1116,31 @@ void resolve_operators(int statement, int debug) {
 	  printf("Cannot at without right hand side\n");
 	  break;
 	}
-	if (rightType != STRING && rightType != LIST) { 
+	if (leftType != STRING && leftType != LIST) { 
 	  print_statement(statement);
 	  printf("Cannot at with non-string or list\n");
 	  break;
 	}
-	if (leftType != INT) {
+	if (rightType != INT) {
 	  print_statement(statement);
 	  printf("Cannot at with non-int\n");
 	  break;
 	}
-	if (rightType == LIST) {
-		ListNode *ln = get_from_list(rightValue, leftValue);
+	if (leftType == LIST) {
+		ListNode *ln = get_from_list(leftValue, rightValue);
 		if (ln != NULL) {
 			PARAMS[paramPointer-2] = ln->type;
 			PARAMS[paramPointer-1] = ln->value;
 		}
 	} else {
-		char *s = get_string(rightValue);
+		char *s = get_string(leftValue);
 		int len = strlen(s);
 		if (leftValue < len) {
 			PARAMS[paramPointer-2] = STRING;
-			PARAMS[paramPointer-1] = add_string(s[leftValue]);
+			PARAMS[paramPointer-1] = add_string(s[rightValue]);
 		}
 	}
+	break;
 	  }
       case CASTINT: {
 	int rightType = BUFFER[++bufferPointer];
@@ -1292,10 +1296,103 @@ void resolve_operators(int statement, int debug) {
 		PARAMS[paramPointer++] = INT;
 		PARAMS[paramPointer++] = len;
 	}
+	break;
 	  }
-      case COUNTOF: {}
-      case EXISTS: {}
+      case COUNTOF: {
+	int aType = BUFFER[++bufferPointer];
+	int aValue = BUFFER[++bufferPointer];
+	int bType = BUFFER[++bufferPointer];
+	int bValue = BUFFER[++bufferPointer];
+
+	if (aType == -1 || bType == -1) {
+	  print_statement(statement);
+	  printf("Cannot countof without right hand side\n");
+	  break;
+	}
+
+	if (aType != STRING && aType != LIST) {
+	  print_statement(statement);
+	  printf("Cannot countof with non-string or list\n");
+	  break;
+	}
+
+	if (aType == LIST) {
+		int len = len_list(aValue);
+		if (len == -1) {
+		  print_statement(statement);
+		  printf("countof found no list\n");
+		  break;
+		}
+		int count = 0;
+		for (int i = 0; i < len; i++) {
+			ListNode *ln = get_from_list(aValue, i);
+			if (ln == NULL) break;
+			if (ln->type == bType && ln->value == bValue) {
+				count++;
+			}
+		}
+		PARAMS[paramPointer++] = INT;
+		PARAMS[paramPointer++] = count;
+	} else {
+		char *s = get_string(aValue);
+		char *s2 = get_string(bValue);
+		int len = strlen(s);
+		int len2 = strlen(s2);
+		int count = 0;
+		for (int i = 0; i < len; i++) {
+			if (i + len2 > len) break;
+			int j = 0;
+			for (; j < len2; j++) {
+				if (s[i + j] != s2[j]) break;
+			}
+			if (j == len2) {
+				count++;
+			}
+		}
+		PARAMS[paramPointer++] = INT;
+		PARAMS[paramPointer++] = count;
+	}
+
+	break;
+	  }
+      case EXISTS: {
+		int rightType = BUFFER[++bufferPointer];
+		int rightValue = BUFFER[++bufferPointer];
+		
+		if (rightType == -1) {
+		  print_statement(statement);
+		  printf("Cannot exists without right hand side\n");
+		  break;
+		}
+
+		if (rightType != STRING) {
+		  print_statement(statement);
+		  printf("Cannot exists with non-string\n");
+		  break;
+		}
+
+		PARAMS[paramPointer++] = INT;
+		PARAMS[paramPointer++] = exists(rightValue);
+		break;
+	  }
       case HASFRAME: {
+		int rightType = BUFFER[++bufferPointer];
+		int rightValue = BUFFER[++bufferPointer];
+		
+		if (rightType == -1) {
+		  print_statement(statement);
+		  printf("Cannot hasframe without right hand side\n");
+		  break;
+		}
+
+		if (rightType != STRING) {
+		  print_statement(statement);
+		  printf("Cannot hasframe with non-string\n");
+		  break;
+		}
+
+		PARAMS[paramPointer++] = INT;
+		PARAMS[paramPointer++] = has_frame(rightValue);
 		break;
 	  }
       case CHOICEOF: {
@@ -1307,22 +1404,23 @@ void resolve_operators(int statement, int debug) {
 		  break;
 		}
 		int len = len_list(rightValue);
+
 		if (len == -1) {
 		  print_statement(statement);
 		  printf("choiceof found no list\n");
 		  break;
 		}
 		int i = rand() % len;
-		printf("CHOICEOF: %i\n", i);
 		ListNode *ln = get_from_list(rightValue, i);
 		if (ln == NULL) {
 		  print_statement(statement);
 		  printf("choiceof found no list\n");
 		  break;
 		}
-		printf("CHOICEOF: %i %i\n", ln->type, ln->value);
+		
 		PARAMS[paramPointer++] = ln->type;
 		PARAMS[paramPointer++] = ln->value;
+		break;
 	  }
       case ISFRAME: {
 		int rightType = BUFFER[++bufferPointer];
@@ -1341,10 +1439,116 @@ void resolve_operators(int statement, int debug) {
 		}
 
 		Frame *f = get_frame(rightValue);
+		if (f == NULL) {
+		  PARAMS[paramPointer++] = INT;
+		  PARAMS[paramPointer++] = 0;
+		} else {
+		  PARAMS[paramPointer++] = INT;
+		  PARAMS[paramPointer++] = 1;
+		}
+		break;
 	  }
-      case ABS: {}
-      case RANGE: {}
-      case INWORLD: {}
+      case ABS: {
+		int rightType = BUFFER[++bufferPointer];
+		int rightValue = BUFFER[++bufferPointer];
+
+		if (rightType == -1) {
+		  print_statement(statement);
+		  printf("Cannot abs without right hand side\n");
+		  break;
+		}
+
+		if (rightType != INT && rightType != FLOAT) {
+		  print_statement(statement);
+		  printf("Cannot abs with non-int or float\n");
+		  break;
+		}
+
+		if (rightType == INT) {
+		  PARAMS[paramPointer++] = INT;
+		  PARAMS[paramPointer++] = abs(rightValue);
+		} else {
+		  PARAMS[paramPointer++] = FLOAT;
+		  PARAMS[paramPointer++] = push_float(abs(get_float(rightValue)));
+		}
+
+		break;
+	  }
+      case RANGE: {
+		int rightType = BUFFER[++bufferPointer];
+		int rightValue = BUFFER[++bufferPointer];
+
+		if (rightType == -1) {
+		  print_statement(statement);
+		  printf("Cannot range without right hand side\n");
+		  break;
+		}
+
+		if (rightType != INT) {
+		  print_statement(statement);
+		  printf("Cannot range with non-int\n");
+		  break;
+		}
+
+		int list = add_list();
+		for (int i = 0; i < rightValue; i++) {
+		  add_to_list(list, INT, i);
+		}
+
+		PARAMS[paramPointer++] = LIST;
+		PARAMS[paramPointer++] = list;
+		break;
+	  }
+      case INWORLD: {
+		int rightType = BUFFER[++bufferPointer];
+		int rightValue = BUFFER[++bufferPointer];
+
+		if (rightType == -1) {
+		  print_statement(statement);
+		  printf("Cannot inworld without right hand side\n");
+		  break;
+		}
+
+		if (rightType != STRING) {
+		  print_statement(statement);
+		  printf("Cannot inworld with non-string\n");
+		  break;
+		}
+
+		ActorEntry *ae;
+		int in_world = 0;
+		DL_FOREACH(world->actors, ae) {
+		  if (ae->actorKey == rightValue) {
+			in_world = 1;
+			break;
+		  }
+		}
+		PARAMS[paramPointer++] = INT;
+		PARAMS[paramPointer++] = in_world;
+		break;
+	  }
+	  case ISINPUTSTATE: {
+		int rightType = BUFFER[++bufferPointer];
+		int rightValue = BUFFER[++bufferPointer];
+
+		if (rightType == -1) {
+		  print_statement(statement);
+		  printf("Cannot isinputstate without right hand side\n");
+		  break;
+		}
+
+		if (rightType != STRING) {
+		  print_statement(statement);
+		  printf("Cannot isinputstate with non-string\n");
+		  break;
+		}
+		
+		InputState *is = get_input_state(rightValue);
+
+		PARAMS[paramPointer++] = INT;
+		PARAMS[paramPointer++] = is != NULL;
+		break;
+	  }
       }
       bufferPointer++;
     } else {
@@ -1356,21 +1560,34 @@ void resolve_operators(int statement, int debug) {
 
 int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int debug) {
   int executionPointer = scriptIdx;
+  int ifNested = 0;
   while (SCRIPTS[executionPointer] != -2000) {
 	if (debug) {
 		printf("Resolving for self %s\n", get_string(self->name));
 		print_statement(executionPointer);
 	}
+	int verb = SCRIPTS[executionPointer];
+	if (ifNested) {
+		if (verb == IF) ifNested++;
+		if (verb == ENDIF) ifNested--;
+		while (SCRIPTS[++executionPointer] != -1000) {
+			if (SCRIPTS[executionPointer] != DOT)
+				executionPointer++;
+		}
+		executionPointer++;
+		continue;
+	}
     _clear();
     clear_float_buffer();
-    int verb = SCRIPTS[executionPointer];
     // for each statement in script
     int bufferPointer = 0;
     int statement = executionPointer;
+	if (debug) printf("Evaluating Literals...\n");
     while (SCRIPTS[executionPointer] != -1000) {
       // evaluate literals
       executionPointer++;
       int type = SCRIPTS[executionPointer];
+
       switch(type) {
       case INT:
       case STRING:
@@ -1415,6 +1632,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 	}
 
 	Actor *a;
+
 	if (leftValue == SELF) a = self;
 	else if (leftValue == RELATED) a = related;
 
@@ -1426,6 +1644,10 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 	case STATE:
 	  BUFFER[bufferPointer-2] = STRING;
 	  BUFFER[bufferPointer-1] = a->state;
+	  break;
+	case FRAME:
+	  BUFFER[bufferPointer-2] = INT;
+	  BUFFER[bufferPointer-1] = a->frame;
 	  break;
 	case _X:
 	  BUFFER[bufferPointer-2] = INT;
@@ -1486,6 +1708,10 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 	case Y_VEL:
 	  BUFFER[bufferPointer-2] = FLOAT;
 	  BUFFER[bufferPointer-1] = push_float(a->y_vel);
+	  break;
+	case _INPUT_NAME:
+	  BUFFER[bufferPointer-2] = STRING;
+	  BUFFER[bufferPointer-1] = a->_input_name;
 	  break;
 	default: {
 	  Attribute* attr;
@@ -1597,6 +1823,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 	  }
       case INP_START: {
 		struct InputState *is = get_input_state(self->_input_name);
+		
 		if (is == NULL) {
 		  BUFFER[bufferPointer++] = INT;
 		  BUFFER[bufferPointer++] = 0;
@@ -1607,16 +1834,48 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 		break;
 	  }
       case INP_EVENTS: {
-		// TODO: implement input events in list
+		struct InputState *is = get_input_state(self->_input_name);
+
+		int list = add_list();
+		BUFFER[bufferPointer++] = LIST;
+		BUFFER[bufferPointer++] = list;
+
+		if (is == NULL) break;
+		if (is->EVENTS[A_DOWN]) add_to_list(list, STRING, _A_DOWN);
+		if (is->EVENTS[A_UP]) add_to_list(list, STRING, _A_UP);
+		if (is->EVENTS[B_DOWN]) add_to_list(list, STRING, _B_DOWN);
+		if (is->EVENTS[B_UP]) add_to_list(list, STRING, _B_UP);
+		if (is->EVENTS[X_DOWN]) add_to_list(list, STRING, _X_DOWN);
+		if (is->EVENTS[X_UP]) add_to_list(list, STRING, _X_UP);
+		if (is->EVENTS[Y_DOWN]) add_to_list(list, STRING, _Y_DOWN);
+		if (is->EVENTS[Y_UP]) add_to_list(list, STRING, _Y_UP);
+		if (is->EVENTS[LEFT_DOWN]) add_to_list(list, STRING, _LEFT_DOWN);
+		if (is->EVENTS[LEFT_UP]) add_to_list(list, STRING, _LEFT_UP);
+		if (is->EVENTS[UP_DOWN]) add_to_list(list, STRING, _UP_DOWN);
+		if (is->EVENTS[UP_UP]) add_to_list(list, STRING, _UP_UP);
+		if (is->EVENTS[RIGHT_DOWN]) add_to_list(list, STRING, _RIGHT_DOWN);
+		if (is->EVENTS[RIGHT_UP]) add_to_list(list, STRING, _RIGHT_UP);
+		if (is->EVENTS[DOWN_DOWN]) add_to_list(list, STRING, _DOWN_DOWN);
+		if (is->EVENTS[DOWN_UP]) add_to_list(list, STRING, _DOWN_UP);
+		if (is->EVENTS[START_DOWN]) add_to_list(list, STRING, _START_DOWN);
+		if (is->EVENTS[START_UP]) add_to_list(list, STRING, _START_UP);
+		break;
 	  }
       }
+	  if (debug) {
+		printf("  B ");
+		print_buffer();
+		printf("  P ");
+		print_params();
+	  }
     }
+	if (debug) printf("  Done...\n");
     // resolve operators
-    resolve_operators(statement, debug);
+    resolve_operators(statement, world, debug);
 	if (debug) {
-	  printf("B ");
+	  printf("  B ");
 	  print_buffer();
-	  printf("P ");
+	  printf("  P ");
 	  print_params();
 	}
     // resolve verb
@@ -1625,6 +1884,9 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
       return -2;
     }
     case GOODBYE: {
+	  remove_actor_from_worlds(self->name);
+	  free_actor(self);
+      clear_ownerless_lists();
 	  return -1;
 	}
     case BREAK: {
@@ -1653,7 +1915,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
       else a = get_actor(nameValue);
       if (a == NULL) {
 	print_statement(statement);
-	printf("Could not find actor %s for SET\n", get_string(nameValue));
+	printf("Could not find actor %s, %i for SET (is self %i? %i)\n", get_string(nameValue), nameValue, SELF, nameValue == SELF);
 	break;
 
       }
@@ -1665,6 +1927,10 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
       case STATE:
 	if (valueType != STRING) break;
 	a->state = valueValue;
+	break;
+	  case FRAME:
+	if (valueType != INT) break;
+	a->frame = valueValue;
 	break;
       case _X: 
 	if (valueType != INT) break;
@@ -1719,13 +1985,21 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 	a->physics = valueValue;
 	break;
       case X_VEL:
-	if (valueType != FLOAT) break;
-	a->x_vel = get_float(valueValue);
+	if (valueType == FLOAT)
+		a->x_vel = get_float(valueValue);
+	else if (valueType == INT)
+		a->x_vel = valueValue;
 	break;
       case Y_VEL:
-	if (valueType != FLOAT) break;
-	a->y_vel = get_float(valueValue);
+	if (valueType != FLOAT)
+		a->y_vel = get_float(valueValue);
+	else if (valueType == INT)
+		a->y_vel = valueValue;
 	break;
+	  case _INPUT_NAME:
+		if (valueType != STRING) break;
+		a->_input_name = valueValue;
+		break;
       default: {
 	Attribute* attr;
 	HASH_FIND_INT(a->attributes, &attrValue, attr);
@@ -1734,9 +2008,11 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 	  attr->name = attrValue;
 	  HASH_ADD_INT(a->attributes, name, attr);
 	}
+	if (attr->type == LIST) remove_owner(attr->value.i);
 	attr->type = valueType;
 	if (attr->type == FLOAT) attr->value.f = get_float(valueValue);
 	else attr->value.i = valueValue;
+	if (attr->type == LIST) add_owner(attr->value.i);
       }
       }
 	  break;
@@ -1745,27 +2021,118 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 		break;
 	}
     case IF: {
-		break;
-	}
-    case ENDIF: {
+		int conditionalType = PARAMS[0];
+		int conditionalValue = PARAMS[1];
+
+		int conditional = 0;
+		switch (conditionalType) {
+		case INT: {
+		  if (conditionalValue != 0) conditional = 1;
+		  break;
+		}
+		case FLOAT: {
+		  if (get_float(conditionalValue) != 0) conditional = 1;
+		  break;
+		}
+		case STRING: {
+		  if (conditionalValue != EMPTY) conditional = 1;
+		  break;
+		}
+		case LIST: {
+		  if (len_list(conditionalValue) != 0) conditional = 1;
+		  break;
+		}
+		}
+		if (!conditional) ifNested++;
+		
 		break;
 	}
     case EXEC: {
+		int scriptType = PARAMS[0];
+		int scriptValue = PARAMS[1];
+
+		if (scriptType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for EXEC\n");
+		  break;
+		}
+		int script = find_script_from_map(self, scriptValue);
+		if (script != -1)
+			resolve_script(script, self, related, world, debug);
 		break;
 	}
     case BACK: {
+		ActorEntry *ae, *tmp;
+		int found = 0;
+		DL_FOREACH_SAFE(world->actors, ae, tmp) {
+		  if (ae->actorKey == self->name) {
+			DL_DELETE(world->actors, ae);
+			found++;
+			break;
+		  }
+		}
+		if (found)
+			DL_APPEND(world->actors, ae);
 		break;
 	}
     case FRONT: {
+		ActorEntry *ae, *tmp;
+		int found = 0;
+		DL_FOREACH_SAFE(world->actors, ae, tmp) {
+		  if (ae->actorKey == self->name) {
+			DL_DELETE(world->actors, ae);
+			found++;
+			break;
+		  }
+		}
+		if (found)
+			DL_PREPEND(world->actors, ae);
 		break;
 	}
     case IMG: {
+		int imgType = PARAMS[0];
+		int imgValue = PARAMS[1];
+
+		if (imgType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for IMG\n");
+		  break;
+		}
+		self->img = imgValue;
 		break;
 	}
     case ACTIVATE: {
+		int frameType = PARAMS[0];
+		int frameValue = PARAMS[1];
+
+		if (frameType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for ACTIVATE\n");
+		  break;
+		}
+
+		Frame *f = get_frame(frameValue);
+		if (f != NULL) {
+		  f->active = 1;
+		}
+
 		break;
 	}
     case DEACTIVATE: {
+		int frameType = PARAMS[0];
+		int frameValue = PARAMS[1];
+
+		if (frameType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for ACTIVATE\n");
+		  break;
+		}
+
+		Frame *f = get_frame(frameValue);
+		if (f != NULL) {
+		  f->active = 1;
+		}
+
 		break;
 	}
     case KILLFRAME: {
@@ -1825,8 +2192,43 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 		break;
 	}
     case HITBOXES: {}
-    case HURTBOXES: {}
-    case CREATE: {}
+    case HURTBOXES: {
+		break;
+	}
+    case CREATE: {
+		int templateNameType = PARAMS[0];
+		int templateNameValue = PARAMS[1];
+		int nameType = PARAMS[2];
+		int nameValue = PARAMS[3];
+		int xType = PARAMS[4];
+		int xValue = PARAMS[5];
+		int yType = PARAMS[6];
+		int yValue = PARAMS[7];
+
+		if (templateNameType != STRING || nameType != STRING || xType != INT || yType != INT) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for CREATE\n");
+		  break;
+		}
+
+		Actor *a = add_actor_from_templatekey(templateNameValue, nameValue);
+		a->ECB->x = xValue;
+		a->ECB->y = yValue;
+
+		add_actor_to_world(world->name, nameValue);
+
+		int script = get_script_for_actor(a);
+		if (script != -1) {
+			int resolution = resolve_script(script, a, NULL, world, debug);
+			if (resolution < 0) return resolution;
+		}
+
+		/*
+			need to add templates in build script
+			use add_template_from_actorKey in load_actors
+		*/
+		break;
+	}
     case UPDATE: {}
     case SFX: {}
     case SONG: {}
@@ -1834,14 +2236,45 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
     case SONGOFF: {}
     case OFFSETBGSCROLLX: {}
     case OFFSETBGSCROLLY: {}
-    case FOR:{}
-    case ENDFOR:{}
-    case PRINT:{}
+    case FOR: {
+
+	}
+    case ENDFOR:{
+		break;
+	}
+    case PRINT:{
+		int type = PARAMS[0];
+		int value = PARAMS[1];
+
+		switch (type) {
+		case STRING:
+			printf("%s", get_string(value));
+			break;
+		case INT:
+			printf("%d", value);
+			break;
+		case FLOAT:
+			printf("%f", get_float(value));
+			break;
+		case LIST:
+			printf("Lists are #TODO hahaha");
+			break;
+		case NONE:
+			printf("None");
+			break;
+		}
+		printf("\n");
+		break;
+	}
     case UPDATE_STICKS: {}
     }
     executionPointer++;
   }
 
+  clear_ownerless_lists();
+  if (debug) {
+	printf("Done. number of lists %i\n", get_num_lists());
+  }
   return 0;
 }
 

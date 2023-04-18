@@ -85,7 +85,7 @@ int main (int argc, char *argv[]) {
   while (input_update() != -1) {
     SDL_RenderClear(rend);
     
-    if (update_world(index_string("root"), debug) == -1) {
+    if (update_world(index_string("root"), debug) == -2) {
       break;
     };
     

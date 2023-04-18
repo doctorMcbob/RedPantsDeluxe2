@@ -1,5 +1,4 @@
-WORLDS = {
- 'CAworld': {'actors': ['goldcoindoor0',
+WORLDS = {'CAworld': {'actors': ['goldcoindoor0',
                         'doorfountain0',
                         'inviswall16',
                         'dragongoldcoin0',
