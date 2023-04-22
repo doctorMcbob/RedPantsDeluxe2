@@ -6,7 +6,7 @@ WAIT:0 empty 0,0
 set self state WAIT
 
 |COLLIDE|
-if self.offsetkey == pigman
+if pigman in self.name
    if self.state == STAND
       set self state SCARE
       set self frame 0

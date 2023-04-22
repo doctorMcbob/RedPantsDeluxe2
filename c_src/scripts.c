@@ -99,7 +99,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	  printf("Cannot + without right hand side\n");
 	  break;
 	}
-	printf("+ types %i + %i\n", leftType, rightType);
+	
 	switch (leftType + 3*rightType) {
 	case (INT + 3*INT): {
 	  PARAMS[paramPointer-2] = INT;
@@ -162,7 +162,6 @@ void resolve_operators(int statement, World* world, int debug) {
 	case (STRING + 3*INT): {
 	  char *s = get_string(leftValue);
 	  char *s2 = int_to_string(rightValue);
-	  printf("concat i i %s + %s\n", s, s2);
 	  int i = concat_strings(s, s2);
 	  if (i == -1) {
 	    print_statement(statement);
@@ -195,7 +194,6 @@ void resolve_operators(int statement, World* world, int debug) {
 	  char *s = get_string(leftValue);
 	  char *s2 = get_string(rightValue);
 	  int i = concat_strings(s, s2);
-	  printf("concat s s (%i) %s + (%i) %s = (%i) %s\n", leftValue, s, rightValue, s2, i, get_string(i));
 	  if (i == -1) {
 	    print_statement(statement);
 	    printf("Failed Concat %s %s\n", s, s2);
@@ -565,9 +563,30 @@ void resolve_operators(int statement, World* world, int debug) {
 	  PARAMS[paramPointer-1] = f == f2;
 	  break;
 	}
+	case (INT + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = 0;
+	  break;
+	}
+	case (STRING + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = 0;
+	  break;
+	}
+	case (FLOAT + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = 0;
+	  break;
+	}
+	case (STRING + 3*FLOAT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = 0;
+	  break;
+	}
 	case (STRING + 3*STRING): {
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = leftValue == rightValue;
+	  break;
 	}
 	default: {
 	  print_statement(statement);
@@ -884,10 +903,37 @@ void resolve_operators(int statement, World* world, int debug) {
 	  PARAMS[paramPointer-1] = f && f2;
 	  break;
 	}
+	case (INT + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l2 = strlen(get_string(rightValue));
+	  PARAMS[paramPointer-1] = leftValue && l2;
+	  break;
+	}
+	case (STRING + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = strlen(get_string(leftValue));
+	  PARAMS[paramPointer-1] = l1 && rightValue;
+	  break;
+	}
+	case (FLOAT + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  float f = get_float(leftValue);
+	  int l2 = strlen(get_string(rightValue));
+	  PARAMS[paramPointer-1] = f && l2;
+	  break;
+	}
+	case (STRING + 3*FLOAT): {
+	  PARAMS[paramPointer-2] = INT;
+	  float f = get_float(rightValue);
+	  int l1 = strlen(get_string(leftValue));
+	  PARAMS[paramPointer-1] = l1 && f;
+	  break;
+	}
 	case (STRING + 3*STRING): {
 	  PARAMS[paramPointer-2] = INT;
 	  int l1 = strlen(get_string(leftValue)), l2 = strlen(get_string(rightValue));
 	  PARAMS[paramPointer-1] = l1 && l2;
+	  break;
 	}
 	default: {
 	  print_statement(statement);
@@ -957,25 +1003,26 @@ void resolve_operators(int statement, World* world, int debug) {
 	
 	if (rightType == -1) {
 	  print_statement(statement);
-	  printf("Cannot and without right hand side\n");
+	  printf("Cannot not without right hand side\n");
 	  break;
 	}
 	switch (rightType) {
 	case (INT): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = rightValue == 0;
+	  PARAMS[paramPointer++] = INT;
+	  PARAMS[paramPointer++] = rightValue == 0;
 	  break;
 	}
 	case (FLOAT): {
 	  float f = get_float(rightValue);
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = f == 0;
+	  PARAMS[paramPointer++] = INT;
+	  PARAMS[paramPointer++] = f == 0;
 	  break;
 	}
 	case (STRING): {
-	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer++] = INT;
 	  char* s = get_string(rightValue);
-	  PARAMS[paramPointer-1] = s[0] == "\0";
+	  PARAMS[paramPointer++] = s[0] == "\0";
+	  break;
 	}
 	default: {
 	  print_statement(statement);
@@ -1135,9 +1182,12 @@ void resolve_operators(int statement, World* world, int debug) {
 	} else {
 		char *s = get_string(leftValue);
 		int len = strlen(s);
-		if (leftValue < len) {
+		if (rightValue < len) {
+			char* c = malloc(sizeof(char) * 2);
+			c[0] = s[rightValue];
+			c[1] = '\0';
 			PARAMS[paramPointer-2] = STRING;
-			PARAMS[paramPointer-1] = add_string(s[rightValue]);
+			PARAMS[paramPointer-1] = add_string(c, 0);
 		}
 	}
 	break;
@@ -1185,13 +1235,13 @@ void resolve_operators(int statement, World* world, int debug) {
 	switch (rightType) {
 	case INT: {
 	  PARAMS[paramPointer++] = STRING;
-	  PARAMS[paramPointer++] = add_string(int_to_string(rightValue));
+	  PARAMS[paramPointer++] = add_string(int_to_string(rightValue), 0);
 	  break;
 	}
 	case FLOAT: {
 	  float f = get_float(rightValue);
 	  PARAMS[paramPointer++] = STRING;
-	  PARAMS[paramPointer++] = add_string(float_to_string(f));
+	  PARAMS[paramPointer++] = add_string(float_to_string(f), 0);
 	  break;
 	}
 	case STRING: {
@@ -1605,14 +1655,17 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
       case NONE: {
 	BUFFER[bufferPointer++] = INT;
 	BUFFER[bufferPointer++] = 0;
+	break;
       }
       case QRAND: {
 	BUFFER[bufferPointer++] = INT;
 	BUFFER[bufferPointer++] = rand() % 2;
+	break;
       }
       case QWORLD: {
 	BUFFER[bufferPointer++] = STRING;
 	BUFFER[bufferPointer++] = world->name;
+	break;
       }
       case DOT: {
 	if (bufferPointer < 2) {
@@ -2056,7 +2109,22 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 		  printf("Missing or Incorrect Parameter for EXEC\n");
 		  break;
 		}
-		int script = find_script_from_map(self, scriptValue);
+		int frame = -1;
+		int state = scriptValue;
+		char* scriptValueStr = strdup(get_string(scriptValue));
+		
+		char* delim = ":";
+		
+	    char* stateStr = strtok(scriptValueStr, delim);
+		char* frameStr = strtok(NULL, delim);
+
+		if (frameStr != NULL) {
+			state = index_string(stateStr);
+			frame = atoi(frameStr);
+		}
+
+		int script = find_script_from_map(self, state, frame);
+
 		if (script != -1)
 			resolve_script(script, self, related, world, debug);
 		break;
@@ -2222,11 +2290,8 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 			int resolution = resolve_script(script, a, NULL, world, debug);
 			if (resolution < 0) return resolution;
 		}
-
-		/*
-			need to add templates in build script
-			use add_template_from_actorKey in load_actors
-		*/
+		
+		a->updated = 1;
 		break;
 	}
     case UPDATE: {}

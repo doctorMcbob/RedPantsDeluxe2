@@ -154,6 +154,7 @@ void copy_actor(Actor* copy,  Actor *a) {
   a->tangible = copy->tangible;
   a->physics = copy->physics;
   a->updated = copy->updated;
+  a->attributes = NULL;
 }
 
 void add_template(Actor* copy) {
@@ -218,8 +219,7 @@ void add_template_from_actorkey(int actorKey) {
 }
 
 int collision_with(Actor *a1, Actor *a2, World* world, int debug) {
-  int scriptName = index_string("COLLIDE");
-  int scriptKey = find_script_from_map(a1, scriptName);
+  int scriptKey = find_script_from_map(a1, COLLIDE, -1);
   if (scriptKey > 0) {
     int resolution = resolve_script(scriptKey,  a1, a2, world, debug);
     if (resolution < 0) return resolution;
@@ -374,12 +374,12 @@ int collision_check(Actor *actor, World* world, int debug) {
   return 0;
 }
 
-int find_script_from_map(Actor* actor, int scriptName) {
+int find_script_from_map(Actor* actor, int scriptName, int scriptFrame) {
   ScriptMap *sm = get_script_map(actor->scriptmapkey);
   ScriptMapEntry *sme;
 
   DL_FOREACH(sm->entries, sme) {
-    if (sme->state == scriptName) {
+    if (sme->state == scriptName && sme->frame == scriptFrame) {
       return sme->scriptIdx;
     }
   };
@@ -416,9 +416,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
   if (x_flag != actor->x_vel && floor(actor->x_vel) == 0) {
     actor->x_vel = 0;
 
-    int scriptName = XCOLLISION;
-
-    int scriptKey = find_script_from_map(actor, scriptName);
+    int scriptKey = find_script_from_map(actor, XCOLLISION, -1);
     if (scriptKey != -1) {
     int resolution = resolve_script(scriptKey, actor, NULL, world, debug);
       if (resolution < 0) return resolution;
@@ -427,9 +425,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
   if (y_flag != actor->y_vel && floor(actor->y_vel) == 0) {
     actor->y_vel = 0;
 
-    int scriptName = YCOLLISION;
-
-    int scriptKey = find_script_from_map(actor, scriptName);
+    int scriptKey = find_script_from_map(actor, YCOLLISION, -1);
     if (scriptKey != -1) {
     int resolution = resolve_script(scriptKey, actor, NULL, world, debug);
     if (resolution < 0) return resolution;
@@ -466,7 +462,8 @@ Sprite* get_sprite_for_actor(Actor* actor) {
     return NULL;
   }
   if (actor->img >= 0) {
-    return get_sprite(actor->img);
+    Sprite * img = get_sprite(actor->img);
+    return img;
   }
 
   struct SpriteMap *sm;

@@ -277,6 +277,8 @@ def _intern_strings(SCRIPTS):
     if "" not in UNIQUE_STRINGS:
         print("WARNING: Empty string not found in UNIQUE_STRINGS")
         UNIQUE_STRINGS.append("")
+    if "COLLIDE" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("COLLIDE")
     UNIQUE_STRINGS.sort()
     string_data_dot_c = "#include \"stringmachine.h\"\n#include <stddef.h>\n"
     string_data_dot_c += f"int NUM_STRINGS = {len(UNIQUE_STRINGS)};\n"
@@ -338,6 +340,7 @@ def _intern_strings(SCRIPTS):
 #define  _START_DOWN {UNIQUE_STRINGS.index("START_DOWN")}
 #define _INPUT_NAME {UNIQUE_STRINGS.index("_input_name")}
 #define EMPTY {UNIQUE_STRINGS.index("")}
+#define COLLIDE {UNIQUE_STRINGS.index("COLLIDE")}
 
 extern const char* STRINGS[{len(UNIQUE_STRINGS)}];
 extern int STRING_LENS[{len(UNIQUE_STRINGS)}];
@@ -511,7 +514,7 @@ def _convert_spritesheets(SPRITESHEETS):
 
 
         spritesheets_dot_c += f"""
-        load_spritesheet(rend, "img/{filename}", {name}names, {name}xs, {name}ys, {name}ws, {name}hs, {length})\n;
+        load_spritesheet(rend, "img/{filename}", {name}names, {name}xs, {name}ys, {name}ws, {name}hs, {length});
     """
 
     keys = set()

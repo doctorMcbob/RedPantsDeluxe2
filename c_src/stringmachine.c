@@ -13,15 +13,18 @@
 StringIndexer* indexers = NULL;
 DynamicString* dynamic_strings = NULL;
 
-int add_string(char* string) {
-    int i = index_string(string);
-    if (i != -1) return i;
+int add_string(char* string, int skipCheck) {
+    if (!skipCheck) {
+      int i = index_string(string);
+      if (i != -1) {
+        return i;
+      }
+    }
     DYNAMIC_STRINGS++;
     DynamicString *ds = malloc(sizeof(DynamicString));
     ds->string = string;
     DL_APPEND(dynamic_strings, ds);
     add_indexer(string, NUM_STRINGS+DYNAMIC_STRINGS-1);
-    printf("{add_string(%s) = %d}", string, NUM_STRINGS+DYNAMIC_STRINGS-1);
     return NUM_STRINGS+DYNAMIC_STRINGS-1;
 }
 
@@ -33,11 +36,9 @@ int concat_strings(char* str1, char* str2) {
     char* concat_str = (char*)malloc(total_len);
     strcpy(concat_str, str1);
     strcat(concat_str, str2);
-    printf("{concat_strings(%s, %s) = %s", str1, str2, concat_str);
     int idx = index_string(concat_str);
-    printf(" at %i}", idx);
     if (idx == -1)
-      return add_string(concat_str);
+      return add_string(concat_str, 1);
     free(concat_str);
     return idx;
 }
@@ -60,7 +61,6 @@ char* get_string(int idx) {
       return ds->string;
     }
   }
-  printf("{get_string(%d) out of bounds}", idx);
   return NULL;
 }
 
@@ -87,25 +87,27 @@ int index_string(char* string) {
   DL_FOREACH(indexers, si) {
     if (si->key[0] != string[0]) continue;
     if (len > 1 && si->key[1] != string[1]) continue;
-
     int starter = si->idx;
-    int tocheck = si->next != NULL ? si->next->idx - starter : NUM_STRINGS - starter;
-
+    int tocheck = si->next != NULL ? si->next->idx - starter : NUM_STRINGS + DYNAMIC_STRINGS - starter;
     for (int i = 0; i < tocheck; i++) {
       if (starter + i < NUM_STRINGS) {
-      	if (strcmp(STRINGS[starter + i], string) == 0)
+      	if (strcmp(STRINGS[starter + i], string) == 0) {
           return starter + i;
+        }
       } else {
         DynamicString *ds;
         int d_idx = starter + i - NUM_STRINGS;
         int depth = d_idx;
+        int count = 0;
         DL_FOREACH(dynamic_strings, ds) {
-          if (d_idx-- != 0) continue;
-          int count = 0;
+          if (d_idx-- > 0) {
+            continue;
+          }
           if (count < tocheck) {
-            count++;
-            if (strcmp(ds->string, string) == 0)
+            if (strcmp(ds->string, string) == 0) {
               return starter + depth + count;
+            }
+            count++;
           } else {
             break;
           }
