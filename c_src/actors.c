@@ -600,8 +600,12 @@ void draw_actor(SDL_Renderer* rend, Actor* actor, int frameKey) {
   SDL_QueryTexture(s->image, NULL, NULL, &dest.w, &dest.h);
   src.w = dest.w;
   src.h = dest.h;
-  
-  SDL_RenderCopy(rend, s->image, &src, &dest);
+
+  SDL_RendererFlip flip = actor->direction == 1 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+  double angle = actor->rotation;
+  SDL_Point pivot = { dest.x + dest.w / 2, dest.y + dest.h / 2 };
+
+  SDL_RenderCopyEx(rend, s->image, &src, &dest, angle, &pivot, flip);
 }
 
 void free_actor(Actor* actor) {
