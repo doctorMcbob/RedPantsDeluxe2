@@ -2044,10 +2044,10 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 		a->x_vel = valueValue;
 	break;
       case Y_VEL:
-	if (valueType != FLOAT)
+	if (valueType == FLOAT)
 		a->y_vel = get_float(valueValue);
 	else if (valueType == INT)
-		a->y_vel = valueValue;
+		a->y_vel = (float)valueValue;
 	break;
 	  case _INPUT_NAME:
 		if (valueType != STRING) break;

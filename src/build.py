@@ -292,7 +292,6 @@ def _intern_strings(SCRIPTS):
             STRING_INDEXERS[token[0:2]] = idx
             string_data_dot_c += f"  add_indexer(\"{token[0:2]}\", {idx});\n"
     string_data_dot_c += "}\n"
-    
     string_data_dot_h = f"""
 #include <stddef.h>
 #ifndef STRING_DATA_LOAD
@@ -394,7 +393,7 @@ void scripts_load() {
         script_data_dot_c += f"    add_script_map({scriptMap_idx});\n"
         SCRIPT_MAP_MAP[scriptMap] = scriptMap_idx
         for key in SCRIPTS[scriptMap]:
-            state, frame = key.split(":") if ":" in key else (key, "0")
+            state, frame = key.split(":") if ":" in key else (key, "-1")
             state_idx = UNIQUE_STRINGS.index(state)
             script_data_dot_c += f"    add_script_to_script_map({scriptMap_idx}, {state_idx}, {frame}, {current_key});\n"
             for statement in SCRIPTS[scriptMap][key]:
