@@ -1613,7 +1613,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
   int ifNested = 0;
   while (SCRIPTS[executionPointer] != -2000) {
 	if (debug) {
-		printf("Resolving for self %s\n", get_string(self->name));
+		printf("Resolving for self (%i) %s\n", self->name, get_string(self->name));
 		print_statement(executionPointer);
 	}
 	int verb = SCRIPTS[executionPointer];

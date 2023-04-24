@@ -20,12 +20,13 @@ int add_string(char* string, int skipCheck) {
         return i;
       }
     }
-    DYNAMIC_STRINGS++;
     DynamicString *ds = malloc(sizeof(DynamicString));
     ds->string = string;
+    int idx = NUM_STRINGS+DYNAMIC_STRINGS;
+    DYNAMIC_STRINGS++;
     DL_APPEND(dynamic_strings, ds);
-    add_indexer(string, NUM_STRINGS+DYNAMIC_STRINGS-1);
-    return NUM_STRINGS+DYNAMIC_STRINGS-1;
+    add_indexer(string, idx);
+    return idx;
 }
 
 int concat_strings(char* str1, char* str2) {
@@ -37,8 +38,10 @@ int concat_strings(char* str1, char* str2) {
     strcpy(concat_str, str1);
     strcat(concat_str, str2);
     int idx = index_string(concat_str);
-    if (idx == -1)
-      return add_string(concat_str, 1);
+    if (idx == -1) {
+      int idx = add_string(concat_str, 1);
+      return idx;
+    }
     free(concat_str);
     return idx;
 }
@@ -84,35 +87,32 @@ int index_string(char* string) {
   int len = strlen(string);
   if (len==0) return -1;
   StringIndexer *si;
+  DynamicString *ds = dynamic_strings;
   DL_FOREACH(indexers, si) {
-    if (si->key[0] != string[0]) continue;
-    if (len > 1 && si->key[1] != string[1]) continue;
     int starter = si->idx;
     int tocheck = si->next != NULL ? si->next->idx - starter : NUM_STRINGS + DYNAMIC_STRINGS - starter;
+    if (si->key[0] != string[0]) {
+      if (starter >= NUM_STRINGS && ds->next != NULL) {
+        for (int i = 0; i < tocheck; i++) ds = ds->next;
+      }
+      continue;
+    }
+    if (len > 1 && si->key[1] != string[1]) {
+      if (starter >= NUM_STRINGS && ds->next != NULL) {
+        for (int i = 0; i < tocheck; i++) ds = ds->next;
+      }
+      continue;
+    }
     for (int i = 0; i < tocheck; i++) {
       if (starter + i < NUM_STRINGS) {
       	if (strcmp(STRINGS[starter + i], string) == 0) {
           return starter + i;
         }
       } else {
-        DynamicString *ds;
-        int d_idx = starter + i - NUM_STRINGS;
-        int depth = d_idx;
-        int count = 0;
-        DL_FOREACH(dynamic_strings, ds) {
-          if (d_idx-- > 0) {
-            continue;
-          }
-          if (count < tocheck) {
-            if (strcmp(ds->string, string) == 0) {
-              return starter + depth + count;
-            }
-            count++;
-          } else {
-            break;
-          }
+        if (strcmp(ds->string, string) == 0) {
+          return starter + i;
         }
-        break;
+        ds = ds->next;
       }
     }
   }
