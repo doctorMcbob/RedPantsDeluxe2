@@ -5,7 +5,9 @@
 # include "utlist.h"
 # include "uthash.h"
 # include "stringmachine.h"
+#include <SDL2/SDL_ttf.h> // for debug purposes only and can be removed from final build
 
+TTF_Font* font;
 World* worlds = NULL;
 
 void add_world(int name,
@@ -105,6 +107,38 @@ void draw_world(World* world, SDL_Renderer* rend, int frameKey) {
       draw_actor(rend, a, frameKey);
   }
 };
+
+void draw_debug_overlay(World* world, SDL_Renderer* rend, int frameKey) {
+  struct ActorEntry *ae;
+  int mouseX, mouseY;
+  SDL_GetMouseState(&mouseX, &mouseY);
+  int hasTextDrawn = 0;
+  DL_FOREACH(world->actors, ae) {
+    Actor* a;
+    a = get_actor(ae->actorKey);
+    SDL_Rect *ECB = a->ECB;
+    SDL_SetRenderDrawColor(rend, 0, 0, 255, 255);
+    SDL_RenderDrawRect(rend, ECB);
+
+    if (hasTextDrawn) continue;
+    if (mouseX >= ECB->x && mouseX < ECB->x + ECB->w && mouseY >= ECB->y && mouseY < ECB->y + ECB->h) {
+      char data[100]; // buffer to hold the formatted string
+      sprintf(data, "%s %s:%iT?%i",
+              get_string(ae->actorKey), get_string(a->state), a->frame, a->tangible);
+
+      SDL_Color textColor = { 0, 0, 0 };
+      SDL_Surface* surface = TTF_RenderText_Solid(font, data, textColor);
+
+      SDL_Texture* Message = SDL_CreateTextureFromSurface(rend, surface);
+      SDL_Rect Message_rect = { mouseX, mouseY, surface->w, surface->h };
+      SDL_RenderCopy(rend, Message, NULL, &Message_rect);
+
+      SDL_FreeSurface(surface);
+      SDL_DestroyTexture(Message);
+      hasTextDrawn = 1;
+    }
+  }
+}
 
 int world_has(World *world, int actorKey) {
   ActorEntry *ae;

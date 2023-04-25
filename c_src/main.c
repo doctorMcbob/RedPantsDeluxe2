@@ -21,6 +21,7 @@ I will be using uthash.h as my dictionary implementation
 # include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <SDL2/SDL_ttf.h> // for debug purposes only and can be removed from final build
 
 # include <SDL2/SDL.h>
 # include <SDL2/SDL_timer.h>
@@ -29,6 +30,8 @@ I will be using uthash.h as my dictionary implementation
 # define W 1152
 # define H 640
 
+
+TTF_Font* font;
 void spritesheet_load(SDL_Renderer* rend);
 void actor_load();
 void world_load();
@@ -40,8 +43,15 @@ int main (int argc, char *argv[]) {
   int debug = 0;
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-d") == 0) {
-      debug = 1;
+      debug++;
     }
+  }
+
+  if (debug) {
+    if (TTF_Init() == -1) {
+      return 1;
+    }
+    font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
   }
 
   srand(time(NULL));
@@ -81,15 +91,25 @@ int main (int argc, char *argv[]) {
   add_input_state(index_string("PLAYER1"), NULL);
   
   add_frame(index_string("MAIN"), get_world(index_string("root")), NULL, 0, 0, W, H);
-  
+
   while (input_update() != -1) {
     SDL_RenderClear(rend);
+     
+    int debugPause = 0;
+    if (debug) {
+      const Uint8 *state = SDL_GetKeyboardState(NULL);
+      if (state[SDL_SCANCODE_SPACE]) {
+        debugPause = 1;
+      }
+    }
+
+    if (!debugPause) {
+      if (update_world(index_string("root"), debug) == -2) {
+        break;
+      }
+    }
     
-    if (update_world(index_string("root"), debug) == -2) {
-      break;
-    };
-    
-    draw_frame(rend, index_string("MAIN"));
+    draw_frame(rend, index_string("MAIN"), debug);
     
     actors_reset_updated();
     SDL_RenderPresent(rend);

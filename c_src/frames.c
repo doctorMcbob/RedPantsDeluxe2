@@ -56,7 +56,7 @@ int in_frame(int frameKey, Actor* actor) {
     return 0;
 }
 
-void draw_frame(SDL_Renderer* rend, int name) {
+void draw_frame(SDL_Renderer* rend, int name, int debug) {
   struct Frame* f;
   f = get_frame(name);
   Uint32 format;
@@ -68,6 +68,9 @@ void draw_frame(SDL_Renderer* rend, int name) {
   SDL_SetRenderTarget(rend, frame_buffer);
   
   draw_world(f->world, rend, name);
+  if (debug) {
+    draw_debug_overlay(f->world, rend, name);
+  }
 
   SDL_SetRenderTarget(rend, render_target);
 

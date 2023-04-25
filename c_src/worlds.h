@@ -33,5 +33,6 @@ void draw_world(World* world, SDL_Renderer* rend, int frameKey);
 int exists(int actorKey);
 int world_has(World *world, int actorKey);
 void remove_actor_from_worlds(int actorKey);
+void draw_debug_overlay(World* world, SDL_Renderer* rend, int frameKey);
 # endif
 

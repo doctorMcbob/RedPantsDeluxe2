@@ -400,6 +400,7 @@ set self state IDLE
 set self frame 0
 
 |XCOLLISION|
+print "XCOLLISION for Puppet mastah"
 set self calc1 self.state == DIVE
 set self calc1 self.state == DIVELAND or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1
@@ -424,6 +425,7 @@ endif
 set self direction self.direction * -1
 
 |YCOLLISION|
+print "YCOLLISION for Puppet mastah"
 set self calc1 self.state == ROLLOUT
 set self calc1 self.state == SLIDEFLIP or self.calc1
 set self calc1 self.state == LONGJUMP or self.calc1

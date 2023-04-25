@@ -72,7 +72,7 @@ void resolve_operators(int statement, World* world, int debug) {
   int bufferPointer = 0;
   int paramPointer = 0;
   while (bufferPointer < 512 && BUFFER[bufferPointer] != -1) {
-	if (debug) {
+	if (debug == 2) {
 		printf("\n   bufferPointer: %i : ", bufferPointer);
 		print_buffer();
 		printf("   paramPointer : %i : ", paramPointer);
@@ -1612,7 +1612,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
   int executionPointer = scriptIdx;
   int ifNested = 0;
   while (SCRIPTS[executionPointer] != -2000) {
-	if (debug) {
+	if (debug == 2) {
 		printf("Resolving for self (%i) %s\n", self->name, get_string(self->name));
 		print_statement(executionPointer);
 	}
@@ -1632,7 +1632,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
     // for each statement in script
     int bufferPointer = 0;
     int statement = executionPointer;
-	if (debug) printf("Evaluating Literals...\n");
+	if (debug == 2) printf("Evaluating Literals...\n");
     while (SCRIPTS[executionPointer] != -1000) {
       // evaluate literals
       executionPointer++;
@@ -1915,17 +1915,17 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 		break;
 	  }
       }
-	  if (debug) {
+	  if (debug == 2) {
 		printf("  B ");
 		print_buffer();
 		printf("  P ");
 		print_params();
 	  }
     }
-	if (debug) printf("  Done...\n");
+	if (debug == 2) printf("  Done...\n");
     // resolve operators
     resolve_operators(statement, world, debug);
-	if (debug) {
+	if (debug == 2) {
 	  printf("  B ");
 	  print_buffer();
 	  printf("  P ");
@@ -2337,7 +2337,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
   }
 
   clear_ownerless_lists();
-  if (debug) {
+  if (debug == 2) {
 	printf("Done. number of lists %i\n", get_num_lists());
   }
   return 0;
