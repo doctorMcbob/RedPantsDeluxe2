@@ -48,10 +48,21 @@ void _clear() {
   }
 }
 
-void add_script_map(int key) {
+int get_script_map_key_by_name(int name) {
+  int i;
+  for(i = 0; i < SCRIPT_MAP_SIZE; i++) {
+	if (SCRIPT_MAPS[i] != NULL && SCRIPT_MAPS[i]->name == name) {
+	  return i;
+	}
+  }
+  return -1;
+}
+
+void add_script_map(int key, int name) {
   ScriptMap *sm = malloc(sizeof(ScriptMap));
   sm->entries = NULL;
   sm->key = key;
+  sm->name = name;
   SCRIPT_MAPS[key] = sm;
 }
 
@@ -1690,10 +1701,12 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 	  BUFFER[bufferPointer-2] = INT;
 	  BUFFER[bufferPointer-1] = a->ECB->y;
 	  break;
+	case _WIDTH:
 	case W:
 	  BUFFER[bufferPointer-2] = INT;
 	  BUFFER[bufferPointer-1] = a->ECB->w;
 	  break;
+	case _HEIGHT:
 	case H:
 	  BUFFER[bufferPointer-2] = INT;
 	  BUFFER[bufferPointer-1] = a->ECB->h;
@@ -1973,10 +1986,12 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 	if (valueType != INT) break;
 	a->ECB->y = valueValue;
 	break;
+	  case _WIDTH:
       case W:
 	if (valueType != INT) break;
 	a->ECB->w = valueValue;
 	break;
+	  case _HEIGHT:
       case H:
 	if (valueType != INT) break;
 	a->ECB->h = valueValue;
@@ -2211,6 +2226,23 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 		break;
 	}
     case REBRAND: {
+		int actorType = PARAMS[0];
+		int actorValue = PARAMS[1];
+
+		if (actorType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for REBRAND\n");
+		  break;
+		}
+
+		self->spritemapkey = actorValue;
+		self->scriptmapkey = get_script_map_key_by_name(actorValue);
+		
+	    int scriptKey = find_script_from_map(self, _START, 0);
+   		if (scriptKey != -1) {
+    		int resolution = resolve_script(scriptKey, self, NULL, world, debug);
+    		if (resolution < 0) return resolution;
+		}
 		break;
 	}
     case REMOVE: {

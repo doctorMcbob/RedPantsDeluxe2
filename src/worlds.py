@@ -117,6 +117,7 @@ class World(object):
                 else:
                     blitz.append((Actor.get_sprite(), frame.scroll((Actor.x+dx, Actor.y+dy))))
             dest.blits(blitz)
+
         if DEBUG:
             for name in self.actors:
                 Actor = actor.get_actor(name)

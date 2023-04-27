@@ -92,7 +92,6 @@ int main (int argc, char *argv[]) {
   
   add_frame(index_string("MAIN"), get_world(index_string("root")), NULL, 0, 0, W, H);
   Frame* main_frame = get_frame(index_string("MAIN"));
-  main_frame->focus = get_actor(index_string("puppetredpants0"));
 
   while (input_update() != -1) {
     SDL_RenderClear(rend);

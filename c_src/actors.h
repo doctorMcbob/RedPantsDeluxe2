@@ -66,6 +66,7 @@ void add_actor(int name,
 void copy_actor(Actor* copy,  Actor *a);
 void add_template(Actor* copy);
 Actor* add_actor_from_templatekey(int templateKey, int name);
+Actor* get_template(int name);
 void add_template_from_actorkey(int actorKey);
 int update_actor(int actorKey, int worldKey, int debug);
 Sprite* get_sprite_for_actor(Actor* actor);

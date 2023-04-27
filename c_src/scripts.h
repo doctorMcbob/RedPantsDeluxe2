@@ -117,10 +117,11 @@ typedef struct ScriptMapEntry
 typedef struct ScriptMap
 {
   int key;
+  int name;
   struct ScriptMapEntry *entries;
 } ScriptMap;
 
-void add_script_map(int key);
+void add_script_map(int key, int name);
 void add_script_to_script_map(int key, int stateStringKey, int frame, int scriptIdx);
 ScriptMap *get_script_map(int key);
 int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world, int debug);

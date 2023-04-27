@@ -67,7 +67,15 @@ int update_world(int worldKey, int debug) {
   return 0;
 }
 
-void _draw_background(World* world, SDL_Renderer* rend) {
+int alt_modulo(int x, int y) {
+    int mod = x % y;
+    if ((mod < 0 && y > 0) || (mod > 0 && y < 0)) {
+        mod += y;
+    }
+    return mod;
+}
+
+void _draw_background(World* world, SDL_Renderer* rend, Frame* frame) {
   Sprite *background;
   background = get_sprite(world->background);
   if (!background) {
@@ -86,16 +94,17 @@ void _draw_background(World* world, SDL_Renderer* rend) {
 
   for (int y = 0; y < h/dest.h+2; y++) {
     dest.y = y*dest.h;
+    dest.y -= alt_modulo((frame->scroll_y / 2) + world->background_y_scroll, dest.h);
     for (int x = 0; x < w/dest.w+2; x++) {
       dest.x = x*dest.w;
-      // TODO: offset by frame background offset value
+      dest.x -= alt_modulo((frame->scroll_x / 2) + world->background_x_scroll, dest.w);
       SDL_RenderCopy(rend, background->image, &src, &dest);
     }
   }
 }
 
 void draw_world(World* world, SDL_Renderer* rend, Frame* frame) {
-  _draw_background(world, rend);
+  _draw_background(world, rend, frame);
 
   struct ActorEntry *ae;
   DL_FOREACH(world->actors, ae) {

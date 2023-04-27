@@ -8,7 +8,8 @@ if isframe MAIN
    set self tangible 1
    set self respawnx self.x
    set self respawny self.y
+   set self respawnworld WORLD?
 endif
-if not isframe MAIN
+if isframe MAIN == 0
    goodbye
 endif

@@ -176,6 +176,7 @@ def make_script_data():
 
 def _intern_strings(SCRIPTS):
     for scriptMap in SCRIPTS:
+        if scriptMap not in UNIQUE_STRINGS: UNIQUE_STRINGS.append(scriptMap)
         for key in SCRIPTS[scriptMap]:
             state, frame = key.split(":") if ":" in key else (key, "0")
             if state not in UNIQUE_STRINGS: UNIQUE_STRINGS.append(state)
@@ -279,6 +280,12 @@ def _intern_strings(SCRIPTS):
         UNIQUE_STRINGS.append("")
     if "COLLIDE" not in UNIQUE_STRINGS:
         UNIQUE_STRINGS.append("COLLIDE")
+    if "START" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("START")
+    if "width" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("width")
+    if "height" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("height")
     UNIQUE_STRINGS.sort()
     string_data_dot_c = "#include \"stringmachine.h\"\n#include <stddef.h>\n"
     string_data_dot_c += f"int NUM_STRINGS = {len(UNIQUE_STRINGS)};\n"
@@ -340,6 +347,9 @@ def _intern_strings(SCRIPTS):
 #define _INPUT_NAME {UNIQUE_STRINGS.index("_input_name")}
 #define EMPTY {UNIQUE_STRINGS.index("")}
 #define COLLIDE {UNIQUE_STRINGS.index("COLLIDE")}
+#define _START {UNIQUE_STRINGS.index("START")}
+#define _WIDTH {UNIQUE_STRINGS.index("width")}
+#define _HEIGHT {UNIQUE_STRINGS.index("height")}
 
 extern const char* STRINGS[{len(UNIQUE_STRINGS)}];
 extern int STRING_LENS[{len(UNIQUE_STRINGS)}];
@@ -390,7 +400,7 @@ void scripts_load() {
     scriptMap_idx = -1
     for scriptMap in SCRIPTS:
         scriptMap_idx += 1
-        script_data_dot_c += f"    add_script_map({scriptMap_idx});\n"
+        script_data_dot_c += f"    add_script_map({scriptMap_idx}, {UNIQUE_STRINGS.index(scriptMap)});\n"
         SCRIPT_MAP_MAP[scriptMap] = scriptMap_idx
         for key in SCRIPTS[scriptMap]:
             state, frame = key.split(":") if ":" in key else (key, "-1")

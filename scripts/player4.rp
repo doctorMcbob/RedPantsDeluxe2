@@ -10,6 +10,7 @@ if isframe MAIN4
    set self tangible 1
    set self respawnx self.x
    set self respawny self.y
+   set self respawnworld WORLD?
 endif
 if not isframe MAIN4
    goodbye

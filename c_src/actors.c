@@ -199,6 +199,15 @@ Actor* add_actor_from_templatekey(int templateKey, int name) {
   return a;
 }
 
+Actor* get_template(int name) {
+  struct Actor *copy;
+  HASH_FIND_INT(templates, &name, copy);
+  if (copy == NULL) {
+    return NULL;
+  }
+  return copy;
+}
+
 void add_template_from_actorkey(int actorKey) {
   struct Actor *copy;
   HASH_FIND_INT(actors, &actorKey, copy);
