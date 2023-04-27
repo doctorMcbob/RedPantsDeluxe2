@@ -137,7 +137,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  int i = push_float(f + f2);
 	  PARAMS[paramPointer-2] = FLOAT;
 	  PARAMS[paramPointer-1] = i;
@@ -250,7 +250,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  int i = push_float(f - f2);
 	  PARAMS[paramPointer-2] = FLOAT;
 	  PARAMS[paramPointer-1] = i;
@@ -303,7 +303,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  int i = push_float(f * f2);
 	  PARAMS[paramPointer-2] = FLOAT;
 	  PARAMS[paramPointer-1] = i;
@@ -354,7 +354,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = (int)f / (int)f2;
 	  break;
@@ -407,7 +407,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  int i = push_float(f / f2);
 	  PARAMS[paramPointer-2] = FLOAT;
 	  PARAMS[paramPointer-1] = i;
@@ -458,7 +458,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = (int)f % (int)f2;
 	  break;
@@ -508,7 +508,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = pow(f, f2);
 	  break;
@@ -558,7 +558,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f == f2;
 	  break;
@@ -633,14 +633,10 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f < f2;
 	  break;
-	}
-	case (STRING + 3*STRING): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = leftValue < rightValue;
 	}
 	default: {
 	  print_statement(statement);
@@ -686,14 +682,10 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f > f2;
 	  break;
-	}
-	case (STRING + 3*STRING): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = leftValue > rightValue;
 	}
 	default: {
 	  print_statement(statement);
@@ -739,14 +731,10 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f <= f2;
 	  break;
-	}
-	case (STRING + 3*STRING): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = leftValue <= rightValue;
 	}
 	default: {
 	  print_statement(statement);
@@ -792,14 +780,10 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f >= f2;
 	  break;
-	}
-	case (STRING + 3*STRING): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = leftValue >= rightValue;
 	}
 	default: {
 	  print_statement(statement);
@@ -845,14 +829,10 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f != f2;
 	  break;
-	}
-	case (STRING + 3*STRING): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = leftValue != rightValue;
 	}
 	default: {
 	  print_statement(statement);
@@ -898,7 +878,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f && f2;
 	  break;
@@ -979,7 +959,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f || f2;
 	  break;
@@ -1068,7 +1048,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (FLOAT + 3*FLOAT): {
 	  float f = get_float(leftValue);
-	  float f2 = get_float(leftValue);
+	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f && f2 == 0;
 	  break;

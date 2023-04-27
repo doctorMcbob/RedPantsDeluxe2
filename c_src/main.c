@@ -110,7 +110,7 @@ int main (int argc, char *argv[]) {
     }
     
     draw_frame(rend, index_string("MAIN"), debug);
-    
+
     actors_reset_updated();
     SDL_RenderPresent(rend);
     SDL_Delay(1000/30);

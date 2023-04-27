@@ -356,6 +356,7 @@ int collision_check(Actor *actor, World* world, int debug) {
       DL_FOREACH(world->actors, ae4) {
         if (actor->name == ae4->actorKey) continue;
         Actor *actor4 = get_actor(ae4->actorKey);
+        if (!actor4->tangible) continue;
         if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, actor->y_vel), actor4->ECB)) {
           check = 0;
         }

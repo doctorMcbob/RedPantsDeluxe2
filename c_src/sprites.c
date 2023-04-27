@@ -19,7 +19,6 @@ https://github.com/troydhanson/uthash/blob/master/src/utlist.h
 Sprite* sprites = NULL;
 SpriteMap* spritemaps = NULL;
 
-
 void sprites_taredown() {
   struct Sprite *s, *tmp;
   HASH_ITER(hh, sprites, s, tmp) {
