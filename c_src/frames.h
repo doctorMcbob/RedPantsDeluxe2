@@ -26,8 +26,8 @@ typedef struct Frame {
 
 void add_frame(int name, World* world, Actor* focus, int x, int y, int w, int h);
 Frame* get_frame(int name);
-int in_frame(int frameKey, Actor* actor);
-void draw_frame(SDL_Renderer* rend, int name, int debug);
-void update_frame(int frameKey);
+int in_frame(Frame* frame, Actor* actor);
+void draw_frame(SDL_Renderer* rend, Frame* frame, int debug);
+void update_frame(Frame* frame);
 int has_frame(int worldKey);
 #endif

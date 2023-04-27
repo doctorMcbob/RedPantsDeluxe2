@@ -110,8 +110,8 @@ int main (int argc, char *argv[]) {
         break;
       }
     }
-    update_frame(index_string("MAIN"));
-    draw_frame(rend, index_string("MAIN"), debug);
+    update_frame(main_frame);
+    draw_frame(rend, main_frame, debug);
 
     actors_reset_updated();
     SDL_RenderPresent(rend);

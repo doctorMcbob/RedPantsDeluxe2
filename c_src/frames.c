@@ -46,19 +46,14 @@ SDL_Rect* scrolled(SDL_Rect* rect, Frame* frame) {
   return r;
 }
 
-int in_frame(int frameKey, Actor* actor) {
-  Frame* frame = get_frame(frameKey);
-  if (!frame) return 0;
-
+int in_frame(Frame* frame, Actor* actor) {
   if (SDL_HasIntersection(frame->rect, scrolled(actor->ECB, frame)))
     return 1;
   else
     return 0;
 }
 
-void draw_frame(SDL_Renderer* rend, int name, int debug) {
-  struct Frame* f;
-  f = get_frame(name);
+void draw_frame(SDL_Renderer* rend, Frame* f, int debug) {
   Uint32 format;
   SDL_Texture* render_target = SDL_GetRenderTarget(rend);
   SDL_QueryTexture(render_target, &format, NULL, NULL, NULL);
@@ -67,9 +62,9 @@ void draw_frame(SDL_Renderer* rend, int name, int debug) {
 
   SDL_SetRenderTarget(rend, frame_buffer);
   
-  draw_world(f->world, rend, name);
+  draw_world(f->world, rend, f);
   if (debug) {
-    draw_debug_overlay(f->world, rend, name);
+    draw_debug_overlay(f->world, rend, f);
   }
 
   SDL_SetRenderTarget(rend, render_target);
@@ -80,10 +75,8 @@ void draw_frame(SDL_Renderer* rend, int name, int debug) {
   SDL_DestroyTexture(frame_buffer);
 }
 
-void update_frame(int frameKey) {
-  Frame* f = get_frame(frameKey);
+void update_frame(Frame* f) {
   if (f->focus != NULL) {
-    printf("focus: %s\n", get_string(f->focus->name));
     f->scroll_x = f->focus->ECB->x + f->focus->ECB->w / 2 - f->rect->w / 2;
     f->scroll_y = f->focus->ECB->y + f->focus->ECB->h / 2 - f->rect->h / 2;
   }

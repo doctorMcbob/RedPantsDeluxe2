@@ -94,7 +94,7 @@ void _draw_background(World* world, SDL_Renderer* rend) {
   }
 }
 
-void draw_world(World* world, SDL_Renderer* rend, int frameKey) {
+void draw_world(World* world, SDL_Renderer* rend, Frame* frame) {
   _draw_background(world, rend);
 
   struct ActorEntry *ae;
@@ -103,12 +103,12 @@ void draw_world(World* world, SDL_Renderer* rend, int frameKey) {
     a = get_actor(ae->actorKey);
     
     if (!a) continue;
-    if (in_frame(frameKey, a))
-      draw_actor(rend, a, frameKey);
+    if (in_frame(frame, a))
+      draw_actor(rend, a, frame);
   }
 };
 
-void draw_debug_overlay(World* world, SDL_Renderer* rend, int frameKey) {
+void draw_debug_overlay(World* world, SDL_Renderer* rend, Frame* frame) {
   struct ActorEntry *ae;
   int mouseX, mouseY;
   SDL_GetMouseState(&mouseX, &mouseY);
@@ -117,6 +117,8 @@ void draw_debug_overlay(World* world, SDL_Renderer* rend, int frameKey) {
     Actor* a;
     a = get_actor(ae->actorKey);
     SDL_Rect *ECB = a->ECB;
+    ECB->x += frame->scroll_x;
+    ECB->y += frame->scroll_y;
     SDL_SetRenderDrawColor(rend, 0, 0, 255, 255);
     SDL_RenderDrawRect(rend, ECB);
 

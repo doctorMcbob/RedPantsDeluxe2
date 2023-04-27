@@ -69,7 +69,9 @@ Actor* add_actor_from_templatekey(int templateKey, int name);
 void add_template_from_actorkey(int actorKey);
 int update_actor(int actorKey, int worldKey, int debug);
 Sprite* get_sprite_for_actor(Actor* actor);
-void draw_actor(SDL_Renderer* rend, Actor* actor, int frameKey);
+
+# include "frames.h"
+void draw_actor(SDL_Renderer* rend, Actor* actor, Frame* frame);
 int get_script_for_actor(Actor* actor);
 void actors_reset_updated();
 int find_script_from_map(Actor* actor, int scriptName, int scriptFrame);

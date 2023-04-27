@@ -577,11 +577,7 @@ void _draw_platform(SDL_Renderer* rend, Actor* actor, Frame* frame) {
   }
 }
 
-void draw_actor(SDL_Renderer* rend, Actor* actor, int frameKey) {
-  Frame *f;
-  f = get_frame(frameKey);
-  if (f == NULL) return;
-
+void draw_actor(SDL_Renderer* rend, Actor* actor, Frame* f) {
   if (actor->platform) {
     return _draw_platform(rend, actor, f);
   }
