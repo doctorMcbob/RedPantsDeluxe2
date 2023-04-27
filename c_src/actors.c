@@ -390,7 +390,7 @@ int find_script_from_map(Actor* actor, int scriptName, int scriptFrame) {
 int update_actor(int actorKey, int worldKey, int debug) {
   Actor *actor = get_actor(actorKey);
   if (!actor) return 0;
-  
+
   World *world = get_world(worldKey);
   if (!world) return 0;
   if (actor->updated) {
@@ -485,8 +485,7 @@ Sprite* get_sprite_for_actor(Actor* actor) {
   return get_sprite(best->spriteKey);
 }
 
-void _draw_platform(SDL_Renderer* rend, Actor* actor) {
-  // currently the grossest
+void _draw_platform(SDL_Renderer* rend, Actor* actor, Frame* frame) {
   struct SpriteMap *sm;
   sm = get_sprite_map(actor->spritemapkey);
   if (!sm) return;
@@ -565,8 +564,8 @@ void _draw_platform(SDL_Renderer* rend, Actor* actor) {
 	continue;
       }
       SDL_Rect dest, src;
-      dest.x = actor->ECB->x + x*32;
-      dest.y = actor->ECB->y + y*32;
+      dest.x = actor->ECB->x + x*32  - frame->scroll_x;
+      dest.y = actor->ECB->y + y*32 - frame->scroll_y;
       src.x = 0;
       src.y = 0;
       
@@ -579,16 +578,17 @@ void _draw_platform(SDL_Renderer* rend, Actor* actor) {
 }
 
 void draw_actor(SDL_Renderer* rend, Actor* actor, int frameKey) {
+  Frame *f;
+  f = get_frame(frameKey);
+  if (f == NULL) return;
+
   if (actor->platform) {
-    return _draw_platform(rend, actor);
+    return _draw_platform(rend, actor, f);
   }
 
   Sprite *s;
   s = get_sprite_for_actor(actor);
   if (s == NULL) return;
-  Frame *f;
-  f = get_frame(frameKey);
-  if (f == NULL) return;
   
   SDL_Rect dest, src;
   dest.x = actor->ECB->x + s->offx - f->scroll_x;

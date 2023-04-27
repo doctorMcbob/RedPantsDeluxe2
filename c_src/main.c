@@ -91,6 +91,8 @@ int main (int argc, char *argv[]) {
   add_input_state(index_string("PLAYER1"), NULL);
   
   add_frame(index_string("MAIN"), get_world(index_string("root")), NULL, 0, 0, W, H);
+  Frame* main_frame = get_frame(index_string("MAIN"));
+  main_frame->focus = get_actor(index_string("puppetredpants0"));
 
   while (input_update() != -1) {
     SDL_RenderClear(rend);
@@ -108,7 +110,7 @@ int main (int argc, char *argv[]) {
         break;
       }
     }
-    
+    update_frame(index_string("MAIN"));
     draw_frame(rend, index_string("MAIN"), debug);
 
     actors_reset_updated();

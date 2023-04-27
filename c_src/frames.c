@@ -83,6 +83,7 @@ void draw_frame(SDL_Renderer* rend, int name, int debug) {
 void update_frame(int frameKey) {
   Frame* f = get_frame(frameKey);
   if (f->focus != NULL) {
+    printf("focus: %s\n", get_string(f->focus->name));
     f->scroll_x = f->focus->ECB->x + f->focus->ECB->w / 2 - f->rect->w / 2;
     f->scroll_y = f->focus->ECB->y + f->focus->ECB->h / 2 - f->rect->h / 2;
   }
