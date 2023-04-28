@@ -1233,6 +1233,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	if (paramPointer == 0) { 
 	  print_statement(statement);
 	  printf("Cannot in without left hand side\n");
+	  break;
 	}
 		
 	int leftType = PARAMS[paramPointer-2];
@@ -1751,10 +1752,25 @@ void resolve_operators(int statement, World* world, int debug) {
   }
 }
 
-int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int debug) {
+int resolve_script(
+	int scriptIdx,
+	Actor* self, 
+	Actor* related, 
+	World* world, 
+	int debug,
+	int eject,
+	int keyType,
+	int keyValue,
+	int replacerType,
+	int replacerValue
+ ) {
   int executionPointer = scriptIdx;
   int ifNested = 0;
   while (SCRIPTS[executionPointer] != -2000) {
+	if (eject > 0 && eject <= executionPointer) {
+		return 0;
+	}
+
 	if (debug == 2) {
 		printf("Resolving for self (%i) %s\n", self->name, get_string(self->name));
 		print_statement(executionPointer);
@@ -1785,6 +1801,12 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
       case INT:
       case STRING:
       case OPERATOR: {
+	if (SCRIPTS[executionPointer] == keyType && SCRIPTS[executionPointer+1] == keyValue) {
+		BUFFER[bufferPointer++] = replacerType;
+		BUFFER[bufferPointer++] = replacerValue;
+		executionPointer++;	
+		break;
+	}
 	BUFFER[bufferPointer++] = SCRIPTS[executionPointer];
 	BUFFER[bufferPointer++] = SCRIPTS[++executionPointer];
 	break;
@@ -2287,7 +2309,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 		int script = find_script_from_map(self, state, frame);
 
 		if (script != -1)
-			resolve_script(script, self, related, world, debug);
+			resolve_script(script, self, related, world, debug, -1, -1, -1, -1, -1);
 		break;
 	}
     case BACK: {
@@ -2406,7 +2428,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 		
 	    int scriptKey = find_script_from_map(self, _START, 0);
    		if (scriptKey != -1) {
-    		int resolution = resolve_script(scriptKey, self, NULL, world, debug);
+    		int resolution = resolve_script(scriptKey, self, NULL, world, debug, -1, -1, -1, -1, -1);
     		if (resolution < 0) return resolution;
 		}
 		break;
@@ -2465,7 +2487,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 
 		int script = get_script_for_actor(a);
 		if (script != -1) {
-			int resolution = resolve_script(script, a, NULL, world, debug);
+			int resolution = resolve_script(script, a, NULL, world, debug, -1, -1, -1, -1, -1);
 			if (resolution < 0) return resolution;
 		}
 		
@@ -2480,6 +2502,70 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
     case OFFSETBGSCROLLX: {}
     case OFFSETBGSCROLLY: {}
     case FOR: {
+		int keyType = PARAMS[0];
+		int keyValue = PARAMS[1];
+		int iterType = PARAMS[2];
+		int iterValue = PARAMS[3];
+
+		if (keyType != STRING || (iterType != STRING && iterType != LIST)) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for FOR\n");
+		  break;
+		}
+		int forNest = 1;
+		int idx = executionPointer;
+		while (SCRIPTS[idx++] != -1000);
+		int exit = idx;
+		while (forNest > 0) {
+	      if (SCRIPTS[exit] == FOR) forNest++;
+		  if (SCRIPTS[exit] == ENDFOR) forNest--;
+
+		  while (SCRIPTS[exit++] != -1000) {
+			if (SCRIPTS[exit] == -2000 || exit >= SCRIPTS_SIZE) {
+			  printf("Missing ENDFOR\n");
+			  return -1;
+			}
+		  }
+		}
+		exit--;
+
+		int len;
+		if (iterType == STRING) {
+		  len = strlen(get_string(iterValue));
+		} else {
+		  len = len_list(iterValue);
+		}
+
+		for (int i = 0; i < len; i++) {
+		  int replacementType;
+		  int replacementValue;
+		  if (iterType == STRING) {
+			replacementType = STRING;
+			char* str = get_string(iterValue);
+			char v[2];
+			v[0] = str[i];
+			v[1] = '\0';
+			replacementValue = index_string(&v);
+			if (replacementValue == -1) {
+			  char* newStr = malloc(sizeof(v));
+			  strcpy(newStr, v);
+			  replacementValue = add_string(newStr, 1);
+			}
+		  } else {
+			ListNode* ln;
+			ln = get_from_list(iterValue, i);
+			if (ln == NULL) {
+				break;
+			}
+			replacementType = ln->type;
+			replacementValue = ln->value;
+		  }
+
+		  int resolution = resolve_script(idx, self, NULL, world, debug,
+		                                  exit, keyType, keyValue, replacementType, replacementValue);
+		  if (resolution < 0) return resolution;
+		}
+		executionPointer = exit;
 		break;
 	}
     case ENDFOR:{
@@ -2520,4 +2606,3 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
   }
   return 0;
 }
-

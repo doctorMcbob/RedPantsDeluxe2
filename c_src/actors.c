@@ -230,7 +230,7 @@ void add_template_from_actorkey(int actorKey) {
 int collision_with(Actor *a1, Actor *a2, World* world, int debug) {
   int scriptKey = find_script_from_map(a1, COLLIDE, -1);
   if (scriptKey > 0) {
-    int resolution = resolve_script(scriptKey,  a1, a2, world, debug);
+    int resolution = resolve_script(scriptKey,  a1, a2, world, debug, -1, -1, -1, -1, -1);
     if (resolution < 0) return resolution;
   }
   return 0;
@@ -413,7 +413,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
   
   int scriptKey = get_script_for_actor(actor);
   if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, actor, NULL, world, debug);
+    int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
     if (resolution < 0) return resolution;
   }
   float x_flag = actor->x_vel, y_flag = actor->y_vel;
@@ -427,7 +427,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
     actor->x_vel = 0;
     int scriptKey = find_script_from_map(actor, XCOLLISION, -1);
     if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, actor, NULL, world, debug);
+    int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
       if (resolution < 0) return resolution;
     }
   }
@@ -435,7 +435,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
     actor->y_vel = 0;
     int scriptKey = find_script_from_map(actor, YCOLLISION, -1);
     if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, actor, NULL, world, debug);
+    int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
     if (resolution < 0) return resolution;
     }
   }
