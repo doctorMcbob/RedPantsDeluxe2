@@ -926,6 +926,50 @@ void resolve_operators(int statement, World* world, int debug) {
 	  PARAMS[paramPointer-1] = l1 && l2;
 	  break;
 	}
+	case (INT + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = leftValue && l2;
+	  break;
+	}
+	case (LIST + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = len_list(leftValue);
+	  PARAMS[paramPointer-1] = l1 && rightValue;
+	  break;
+	}
+	case (FLOAT + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  float f = get_float(leftValue);
+	  int l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = f && l2;
+	  break;
+	}
+	case (LIST + 3*FLOAT): {
+	  PARAMS[paramPointer-2] = INT;
+	  float f = get_float(rightValue);
+	  int l1 = len_list(leftValue);
+	  PARAMS[paramPointer-1] = l1 && f;
+	  break;
+	}
+	case (STRING + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = strlen(get_string(leftValue)), l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = l1 && l2;
+	  break;
+	}
+	case (LIST + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = len_list(leftValue), l2 = strlen(get_string(rightValue));
+	  PARAMS[paramPointer-1] = l1 && l2;
+	  break;
+	}
+	case (LIST + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = len_list(leftValue), l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = l1 && l2;
+	  break;
+	}
 	default: {
 	  print_statement(statement);
 	  printf("Failed to and types %i and %i\n", leftType, rightType);
@@ -980,6 +1024,50 @@ void resolve_operators(int statement, World* world, int debug) {
 	  int l1 = strlen(get_string(leftValue)), l2 = strlen(get_string(rightValue));
 	  PARAMS[paramPointer-1] = l1 || l2;
 	}
+	case (INT + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = leftValue || l2;
+	  break;
+	}
+	case (LIST + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = len_list(leftValue);
+	  PARAMS[paramPointer-1] = l1 || rightValue;
+	  break;
+	}
+	case (FLOAT + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  float f = get_float(leftValue);
+	  int l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = f || l2;
+	  break;
+	}
+	case (LIST + 3*FLOAT): {
+	  PARAMS[paramPointer-2] = INT;
+	  float f = get_float(rightValue);
+	  int l1 = len_list(leftValue);
+	  PARAMS[paramPointer-1] = l1 || f;
+	  break;
+	}
+	case (STRING + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = strlen(get_string(leftValue)), l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = l1 || l2;
+	  break;
+	}
+	case (LIST + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = len_list(leftValue), l2 = strlen(get_string(rightValue));
+	  PARAMS[paramPointer-1] = l1 || l2;
+	  break;
+	}
+	case (LIST + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = len_list(leftValue), l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = l1 || l2;
+	  break;
+	}
 	default: {
 	  print_statement(statement);
 	  printf("Failed to or types %i or %i\n", leftType, rightType);
@@ -1013,6 +1101,12 @@ void resolve_operators(int statement, World* world, int debug) {
 	  PARAMS[paramPointer++] = INT;
 	  char* s = get_string(rightValue);
 	  PARAMS[paramPointer++] = s[0] == "\0";
+	  break;
+	}
+	case (LIST): {
+	  PARAMS[paramPointer++] = INT;
+	  int l = len_list(rightValue);
+	  PARAMS[paramPointer++] = l == 0;
 	  break;
 	}
 	default: {
@@ -1069,6 +1163,64 @@ void resolve_operators(int statement, World* world, int debug) {
 	  int l1 = strlen(get_string(leftValue)), l2 = strlen(get_string(rightValue));
 	  PARAMS[paramPointer-1] = l1 && l2 == 0;
 	}
+	case (STRING + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = strlen(get_string(leftValue));
+	  PARAMS[paramPointer-1] = l1 && rightValue == 0;
+	  break;
+	}
+	case (INT + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l2 = strlen(get_string(rightValue));
+	  PARAMS[paramPointer-1] = leftValue && l2 == 0;
+	  break;
+	}
+	case (STRING + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = strlen(get_string(leftValue));
+	  PARAMS[paramPointer-1] = l1 && f == 0;
+	  break;
+	}
+	case (FLOAT + 3*STRING): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  int l2 = strlen(get_string(rightValue));
+	  PARAMS[paramPointer-1] = f && l2 == 0;
+	  break;
+	}
+	case (LIST + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = len_list(leftValue), l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = l1 && l2 == 0;
+	  break;
+	}
+	case (LIST + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = len_list(leftValue);
+	  PARAMS[paramPointer-1] = l1 && rightValue == 0;
+	  break;
+	}
+	case (INT + 3*LIST): {
+	  PARAMS[paramPointer-2] = INT;
+	  int l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = leftValue && l2 == 0;
+	  break;
+	}
+	case (LIST + 3*FLOAT): {
+	  float f = get_float(rightValue);
+	  PARAMS[paramPointer-2] = INT;
+	  int l1 = len_list(leftValue);
+	  PARAMS[paramPointer-1] = l1 && f == 0;
+	  break;
+	}
+	case (FLOAT + 3*LIST): {
+	  float f = get_float(leftValue);
+	  PARAMS[paramPointer-2] = INT;
+	  int l2 = len_list(rightValue);
+	  PARAMS[paramPointer-1] = f && l2 == 0;
+	  break;
+	}
 	default: {
 	  print_statement(statement);
 	  printf("Failed to nor types %i nor %i\n", leftType, rightType);
@@ -1080,7 +1232,7 @@ void resolve_operators(int statement, World* world, int debug) {
       case IN: {
 	if (paramPointer == 0) { 
 	  print_statement(statement);
-	  printf("Cannot and without left hand side\n");
+	  printf("Cannot in without left hand side\n");
 	}
 		
 	int leftType = PARAMS[paramPointer-2];
@@ -1090,7 +1242,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	
 	if (rightType == -1) {
 	  print_statement(statement);
-	  printf("Cannot and without right hand side\n");
+	  printf("Cannot in without right hand side\n");
 	  break;
 	}
 	if (rightType != STRING && rightType != LIST) { 
@@ -1407,8 +1559,8 @@ void resolve_operators(int statement, World* world, int debug) {
 		}
 
 		if (rightType != STRING) {
-		  print_statement(statement);
-		  printf("Cannot exists with non-string\n");
+		  PARAMS[paramPointer++] = INT;
+		  PARAMS[paramPointer++] = 0;
 		  break;
 		}
 
@@ -1658,6 +1810,20 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 	BUFFER[bufferPointer++] = world->name;
 	break;
       }
+	  case QCOLLIDE: {
+		int list = add_list();
+		BUFFER[bufferPointer++] = LIST;
+		BUFFER[bufferPointer++] = list;
+		ActorEntry *ae;
+		DL_FOREACH(world->actors, ae) {
+			Actor *a = get_actor(ae->actorKey);
+			if (a == NULL) continue;
+			if (SDL_HasIntersection(self->ECB, a->ECB)) {
+				add_to_list(list, STRING, a->name);
+			}
+		}
+		break;
+	  }
       case DOT: {
 	if (bufferPointer < 2) {
 	  print_statement(statement);
@@ -2193,7 +2359,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
 
 		Frame *f = get_frame(frameValue);
 		if (f != NULL) {
-		  f->active = 1;
+		  f->active = 0;
 		}
 
 		break;
@@ -2314,7 +2480,7 @@ int resolve_script(int scriptIdx, Actor* self, Actor* related, World* world, int
     case OFFSETBGSCROLLX: {}
     case OFFSETBGSCROLLY: {}
     case FOR: {
-
+		break;
 	}
     case ENDFOR:{
 		break;
