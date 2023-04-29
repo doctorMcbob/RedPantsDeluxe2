@@ -1782,6 +1782,7 @@ int resolve_script(
 		while (SCRIPTS[++executionPointer] != -1000) {
 			if ( // special cases, dont have data to increment over
 				SCRIPTS[executionPointer] != DOT &&
+				SCRIPTS[executionPointer] != NONE &&
 				SCRIPTS[executionPointer] != QRAND &&
 				SCRIPTS[executionPointer] != QWORLD &&
 				SCRIPTS[executionPointer] != QCOLLIDE && 
