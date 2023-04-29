@@ -1780,7 +1780,22 @@ int resolve_script(
 		if (verb == IF) ifNested++;
 		if (verb == ENDIF) ifNested--;
 		while (SCRIPTS[++executionPointer] != -1000) {
-			if (SCRIPTS[executionPointer] != DOT)
+			if ( // special cases, dont have data to increment over
+				SCRIPTS[executionPointer] != DOT &&
+				SCRIPTS[executionPointer] != QRAND &&
+				SCRIPTS[executionPointer] != QWORLD &&
+				SCRIPTS[executionPointer] != QCOLLIDE && 
+				SCRIPTS[executionPointer] != INP_A && 
+				SCRIPTS[executionPointer] != INP_B && 
+				SCRIPTS[executionPointer] != INP_X &&
+				SCRIPTS[executionPointer] != INP_Y &&
+				SCRIPTS[executionPointer] != INP_START &&
+				SCRIPTS[executionPointer] != INP_LEFT &&
+				SCRIPTS[executionPointer] != INP_RIGHT &&
+				SCRIPTS[executionPointer] != INP_UP &&
+				SCRIPTS[executionPointer] != INP_DOWN &&
+				SCRIPTS[executionPointer] != INP_EVENTS
+				)
 				executionPointer++;
 		}
 		executionPointer++;
@@ -2279,7 +2294,7 @@ int resolve_script(
 		  break;
 		}
 		}
-		if (!conditional) ifNested++;
+		if (!conditional) ifNested = 1;
 		
 		break;
 	}
