@@ -1,6 +1,10 @@
 #include "lists.h"
+#include "floatmachine.h"
 #include "utlist.h"
 #include "uthash.h"
+#include "stringmachine.h"
+#include "scripts.h"
+
 
 ListEntry* lists = NULL;
 int list_count = 0;
@@ -122,4 +126,28 @@ void delete_list(int id) {
   }
   HASH_DEL(lists, le);
   free(le);
+}
+
+void print_list(int id) {
+  ListEntry *le;
+  HASH_FIND_INT(lists, &id, le);
+  if (le == NULL) return;
+  ListNode *ln;
+  DL_FOREACH(le->head, ln) {
+    switch (ln->type) {
+      case INT:
+        printf("%i", ln->value);
+        break;
+      case FLOAT:
+        printf("%f", get_float(ln->value));
+        break;
+      case STRING:
+        printf("%s", get_string(ln->value));
+        break;
+      case LIST:
+        print_list(ln->value);
+        break;
+    }
+    if (ln->next != NULL) printf(", ");
+  }
 }

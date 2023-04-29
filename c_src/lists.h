@@ -29,4 +29,5 @@ void remove_owner(int id);
 void add_owner(int id);
 void clear_ownerless_lists();
 int get_num_lists();
+void print_list(int id);
 #endif

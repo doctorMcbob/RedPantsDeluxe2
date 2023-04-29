@@ -422,7 +422,9 @@ int update_actor(int actorKey, int worldKey, int debug) {
   int scriptKey = get_script_for_actor(actor);
   if (scriptKey != -1) {
     int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
-    if (resolution < 0) return resolution;
+    if (resolution < 0) {
+      return resolution;
+    }
   }
   float x_flag = actor->x_vel, y_flag = actor->y_vel;
   if (actor->physics || actor->tangible) {

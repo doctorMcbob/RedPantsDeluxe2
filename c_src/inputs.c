@@ -105,6 +105,7 @@ int input_update() {
       return -1;
    case SDL_KEYDOWN:
       {
+		if (event.key.repeat != 0) continue;
 	if (event.key.keysym.sym == SDLK_ESCAPE) {
 	  return -1;
 	}

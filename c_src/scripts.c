@@ -2324,8 +2324,11 @@ int resolve_script(
 
 		int script = find_script_from_map(self, state, frame);
 
-		if (script != -1)
-			resolve_script(script, self, related, world, debug, -1, -1, -1, -1, -1);
+		if (script != -1) {
+			int resolution = resolve_script(script, self, related, world, debug, -1, -1, -1, -1, -1);
+			if (resolution < 0)
+				return resolution;
+		}
 		break;
 	}
     case BACK: {
@@ -2602,7 +2605,7 @@ int resolve_script(
 			printf("%f", get_float(value));
 			break;
 		case LIST:
-			printf("Lists are #TODO hahaha");
+			print_list(value);
 			break;
 		case NONE:
 			printf("None");
