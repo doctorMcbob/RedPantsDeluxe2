@@ -364,22 +364,6 @@ class Actor(Rect):
         for hit in hits:
             self.collision_with(actors[hit], world)
             actors[hit].collision_with(self, world)
-        
-        # if self.name not in world.actors:
-        #     # If the actor has moved to a different world we need to do hit collision against actors in that world
-        #     for w in worlds.get_worlds():
-        #         if self.name in w.actors:
-        #             actors = list(filter(
-        #                 lambda actor: actor is not None and not (actor is self), w.get_actors()
-        #             ))
-        #             tangibles = list(filter(
-        #                 lambda actor: actor is not None and actor.tangible, actors
-        #             ))
-        #             if not self.tangible:
-        #                 tangibles = list(filter(
-        #                     lambda actor: actor is not None and actor.tangible and actor.platform, actors
-        #                 ))
-        #             break
 
         # X axis
         if self.x_vel:

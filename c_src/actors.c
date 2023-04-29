@@ -245,6 +245,12 @@ SDL_Rect* move(SDL_Rect* rect, int dx, int dy) {
   return new;
 }
 
+float _floor(float x) {
+  int i = x > 0 ? 1 : -1;
+  x = fabs(x);
+  return floor(x) * i;
+}
+
 int collision_check(Actor *actor, World* world, int debug) {
   ActorEntry *ae;
   DL_FOREACH(world->actors, ae) {
@@ -258,9 +264,9 @@ int collision_check(Actor *actor, World* world, int debug) {
     }
   }
 
-  if (floor(actor->x_vel) != 0) {
+  if (_floor(actor->x_vel) != 0) {
     int direction = actor->x_vel < 0 ? 1 : -1;
-    for (int i = 0; i < (floor(actor->x_vel) / actor->ECB->w); i++) {
+    for (int i = 0; i < (_floor(actor->x_vel) / actor->ECB->w); i++) {
       ActorEntry *ae2;
       int exit = 0;
       DL_FOREACH(world->actors, ae2) {
@@ -303,13 +309,14 @@ int collision_check(Actor *actor, World* world, int debug) {
       }
       if (check == 0) {
         actor->x_vel += direction;
+        actor->x_vel = _floor(actor->x_vel);
       }
     }
   }
 
-  if (floor(actor->y_vel) != 0) {
+  if (floor(fabs(actor->y_vel)) != 0) {
     int direction = actor->y_vel < 0 ? 1 : -1;
-    for (int i = 0; i < (floor(actor->y_vel) / actor->ECB->h); i++) {
+    for (int i = 0; i < (_floor(actor->y_vel) / actor->ECB->h); i++) {
       ActorEntry *ae2;
       int exit = 0;
       DL_FOREACH(world->actors, ae2) {
@@ -352,11 +359,12 @@ int collision_check(Actor *actor, World* world, int debug) {
       }
       if (check == 0) {
         actor->y_vel += direction;
+        actor->y_vel = _floor(actor->y_vel);
       }
     }
   }
 
-  if (floor(actor->x_vel) != 0 && floor(actor->y_vel) != 0) {
+  if (_floor(actor->x_vel) != 0 && _floor(actor->y_vel) != 0) {
     ActorEntry *ae4;
 
     int check = 0;
@@ -419,11 +427,11 @@ int update_actor(int actorKey, int worldKey, int debug) {
   float x_flag = actor->x_vel, y_flag = actor->y_vel;
   if (actor->physics || actor->tangible) {
     collision_check(actor, world, debug);
-    actor->ECB->x += floor(actor->x_vel);
-    actor->ECB->y += floor(actor->y_vel);
+    actor->ECB->x += _floor(actor->x_vel);
+    actor->ECB->y += _floor(actor->y_vel);
   }
 
-  if (x_flag != actor->x_vel && floor(actor->x_vel) == 0) {
+  if (x_flag != actor->x_vel && _floor(actor->x_vel) == 0) {
     actor->x_vel = 0;
     int scriptKey = find_script_from_map(actor, XCOLLISION, -1);
     if (scriptKey != -1) {
@@ -431,7 +439,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
       if (resolution < 0) return resolution;
     }
   }
-  if (y_flag != actor->y_vel && floor(actor->y_vel) == 0) {
+  if (y_flag != actor->y_vel && _floor(actor->y_vel) == 0) {
     actor->y_vel = 0;
     int scriptKey = find_script_from_map(actor, YCOLLISION, -1);
     if (scriptKey != -1) {
