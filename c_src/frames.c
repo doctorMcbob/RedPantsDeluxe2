@@ -47,7 +47,8 @@ SDL_Rect* scrolled(SDL_Rect* rect, Frame* frame) {
 }
 
 int in_frame(Frame* frame, Actor* actor) {
-  if (SDL_HasIntersection(frame->rect, scrolled(actor->ECB, frame)))
+  SDL_Rect *r = scrolled(actor->ECB, frame);
+  if (SDL_HasIntersection(frame->rect, r))
     return 1;
   else
     return 0;

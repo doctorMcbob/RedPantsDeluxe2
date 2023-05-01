@@ -82,6 +82,7 @@ ScriptMap* get_script_map(int key) {
 void resolve_operators(int statement, World* world, int debug) {
   int bufferPointer = 0;
   int paramPointer = 0;
+
   while (bufferPointer < 512 && BUFFER[bufferPointer] != -1) {
 	if (debug == 2) {
 		printf("\n   bufferPointer: %i : ", bufferPointer);
@@ -2310,20 +2311,23 @@ int resolve_script(
 		}
 		int frame = -1;
 		int state = scriptValue;
-		char* scriptValueStr = strdup(get_string(scriptValue));
+
+		char* _string = get_string(scriptValue);
+		char* scriptValueStr = malloc(strlen(_string) + 1);
+		strcpy(scriptValueStr, _string);
 		
 		char* delim = ":";
-		
-	    char* stateStr = strtok(scriptValueStr, delim);
-		char* frameStr = strtok(NULL, delim);
 
+		char* stateStr = strtok(scriptValueStr, delim);
+		char* frameStr = strtok(NULL, delim);
+		
 		if (frameStr != NULL) {
 			state = index_string(stateStr);
 			frame = atoi(frameStr);
 		}
 
 		int script = find_script_from_map(self, state, frame);
-
+		free(scriptValueStr);
 		if (script != -1) {
 			int resolution = resolve_script(script, self, related, world, debug, -1, -1, -1, -1, -1);
 			if (resolution < 0)
@@ -2478,7 +2482,9 @@ int resolve_script(
 		add_to_list(listValue, valueType, valueValue);
 		break;
 	}
-    case HITBOXES: {}
+    case HITBOXES: {
+		break;
+	}
     case HURTBOXES: {
 		break;
 	}
@@ -2513,13 +2519,27 @@ int resolve_script(
 		a->updated = 1;
 		break;
 	}
-    case UPDATE: {}
-    case SFX: {}
-    case SONG: {}
-    case SFXOFF: {}
-    case SONGOFF: {}
-    case OFFSETBGSCROLLX: {}
-    case OFFSETBGSCROLLY: {}
+    case UPDATE: {
+		break;
+	}
+    case SFX: {
+		break;
+	}
+    case SONG: {
+		break;
+	}
+    case SFXOFF: {
+		break;
+	}
+    case SONGOFF: {
+		break;
+	}
+    case OFFSETBGSCROLLX: {
+		break;
+	}
+    case OFFSETBGSCROLLY: {
+		break;
+	}
     case FOR: {
 		int keyType = PARAMS[0];
 		int keyValue = PARAMS[1];
@@ -2614,7 +2634,9 @@ int resolve_script(
 		printf("\n");
 		break;
 	}
-    case UPDATE_STICKS: {}
+    case UPDATE_STICKS: {
+		break;
+	}
     }
     executionPointer++;
   }
@@ -2623,5 +2645,6 @@ int resolve_script(
   if (debug == 2) {
 	printf("Done. number of lists %i\n", get_num_lists());
   }
+
   return 0;
 }

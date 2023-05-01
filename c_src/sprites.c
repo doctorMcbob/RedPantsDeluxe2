@@ -110,60 +110,23 @@ void add_offset(int name, int x, int y) {
   }
 }
 
-SDL_Surface* load_image(const char* filename) {
-  SDL_Surface* image = IMG_Load(filename);
-  if (!image) {
-    return NULL;
-  }
-  return image;
-}
+void load_sprite(int name, const unsigned char sprite[][4], int w, int h, SDL_Renderer* rend) {
+    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGBA32);
+    Uint32* pixels = (Uint32*)surface->pixels;
 
-void load_spritesheet(SDL_Renderer* rend,
-		      const char* filename,
-		      int names[],
-		      int xs[],
-		      int ys[],
-		      int ws[],
-		      int hs[],
-		      int count) {
-
-  SDL_Surface* spritesheet = load_image(filename);
-  if (!spritesheet)
-    {
-      printf("Could not load %s\n", filename);
-      return;
+    for (int y = 0; y < h; y++) {
+        for (int x = 0; x < w; x++) {
+            Uint32 pixel = SDL_MapRGBA(surface->format,
+				       sprite[y*w+x][0],
+				       sprite[y*w+x][1],
+				       sprite[y*w+x][2],
+				       sprite[y*w+x][3]);
+            pixels[y * w + x] = pixel;
+        }
     }
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(rend, surface);
+    add_sprite(name, texture);
 
-  SDL_SetColorKey(spritesheet, SDL_TRUE, SDL_MapRGB(spritesheet->format, 1, 255, 1));
-  for (int i = 0; i < count; i++) {
-    if (ws[i] == 0) {
-      ws[i] = 1;
-    }
-    if (hs[i] == 0) {
-      hs[i] = 1;
-    }
-    
-    SDL_Surface* sprite = SDL_CreateRGBSurfaceWithFormat(0, ws[i], hs[i], 32, spritesheet->format->format);
-    SDL_Rect src;
-    SDL_Rect dst;
-    src.x = xs[i];
-    src.y = ys[i];
-    src.w = ws[i];
-    src.h = hs[i];
-    dst.x = 0;
-    dst.y = 0;
-    dst.w = sprite->w;
-    dst.h = sprite->h;
-    
-    SDL_BlitSurface(spritesheet, &src, sprite, &dst);
-
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(rend, sprite);
-
-    add_sprite(names[i], texture);
-
-    SDL_FreeSurface(sprite);
-  }
-
-  SDL_FreeSurface(spritesheet);
+    SDL_FreeSurface(surface);
 }
 

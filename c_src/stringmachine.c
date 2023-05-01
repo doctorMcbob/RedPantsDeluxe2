@@ -31,6 +31,7 @@ int add_string(char* string, int skipCheck) {
 
 int concat_strings(char* str1, char* str2) {
     if (str1 == NULL || str2 == NULL) return -1;
+
     int len1 = strlen(str1);
     int len2 = strlen(str2);
     int total_len = len1 + len2 + 1;
@@ -124,16 +125,18 @@ char *int_to_string(int num) {
     int digits = 0;
 
     // Count the number of digits in the number
-    while (temp != 0) {
+    do {
         digits++;
         temp /= 10;
-    }
+    } while(temp != 0);
+
+    if (num < 0) digits++;
 
     // Allocate enough memory to store the string representation of the number
     char *str = malloc((digits + 1) * sizeof(char));
 
     // Convert the number to a string
-    sprintf(str, "%d", num);
+    sprintf(str, "%i", num);
 
     return str;
 }

@@ -54,7 +54,7 @@ int main (int argc, char *argv[]) {
     font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
   }
 
-  srand(time(NULL));
+  srand(0);//time(NULL));
 
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("Error initializing SDL2: %s\n", SDL_GetError());
@@ -92,7 +92,6 @@ int main (int argc, char *argv[]) {
   
   add_frame(index_string("MAIN"), get_world(index_string("root")), NULL, 0, 0, W, H);
   Frame* main_frame = get_frame(index_string("MAIN"));
-  main_frame->focus = get_actor(index_string("player1frameless2"));
 
   while (input_update() != -1) {
     SDL_RenderClear(rend);

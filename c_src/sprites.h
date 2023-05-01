@@ -32,16 +32,9 @@ void add_sprite(int name, SDL_Texture* image);
 Sprite* get_sprite(int name);
 void add_offset(int name, int x, int y);
 SDL_Surface* load_image(const char* filename);
-void load_spritesheet(SDL_Renderer* rend,
-		      const char* filename,
-		      int names[],
-		      int xs[],
-		      int ys[],
-		      int ws[],
-		      int hs[],
-		      int count);
 void add_sprite_map(int name);
 SpriteMap* get_sprite_map(int name);
 void add_to_sprite_map(int name, int state, int frame, int spriteKey);
 void sprites_taredown();
+void load_sprite(int name, const unsigned char sprite[][4], int w, int h, SDL_Renderer* rend);
 #endif
