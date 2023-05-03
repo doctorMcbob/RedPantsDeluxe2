@@ -2416,24 +2416,177 @@ int resolve_script(
 		break;
 	}
     case FOCUS: {
+		int frameType = PARAMS[0];
+		int frameValue = PARAMS[1];
+		int nameType = PARAMS[2];
+		int nameValue = PARAMS[3];
+
+		if (frameType != STRING || nameType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for FOCUS\n");
+		  break;
+		}
+
+		Frame *f = get_frame(frameValue);
+		if (f == NULL) {
+		  print_statement(statement);
+		  printf("Frame %s not found for FOCUS\n", get_string(frameValue));
+		  break;
+		}
+
+		f->focus = nameValue;
+
 		break;
 	}
     case SCROLLBOUND: {
 		break;
 	}
     case VIEW: {
+		int frameType = PARAMS[0];
+		int frameValue = PARAMS[1];
+		int worldType = PARAMS[2];
+		int worldValue = PARAMS[3];
+
+		if (frameType != STRING || worldType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for VIEW\n");
+		  break;
+		}
+
+		Frame *f = get_frame(frameValue);
+		if (f == NULL) {
+		  print_statement(statement);
+		  printf("Frame %s not found for VIEW\n", get_string(frameValue));
+		  break;
+		}
+
+		World *w = get_world(worldValue);
+		if (w == NULL) {
+		  print_statement(statement);
+		  printf("World %s not found for VIEW\n", get_string(worldValue));
+		  break;
+		}
+
+		f->world = w;
 		break;
 	}
     case MOVE: {
+		int nameType = PARAMS[0];
+		int nameValue = PARAMS[1];
+		int worldType = PARAMS[2];
+		int worldValue = PARAMS[3];
+
+		if (nameType != STRING || worldType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for MOVE\n");
+		  break;
+		}
+
+		if (nameValue == SELF) {
+			nameValue = self->name;
+		} else if (nameValue == RELATED) {
+			nameValue = related->name;
+		}
+
+		if (remove_actor_from_world(world, nameValue) == 1) {
+			print_statement(statement);
+			printf("Actor %s not found for MOVE\n", get_string(nameValue));
+			break;
+		}
+
+		add_actor_to_world(worldValue, nameValue);
+
 		break;
 	}
     case PLACE: {
+		int nameType = PARAMS[0];
+		int nameValue = PARAMS[1];
+		int worldType = PARAMS[2];
+		int worldValue = PARAMS[3];
+
+		if (nameType != STRING || worldType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for PLACE\n");
+		  break;
+		}
+
+		Actor *a = NULL;
+		if (nameValue == SELF) {
+		  a = self;
+		} else if (nameValue == RELATED) {
+		  a = related;
+		} else {
+		  a = get_actor(nameValue);
+		}
+		if (a == NULL) {
+		  print_statement(statement);
+		  printf("Actor %s not found for PLACE\n", get_string(nameValue));
+		  break;
+		}
+		World *w = get_world(worldValue);
+		if (w == NULL) {
+		  print_statement(statement);
+		  printf("World %s not found for PLACE\n", get_string(worldValue));
+		  break;
+		}
+		if (world_has(w, a->name) == 0) {
+		  add_actor_to_world(worldValue, a->name);
+		}
 		break;
 	}
     case TAKE: {
+		int worldType = PARAMS[0];
+		int worldValue = PARAMS[1];
+		int nameType = PARAMS[2];
+		int nameValue = PARAMS[3];
+
+		if (worldType != STRING || nameType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for TAKE\n");
+		  break;
+		}
+
+		Actor *a = NULL;
+		if (nameValue == SELF) {
+		  a = self;
+		} else if (nameValue == RELATED) {
+		  a = related;
+		} else {
+		  a = get_actor(nameValue);
+		}
+		if (a == NULL) {
+		  print_statement(statement);
+		  printf("Actor %s not found for TAKE\n", get_string(nameValue));
+		  break;
+		}
+		World *w = get_world(worldValue);
+		if (w == NULL) {
+		  print_statement(statement);
+		  printf("World %s not found for TAKE\n", get_string(worldValue));
+		  break;
+		}
+		if (world_has(w, a->name) == 1) {
+		  remove_actor_from_world(worldValue, a->name);
+		}
 		break;
 	}
     case TAKEALL: {
+		int nameType = PARAMS[0];
+		int nameValue = PARAMS[1];
+
+		if (nameType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for TAKEALL\n");
+		  break;
+		}
+
+		if (nameValue == SELF) {
+		  nameValue = self->name;
+		} else if (nameValue == RELATED) {
+		  nameValue = related->name;
+		}
+
+		remove_actor_from_worlds(nameValue);
 		break;
 	}
     case REBRAND: {
@@ -2520,6 +2673,23 @@ int resolve_script(
 		break;
 	}
     case UPDATE: {
+		int worldType = PARAMS[0];
+		int worldValue = PARAMS[1];
+
+		if (worldType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for UPDATE\n");
+		  break;
+		}
+
+		World *w = get_world(worldValue);
+		if (w == NULL) {
+		  print_statement(statement);
+		  printf("World %s not found for UPDATE\n", get_string(worldValue));
+		  break;
+		}
+		
+		w->flagged_for_update = 1;
 		break;
 	}
     case SFX: {

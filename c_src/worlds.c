@@ -171,6 +171,18 @@ int exists(int actorKey) {
   return 0;
 }
 
+int remove_actor_from_world(World* world, int actorKey) {
+  ActorEntry *ae, *tmp;
+  DL_FOREACH_SAFE(world->actors, ae, tmp) {
+    if (ae->actorKey == actorKey) {
+      DL_DELETE(world->actors, ae);
+      free(ae);
+      return 1;
+    }
+  }
+  return 0;
+}
+
 void remove_actor_from_worlds(int actorKey) {
   struct World *w, *tmp;
   HASH_ITER(hh, worlds, w, tmp) {
