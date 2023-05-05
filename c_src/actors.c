@@ -434,7 +434,6 @@ int update_actor(int actorKey, int worldKey, int debug) {
   }
 
   if (x_flag != actor->x_vel && _floor(actor->x_vel) == 0) {
-    actor->x_vel = 0;
     int scriptKey = find_script_from_map(actor, XCOLLISION, -1);
     if (scriptKey != -1) {
     int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);

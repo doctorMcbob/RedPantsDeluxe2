@@ -1101,7 +1101,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	case (STRING): {
 	  PARAMS[paramPointer++] = INT;
 	  char* s = get_string(rightValue);
-	  PARAMS[paramPointer++] = s[0] == "\0";
+	  PARAMS[paramPointer++] = s[0] == '\0';
 	  break;
 	}
 	case (LIST): {
@@ -1884,7 +1884,13 @@ int resolve_script(
 
 	if (leftValue == SELF) a = self;
 	else if (leftValue == RELATED) a = related;
-
+	else a = get_actor(leftValue);
+	
+	if (a == NULL) {
+	  print_statement(statement);
+	  printf("Could not find actor for dot\n");
+	  break;
+	}
 	switch (rightValue) {
 	case NAME:
 	  BUFFER[bufferPointer-2] = STRING;
@@ -2434,7 +2440,17 @@ int resolve_script(
 		  break;
 		}
 
-		f->focus = nameValue;
+		Actor *a = NULL;
+		if (nameValue == SELF) a = self;
+		else if (nameValue == RELATED) a = related;
+		else a = get_actor(nameValue);
+		if (a == NULL) {
+		  print_statement(statement);
+		  printf("Actor %s not found for FOCUS\n", get_string(nameValue));
+		  break;
+		}
+
+		f->focus = a;
 
 		break;
 	}
@@ -2566,7 +2582,7 @@ int resolve_script(
 		  break;
 		}
 		if (world_has(w, a->name) == 1) {
-		  remove_actor_from_world(worldValue, a->name);
+		  remove_actor_from_world(w, a->name);
 		}
 		break;
 	}
@@ -2754,7 +2770,7 @@ int resolve_script(
 			char v[2];
 			v[0] = str[i];
 			v[1] = '\0';
-			replacementValue = index_string(&v);
+			replacementValue = index_string(&v[0]);
 			if (replacementValue == -1) {
 			  char* newStr = malloc(sizeof(v));
 			  strcpy(newStr, v);

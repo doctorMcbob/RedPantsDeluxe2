@@ -23,6 +23,7 @@ void add_frame(int name, World* world, Actor* focus, int x, int y, int w, int h)
   f->rect = rect;
   f->world = world;
   f->focus = focus;
+  f->active = 1;
   HASH_ADD_INT(frames, name, f);
 }
 

@@ -17,18 +17,20 @@ I will be using uthash.h as my dictionary implementation
 # include "worlds.h"
 # include "frames.h"
 # include "stringmachine.h"
+# include "stringdata.h"
+# include "clock.h"
 # include <string.h>
 # include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <SDL2/SDL_ttf.h> // for debug purposes only and can be removed from final build
+#include <SDL2/SDL_ttf.h>
 
 # include <SDL2/SDL.h>
 # include <SDL2/SDL_timer.h>
 # include <SDL2/SDL_image.h>
 
-# define W 1152
-# define H 640
+# define WID 1152
+# define HIGH 640
 
 
 TTF_Font* font;
@@ -38,6 +40,8 @@ void world_load();
 void boxes_load();
 void scripts_load();
 void load_string_indexers();
+extern Frame* frames;
+extern World* worlds;
 
 int main (int argc, char *argv[]) {
   int debug = 0;
@@ -47,14 +51,13 @@ int main (int argc, char *argv[]) {
     }
   }
 
-  if (debug) {
-    if (TTF_Init() == -1) {
-      return 1;
-    }
-    font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
+  if (TTF_Init() == -1) {
+    return 1;
   }
+  font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
 
-  srand(0);//time(NULL));
+
+  srand(time(NULL));
 
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     printf("Error initializing SDL2: %s\n", SDL_GetError());
@@ -64,8 +67,8 @@ int main (int argc, char *argv[]) {
   SDL_Window* screen = SDL_CreateWindow("Long way to the top, if you wanna make a game engine",
 					SDL_WINDOWPOS_CENTERED,
 					SDL_WINDOWPOS_CENTERED,
-					W,
-					H,
+					WID,
+					HIGH,
 					0);
   if (!screen) {
     printf("error creating window: %s\n", SDL_GetError());
@@ -89,13 +92,12 @@ int main (int argc, char *argv[]) {
   boxes_load();
   scripts_load();
   add_input_state(index_string("PLAYER1"), NULL);
-  
-  add_frame(index_string("MAIN"), get_world(index_string("root")), NULL, 0, 0, W, H);
-  Frame* main_frame = get_frame(index_string("MAIN"));
+  add_frame(MAIN, get_world(ROOT), NULL, 0, 0, W, H);
+  Clock* c = new_clock();
 
   while (input_update() != -1) {
     SDL_RenderClear(rend);
-     
+
     int debugPause = 0;
     if (debug) {
       const Uint8 *state = SDL_GetKeyboardState(NULL);
@@ -103,18 +105,48 @@ int main (int argc, char *argv[]) {
         debugPause = 1;
       }
     }
+    Frame *f, *tmpf;
+    
+    if (!debugPause) {  
+      HASH_ITER(hh, frames, f, tmpf) {
+        if (f->active && f->world != NULL) {
+          f->world->flagged_for_update = 1;
+        }
+      }
 
-    if (!debugPause) {
-      if (update_world(index_string("root"), debug) == -2) {
-        break;
+      World *w, *tmpw;
+      HASH_ITER(hh, worlds, w, tmpw) {
+        if (w->flagged_for_update) {
+          update_world(w->name, debug);
+          w->flagged_for_update = 0;
+        }
+      }
+      actors_reset_updated();
+    }
+
+    HASH_ITER(hh, frames, f, tmpf) {
+      if (f->active) {
+        update_frame(f);
+        draw_frame(rend, f, debug);
       }
     }
-    update_frame(main_frame);
-    draw_frame(rend, main_frame, debug);
 
-    actors_reset_updated();
+    Uint32 fps = Clock_get_fps(c);
+
+    char fps_str[10]; // buffer to hold the FPS string
+    snprintf(fps_str, 10, "FPS: %d", fps); // convert the FPS to a string
+
+    SDL_Color color = {0, 0, 0, 255}; // black color
+    SDL_Surface *surface = TTF_RenderText_Solid(font, fps_str, color); // create a surface with the FPS text
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, surface); // create a texture from the surface
+    SDL_Rect dest_rect = {0, 0, surface->w, surface->h}; // destination rectangle for the texture
+
+    SDL_RenderCopy(rend, texture, NULL, &dest_rect); // copy the texture to the renderer
+    SDL_FreeSurface(surface); // free the surface
+    SDL_DestroyTexture(texture); // destroy the texture
+
     SDL_RenderPresent(rend);
-    SDL_Delay(1000/30);
+    Clock_tick(c, 20);
   }
 
   sprites_taredown();
