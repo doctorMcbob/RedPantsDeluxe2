@@ -117,7 +117,7 @@ int main (int argc, char *argv[]) {
       World *w, *tmpw;
       HASH_ITER(hh, worlds, w, tmpw) {
         if (w->flagged_for_update) {
-          update_world(w->name, debug);
+          if (update_world(w->name, debug) == -2) return 0;
           w->flagged_for_update = 0;
         }
       }
