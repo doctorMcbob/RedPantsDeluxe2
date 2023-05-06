@@ -1,5 +1,6 @@
 # include "uthash.h"
 # include "utlist.h"
+# include "stringmachine.h"
 # include <SDL2/SDL.h>
 # include "boxes.h"
 
@@ -7,19 +8,19 @@ BoxMap* hitboxes = NULL;
 BoxMap* hurtboxes = NULL;
 
 
-void add_hitbox_map(const char* name) {
+void add_hitbox_map(int name) {
   struct BoxMap* hbm;
   hbm = malloc(sizeof(BoxMap));
   if (hbm == NULL) {
     exit(-1);
   }
-  strcpy(hbm->name, name);
+  hbm->name = name;
   hbm->entries = NULL;
-  HASH_ADD_STR(hitboxes, name, hbm);
+  HASH_ADD_INT(hitboxes, name, hbm);
 }
 
-void add_to_hitbox_map(const char* name,
-		       const char* state,
+void add_to_hitbox_map(int name,
+		       int state,
 		       int frame,
 		       int x[],
 		       int y[],
@@ -29,7 +30,7 @@ void add_to_hitbox_map(const char* name,
   struct BoxMap* hbm;
   hbm = get_hitbox_map(name);
   if (hbm == NULL) {
-    printf("No hitbox BoxMap %s\n", name);
+    printf("No hitbox BoxMap %s\n", get_string(name));
     return;
   }
 
@@ -39,7 +40,7 @@ void add_to_hitbox_map(const char* name,
     exit(-1);
   }
 
-  strcpy(bme->state, state);
+  bme->state = state;
   bme->frame = frame;
   bme->next = NULL;
   bme->prev = NULL;
@@ -56,28 +57,28 @@ void add_to_hitbox_map(const char* name,
   DL_APPEND(hbm->entries, bme);
 }
 
-BoxMap* get_hitbox_map(const char* name) {
+BoxMap* get_hitbox_map(int name) {
   struct BoxMap *hbm;
 
-  HASH_FIND_STR(hitboxes, name, hbm);
+  HASH_FIND_INT(hitboxes, &name, hbm);
   if (hbm) {
     return hbm;
   }
   return NULL;
 }
 
-void add_hurtbox_map(const char* name) {
+void add_hurtbox_map(int name) {
   struct BoxMap* hbm;
   hbm = malloc(sizeof(BoxMap));
   if (hbm == NULL) {
     exit(-1);
   }
-  strcpy(hbm->name, name);
+  hbm->name = name;
   hbm->entries = NULL;
-  HASH_ADD_STR(hurtboxes, name, hbm);
+  HASH_ADD_INT(hurtboxes, name, hbm);
 }
-void add_to_hurtbox_map(const char* name,
-			const char* state,
+void add_to_hurtbox_map(int name,
+			int state,
 			int frame,
 			int x[],
 			int y[],
@@ -87,7 +88,7 @@ void add_to_hurtbox_map(const char* name,
   struct BoxMap* hbm;
   hbm = get_hurtbox_map(name);
   if (hbm == NULL) {
-    printf("No hurtbox BoxMap %s\n", name);
+    printf("No hurtbox BoxMap %s\n", get_string(name));
     return;
   }
 
@@ -97,7 +98,7 @@ void add_to_hurtbox_map(const char* name,
     exit(-1);
   }
 
-  strcpy(bme->state, state);
+  bme->state = state;
   bme->frame = frame;
   bme->next = NULL;
   bme->prev = NULL;
@@ -114,10 +115,10 @@ void add_to_hurtbox_map(const char* name,
   DL_APPEND(hbm->entries, bme);
 }
   
-BoxMap* get_hurtbox_map(const char* name) {
+BoxMap* get_hurtbox_map(int name) {
   struct BoxMap *hbm;
 
-  HASH_FIND_STR(hurtboxes, name, hbm);
+  HASH_FIND_INT(hurtboxes, &name, hbm);
   if (hbm) {
     return hbm;
   }

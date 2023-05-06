@@ -1664,7 +1664,10 @@ void resolve_operators(int statement, World* world, int debug) {
 		  PARAMS[paramPointer++] = abs(rightValue);
 		} else {
 		  PARAMS[paramPointer++] = FLOAT;
-		  PARAMS[paramPointer++] = push_float(abs(get_float(rightValue)));
+		  float rightFloat = get_float(rightValue);
+		  int rightInt = (int)rightFloat;
+		  float absFloat = (float)abs(rightInt);
+		  PARAMS[paramPointer++] = push_float(absFloat);
 		}
 
 		break;

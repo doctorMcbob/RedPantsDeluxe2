@@ -7,6 +7,7 @@
 # include "worlds.h"
 # include "frames.h"
 # include "scripts.h"
+# include "boxes.h"
 # include "stringmachine.h"
 # include "stringdata.h"
 # include <math.h>
@@ -501,6 +502,14 @@ Sprite* get_sprite_for_actor(Actor* actor) {
     return NULL;
   }
   return get_sprite(best->spriteKey);
+}
+
+BoxMapEntry* get_hitboxes_for_actor(Actor* actor) {
+  if (actor->hitboxkey == NULL) return NULL;
+  BoxMap *bm = get_hitbox_map(actor->hitboxkey);
+  if (!bm) return NULL;
+  BoxMapEntry *best, *bme;
+  best = NULL;
 }
 
 void _draw_platform(SDL_Renderer* rend, Actor* actor, Frame* frame) {

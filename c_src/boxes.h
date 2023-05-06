@@ -6,7 +6,7 @@
 #define BOX_DEF 1
 
 typedef struct BoxMapEntry {
-  char state[32];
+  int state;
   int frame;
   struct BoxMapEntry* next;
   struct BoxMapEntry* prev;
@@ -14,14 +14,14 @@ typedef struct BoxMapEntry {
 } BoxMapEntry;
 
 typedef struct BoxMap {
-  char name[32];
+  int name;
   struct BoxMapEntry* entries;
   UT_hash_handle hh;
 } BoxMap;
 
-void add_hitbox_map(const char* name);
-void add_to_hitbox_map(const char* name,
-		       const char* state,
+void add_hitbox_map(int name);
+void add_to_hitbox_map(int name,
+		       int state,
 		       int frame,
 		       int x[],
 		       int y[],
@@ -29,11 +29,11 @@ void add_to_hitbox_map(const char* name,
 		       int h[],
 		       int count);
 
-BoxMap* get_hitbox_map(const char* name);
+BoxMap* get_hitbox_map(int name);
 
-void add_hurtbox_map(const char* name);
-void add_to_hurtbox_map(const char* name,
-			const char* state,
+void add_hurtbox_map(int name);
+void add_to_hurtbox_map(int name,
+			int state,
 			int frame,
 			int x[],
 			int y[],
@@ -41,5 +41,5 @@ void add_to_hurtbox_map(const char* name,
 			int h[],
 			int count);
 
-BoxMap* get_hurtbox_map(const char* name);
+BoxMap* get_hurtbox_map(int name);
 #endif

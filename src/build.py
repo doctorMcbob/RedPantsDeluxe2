@@ -568,7 +568,7 @@ def _convert_boxes():
     """
 
     for mapkey in BOXES.HITBOXES.keys():
-        boxdata_dot_c += f"    add_hitbox_map(\"{mapkey}\");\n"
+        boxdata_dot_c += f"    add_hitbox_map({UNIQUE_STRINGS.index(mapkey)});\n"
         for key in BOXES.HITBOXES[mapkey]:
             if not BOXES.HITBOXES[mapkey][key]: continue
             count = len(BOXES.HITBOXES[mapkey][key])
@@ -581,11 +581,11 @@ def _convert_boxes():
             boxdata_dot_c += f"    int i{mapkey}{state}{frame}ys[{count}] = " + "{" + ", ".join(str(v) for v  in ys) + "};\n"
             boxdata_dot_c += f"    int i{mapkey}{state}{frame}ws[{count}] = " + "{" + ", ".join(str(v) for v  in ws) + "};\n"
             boxdata_dot_c += f"    int i{mapkey}{state}{frame}hs[{count}] = " + "{" + ", ".join(str(v) for v  in hs) + "};\n"
-            boxdata_dot_c += f"    add_to_hitbox_map(\"{mapkey}\", \"{state}\", {frame}, i{mapkey}{state}{frame}xs, i{mapkey}{state}{frame}ys, i{mapkey}{state}{frame}hs, i{mapkey}{state}{frame}ws, {count});\n"
+            boxdata_dot_c += f"    add_to_hitbox_map({UNIQUE_STRINGS.index(mapkey)}, {UNIQUE_STRINGS.index(state)}, {frame}, i{mapkey}{state}{frame}xs, i{mapkey}{state}{frame}ys, i{mapkey}{state}{frame}hs, i{mapkey}{state}{frame}ws, {count});\n"
 
 
     for mapkey in BOXES.HURTBOXES.keys():
-        boxdata_dot_c += f"    add_hurtbox_map(\"{mapkey}\");\n"
+        boxdata_dot_c += f"    add_hurtbox_map({UNIQUE_STRINGS.index(mapkey)});\n"
         for key in BOXES.HURTBOXES[mapkey]:
             if not BOXES.HURTBOXES[mapkey][key]: continue
             count = len(BOXES.HURTBOXES[mapkey][key])
@@ -598,7 +598,7 @@ def _convert_boxes():
             boxdata_dot_c += f"    int u{mapkey}{state}{frame}ys[{count}] = " + "{" + ", ".join(str(v) for v  in ys) + "};\n"
             boxdata_dot_c += f"    int u{mapkey}{state}{frame}ws[{count}] = " + "{" + ", ".join(str(v) for v  in ws) + "};\n"
             boxdata_dot_c += f"    int u{mapkey}{state}{frame}hs[{count}] = " + "{" + ", ".join(str(v) for v  in hs) + "};\n"
-            boxdata_dot_c += f"    add_to_hurtbox_map(\"{mapkey}\", \"{state}\", {frame}, u{mapkey}{state}{frame}xs, u{mapkey}{state}{frame}ys, u{mapkey}{state}{frame}hs, u{mapkey}{state}{frame}ws, {count});\n"
+            boxdata_dot_c += f"    add_to_hurtbox_map({UNIQUE_STRINGS.index(mapkey)}, {UNIQUE_STRINGS.index(state)}, {frame}, u{mapkey}{state}{frame}xs, u{mapkey}{state}{frame}ys, u{mapkey}{state}{frame}hs, u{mapkey}{state}{frame}ws, {count});\n"
 
 
     boxdata_dot_c += "}\n"
