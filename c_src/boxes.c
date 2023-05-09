@@ -47,13 +47,13 @@ void add_to_hitbox_map(int name,
   
   for (int i = 0; i < count; i++) {
     SDL_Rect rect;
-    rect.x = x[count];
-    rect.y = y[count];
-    rect.w = w[count];
-    rect.h = h[count];
+    rect.x = x[i];
+    rect.y = y[i];
+    rect.w = w[i];
+    rect.h = h[i];
     bme->rect[i] = rect;
   }
-
+  bme->count = count;
   DL_APPEND(hbm->entries, bme);
 }
 
@@ -77,6 +77,7 @@ void add_hurtbox_map(int name) {
   hbm->entries = NULL;
   HASH_ADD_INT(hurtboxes, name, hbm);
 }
+
 void add_to_hurtbox_map(int name,
 			int state,
 			int frame,
@@ -102,15 +103,15 @@ void add_to_hurtbox_map(int name,
   bme->frame = frame;
   bme->next = NULL;
   bme->prev = NULL;
-  
   for (int i = 0; i < count; i++) {
     SDL_Rect rect;
-    rect.x = x[count];
-    rect.y = y[count];
-    rect.w = w[count];
-    rect.h = h[count];
+    rect.x = x[i];
+    rect.y = y[i];
+    rect.w = w[i];
+    rect.h = h[i];
     bme->rect[i] = rect;
   }
+  bme->count = count;
 
   DL_APPEND(hbm->entries, bme);
 }

@@ -2,6 +2,7 @@
 # include "worlds.h"
 # include "frames.h"
 # include "sprites.h"
+# include "boxes.h"
 # include "utlist.h"
 # include "uthash.h"
 # include "stringmachine.h"
@@ -127,29 +128,60 @@ void draw_debug_overlay(World* world, SDL_Renderer* rend, Frame* frame) {
   DL_FOREACH(world->actors, ae) {
     Actor* a;
     a = get_actor(ae->actorKey);
-    SDL_Rect *ECB = a->ECB;
-    ECB->x += frame->scroll_x;
-    ECB->y += frame->scroll_y;
+
+    SDL_Rect *ECB = malloc(sizeof(SDL_Rect));;
+    ECB->x += a->ECB->x + frame->scroll_x;
+    ECB->y += a->ECB->y + frame->scroll_y;
+    ECB->w = a->ECB->w;
+    ECB->h = a->ECB->h;
+
     SDL_SetRenderDrawColor(rend, 0, 0, 255, 255);
     SDL_RenderDrawRect(rend, ECB);
 
-    if (hasTextDrawn) continue;
-    if (mouseX >= ECB->x && mouseX < ECB->x + ECB->w && mouseY >= ECB->y && mouseY < ECB->y + ECB->h) {
-      char data[100]; // buffer to hold the formatted string
-      sprintf(data, "%s %s:%iT?%i",
-              get_string(ae->actorKey), get_string(a->state), a->frame, a->tangible);
-
-      SDL_Color textColor = { 0, 0, 0 };
-      SDL_Surface* surface = TTF_RenderText_Solid(font, data, textColor);
-
-      SDL_Texture* Message = SDL_CreateTextureFromSurface(rend, surface);
-      SDL_Rect Message_rect = { mouseX, mouseY, surface->w, surface->h };
-      SDL_RenderCopy(rend, Message, NULL, &Message_rect);
-
-      SDL_FreeSurface(surface);
-      SDL_DestroyTexture(Message);
-      hasTextDrawn = 1;
+    BoxMapEntry *bme;
+    bme = get_hurtboxes_for_actor(a);
+    if (bme != NULL) {
+      for (int i=0; i<bme->count; i++) {
+        SDL_Rect *hurtbox = translate_rect_by_actor(a, &(bme->rect[i]));
+        hurtbox->x += frame->scroll_x;
+        hurtbox->y += frame->scroll_y;
+        SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
+        SDL_RenderDrawRect(rend, hurtbox);
+        free(hurtbox);
+      }
     }
+
+    bme = get_hitboxes_for_actor(a);
+    if (bme != NULL) {
+      for (int i=0; i<bme->count; i++) {
+        SDL_Rect *hurtbox = translate_rect_by_actor(a, &(bme->rect[i]));
+        hurtbox->x += frame->scroll_x;
+        hurtbox->y += frame->scroll_y;
+        SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
+        SDL_RenderDrawRect(rend, hurtbox);
+        free(hurtbox);
+      }
+    }
+
+    if (!hasTextDrawn) {
+      if (mouseX >= ECB->x && mouseX < ECB->x + ECB->w && mouseY >= ECB->y && mouseY < ECB->y + ECB->h) {
+        char data[100]; // buffer to hold the formatted string
+        sprintf(data, "%s %s:%iT?%i",
+                get_string(ae->actorKey), get_string(a->state), a->frame, a->tangible);
+
+        SDL_Color textColor = { 0, 0, 0 };
+        SDL_Surface* surface = TTF_RenderText_Solid(font, data, textColor);
+
+        SDL_Texture* Message = SDL_CreateTextureFromSurface(rend, surface);
+        SDL_Rect Message_rect = { mouseX, mouseY, surface->w, surface->h };
+        SDL_RenderCopy(rend, Message, NULL, &Message_rect);
+
+        SDL_FreeSurface(surface);
+        SDL_DestroyTexture(Message);
+        hasTextDrawn = 1;
+      }
+    }
+    free(ECB);
   }
 }
 

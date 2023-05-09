@@ -510,6 +510,93 @@ BoxMapEntry* get_hitboxes_for_actor(Actor* actor) {
   if (!bm) return NULL;
   BoxMapEntry *best, *bme;
   best = NULL;
+  DL_FOREACH(bm->entries, bme) {
+    if (actor->state != bme->state) continue;
+    if (actor->frame < bme->frame) continue;
+    if (best) {
+      if (bme->frame < best->frame)
+        continue;
+    }
+    best = bme;
+  }
+  if (best != NULL)
+    return best;
+  return NULL;
+}
+
+BoxMapEntry* get_hurtboxes_for_actor(Actor* actor) {
+  if (actor->hurtboxkey == NULL) return NULL;
+  BoxMap *bm = get_hurtbox_map(actor->hurtboxkey);
+  if (!bm) return NULL;
+  BoxMapEntry *best, *bme;
+  best = NULL;
+  DL_FOREACH(bm->entries, bme) {
+    if (actor->state != bme->state) continue;
+    if (actor->frame < bme->frame) continue;
+    if (best) {
+      if (bme->frame < best->frame)
+        continue;
+    }
+    best = bme;
+  }
+  if (best != NULL)
+    return best;
+  return NULL;
+}
+
+void rotate_box_by_actor(Actor* actor, SDL_Rect* rect, int deg) {
+  int x1 = actor->ECB->x;
+  int y1 = actor->ECB->y;
+  int w1 = actor->ECB->w;
+  int h1 = actor->ECB->h;
+  int x2 = rect->x - x1;
+  int y2 = rect->y - y1;
+  int w2 = rect->w;
+  int h2 = rect->h;
+  switch (deg) {
+    case 0:
+      rect->x = x1 + x2;
+      rect->y = y1 + y2;
+      rect->w = w2;
+      rect->h = h2;
+      break;
+    case 90:
+      rect->x = x1 + y2;
+      rect->y = y1 + w1 - x2 - w2;
+      rect->w = h2;
+      rect->h = w2;
+      break;
+    case 180:
+      rect->x = x1 + w1 - x2 - w2;
+      rect->y = y1 + h1 - y2 - h2;
+      rect->w = w2;
+      rect->h = h2;
+      break;
+    case 270:
+      rect->x = x1 + h1 - y2 - h2;
+      rect->y = y1 + x2;
+      rect->w = h2;
+      rect->h = w2;
+      break;
+    default:
+      break;
+  }
+}
+
+SDL_Rect* translate_rect_by_actor(Actor* actor, SDL_Rect* rect) {
+  if (actor == NULL || rect == NULL) return NULL;
+  SDL_Rect* new_rect = (SDL_Rect*)malloc(sizeof(SDL_Rect));
+  new_rect->w = rect->w;
+  new_rect->h = rect->h;
+  if (actor->direction == 1) {
+    new_rect->x = (actor->ECB->x + actor->ECB->w) - (rect->x + rect->w);
+    new_rect->y = actor->ECB->y + rect->y;
+  } else {
+    new_rect->x = actor->ECB->x + rect->x;
+    new_rect->y = actor->ECB->y + rect->y;
+  }
+  rotate_box_by_actor(actor, new_rect, actor->rotation);
+  return new_rect;
 }
 
 void _draw_platform(SDL_Renderer* rend, Actor* actor, Frame* frame) {

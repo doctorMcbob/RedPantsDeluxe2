@@ -98,16 +98,10 @@ int main (int argc, char *argv[]) {
   while (input_update() != -1) {
     SDL_RenderClear(rend);
 
-    int debugPause = 0;
-    if (debug) {
-      const Uint8 *state = SDL_GetKeyboardState(NULL);
-      if (state[SDL_SCANCODE_SPACE]) {
-        debugPause = 1;
-      }
-    }
+
     Frame *f, *tmpf;
     
-    if (!debugPause) {  
+    // if (!debugPause) { 
       HASH_ITER(hh, frames, f, tmpf) {
         if (f->active && f->world != NULL) {
           f->world->flagged_for_update = 1;
@@ -122,7 +116,7 @@ int main (int argc, char *argv[]) {
         }
       }
       actors_reset_updated();
-    }
+    // }
 
     HASH_ITER(hh, frames, f, tmpf) {
       if (f->active) {
@@ -131,19 +125,19 @@ int main (int argc, char *argv[]) {
       }
     }
 
-    Uint32 fps = Clock_get_fps(c);
+    // Uint32 fps = Clock_get_fps(c);
 
-    char fps_str[10]; // buffer to hold the FPS string
-    snprintf(fps_str, 10, "FPS: %d", fps); // convert the FPS to a string
+    // char fps_str[10]; // buffer to hold the FPS string
+    // snprintf(fps_str, 10, "FPS: %d", fps); // convert the FPS to a string
 
-    SDL_Color color = {0, 0, 0, 255}; // black color
-    SDL_Surface *surface = TTF_RenderText_Solid(font, fps_str, color); // create a surface with the FPS text
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, surface); // create a texture from the surface
-    SDL_Rect dest_rect = {0, 0, surface->w, surface->h}; // destination rectangle for the texture
+    // SDL_Color color = {0, 0, 0, 255}; // black color
+    // SDL_Surface *surface = TTF_RenderText_Solid(font, fps_str, color); // create a surface with the FPS text
+    // SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, surface); // create a texture from the surface
+    // SDL_Rect dest_rect = {0, 0, surface->w, surface->h}; // destination rectangle for the texture
 
-    SDL_RenderCopy(rend, texture, NULL, &dest_rect); // copy the texture to the renderer
-    SDL_FreeSurface(surface); // free the surface
-    SDL_DestroyTexture(texture); // destroy the texture
+    // SDL_RenderCopy(rend, texture, NULL, &dest_rect); // copy the texture to the renderer
+    // SDL_FreeSurface(surface); // free the surface
+    // SDL_DestroyTexture(texture); // destroy the texture
 
     SDL_RenderPresent(rend);
     Clock_tick(c, 20);

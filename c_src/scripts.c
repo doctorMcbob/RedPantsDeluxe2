@@ -2655,9 +2655,29 @@ int resolve_script(
 		break;
 	}
     case HITBOXES: {
+		int hitboxType = PARAMS[0];
+		int hitboxValue = PARAMS[1];
+
+		if (hitboxType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for HITBOXES\n");
+		  break;
+		}
+
+		self->hitboxkey = hitboxValue;
 		break;
 	}
     case HURTBOXES: {
+		int hurtboxType = PARAMS[0];
+		int hurtboxValue = PARAMS[1];
+
+		if (hurtboxType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for HURTBOXES\n");
+		  break;
+		}
+
+		self->hurtboxkey = hurtboxValue;
 		break;
 	}
     case CREATE: {

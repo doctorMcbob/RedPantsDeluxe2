@@ -10,6 +10,7 @@ typedef struct BoxMapEntry {
   int frame;
   struct BoxMapEntry* next;
   struct BoxMapEntry* prev;
+  int count;
   SDL_Rect rect[];
 } BoxMapEntry;
 
