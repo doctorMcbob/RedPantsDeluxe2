@@ -230,7 +230,7 @@ void add_template_from_actorkey(int actorKey) {
 
 int collision_with(Actor *a1, Actor *a2, World* world, int debug) {
   int scriptKey = find_script_from_map(a1, COLLIDE, -1);
-  if (scriptKey > 0) {
+  if (scriptKey != -1) {
     int resolution = resolve_script(scriptKey,  a1, a2, world, debug, -1, -1, -1, -1, -1);
     if (resolution < 0) return resolution;
   }
@@ -437,7 +437,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
   if (x_flag != actor->x_vel && _floor(actor->x_vel) == 0) {
     int scriptKey = find_script_from_map(actor, XCOLLISION, -1);
     if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
+      int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
       if (resolution < 0) return resolution;
     }
   }
@@ -445,9 +445,19 @@ int update_actor(int actorKey, int worldKey, int debug) {
     actor->y_vel = 0;
     int scriptKey = find_script_from_map(actor, YCOLLISION, -1);
     if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
-    if (resolution < 0) return resolution;
+      int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
+      if (resolution < 0) return resolution;
     }
+  }
+
+  ActorEntry *ae;
+  Actor* actor2;
+
+  DL_FOREACH(world->actors, ae) {
+    actor2 = get_actor(ae->actorKey);
+    if (actor2->name == actor->name) continue;
+    int resolution = hit_check(actor, actor2, world, debug);
+    if (resolution < 0) return resolution;
   }
 
   actor->frame += 1;
@@ -597,6 +607,40 @@ SDL_Rect* translate_rect_by_actor(Actor* actor, SDL_Rect* rect) {
   }
   rotate_box_by_actor(actor, new_rect, actor->rotation);
   return new_rect;
+}
+
+int hit_check(Actor *self, Actor* related, World *world, int debug) {
+  BoxMapEntry *hurtboxes, *hitboxes;
+
+  hurtboxes = get_hurtboxes_for_actor(self);
+  if (hurtboxes == NULL) return 0;
+  hitboxes = get_hitboxes_for_actor(related);
+  if (hitboxes == NULL) return 0;
+
+  for (int i=0; i<hurtboxes->count; i++) {
+    SDL_Rect *hurtbox = translate_rect_by_actor(self, &(hurtboxes->rect[i]));
+
+    for (int j=0; j<hitboxes->count; j++) {
+      SDL_Rect *hitbox = translate_rect_by_actor(related, &(hitboxes->rect[j]));
+      if (SDL_HasIntersection(hurtbox, hitbox)) {
+        int scriptKey = find_script_from_map(related, HIT, -1);
+        if (scriptKey != -1) {
+          int resolution = resolve_script(scriptKey, self, related, world, debug, -1, -1, -1, -1, -1);
+          if (resolution < 0) {
+            free(hitbox);
+            free(hurtbox);
+            return resolution;
+          }
+        }
+        break;
+      }
+
+      free(hitbox);
+    }
+
+    free(hurtbox);
+  }
+  return 0;
 }
 
 void _draw_platform(SDL_Renderer* rend, Actor* actor, Frame* frame) {

@@ -1,6 +1,7 @@
 # include <SDL2/SDL.h>
 # include "uthash.h"
 # include "sprites.h"
+# include "boxes.h"
 
 #ifndef ACTORS_DEF
 # define ACTORS_DEF 1
@@ -77,4 +78,7 @@ int get_script_for_actor(Actor* actor);
 void actors_reset_updated();
 int find_script_from_map(Actor* actor, int scriptName, int scriptFrame);
 void free_actor(Actor* actor);
+BoxMapEntry* get_hurtboxes_for_actor(Actor* actor);
+BoxMapEntry* get_hitboxes_for_actor(Actor* actor);
+int hit_check(Actor *self, Actor* related, World *world, int debug);
 #endif

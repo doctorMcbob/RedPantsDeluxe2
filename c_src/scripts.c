@@ -846,6 +846,11 @@ void resolve_operators(int statement, World* world, int debug) {
 	  PARAMS[paramPointer-1] = f != f2;
 	  break;
 	}
+	case (STRING + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = leftValue != rightValue;
+	  break;
+	}
 	default: {
 	  print_statement(statement);
 	  printf("Failed to != types %i != %i\n", leftType, rightType);
@@ -2395,10 +2400,13 @@ int resolve_script(
 		}
 
 		Frame *f = get_frame(frameValue);
-		if (f != NULL) {
-		  f->active = 1;
+		if (f == NULL) {
+		  print_statement(statement);
+		  printf("Frame %s does not exist for ACTIVATE\n", get_string(frameValue));
+		  break;
 		}
 
+		f->active = 1;
 		break;
 	}
     case DEACTIVATE: {
@@ -2410,18 +2418,65 @@ int resolve_script(
 		  printf("Missing or Incorrect Parameter for ACTIVATE\n");
 		  break;
 		}
-
+		
 		Frame *f = get_frame(frameValue);
-		if (f != NULL) {
-		  f->active = 0;
+		if (f == NULL) {
+		  print_statement(statement);
+		  printf("Frame %s does not exist for DEACTIVATE\n", get_string(frameValue));
+		  break;
 		}
 
+		f->active = 0;
 		break;
 	}
     case KILLFRAME: {
+		int frameType = PARAMS[0];
+		int frameValue = PARAMS[1];
+
+		if (frameType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for KILLFRAME\n");
+		  break;
+		}
+
+		Frame *f = get_frame(frameValue);
+		if (f == NULL) {
+		  print_statement(statement);
+		  printf("Frame %s does not exist for KILLFRAME\n", get_string(frameValue));
+		  break;
+		}
+
+		delete_frame(f);
 		break;
 	}
     case MAKEFRAME: {
+		int nameType = PARAMS[0];
+		int nameValue = PARAMS[1];
+		int worldType = PARAMS[2];
+		int worldValue = PARAMS[3];
+		int xType = PARAMS[4];
+		int xValue = PARAMS[5];
+		int yType = PARAMS[6];
+		int yValue = PARAMS[7];
+		int wType = PARAMS[8];
+		int wValue = PARAMS[9];
+		int hType = PARAMS[10];
+		int hValue = PARAMS[11];
+
+		if (nameType != STRING || worldType != STRING || xType != INT || yType != INT || wType != INT || hType != INT) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for MAKEFRAME\n");
+		  break;
+		}
+
+		World *w = get_world(worldValue);
+		if (w == NULL) {
+		  print_statement(statement);
+		  printf("World %s not found for MAKEFRAME\n", get_string(worldValue));
+		  break;
+		}
+
+		add_frame(nameValue, w, NULL, xValue, yValue, wValue, hValue);
 		break;
 	}
     case FOCUS: {
@@ -2458,6 +2513,44 @@ int resolve_script(
 		break;
 	}
     case SCROLLBOUND: {
+		int frameType = PARAMS[0];
+		int frameValue = PARAMS[1];
+		int directionType = PARAMS[2];
+		int directionValue = PARAMS[3];
+		int valueType = PARAMS[4];
+		int valueValue = PARAMS[5];
+
+		if (frameType != STRING || directionType != STRING || valueType != INT) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for SCROLLBOUND\n");
+		  break;
+		}
+
+		Frame *f = get_frame(frameValue);
+		if (f == NULL) {
+		  print_statement(statement);
+		  printf("Frame %s not found for SCROLLBOUND\n", get_string(frameValue));
+		  break;
+		}
+
+		switch (directionValue) {
+		  case TOP:
+			f->bound_top = 1;
+			f->top_bind = valueValue;
+			break;
+		  case _LEFT:
+			f->bound_left = 1;
+			f->left_bind = valueValue;
+			break;
+		  case BOTTOM:
+			f->bound_bottom = 1;
+			f->bottom_bind = valueValue;
+			break;
+		  case _RIGHT:
+			f->bound_right = 1;
+			f->right_bind = valueValue;
+			break;
+		}
 		break;
 	}
     case VIEW: {
@@ -2744,9 +2837,47 @@ int resolve_script(
 		break;
 	}
     case OFFSETBGSCROLLX: {
+		int worldType = PARAMS[0];
+		int worldValue = PARAMS[1];
+		int valueType = PARAMS[2];
+		int valueValue = PARAMS[3];
+
+		if (worldType != STRING || valueType != INT) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for OFFSETBGSCROLLX\n");
+		  break;
+		}
+
+		World *w = get_world(worldValue);
+		if (w == NULL) {
+		  print_statement(statement);
+		  printf("World %s not found for OFFSETBGSCROLLX\n", get_string(worldValue));
+		  break;
+		}
+
+		w->background_x_scroll = valueValue;
 		break;
 	}
     case OFFSETBGSCROLLY: {
+		int worldType = PARAMS[0];
+		int worldValue = PARAMS[1];
+		int valueType = PARAMS[2];
+		int valueValue = PARAMS[3];
+
+		if (worldType != STRING || valueType != INT) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for OFFSETBGSCROLLY\n");
+		  break;
+		}
+
+		World *w = get_world(worldValue);
+		if (w == NULL) {
+		  print_statement(statement);
+		  printf("World %s not found for OFFSETBGSCROLLY\n", get_string(worldValue));
+		  break;
+		}
+
+		w->background_y_scroll = valueValue;
 		break;
 	}
     case FOR: {

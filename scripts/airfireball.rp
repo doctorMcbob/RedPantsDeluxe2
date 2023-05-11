@@ -11,6 +11,7 @@ set self state FIREBALL
 set self frame 0
 set self y_vel 8
 hitboxes airfireball
+set self creatorname fillmein
 
 |FIREBALL:0|
 set self x self.direction * self.speed + self.x

@@ -12,6 +12,7 @@ set self framelifespan 90
 set self state FIREBALL
 set self frame 0
 hitboxes fireball
+set self creatorname fillmein
 
 |FIREBALL:0|
 set self x self.direction * self.speed + self.x

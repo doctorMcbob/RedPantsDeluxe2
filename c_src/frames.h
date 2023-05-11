@@ -30,4 +30,5 @@ int in_frame(Frame* frame, Actor* actor);
 void draw_frame(SDL_Renderer* rend, Frame* frame, int debug);
 void update_frame(Frame* frame);
 int has_frame(int worldKey);
+int delete_frame(Frame* frame);
 #endif

@@ -26,6 +26,7 @@ set self w 64
 set self bulletnumber 0
 hurtboxes robot
 set self physics 1
+set self creatorname fillmein
 
 |WANDER:0|
 set self x_vel self.speed * self.direction

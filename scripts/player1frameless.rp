@@ -10,6 +10,3 @@ if isframe MAIN
    set self respawny self.y
    set self respawnworld WORLD?
 endif
-if isframe MAIN == 0
-   goodbye
-endif

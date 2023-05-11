@@ -293,10 +293,14 @@ def _intern_strings(SCRIPTS):
         UNIQUE_STRINGS.append("width")
     if "height" not in UNIQUE_STRINGS:
         UNIQUE_STRINGS.append("height")
+    if "ROOT" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("ROOT")
     if "root" not in UNIQUE_STRINGS:
         UNIQUE_STRINGS.append("root")
-    if "main" not in UNIQUE_STRINGS:
-        UNIQUE_STRINGS.append("main")
+    if "MAIN" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("MAIN")
+    if "HIT" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("HIT")
     UNIQUE_STRINGS.sort()
     string_data_dot_c = "#include \"stringmachine.h\"\n#include <stddef.h>\n"
     string_data_dot_c += f"int NUM_STRINGS = {len(UNIQUE_STRINGS)};\n"
@@ -361,8 +365,10 @@ def _intern_strings(SCRIPTS):
 #define _START {UNIQUE_STRINGS.index("START")}
 #define _WIDTH {UNIQUE_STRINGS.index("width")}
 #define _HEIGHT {UNIQUE_STRINGS.index("height")}
-#define ROOT {UNIQUE_STRINGS.index("root")}
-#define MAIN {UNIQUE_STRINGS.index("main")}
+#define ROOT {UNIQUE_STRINGS.index("ROOT")}
+#define _ROOT {UNIQUE_STRINGS.index("root")}
+#define MAIN {UNIQUE_STRINGS.index("MAIN")}
+#define HIT {UNIQUE_STRINGS.index("HIT")}
 
 extern const char* STRINGS[{len(UNIQUE_STRINGS)}];
 extern int STRING_LENS[{len(UNIQUE_STRINGS)}];

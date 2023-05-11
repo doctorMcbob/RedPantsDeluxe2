@@ -16,13 +16,16 @@ void add_frame(int name, World* world, Actor* focus, int x, int y, int w, int h)
   f->name = name;
   SDL_Rect* rect;
   rect = malloc(sizeof(SDL_Rect));
+
   rect->x = x;
   rect->y = y;
   rect->w = w;
   rect->h = h;
+
   f->rect = rect;
   f->world = world;
   f->focus = focus;
+
   f->active = 1;
   HASH_ADD_INT(frames, name, f);
 }
@@ -43,8 +46,7 @@ SDL_Rect* scrolled(SDL_Rect* rect, Frame* frame) {
   scrolled.y = rect->y - frame->scroll_y;
   scrolled.w = rect->w;
   scrolled.h = rect->h;
-  SDL_Rect* r = &scrolled;
-  return r;
+  return &scrolled;
 }
 
 int in_frame(Frame* frame, Actor* actor) {
@@ -63,7 +65,7 @@ void draw_frame(SDL_Renderer* rend, Frame* f, int debug) {
     rend, format, SDL_TEXTUREACCESS_TARGET, f->rect->w, f->rect->h);
 
   SDL_SetRenderTarget(rend, frame_buffer);
-  
+
   draw_world(f->world, rend, f);
   if (debug) {
     draw_debug_overlay(f->world, rend, f);
@@ -105,5 +107,11 @@ int has_frame(int worldKey) {
   HASH_ITER(hh, frames, f, tmp) {
     if (worldKey == f->world->name) return 1;
   }
+  return 0;
+}
+
+int delete_frame(Frame* frame) {
+  HASH_DEL(frames, frame);
+  free(frame);
   return 0;
 }
