@@ -231,7 +231,7 @@ void add_template_from_actorkey(int actorKey) {
 int collision_with(Actor *a1, Actor *a2, World* world, int debug) {
   int scriptKey = find_script_from_map(a1, COLLIDE, -1);
   if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey,  a1, a2, world, debug, -1, -1, -1, -1, -1);
+    int resolution = resolve_script(scriptKey, a2, a1, world, debug, -1, -1, -1, -1, -1);
     if (resolution < 0) return resolution;
   }
   return 0;
