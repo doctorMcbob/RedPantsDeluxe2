@@ -6,7 +6,8 @@ CC := clang
 # set compiler flags #! REMOVE -g !# 
 SDL_FLAGS := `sdl2-config --libs --cflags`
 TTF_FLAGS := -L/usr/lib/x86_64-linux-gnu -lSDL2_ttf
-CFLAGS := $(SDL_FLAGS) $(TTF_FLAGS) -ggdb3 -O0 --std=c99 -Wall
+CFLAGS := $(SDL_FLAGS) $(TTF_FLAGS) -ggdb3 -O0 --std=c99 -Wall -lSDL2_mixer
+
 
 # add headers here
 HDRS :=

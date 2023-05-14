@@ -28,6 +28,7 @@ I will be using uthash.h as my dictionary implementation
 # include <SDL2/SDL.h>
 # include <SDL2/SDL_timer.h>
 # include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 # define WID 1152
 # define HIGH 640
@@ -38,6 +39,7 @@ void spritesheet_load(SDL_Renderer* rend);
 void actor_load();
 void world_load();
 void boxes_load();
+void audio_load();
 void scripts_load();
 void load_string_indexers();
 extern Frame* frames;
@@ -59,9 +61,26 @@ int main (int argc, char *argv[]) {
 
   srand(time(NULL));
 
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO || SDL_INIT_AUDIO) != 0) {
     printf("Error initializing SDL2: %s\n", SDL_GetError());
     return 1;
+  }
+  
+  // Initialize SDL_mixer
+  if ((Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG) & (MIX_INIT_MP3 | MIX_INIT_OGG)) != (MIX_INIT_MP3 | MIX_INIT_OGG)) {
+      printf("SDL_mixer initialization failed: %s\n", Mix_GetError());
+      return 1;
+  }
+
+  // Open audio device
+  int frequency = 44100;
+  Uint16 format = MIX_DEFAULT_FORMAT;
+  int channels = 2;
+  int chunksize = 1024;
+
+  if (Mix_OpenAudio(frequency, format, channels, chunksize) < 0) {
+      printf("SDL_mixer failed to open audio: %s\n", Mix_GetError());
+      return 1;
   }
 
   SDL_Window* screen = SDL_CreateWindow("Long way to the top, if you wanna make a game engine",
@@ -91,6 +110,7 @@ int main (int argc, char *argv[]) {
   world_load();
   boxes_load();
   scripts_load();
+  audio_load();
   add_input_state(index_string("PLAYER1"), NULL);
   add_frame(ROOT, get_world(_ROOT), NULL, 0, 0, W, H);
   Clock* c = new_clock();

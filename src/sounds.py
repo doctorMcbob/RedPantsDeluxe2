@@ -18,6 +18,12 @@ def load():
             elif f[-4:] == ".mp3":
                 SONGS[f[:-4]] = SOUND_LOCATION + "/" + f
 
+def get_songs():
+    return SONGS
+
+def get_sounds():
+    return SOUNDS
+
 def get_song():
     return SONG
 

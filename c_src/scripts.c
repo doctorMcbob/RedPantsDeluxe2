@@ -5,6 +5,7 @@
 #include "worlds.h"
 #include "debug.h"
 #include "inputs.h"
+#include "sounds.h"
 #include "math.h"
 #include "stringmachine.h"
 #include "floatmachine.h"
@@ -844,6 +845,16 @@ void resolve_operators(int statement, World* world, int debug) {
 	  float f2 = get_float(rightValue);
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = f != f2;
+	  break;
+	}
+	case (INT + 3*STRING): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = 1;
+	  break;
+	}
+	case (STRING + 3*INT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = 1 ;
 	  break;
 	}
 	case (STRING + 3*STRING): {
@@ -2600,7 +2611,7 @@ int resolve_script(
 			nameValue = related->name;
 		}
 
-		if (remove_actor_from_world(world, nameValue) == 1) {
+		if (remove_actor_from_world(world, nameValue) != 1) {
 			print_statement(statement);
 			printf("Actor %s not found for MOVE\n", get_string(nameValue));
 			break;
@@ -2825,6 +2836,16 @@ int resolve_script(
 		break;
 	}
     case SFX: {
+		int sfxType = PARAMS[0];
+		int sfxValue = PARAMS[1];
+
+		if (sfxType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for SFX\n");
+		  break;
+		}
+
+		play_sound(sfxValue);
 		break;
 	}
     case SONG: {
