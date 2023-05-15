@@ -2849,6 +2849,16 @@ int resolve_script(
 		break;
 	}
     case SONG: {
+		int songType = PARAMS[0];
+		int songValue = PARAMS[1];
+
+		if (songType != STRING) {
+		  print_statement(statement);
+		  printf("Missing or Incorrect Parameter for SONG\n");
+		  break;
+		}
+
+		play_song(songValue);
 		break;
 	}
     case SFXOFF: {
