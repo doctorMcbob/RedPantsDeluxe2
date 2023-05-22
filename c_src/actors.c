@@ -70,14 +70,8 @@ void add_actor(int name,
   ecb->h = h;
   a->ECB = ecb;
   a->name = name;
-  if (x_vel)
-    a->x_vel = x_vel;
-  else
-    a->x_vel = 0;
-  if (y_vel)
-    a->y_vel = y_vel;
-  else
-    a->y_vel = 0;
+  a->x_vel = 0;
+  a->y_vel = 0;
   
   a->hurtboxkey= hurtboxkey;
   
@@ -274,6 +268,7 @@ int collision_check(Actor *actor, World* world, int debug) {
         if (actor->name == ae2->actorKey) continue;
         Actor *actor2 = get_actor(ae2->actorKey);
         if (!actor2->tangible) continue;
+        if (actor->tangible == 0 && actor2->platform == 0) continue;
         if (SDL_HasIntersection(move(actor->ECB, actor->ECB->w * i, 0), actor2->ECB)) {
           actor->x_vel -= actor->ECB->w * i;
           exit = 1;
@@ -288,6 +283,7 @@ int collision_check(Actor *actor, World* world, int debug) {
       if (actor->name == ae2->actorKey) continue;
       Actor *actor2 = get_actor(ae2->actorKey);
       if (!actor2->tangible) continue;
+      if (actor->tangible == 0 && actor2->platform == 0) continue;
       if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, 0), actor2->ECB)) {
         int resolution3 = collision_with(actor, actor2, world, debug);
         if (resolution3 < 0) return resolution3;
@@ -304,6 +300,7 @@ int collision_check(Actor *actor, World* world, int debug) {
         if (actor->name == ae3->actorKey) continue;
         Actor *actor3 = get_actor(ae3->actorKey);
         if (!actor3->tangible) continue;
+        if (actor->tangible == 0 && actor3->platform == 0) continue;
         if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, 0), actor3->ECB)) {
           check = 0;
         } 
@@ -324,6 +321,7 @@ int collision_check(Actor *actor, World* world, int debug) {
         if (actor->name == ae2->actorKey) continue;
         Actor *actor2 = get_actor(ae2->actorKey);
         if (!actor2->tangible) continue;
+        if (actor->tangible == 0 && actor2->platform == 0) continue;
         if (SDL_HasIntersection(move(actor->ECB, 0, actor->ECB->h * i), actor2->ECB)) {
           actor->y_vel -= actor->ECB->h * i;
           exit = 1;
@@ -338,6 +336,7 @@ int collision_check(Actor *actor, World* world, int debug) {
       if (actor->name == ae2->actorKey) continue;
       Actor *actor2 = get_actor(ae2->actorKey);
       if (!actor2->tangible) continue;
+      if (actor->tangible == 0 && actor2->platform == 0) continue;
       if (SDL_HasIntersection(move(actor->ECB, 0, actor->y_vel), actor2->ECB)) {
         int resolution3 = collision_with(actor, actor2, world, debug);
         if (resolution3 < 0) return resolution3;
@@ -354,6 +353,7 @@ int collision_check(Actor *actor, World* world, int debug) {
         if (actor->name == ae3->actorKey) continue;
         Actor *actor3 = get_actor(ae3->actorKey);
         if (!actor3->tangible) continue;
+        if (actor->tangible == 0 && actor3->platform == 0) continue;
         if (SDL_HasIntersection(move(actor->ECB, 0, actor->y_vel), actor3->ECB)) {
           check = 0;
         } 
@@ -375,6 +375,7 @@ int collision_check(Actor *actor, World* world, int debug) {
         if (actor->name == ae4->actorKey) continue;
         Actor *actor4 = get_actor(ae4->actorKey);
         if (!actor4->tangible) continue;
+        if (actor->tangible == 0 && actor4->platform == 0) continue;
         if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, actor->y_vel), actor4->ECB)) {
           check = 0;
         }
@@ -389,7 +390,6 @@ int collision_check(Actor *actor, World* world, int debug) {
       }
     }
   }
-  
   return 0;
 }
 
@@ -588,8 +588,6 @@ void rotate_box_by_actor(Actor* actor, SDL_Rect* rect, int deg) {
       rect->w = h2;
       rect->h = w2;
       break;
-    default:
-      break;
   }
 }
 
@@ -745,18 +743,27 @@ void draw_actor(SDL_Renderer* rend, Actor* actor, Frame* f) {
   if (s == NULL) return;
   
   SDL_Rect dest, src;
-  dest.x = actor->ECB->x + s->offx - f->scroll_x;
-  dest.y = actor->ECB->y + s->offy - f->scroll_y;
+
+  SDL_QueryTexture(s->image, NULL, NULL, &dest.w, &dest.h);
+
   src.x = 0;
   src.y = 0;
-  
-  SDL_QueryTexture(s->image, NULL, NULL, &dest.w, &dest.h);
+  if (actor->name == index_string("player10pistol")) printf("%d\n", actor->rotation);
+  if (actor->direction == 1 && (abs(actor->rotation) != 270 && abs(actor->rotation) != 90)) {
+    dest.x = actor->ECB->x + actor->ECB->w - s->offx - dest.w;
+  } else {
+    dest.x = actor->ECB->x + s->offx;
+  }
+
+  dest.y = actor->ECB->y + s->offy;
   src.w = dest.w;
   src.h = dest.h;
 
+  scrolled(&dest, f);
+
   SDL_RendererFlip flip = actor->direction == 1 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-  double angle = actor->rotation;
-  SDL_Point pivot = { dest.x + dest.w / 2, dest.y + dest.h / 2 };
+  double angle = 0 - actor->rotation;
+  SDL_Point pivot = { dest.w / 2, dest.h / 2 };
 
   SDL_RenderCopyEx(rend, s->image, &src, &dest, angle, &pivot, flip);
 }

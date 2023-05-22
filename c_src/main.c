@@ -61,7 +61,7 @@ int main (int argc, char *argv[]) {
 
   srand(time(NULL));
 
-  if (SDL_Init(SDL_INIT_VIDEO || SDL_INIT_AUDIO) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
     printf("Error initializing SDL2: %s\n", SDL_GetError());
     return 1;
   }
@@ -71,6 +71,7 @@ int main (int argc, char *argv[]) {
       printf("SDL_mixer initialization failed: %s\n", Mix_GetError());
       return 1;
   }
+  Mix_AllocateChannels(16);
 
   // Open audio device
   int frequency = 44100;
@@ -112,7 +113,7 @@ int main (int argc, char *argv[]) {
   scripts_load();
   audio_load();
   add_input_state(index_string("PLAYER1"), NULL);
-  add_frame(ROOT, get_world(_ROOT), NULL, 0, 0, W, H);
+  add_frame(ROOT, get_world(_ROOT), NULL, 0, 0, WID, HIGH);
   Clock* c = new_clock();
 
   while (input_update() != -1) {

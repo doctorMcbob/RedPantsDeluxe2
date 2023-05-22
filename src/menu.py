@@ -64,6 +64,6 @@ def run_controller_menu(G, cb=lambda *args: None, args=None, noquit=False):
         if "key" in registered and keys[DEFAULT_MAP["START"]]:
             inmenu = False
 
-    frames.add_frame("BOOT", G["ROOT"], (G["W"], G["H"]), pos=(0, 0))
+    frames.add_frame("ROOT", G["ROOT"], (G["W"], G["H"]), pos=(0, 0))
 
 

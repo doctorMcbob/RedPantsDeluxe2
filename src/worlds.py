@@ -109,7 +109,7 @@ class World(object):
             blitz = []
             if frame.in_frame(Actor):
                 dx, dy = Actor.get_offset()
-                if Actor.direction == 1 and not Actor.rotation in [270, 90]:
+                if Actor.direction == 1 and not Actor.rotation in [270, 90, -90, -270]:
                     sprite = Actor.get_sprite()
                     blitz.append((sprite, frame.scroll((
                         (Actor.x+Actor.w-dx)-sprite.get_width(), Actor.y+dy)

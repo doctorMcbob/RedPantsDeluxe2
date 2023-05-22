@@ -35,6 +35,18 @@ void add_input_state(int name, SDL_Joystick* joy) {
   }
   struct InputState *input_state;
   input_state = malloc(sizeof(InputState));
+  input_state->A = 0;
+  input_state->B = 0;
+  input_state->X = 0;
+  input_state->Y = 0;
+  input_state->LEFT = 0;
+  input_state->UP = 0;
+  input_state->RIGHT = 0;
+  input_state->DOWN = 0;
+  input_state->START = 0;
+  for (int i = 0; i < 18; i++) {
+	input_state->EVENTS[i] = 0;
+  }
   if (input_state == NULL) {
     printf("Error creating InputState\n");
     exit(-1);

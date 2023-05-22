@@ -9,7 +9,7 @@ typedef struct Frame {
   int name;
   int scroll_x;
   int scroll_y;
-  SDL_Rect* rect;
+  SDL_Rect rect;
   World* world;
   Actor* focus;
   int bound_left;
@@ -31,4 +31,5 @@ void draw_frame(SDL_Renderer* rend, Frame* frame, int debug);
 void update_frame(Frame* frame);
 int has_frame(int worldKey);
 int delete_frame(Frame* frame);
+void scrolled(SDL_Rect* rect, Frame* frame);
 #endif

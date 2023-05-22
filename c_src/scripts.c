@@ -1,3 +1,4 @@
+
 #include "scripts.h"
 #include "scriptdata.h"
 #include "utlist.h"
@@ -121,7 +122,7 @@ void resolve_operators(int statement, World* world, int debug) {
 	}
 	case (INT + 3*FLOAT): {
 	  float f = get_float(rightValue);
-	  int i = push_float(f + leftValue);
+	  int i = push_float((float)leftValue + f);
 	  PARAMS[paramPointer-2] = FLOAT;
 	  PARAMS[paramPointer-1] = i;
 	  break;
@@ -1806,6 +1807,7 @@ int resolve_script(
 				SCRIPTS[executionPointer] != QRAND &&
 				SCRIPTS[executionPointer] != QWORLD &&
 				SCRIPTS[executionPointer] != QCOLLIDE && 
+				SCRIPTS[executionPointer] != QSONG &&
 				SCRIPTS[executionPointer] != INP_A && 
 				SCRIPTS[executionPointer] != INP_B && 
 				SCRIPTS[executionPointer] != INP_X &&
@@ -1874,14 +1876,21 @@ int resolve_script(
 		BUFFER[bufferPointer++] = list;
 		ActorEntry *ae;
 		DL_FOREACH(world->actors, ae) {
+			if (ae->actorKey == self->name) continue;
 			Actor *a = get_actor(ae->actorKey);
 			if (a == NULL) continue;
+			if (a->tangible == 0) continue;
 			if (SDL_HasIntersection(self->ECB, a->ECB)) {
 				add_to_list(list, STRING, a->name);
 			}
 		}
 		break;
 	  }
+	case QSONG: {
+		BUFFER[bufferPointer++] = STRING;
+		BUFFER[bufferPointer++] = get_song();
+		break;
+    }
       case DOT: {
 	if (bufferPointer < 2) {
 	  print_statement(statement);
@@ -2247,36 +2256,38 @@ int resolve_script(
 	a->direction = valueValue;
 	break;
       case PLATFORM:
-	if (valueType != INT) break;
-	a->platform = valueValue;
+		if (valueType != INT) break;
+		a->platform = valueValue;
 	break;
       case ROTATION:
-	if (valueType != INT) break;
-	a->rotation = valueValue;
+		if (valueType != INT) break;
+		a->rotation = valueValue;
 	break;
       case TANGIBLE:
-	if (valueType != INT) break;
-	a->tangible = valueValue;
+		if (valueType != INT) break;
+		a->tangible = valueValue;
 	break;
       case PHYSICS:
-	if (valueType != INT) break;
-	a->physics = valueValue;
+		if (valueType != INT) break;
+		a->physics = valueValue;
 	break;
       case X_VEL:
-	if (valueType == FLOAT)
-		a->x_vel = get_float(valueValue);
-	else if (valueType == INT)
-		a->x_vel = valueValue;
-	break;
+	  	if (valueType != FLOAT && valueType != INT) break;
+		if (valueType == FLOAT) {
+			a->x_vel = get_float(valueValue); }
+		else if (valueType == INT)
+			a->x_vel = valueValue;
+		break;
       case Y_VEL:
-	if (valueType == FLOAT)
-		a->y_vel = get_float(valueValue);
-	else if (valueType == INT)
-		a->y_vel = (float)valueValue;
-	break;
+	  	if (valueType != FLOAT && valueType != INT) break;
+		if (valueType == FLOAT)
+			a->y_vel = get_float(valueValue);
+		else if (valueType == INT)
+			a->y_vel = (float)valueValue;
+		break;
 	  case _INPUT_NAME:
 		if (valueType != STRING) break;
-		a->_input_name = valueValue;
+			a->_input_name = valueValue;
 		break;
       default: {
 	Attribute* attr;
@@ -2371,7 +2382,7 @@ int resolve_script(
 		  }
 		}
 		if (found)
-			DL_APPEND(world->actors, ae);
+			DL_PREPEND(world->actors, ae);
 		break;
 	}
     case FRONT: {
@@ -2385,7 +2396,7 @@ int resolve_script(
 		  }
 		}
 		if (found)
-			DL_PREPEND(world->actors, ae);
+			DL_APPEND(world->actors, ae);
 		break;
 	}
     case IMG: {
@@ -2862,9 +2873,11 @@ int resolve_script(
 		break;
 	}
     case SFXOFF: {
+      disable_sfx();
 		break;
 	}
     case SONGOFF: {
+      disable_music();
 		break;
 	}
     case OFFSETBGSCROLLX: {

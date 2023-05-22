@@ -393,7 +393,7 @@ class Actor(Rect):
             for hit in hits:
                 self.collision_with(tangibles[hit], world)
                 tangibles[hit].collision_with(self, world)
-
+               
             while self.move(0, int(self.y_vel)).collidelist(tangibles) != -1:
                 self.y_vel += direction
 

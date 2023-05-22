@@ -36,7 +36,7 @@ LITERAL_KEYWORDS = {
     "None": 0,
     "RAND?": 6,
     "WORLD?": 7,
-    "SONG?": 8,
+    "song?": 8,
     "COLLIDE?": 9,
     "[]": 10,
     "inpA": 11,
@@ -214,9 +214,25 @@ def _intern_strings(SCRIPTS):
                                 if token not in UNIQUE_STRINGS:
                                     UNIQUE_STRINGS.append(token)
 
+    for name in WORLDS.keys():
+        if name not in UNIQUE_STRINGS:
+            UNIQUE_STRINGS.append(name)
+
     for name in ACTORS.ACTORS.keys():
         if name not in UNIQUE_STRINGS:
             UNIQUE_STRINGS.append(name)
+
+    sounds.load()
+    soundfx = sounds.get_sounds()
+    for name in soundfx.keys():
+        if name not in UNIQUE_STRINGS:
+            UNIQUE_STRINGS.append(name)
+
+    songs = sounds.get_songs()
+    for name in songs.keys():
+        song_name = songs[name].split("/")[-1].split(".")[0]
+        if song_name not in UNIQUE_STRINGS:
+            UNIQUE_STRINGS.append(song_name)
 
     for filename in SPRITESHEETS.SPRITESHEETS.keys():
         for name in SPRITESHEETS.SPRITESHEETS[filename].keys():
@@ -635,8 +651,8 @@ def _convert_worlds():
 
     for name in WORLDS.keys():
         background = WORLDS[name]["background"]
-        x_lock = WORLDS[name]["x_lock"]
-        y_lock = WORLDS[name]["y_lock"]
+        x_lock = WORLDS[name]["x_lock"] if "x_lock" in WORLDS[name] else None
+        y_lock = WORLDS[name]["y_lock"] if "y_lock" in WORLDS[name] else None
         worlddata_dot_c += f"    add_world({UNIQUE_STRINGS.index(name)}, {UNIQUE_STRINGS.index(background)}, {x_lock if x_lock is not None else 0}, {y_lock if y_lock is not None else 0});\n"
         for actor in WORLDS[name]["actors"]:
             worlddata_dot_c += f"    add_actor_to_world({UNIQUE_STRINGS.index(name)}, {UNIQUE_STRINGS.index(actor)});\n"
