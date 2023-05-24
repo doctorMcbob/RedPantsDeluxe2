@@ -10,6 +10,7 @@ PLATFORM21 greybackground21 0,0
 PLATFORM22 greybackground22 0,0
 
 |START:0|
+set self state PLATFORM
 set self platform 1
 set self frame 0
 

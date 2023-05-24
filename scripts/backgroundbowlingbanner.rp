@@ -10,6 +10,7 @@ PLATFORM21 bowlingbanner21 0,0
 PLATFORM22 bowlingbanner22 0,0
 
 |START:0|
+set self state PLATFORM
 set self platform 1
 set self frame 0
 

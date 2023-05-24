@@ -10,6 +10,7 @@ PLATFORM21 castlepiece21 0,0
 PLATFORM22 castlepiece22 0,0
 
 |START:0|
+set self state PLATFORM
 set self platform 1
 set self frame 0
 back
