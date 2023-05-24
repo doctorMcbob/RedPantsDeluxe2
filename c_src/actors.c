@@ -571,10 +571,17 @@ void rotate_box_by_actor(Actor* actor, SDL_Rect* rect, int deg) {
       rect->h = h2;
       break;
     case 90:
-      rect->x = x1 + y2;
-      rect->y = y1 + w1 - x2 - w2;
-      rect->w = h2;
-      rect->h = w2;
+      if (actor->direction == 1) {
+        rect->x = x1 + y2;
+        rect->y = y1 + h1 + h1 - x2 - w2;
+        rect->w = h2;
+        rect->h = w2;
+      } else {
+        rect->x = x1 + y2;
+        rect->y = y1 + h1 - x2 - w2;
+        rect->w = h2;
+        rect->h = w2;
+      }
       break;
     case 180:
       rect->x = x1 + w1 - x2 - w2;
@@ -583,10 +590,17 @@ void rotate_box_by_actor(Actor* actor, SDL_Rect* rect, int deg) {
       rect->h = h2;
       break;
     case 270:
-      rect->x = x1 + h1 - y2 - h2;
-      rect->y = y1 + x2;
-      rect->w = h2;
-      rect->h = w2;
+      if (actor->direction == 1) {
+        rect->x = x1 + w1 - y2 - h2;
+        rect->y = y1 + x2 - h1;
+        rect->w = h2;
+        rect->h = w2;
+      } else {
+        rect->x = x1 + w1 - y2 - h2;
+        rect->y = y1 + x2;
+        rect->w = h2;
+        rect->h = w2;
+      }
       break;
   }
 }
@@ -748,14 +762,24 @@ void draw_actor(SDL_Renderer* rend, Actor* actor, Frame* f) {
 
   src.x = 0;
   src.y = 0;
-  if (actor->name == index_string("player10pistol")) printf("%d\n", actor->rotation);
-  if (actor->direction == 1 && (abs(actor->rotation) != 270 && abs(actor->rotation) != 90)) {
-    dest.x = actor->ECB->x + actor->ECB->w - s->offx - dest.w;
-  } else {
-    dest.x = actor->ECB->x + s->offx;
-  }
 
-  dest.y = actor->ECB->y + s->offy;
+  switch (actor->rotation) {
+  case -90:
+  case 90:
+  case 0:
+    dest.x = actor->ECB->x + s->offx;
+    dest.y = actor->ECB->y + s->offy;
+    break;
+  case -270:
+  case 270:
+  case -180:
+  case 180:
+    dest.x = actor->ECB->x + actor->ECB->w - s->offx - dest.w;
+    dest.y = actor->ECB->y + actor->ECB->h - s->offy - dest.h;
+    break;
+  }  
+
+  
   src.w = dest.w;
   src.h = dest.h;
 
@@ -764,6 +788,10 @@ void draw_actor(SDL_Renderer* rend, Actor* actor, Frame* f) {
   SDL_RendererFlip flip = actor->direction == 1 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
   double angle = 0 - actor->rotation;
   SDL_Point pivot = { dest.w / 2, dest.h / 2 };
+
+  // // draw dest rect
+  // SDL_SetRenderDrawColor(rend, 155, 0, 155, 255);
+  // SDL_RenderDrawRect(rend, &dest);
 
   SDL_RenderCopyEx(rend, s->image, &src, &dest, angle, &pivot, flip);
 }
