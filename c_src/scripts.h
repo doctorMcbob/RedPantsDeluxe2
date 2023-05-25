@@ -6,7 +6,7 @@
 #ifndef SCRIPTS_LOAD
 #define SCRIPTS_LOAD 1
 // Define Literal Types
-#define NONE 0
+#define NONE 21
 #define INT 1
 #define FLOAT 2
 #define STRING 3

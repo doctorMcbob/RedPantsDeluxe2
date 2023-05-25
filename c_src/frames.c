@@ -94,20 +94,20 @@ void update_frame(Frame* f) {
     f->scroll_y = f->focus->ECB->y + f->focus->ECB->h / 2 - f->rect.h / 2;
   }
 
-  if (f->bound_left && f->rect.x < f->left_bind) {
-    f->rect.x = f->left_bind;
+  if (f->bound_left && f->scroll_x < f->left_bind) {
+    f->scroll_x = f->left_bind;
   }
 
-  if (f->bound_top && f->rect.y < f->top_bind) {
-    f->rect.y = f->top_bind;
+  if (f->bound_top && f->scroll_y < f->top_bind) {
+    f->scroll_y = f->top_bind;
   }
 
-  if (f->bound_right && f->rect.x + f->rect.w > f->right_bind) {
-    f->rect.x = f->right_bind - f->rect.w;
+  if (f->bound_right && f->scroll_x + f->rect.w > f->right_bind) {
+    f->scroll_x = f->right_bind - f->rect.w;
   }
 
-  if (f->bound_bottom && f->rect.y + f->rect.h < f->bottom_bind) {
-    f->rect.y = f->bottom_bind - f->rect.h;
+  if (f->bound_bottom && f->scroll_y + f->rect.h > f->bottom_bind) {
+    f->scroll_y = f->bottom_bind - f->rect.h;
   }
 }
 

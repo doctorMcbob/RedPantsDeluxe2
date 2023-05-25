@@ -577,29 +577,28 @@ void resolve_operators(int statement, World* world, int debug) {
 	  PARAMS[paramPointer-1] = f == f2;
 	  break;
 	}
-	case (INT + 3*STRING): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = 0;
-	  break;
-	}
-	case (STRING + 3*INT): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = 0;
-	  break;
-	}
-	case (FLOAT + 3*STRING): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = 0;
-	  break;
-	}
-	case (STRING + 3*FLOAT): {
-	  PARAMS[paramPointer-2] = INT;
-	  PARAMS[paramPointer-1] = 0;
-	  break;
-	}
 	case (STRING + 3*STRING): {
 	  PARAMS[paramPointer-2] = INT;
 	  PARAMS[paramPointer-1] = leftValue == rightValue;
+	  break;
+	}
+	case (NONE + 3*NONE): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = 1;
+	  break;
+	}
+	case (INT + 3*STRING): 
+	case (STRING + 3*INT):
+	case (FLOAT + 3*STRING):
+	case (STRING + 3*FLOAT): 
+	case (INT + 3*NONE): 
+	case (FLOAT + 3*NONE): 
+	case (STRING + 3*NONE):
+	case (NONE + 3*INT):
+	case (NONE + 3*STRING):
+	case (NONE + 3*FLOAT): {
+	  PARAMS[paramPointer-2] = INT;
+	  PARAMS[paramPointer-1] = 0;
 	  break;
 	}
 	default: {
@@ -1856,7 +1855,7 @@ int resolve_script(
 	break;
       }
       case NONE: {
-	BUFFER[bufferPointer++] = INT;
+	BUFFER[bufferPointer++] = NONE;
 	BUFFER[bufferPointer++] = 0;
 	break;
       }
@@ -2542,7 +2541,7 @@ int resolve_script(
 		int valueType = PARAMS[4];
 		int valueValue = PARAMS[5];
 
-		if (frameType != STRING || directionType != STRING || valueType != INT) {
+		if (frameType != STRING || directionType != STRING || (valueType != INT && valueType != NONE)) {
 		  print_statement(statement);
 		  printf("Missing or Incorrect Parameter for SCROLLBOUND\n");
 		  break;
@@ -2557,19 +2556,19 @@ int resolve_script(
 
 		switch (directionValue) {
 		  case TOP:
-			f->bound_top = 1;
+			f->bound_top = valueType != NONE;
 			f->top_bind = valueValue;
 			break;
 		  case _LEFT:
-			f->bound_left = 1;
+			f->bound_left = valueType != NONE;
 			f->left_bind = valueValue;
 			break;
 		  case BOTTOM:
-			f->bound_bottom = 1;
+			f->bound_bottom = valueType != NONE;
 			f->bottom_bind = valueValue;
 			break;
 		  case _RIGHT:
-			f->bound_right = 1;
+			f->bound_right = valueType != NONE;
 			f->right_bind = valueValue;
 			break;
 		}
