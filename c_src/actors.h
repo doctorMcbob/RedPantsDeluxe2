@@ -37,6 +37,7 @@ typedef struct Actor {
   int tangible;
   int physics;
   int updated;
+  int background;
   // attribute hash
   Attribute* attributes;
   UT_hash_handle hh;

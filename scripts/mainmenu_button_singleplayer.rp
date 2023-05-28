@@ -12,11 +12,9 @@ set self right_button 0
 set self down_button mainmenu_button_twoplayer0
 set self up_button mainmenu_button_quit0
 set self direction -1
-song firstLevel
 
 |SELECTED:2|
 if self.frame % 10 == 3
-   sfx shotgun_fire
    update_sticks
 endif
 if A_DOWN in inpEVENTS

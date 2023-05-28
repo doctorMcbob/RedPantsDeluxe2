@@ -72,7 +72,7 @@ void add_actor(int name,
   a->name = name;
   a->x_vel = 0;
   a->y_vel = 0;
-  
+  a->background = 0;
   a->hurtboxkey= hurtboxkey;
   
   a->hitboxkey= hitboxkey;
@@ -150,6 +150,7 @@ void copy_actor(Actor* copy,  Actor *a) {
   a->physics = copy->physics;
   a->updated = copy->updated;
   a->attributes = NULL;
+  a->background = copy->background;
 }
 
 void add_template(Actor* copy) {
@@ -419,7 +420,6 @@ int update_actor(int actorKey, int worldKey, int debug) {
   }
   actor->updated = 1;
   actor->img = -1;
-  
   int scriptKey = get_script_for_actor(actor);
   if (scriptKey != -1) {
     int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);

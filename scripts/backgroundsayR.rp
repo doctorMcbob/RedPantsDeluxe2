@@ -14,6 +14,8 @@ set self platform 1
 set self state PLATFORM
 set self timer -1
 back
+set self background 1 
+
 
 |PLATFORM:0|
 if self.frame > self.timer

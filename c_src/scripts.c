@@ -2288,6 +2288,10 @@ int resolve_script(
 		if (valueType != STRING) break;
 			a->_input_name = valueValue;
 		break;
+	case BACKGROUND:
+		if (valueType != INT) break;
+		a->background = valueValue;
+		break;
       default: {
 	Attribute* attr;
 	HASH_FIND_INT(a->attributes, &attrValue, attr);
@@ -2371,17 +2375,37 @@ int resolve_script(
 		break;
 	}
     case BACK: {
-		ActorEntry *ae, *tmp;
-		int found = 0;
+		ActorEntry *ae, *tmp, *found = NULL;
 		DL_FOREACH_SAFE(world->actors, ae, tmp) {
 		  if (ae->actorKey == self->name) {
 			DL_DELETE(world->actors, ae);
-			found++;
+			found = ae;
 			break;
 		  }
 		}
-		if (found)
-			DL_PREPEND(world->actors, ae);
+		if (found != NULL) {
+			ae = world->actors;
+			tmp = NULL;
+			found->next = NULL;
+			found->prev = NULL;
+			Actor* a = get_actor(ae->actorKey);
+			while (a->background != 0) {
+				tmp = ae;
+				ae = ae->next;
+				if (ae == NULL) {
+					DL_APPEND(world->actors, found);
+					break;
+				}
+				a = get_actor(ae->actorKey);
+			}
+			if (ae != NULL) {
+				if (tmp == NULL) {
+					DL_PREPEND_ELEM(world->actors, ae, found);
+				} else {
+					DL_APPEND_ELEM(world->actors, tmp, found);
+				}
+			}
+		}
 		break;
 	}
     case FRONT: {

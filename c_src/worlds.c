@@ -153,12 +153,6 @@ int remove_actor_from_world(World* world, int actorKey) {
 void remove_actor_from_worlds(int actorKey) {
   struct World *w, *tmp;
   HASH_ITER(hh, worlds, w, tmp) {
-    ActorEntry *ae, *tmp2;
-    DL_FOREACH_SAFE(w->actors, ae, tmp2) {
-      if (ae->actorKey == actorKey) {
-        DL_DELETE(w->actors, ae);
-        free(ae);
-      }
-    }
+    remove_actor_from_world(w, actorKey);
   }
 }
