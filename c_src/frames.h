@@ -32,4 +32,5 @@ void update_frame(Frame* frame);
 int has_frame(int worldKey);
 int delete_frame(Frame* frame);
 void scrolled(SDL_Rect* rect, Frame* frame);
+void remove_actor_from_frames(int name);
 #endif

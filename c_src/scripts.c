@@ -2169,6 +2169,7 @@ int resolve_script(
     }
     case GOODBYE: {
 	  remove_actor_from_worlds(self->name);
+	  remove_actor_from_frames(self->name);
 	  free_actor(self);
       clear_ownerless_lists();
 	  return -1;
@@ -2552,7 +2553,6 @@ int resolve_script(
 		  printf("Actor %s not found for FOCUS\n", get_string(nameValue));
 		  break;
 		}
-
 		f->focus = a;
 
 		break;
@@ -2834,7 +2834,16 @@ int resolve_script(
 		  break;
 		}
 
-		Actor *a = add_actor_from_templatekey(templateNameValue, nameValue);
+		Actor *a;
+		a = get_actor(nameValue);
+		if (a != NULL) {
+			remove_actor_from_worlds(a->name);
+			remove_actor_from_frames(a->name);
+			free_actor(a);
+    		clear_ownerless_lists();
+		}
+
+		a = add_actor_from_templatekey(templateNameValue, nameValue);
 		a->ECB->x = xValue;
 		a->ECB->y = yValue;
 

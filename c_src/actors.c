@@ -8,6 +8,7 @@
 # include "frames.h"
 # include "scripts.h"
 # include "boxes.h"
+# include "lists.h"
 # include "stringmachine.h"
 # include "stringdata.h"
 # include <math.h>

@@ -124,3 +124,12 @@ int delete_frame(Frame* frame) {
   free(frame);
   return 0;
 }
+
+void remove_actor_from_frames(int name) {
+  Frame *f, *tmpf;
+  HASH_ITER(hh, frames, f, tmpf) {
+    if (f->focus != NULL && f->focus->name == name) {
+      f->focus = NULL;
+    }
+  }
+}

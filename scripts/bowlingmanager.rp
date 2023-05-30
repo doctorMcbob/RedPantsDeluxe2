@@ -96,7 +96,8 @@ exec focusOn
 set self state WAIT_FOR_THROW
 
 |WAIT_FOR_THROW:0|
-if THROW in bowler.state and bowler.frame == 12
+set self calc bowler.frame == 12
+if THROW in bowler.state and self.calc
    set self focus bowlingball
    exec focusOn
    set self state WAIT
