@@ -477,7 +477,7 @@ if related.state == PUNCH
    set self hit_y_vel -8
 endif
 
-if self.thwacks == None
+if not self.thwacks 
    set self thwacks 1
 endif
 

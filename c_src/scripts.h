@@ -131,9 +131,10 @@ int resolve_script(
 	World* world, 
 	int debug,
 	int eject,
-	int keyType,
-	int keyValue,
-	int replacerType,
-	int replacerValue
+	int keyTypes[],
+	int keyValues[],
+	int replacerTypes[],
+	int replacerValues[],
+	int replacerCount
 );
 #endif

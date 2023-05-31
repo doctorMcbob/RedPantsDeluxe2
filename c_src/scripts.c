@@ -1779,10 +1779,11 @@ int resolve_script(
 	World* world, 
 	int debug,
 	int eject,
-	int keyType,
-	int keyValue,
-	int replacerType,
-	int replacerValue
+	int keyTypes[],
+	int keyValues[],
+	int replacerTypes[],
+	int replacerValues[],
+	int replacerCount
  ) {
   int executionPointer = scriptIdx;
   int ifNested = 0;
@@ -1838,12 +1839,21 @@ int resolve_script(
       case INT:
       case STRING:
       case OPERATOR: {
-	if (SCRIPTS[executionPointer] == keyType && SCRIPTS[executionPointer+1] == keyValue) {
-		BUFFER[bufferPointer++] = replacerType;
-		BUFFER[bufferPointer++] = replacerValue;
-		executionPointer++;	
-		break;
-	}
+		int found = 0;
+		for (int i = 0; i < replacerCount; i++) {
+			int keyType = keyTypes[i];
+			int keyValue = keyValues[i];
+			int replacerType = replacerTypes[i];
+			int replacerValue = replacerValues[i];
+			if (SCRIPTS[executionPointer] == keyType && SCRIPTS[executionPointer+1] == keyValue) {
+				found = 1;
+				BUFFER[bufferPointer++] = replacerType;
+				BUFFER[bufferPointer++] = replacerValue;
+				executionPointer++;	
+				break;
+			}
+		}
+	if (found) break;
 	BUFFER[bufferPointer++] = SCRIPTS[executionPointer];
 	BUFFER[bufferPointer++] = SCRIPTS[++executionPointer];
 	break;
@@ -2369,7 +2379,7 @@ int resolve_script(
 		int script = find_script_from_map(self, state, frame);
 		free(scriptValueStr);
 		if (script != -1) {
-			int resolution = resolve_script(script, self, related, world, debug, -1, -1, -1, -1, -1);
+			int resolution = resolve_script(script, self, related, world, debug, -1, 0, 0, 0, 0, 0);
 			if (resolution < 0)
 				return resolution;
 		}
@@ -2761,7 +2771,7 @@ int resolve_script(
 		
 	    int scriptKey = find_script_from_map(self, _START, 0);
    		if (scriptKey != -1) {
-    		int resolution = resolve_script(scriptKey, self, NULL, world, debug, -1, -1, -1, -1, -1);
+    		int resolution = resolve_script(scriptKey, self, NULL, world, debug, -1, 0, 0, 0, 0, 0);
     		if (resolution < 0) return resolution;
 		}
 		break;
@@ -2851,7 +2861,7 @@ int resolve_script(
 
 		int script = get_script_for_actor(a);
 		if (script != -1) {
-			int resolution = resolve_script(script, a, NULL, world, debug, -1, -1, -1, -1, -1);
+			int resolution = resolve_script(script, a, NULL, world, debug, -1, 0, 0, 0, 0, 0);
 			if (resolution < 0) return resolution;
 		}
 		
@@ -3016,8 +3026,28 @@ int resolve_script(
 			replacementValue = ln->value;
 		  }
 
+		  int* _keyTypes = malloc(sizeof(int) * (replacerCount + 1));
+		  int* _keyValues = malloc(sizeof(int) * (replacerCount + 1));
+		  int* _replacerTypes = malloc(sizeof(int) * (replacerCount + 1));
+		  int* _replacerValues = malloc(sizeof(int) * (replacerCount + 1));
+		  for (int j = 0; j < replacerCount; j++) {
+			_keyTypes[j] = keyTypes[j];
+			_keyValues[j] = keyValues[j];
+			_replacerTypes[j] = replacerTypes[j];
+			_replacerValues[j] = replacerValues[j];
+		  }
+		  _keyTypes[replacerCount] = keyType;
+		  _keyValues[replacerCount] = keyValue;
+		  _replacerTypes[replacerCount] = replacementType;
+		  _replacerValues[replacerCount] = replacementValue;
+
 		  int resolution = resolve_script(idx, self, NULL, world, debug,
-		                                  exit, keyType, keyValue, replacementType, replacementValue);
+		                                  exit, _keyTypes, _keyValues, _replacerTypes, _replacerValues, replacerCount + 1);
+		  free(_keyTypes);
+		  free(_keyValues);
+		  free(_replacerTypes);
+	      free(_replacerValues);
+
 		  if (resolution < 0) return resolution;
 		}
 		executionPointer = exit;

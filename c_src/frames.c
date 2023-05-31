@@ -56,9 +56,11 @@ int in_frame(Frame* frame, Actor* actor) {
   r->w = actor->ECB->w;
   r->h = actor->ECB->h;
   scrolled(r, frame);
+  SDL_Rect frameRect = {0, 0, frame->rect.w, frame->rect.h};
 
-  int i = SDL_HasIntersection(&frame->rect, r);
+  int i = SDL_HasIntersection(&frameRect, r);
   free(r);
+
   if (i)
     return 1;
   else
@@ -66,23 +68,33 @@ int in_frame(Frame* frame, Actor* actor) {
 }
 
 void draw_frame(SDL_Renderer* rend, Frame* f, int debug) {
-  Uint32 format;
   SDL_Texture* render_target = SDL_GetRenderTarget(rend);
-  SDL_QueryTexture(render_target, &format, NULL, NULL, NULL);
   SDL_Texture* frame_buffer = SDL_CreateTexture(
-    rend, format, SDL_TEXTUREACCESS_TARGET, f->rect.w, f->rect.h);
+    rend, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, f->rect.w, f->rect.h);
 
-  SDL_SetRenderTarget(rend, frame_buffer);
+  if (frame_buffer == NULL) {
+    printf("Error creating frame buffer: %s\n", SDL_GetError());
+  }
+
+  if (SDL_SetRenderTarget(rend, frame_buffer) != 0) {
+    printf("Error setting render target: %s\n", SDL_GetError());
+  } 
 
   draw_world(f->world, rend, f);
   if (debug) {
     draw_debug_overlay(f->world, rend, f);
   }
 
-  SDL_SetRenderTarget(rend, render_target);
+  if (SDL_SetRenderTarget(rend, render_target) != 0) {
+    printf("Error resetting render target: %s\n", SDL_GetError());
+  }
 
+  SDL_Rect dest = {f->rect.x, f->rect.y, f->rect.w, f->rect.h};
   SDL_Rect src = {0, 0, f->rect.w, f->rect.h};
-  SDL_RenderCopy(rend, frame_buffer, &src, &f->rect);
+
+  if (SDL_RenderCopy(rend, frame_buffer, &src, &dest) != 0) {
+    printf("Error copying frame buffer: %s\n", SDL_GetError());
+  }
   
   SDL_DestroyTexture(frame_buffer);
 }

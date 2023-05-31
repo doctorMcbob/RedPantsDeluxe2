@@ -58,6 +58,11 @@ int main (int argc, char *argv[]) {
   }
   font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
 
+  // do IMG_Init
+  if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
+    printf("Error initializing SDL2_image: %s\n", IMG_GetError());
+    return 1;
+  }
 
   srand(time(NULL));
 

@@ -227,7 +227,7 @@ void add_template_from_actorkey(int actorKey) {
 int collision_with(Actor *a1, Actor *a2, World* world, int debug) {
   int scriptKey = find_script_from_map(a1, COLLIDE, -1);
   if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, a2, a1, world, debug, -1, -1, -1, -1, -1);
+    int resolution = resolve_script(scriptKey, a2, a1, world, debug, -1, -1, -1, -1, -1, 0);
     if (resolution < 0) return resolution;
   }
   return 0;
@@ -423,7 +423,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
   actor->img = -1;
   int scriptKey = get_script_for_actor(actor);
   if (scriptKey != -1) {
-    int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
+    int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1, 0);
     if (resolution < 0) {
       return resolution;
     }
@@ -438,7 +438,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
   if (x_flag != actor->x_vel && _floor(actor->x_vel) == 0) {
     int scriptKey = find_script_from_map(actor, XCOLLISION, -1);
     if (scriptKey != -1) {
-      int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
+      int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1, 0);
       if (resolution < 0) return resolution;
     }
   }
@@ -446,7 +446,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
     actor->y_vel = 0;
     int scriptKey = find_script_from_map(actor, YCOLLISION, -1);
     if (scriptKey != -1) {
-      int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1);
+      int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1, -1, -1, -1, -1, 0);
       if (resolution < 0) return resolution;
     }
   }
@@ -606,20 +606,17 @@ void rotate_box_by_actor(Actor* actor, SDL_Rect* rect, int deg) {
   }
 }
 
-SDL_Rect* translate_rect_by_actor(Actor* actor, SDL_Rect* rect) {
-  if (actor == NULL || rect == NULL) return NULL;
-  SDL_Rect* new_rect = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-  new_rect->w = rect->w;
-  new_rect->h = rect->h;
+void translate_rect_by_actor(Actor* actor, SDL_Rect* rect) {
+  if (actor == NULL || rect == NULL) return;
+
   if (actor->direction == 1) {
-    new_rect->x = (actor->ECB->x + actor->ECB->w) - (rect->x + rect->w);
-    new_rect->y = actor->ECB->y + rect->y;
+    rect->x = (actor->ECB->x + actor->ECB->w) - (rect->x + rect->w);
+    rect->y = actor->ECB->y + rect->y;
   } else {
-    new_rect->x = actor->ECB->x + rect->x;
-    new_rect->y = actor->ECB->y + rect->y;
+    rect->x = actor->ECB->x + rect->x;
+    rect->y = actor->ECB->y + rect->y;
   }
-  rotate_box_by_actor(actor, new_rect, actor->rotation);
-  return new_rect;
+  rotate_box_by_actor(actor, rect, actor->rotation);
 }
 
 int hit_check(Actor *self, Actor* related, World *world, int debug) {
@@ -631,27 +628,23 @@ int hit_check(Actor *self, Actor* related, World *world, int debug) {
   if (hitboxes == NULL) return 0;
 
   for (int i=0; i<hurtboxes->count; i++) {
-    SDL_Rect *hurtbox = translate_rect_by_actor(self, &(hurtboxes->rect[i]));
+    SDL_Rect hurtbox = {hurtboxes->rect[i].x, hurtboxes->rect[i].y, hurtboxes->rect[i].w, hurtboxes->rect[i].h};
+    translate_rect_by_actor(self, &hurtbox);
 
     for (int j=0; j<hitboxes->count; j++) {
-      SDL_Rect *hitbox = translate_rect_by_actor(related, &(hitboxes->rect[j]));
-      if (SDL_HasIntersection(hurtbox, hitbox)) {
+      SDL_Rect hitbox = {hitboxes->rect[j].x, hitboxes->rect[j].y, hitboxes->rect[j].w, hitboxes->rect[j].h};
+      translate_rect_by_actor(related, &hitbox);
+      if (SDL_HasIntersection(&hurtbox, &hitbox)) {
         int scriptKey = find_script_from_map(related, HIT, -1);
         if (scriptKey != -1) {
-          int resolution = resolve_script(scriptKey, self, related, world, debug, -1, -1, -1, -1, -1);
+          int resolution = resolve_script(scriptKey, self, related, world, debug, -1, -1, -1, -1, -1, 0);
           if (resolution < 0) {
-            free(hitbox);
-            free(hurtbox);
             return resolution;
           }
         }
         break;
       }
-
-      free(hitbox);
     }
-
-    free(hurtbox);
   }
   return 0;
 }

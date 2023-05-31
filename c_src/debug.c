@@ -321,43 +321,38 @@ void draw_debug_overlay(World* world, SDL_Renderer* rend, Frame* frame) {
     Actor* a;
     a = get_actor(ae->actorKey);
 
-    SDL_Rect *ECB = (SDL_Rect*)malloc(sizeof(SDL_Rect));
-    ECB->x = a->ECB->x;
-    ECB->y = a->ECB->y;
-    ECB->w = a->ECB->w;  
-    ECB->h = a->ECB->h;
+    SDL_Rect ECB = { a->ECB->x, a->ECB->y, a->ECB->w, a->ECB->h };
 
-    scrolled(ECB, frame);
+    scrolled(&ECB, frame);
 
     SDL_SetRenderDrawColor(rend, 0, 0, 255, 255);
 
-    SDL_RenderDrawRect(rend, ECB);
-
+    SDL_RenderDrawRect(rend, &ECB);
     BoxMapEntry *bme;
     bme = get_hurtboxes_for_actor(a);
     if (bme != NULL) {
       for (int i=0; i<bme->count; i++) {
-        SDL_Rect *hurtbox = translate_rect_by_actor(a, &(bme->rect[i]));
-        scrolled(hurtbox, frame);
+        SDL_Rect hurtbox = {bme->rect[i].x, bme->rect[i].y, bme->rect[i].w, bme->rect[i].h};
+        translate_rect_by_actor(a, &hurtbox);
+        scrolled(&hurtbox, frame);
         SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
-        SDL_RenderDrawRect(rend, hurtbox);
-        free(hurtbox);
+        SDL_RenderDrawRect(rend, &hurtbox);
       }
     }
 
     bme = get_hitboxes_for_actor(a);
     if (bme != NULL) {
       for (int i=0; i<bme->count; i++) {
-        SDL_Rect *hitbox = translate_rect_by_actor(a, &(bme->rect[i]));
-        scrolled(hitbox, frame);
+        SDL_Rect hitbox = {bme->rect[i].x, bme->rect[i].y, bme->rect[i].w, bme->rect[i].h};
+        translate_rect_by_actor(a, &hitbox);
+        scrolled(&hitbox, frame);
         SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
-        SDL_RenderDrawRect(rend, hitbox);
-        free(hitbox);
+        SDL_RenderDrawRect(rend, &hitbox);
       }
     }
 
     if (!hasTextDrawn) {
-      if (mouseX >= ECB->x && mouseX < ECB->x + ECB->w && mouseY >= ECB->y && mouseY < ECB->y + ECB->h) {
+      if (mouseX >= ECB.x && mouseX < ECB.x + ECB.w && mouseY >= ECB.y && mouseY < ECB.y + ECB.h) {
         char data[100]; // buffer to hold the formatted string
         sprintf(data, "%s %s:%iT?%i",
                 get_string(ae->actorKey), get_string(a->state), a->frame, a->tangible);
@@ -374,6 +369,5 @@ void draw_debug_overlay(World* world, SDL_Renderer* rend, Frame* frame) {
         hasTextDrawn = 1;
       }
     }
-    free(ECB);
   }
 }
