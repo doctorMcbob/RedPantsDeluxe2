@@ -1709,10 +1709,13 @@ void resolve_operators(int statement, World *world, int debug) {
           break;
         }
 
-        if (rightType != INT) {
+        if (rightType != INT && rightType != FLOAT) {
           print_statement(statement);
-          printf("Cannot range with non-int\n");
+          printf("Cannot range with non-number\n");
           break;
+        }
+        if (rightType == FLOAT) {
+          rightValue = (int)get_float(rightValue);
         }
 
         int list = add_list();
@@ -3053,11 +3056,13 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int valueType = PARAMS[2];
       int valueValue = PARAMS[3];
 
-      if (worldType != STRING || valueType != INT) {
+      if (worldType != STRING || (valueType != INT && valueType != FLOAT)) {
         print_statement(statement);
         printf("Missing or Incorrect Parameter for OFFSETBGSCROLLX\n");
         break;
       }
+      if (valueType == FLOAT)
+        valueValue = (int)get_float(valueValue);
 
       World *w = get_world(worldValue);
       if (w == NULL) {
@@ -3076,11 +3081,13 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int valueType = PARAMS[2];
       int valueValue = PARAMS[3];
 
-      if (worldType != STRING || valueType != INT) {
+      if (worldType != STRING || (valueType != INT && valueType != FLOAT)) {
         print_statement(statement);
         printf("Missing or Incorrect Parameter for OFFSETBGSCROLLY\n");
         break;
       }
+      if (valueType == FLOAT)
+        valueValue = (int)get_float(valueValue);
 
       World *w = get_world(worldValue);
       if (w == NULL) {
@@ -3128,9 +3135,9 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       if (iterType == STRING) {
         len = strlen(get_string(iterValue));
       } else {
+        add_owner(iterValue);
         len = len_list(iterValue);
       }
-
       for (int i = 0; i < len; i++) {
         int replacementType;
         int replacementValue;
@@ -3150,6 +3157,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
           ListNode *ln;
           ln = get_from_list(iterValue, i);
           if (ln == NULL) {
+            remove_owner(iterValue);
             break;
           }
           replacementType = ln->type;
@@ -3179,10 +3187,13 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         free(_replacerTypes);
         free(_replacerValues);
 
-        if (resolution < 0)
+        if (resolution < 0) {
+          remove_owner(iterValue);
           return resolution;
+        }
       }
       executionPointer = exit;
+      remove_owner(iterValue);
       break;
     }
     case ENDFOR: {
