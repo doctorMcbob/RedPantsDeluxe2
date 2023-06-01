@@ -198,8 +198,11 @@ if self.x_vel != 0 and inpA
    set self frame 0
 endif
 
-set self calc inpRIGHT and self.direction == 1
-set self calc inpLEFT and self.direction == -1 or self.calc
+set self calc self.direction == 1
+set self calc inpRIGHT and self.calc
+set self calc2 self.direction == -1
+set self calc2 inpLEFT and self.calc2
+set self calc self.calc or self.calc2
 if inpB
    if self.calc
       set self state HADOKEN
@@ -281,15 +284,22 @@ if self.x_vel != 0
    exec applyGrav
 endif
 if abs self.x_vel < self.speed
+
    set self calc1 self.x_vel > 0 and inpRIGHT
    set self calc1 not inpLEFT and self.calc1
+
    if self.calc1
       set self direction 1
    endif
-   if not inpRIGHT and self.x_vel < 0 and inpLEFT
+   
+   set self calc2 self.x_vel < 0 and inpLEFT
+   set self calc2 not inpRIGHT and self.calc2
+
+   if self.calc2
       set self direction -1
    endif
-   if not inpRIGHT and self.x_vel < 0 and inpLEFT or self.calc1
+   
+   if self.calc1 or self.calc2
       set self state RUNNING
       set self frame 0
    endif
@@ -312,14 +322,18 @@ if not self.calc1 nor self.calc2
    if B_DOWN in inpEVENTS and inpUP
       set self state SHORYUSTART
    endif
-   set self calc inpRIGHT and self.direction == -1
-   set self calc inpLEFT and self.direction == 1 or self.calc
+   set self calc self.direction == -1
+   set self calc inpRIGHT and self.calc
+   set self calc_ self.direction == 1
+   set self calc inpLEFT and self.calc_ or self.calc
    if B_DOWN in inpEVENTS and self.calc
       set self state TATSUSTART
       set self frame 0
    endif
-   set self calc inpRIGHT and self.direction == 1
-   set self calc inpLEFT and self.direction == -1 or self.calc
+   set self calc self.direction == 1
+   set self calc inpRIGHT and self.calc
+   set self calc_ self.direction == -1
+   set self calc inpLEFT and self.calc_ or self.calc
    if B_DOWN in inpEVENTS and self.calc and inpDOWN
       set self state AIRHADOKEN
       set self frame 0
