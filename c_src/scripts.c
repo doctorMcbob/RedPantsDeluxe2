@@ -3072,7 +3072,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         break;
       }
 
-      w->background_x_scroll = valueValue;
+      w->background_x_scroll += valueValue;
       break;
     }
     case OFFSETBGSCROLLY: {
@@ -3097,7 +3097,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         break;
       }
 
-      w->background_y_scroll = valueValue;
+      w->background_y_scroll += valueValue;
       break;
     }
     case FOR: {

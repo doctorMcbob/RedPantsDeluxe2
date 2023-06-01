@@ -95,11 +95,13 @@ void _draw_background(World *world, SDL_Renderer *rend, Frame *frame) {
   SDL_GetRendererOutputSize(rend, &w, &h);
 
   for (int y = 0; y < h / dest.h + 2; y++) {
-    dest.y = y * dest.h + world->background_y_scroll;
-    dest.y -= alt_modulo((frame->scroll_y / 2), dest.h);
+    dest.y = y * dest.h;
+    dest.y -=
+        alt_modulo((frame->scroll_y / 2) + world->background_y_scroll, dest.h);
     for (int x = 0; x < w / dest.w + 2; x++) {
-      dest.x = x * dest.w + world->background_x_scroll;
-      dest.x -= alt_modulo(frame->scroll_x / 2, dest.w);
+      dest.x = x * dest.w;
+      dest.x -= alt_modulo((frame->scroll_x / 2) + world->background_x_scroll,
+                           dest.w);
       SDL_RenderCopy(rend, background->image, &src, &dest);
     }
   }
