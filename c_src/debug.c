@@ -1,142 +1,142 @@
-#include "stdio.h"
-#include "scripts.h"
 #include "floatmachine.h"
-#include "scriptdata.h"
-#include "stringmachine.h"
 #include "frames.h"
+#include "scriptdata.h"
+#include "scripts.h"
+#include "stdio.h"
+#include "stringmachine.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-TTF_Font* font;
+TTF_Font *font;
 
 void _debug_print_verb(int verb) {
   switch (verb) {
-    case QUIT:
-      printf("QUIT ");
-      break;
-    case GOODBYE:
-      printf("GOODBYE ");
-      break;
-    case BREAK:
-      printf("BREAK ");
-      break;
-    case RESET:
-      printf("RESET ");
-      break;
-    case SET:
-      printf("SET ");
-      break;
-    case REASSIGN:
-      printf("REASSIGN ");
-      break;
-    case IF:
-      printf("IF ");
-      break;
-    case ENDIF:
-      printf("ENDIF ");
-      break;
-    case EXEC:
-      printf("EXEC ");
-      break;
-    case BACK:
-      printf("BACK ");
-      break;
-    case FRONT:
-      printf("FRONT ");
-      break;
-    case IMG:
-      printf("IMG ");
-      break;
-    case ACTIVATE:
-      printf("ACTIVATE ");
-      break;
-    case DEACTIVATE:
-      printf("DEACTIVATE ");
-      break;
-    case KILLFRAME:
-      printf("KILLFRAME ");
-      break;
-    case MAKEFRAME:
-      printf("MAKEFRAME ");
-      break;
-    case FOCUS:
-      printf("FOCUS ");
-      break;
-    case SCROLLBOUND:
-      printf("SCROLLBOUND ");
-      break;
-    case VIEW:
-      printf("VIEW ");
-      break;
-    case MOVE:
-      printf("MOVE ");
-      break;
-    case PLACE:
-      printf("PLACE ");
-      break;
-    case TAKE:
-      printf("TAKE ");
-      break;
-    case TAKEALL:
-      printf("TAKEALL ");
-      break;
-    case REBRAND:
-      printf("REBRAND ");
-      break;
-    case REMOVE:
-      printf("REMOVE ");
-      break;
-    case ADD:
-      printf("ADD ");
-      break;
-    case HITBOXES:
-      printf("HITBOXES ");
-      break;
-    case HURTBOXES:
-      printf("HURTBOXES ");
-      break;
-    case CREATE:
-      printf("CREATE ");
-      break;
-    case UPDATE:
-      printf("UPDATE ");
-      break;
-    case SFX:
-      printf("SFX ");
-      break;
-    case SONG:
-      printf("SONG ");
-      break;
-    case SFXOFF:
-      printf("SFXOFF ");
-      break;
-    case SONGOFF:
-      printf("SONGOFF ");
-      break;
-    case OFFSETBGSCROLLX:
-      printf("OFFSETBGSCROLLX ");
-      break;
-    case OFFSETBGSCROLLY:
-      printf("OFFSETBGSCROLLY ");
-      break;
-    case FOR:
-      printf("FOR ");
-      break;
-    case ENDFOR:
-      printf("ENDFOR ");
-      break;
-    case PRINT:
-      printf("PRINT ");
-      break;
-    case UPDATE_STICKS:
-      printf("UPDATE_STICKS ");
-      break;
+  case QUIT:
+    printf("QUIT ");
+    break;
+  case GOODBYE:
+    printf("GOODBYE ");
+    break;
+  case BREAK:
+    printf("BREAK ");
+    break;
+  case RESET:
+    printf("RESET ");
+    break;
+  case SET:
+    printf("SET ");
+    break;
+  case REASSIGN:
+    printf("REASSIGN ");
+    break;
+  case IF:
+    printf("IF ");
+    break;
+  case ENDIF:
+    printf("ENDIF ");
+    break;
+  case EXEC:
+    printf("EXEC ");
+    break;
+  case BACK:
+    printf("BACK ");
+    break;
+  case FRONT:
+    printf("FRONT ");
+    break;
+  case IMG:
+    printf("IMG ");
+    break;
+  case ACTIVATE:
+    printf("ACTIVATE ");
+    break;
+  case DEACTIVATE:
+    printf("DEACTIVATE ");
+    break;
+  case KILLFRAME:
+    printf("KILLFRAME ");
+    break;
+  case MAKEFRAME:
+    printf("MAKEFRAME ");
+    break;
+  case FOCUS:
+    printf("FOCUS ");
+    break;
+  case SCROLLBOUND:
+    printf("SCROLLBOUND ");
+    break;
+  case VIEW:
+    printf("VIEW ");
+    break;
+  case MOVE:
+    printf("MOVE ");
+    break;
+  case PLACE:
+    printf("PLACE ");
+    break;
+  case TAKE:
+    printf("TAKE ");
+    break;
+  case TAKEALL:
+    printf("TAKEALL ");
+    break;
+  case REBRAND:
+    printf("REBRAND ");
+    break;
+  case REMOVE:
+    printf("REMOVE ");
+    break;
+  case ADD:
+    printf("ADD ");
+    break;
+  case HITBOXES:
+    printf("HITBOXES ");
+    break;
+  case HURTBOXES:
+    printf("HURTBOXES ");
+    break;
+  case CREATE:
+    printf("CREATE ");
+    break;
+  case UPDATE:
+    printf("UPDATE ");
+    break;
+  case SFX:
+    printf("SFX ");
+    break;
+  case SONG:
+    printf("SONG ");
+    break;
+  case SFXOFF:
+    printf("SFXOFF ");
+    break;
+  case SONGOFF:
+    printf("SONGOFF ");
+    break;
+  case OFFSETBGSCROLLX:
+    printf("OFFSETBGSCROLLX ");
+    break;
+  case OFFSETBGSCROLLY:
+    printf("OFFSETBGSCROLLY ");
+    break;
+  case FOR:
+    printf("FOR ");
+    break;
+  case ENDFOR:
+    printf("ENDFOR ");
+    break;
+  case PRINT:
+    printf("PRINT ");
+    break;
+  case UPDATE_STICKS:
+    printf("UPDATE_STICKS ");
+    break;
   }
 }
 
 void _debug_print_operator(int operator) {
-  switch(operator) {
+  switch (operator) {
   case PLUS:
     printf("+ ");
     break;
@@ -311,17 +311,16 @@ void print_statement(int statementKey) {
   printf("\n");
 }
 
-
-void draw_debug_overlay(World* world, SDL_Renderer* rend, Frame* frame) {
+void draw_debug_overlay(World *world, SDL_Renderer *rend, Frame *frame) {
   struct ActorEntry *ae;
   int mouseX, mouseY;
   SDL_GetMouseState(&mouseX, &mouseY);
   int hasTextDrawn = 0;
   DL_FOREACH(world->actors, ae) {
-    Actor* a;
+    Actor *a;
     a = get_actor(ae->actorKey);
 
-    SDL_Rect ECB = { a->ECB->x, a->ECB->y, a->ECB->w, a->ECB->h };
+    SDL_Rect ECB = {a->ECB->x, a->ECB->y, a->ECB->w, a->ECB->h};
 
     scrolled(&ECB, frame);
 
@@ -331,8 +330,9 @@ void draw_debug_overlay(World* world, SDL_Renderer* rend, Frame* frame) {
     BoxMapEntry *bme;
     bme = get_hurtboxes_for_actor(a);
     if (bme != NULL) {
-      for (int i=0; i<bme->count; i++) {
-        SDL_Rect hurtbox = {bme->rect[i].x, bme->rect[i].y, bme->rect[i].w, bme->rect[i].h};
+      for (int i = 0; i < bme->count; i++) {
+        SDL_Rect hurtbox = {bme->rect[i].x, bme->rect[i].y, bme->rect[i].w,
+                            bme->rect[i].h};
         translate_rect_by_actor(a, &hurtbox);
         scrolled(&hurtbox, frame);
         SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
@@ -342,8 +342,9 @@ void draw_debug_overlay(World* world, SDL_Renderer* rend, Frame* frame) {
 
     bme = get_hitboxes_for_actor(a);
     if (bme != NULL) {
-      for (int i=0; i<bme->count; i++) {
-        SDL_Rect hitbox = {bme->rect[i].x, bme->rect[i].y, bme->rect[i].w, bme->rect[i].h};
+      for (int i = 0; i < bme->count; i++) {
+        SDL_Rect hitbox = {bme->rect[i].x, bme->rect[i].y, bme->rect[i].w,
+                           bme->rect[i].h};
         translate_rect_by_actor(a, &hitbox);
         scrolled(&hitbox, frame);
         SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
@@ -352,16 +353,17 @@ void draw_debug_overlay(World* world, SDL_Renderer* rend, Frame* frame) {
     }
 
     if (!hasTextDrawn) {
-      if (mouseX >= ECB.x && mouseX < ECB.x + ECB.w && mouseY >= ECB.y && mouseY < ECB.y + ECB.h) {
+      if (mouseX >= ECB.x && mouseX < ECB.x + ECB.w && mouseY >= ECB.y &&
+          mouseY < ECB.y + ECB.h) {
         char data[100]; // buffer to hold the formatted string
-        sprintf(data, "%s %s:%iT?%i",
-                get_string(ae->actorKey), get_string(a->state), a->frame, a->tangible);
+        sprintf(data, "%s %s:%iT?%i", get_string(ae->actorKey),
+                get_string(a->state), a->frame, a->tangible);
 
-        SDL_Color textColor = { 0, 0, 0 };
-        SDL_Surface* surface = TTF_RenderText_Solid(font, data, textColor);
+        SDL_Color textColor = {0, 0, 0};
+        SDL_Surface *surface = TTF_RenderText_Solid(font, data, textColor);
 
-        SDL_Texture* Message = SDL_CreateTextureFromSurface(rend, surface);
-        SDL_Rect Message_rect = { mouseX, mouseY, surface->w, surface->h };
+        SDL_Texture *Message = SDL_CreateTextureFromSurface(rend, surface);
+        SDL_Rect Message_rect = {mouseX, mouseY, surface->w, surface->h};
         SDL_RenderCopy(rend, Message, NULL, &Message_rect);
 
         SDL_FreeSurface(surface);

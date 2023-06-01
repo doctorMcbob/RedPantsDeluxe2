@@ -6,27 +6,27 @@
    key maps are what the engine will use to manage the virtual controller
 
    KEY DOWN -> event.key is SDLK_UP
-   for each KeyMap in our hash, 
+   for each KeyMap in our hash,
        is SDLK_UP KeyMap.A?
        is SDLK_UP KeyMap.B?
        is SDLK_UP KeyMap.X?
        is SDLK_UP KeyMap.Y?
        is SDLK_UP KeyMap.up?
           update controller with the same name InputState.UP = 1
-	  add UP_DOWN event to InputState.EVENTS
+          add UP_DOWN event to InputState.EVENTS
 
-       
+
  */
 
-# include "uthash.h"
-# include "inputs.h"
-# include <SDL2/SDL.h>
-# include <SDL2/SDL_image.h>
+#include "inputs.h"
+#include "uthash.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-InputHashNode* input_states = NULL;
-KeyHashNode* key_maps = NULL;
+InputHashNode *input_states = NULL;
+KeyHashNode *key_maps = NULL;
 
-void add_input_state(int name, SDL_Joystick* joy) {
+void add_input_state(int name, SDL_Joystick *joy) {
   struct InputHashNode *is;
   is = malloc(sizeof(InputHashNode));
   if (is == NULL) {
@@ -45,7 +45,7 @@ void add_input_state(int name, SDL_Joystick* joy) {
   input_state->DOWN = 0;
   input_state->START = 0;
   for (int i = 0; i < 18; i++) {
-	input_state->EVENTS[i] = 0;
+    input_state->EVENTS[i] = 0;
   }
   if (input_state == NULL) {
     printf("Error creating InputState\n");
@@ -59,7 +59,7 @@ void add_input_state(int name, SDL_Joystick* joy) {
       printf("Error creating KeyHashNode\n");
       exit(-1);
     }
-    
+
     struct KeyMap *key_map;
     key_map = malloc(sizeof(KeyMap));
     if (key_map == NULL) {
@@ -79,18 +79,18 @@ void add_input_state(int name, SDL_Joystick* joy) {
     key_map->DOWN = SDLK_DOWN;
 
     key_map->START = SDLK_RETURN;
-   
+
     km->keymap = key_map;
-	km->name = name;
+    km->name = name;
     HASH_ADD_INT(key_maps, name, km);
   }
   is->name = name;
   is->data = input_state;
-  
+
   HASH_ADD_INT(input_states, name, is);
 }
 
-InputState* get_input_state(int name) {
+InputState *get_input_state(int name) {
   struct InputHashNode *is;
 
   HASH_FIND_INT(input_states, &name, is);
@@ -115,123 +115,121 @@ int input_update() {
     switch (event.type) {
     case SDL_QUIT:
       return -1;
-   case SDL_KEYDOWN:
-      {
-		if (event.key.repeat != 0) continue;
-	if (event.key.keysym.sym == SDLK_ESCAPE) {
-	  return -1;
-	}
-	KeyHashNode *km, *tmp;
-	HASH_ITER(hh, key_maps, km, tmp) {
-	  InputHashNode* inputNode;
-	  HASH_FIND_INT(input_states, &(km->name), inputNode);
-	  if (inputNode == NULL || inputNode->data == NULL) {
-	    printf("Unfortunately there was no input state with the name %i", km->name);
-	    continue;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->A) {
-	    inputNode->data->A = 1;
-	    inputNode->data->EVENTS[A_DOWN] = 1;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->B) {
-	    inputNode->data->B = 1;
-	    inputNode->data->EVENTS[B_DOWN] = 1;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->X) {
-	    inputNode->data->X = 1;
-	    inputNode->data->EVENTS[X_DOWN] = 1;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->Y) {
-	    inputNode->data->Y = 1;
-	    inputNode->data->EVENTS[Y_DOWN] = 1;
-	  }
-
-	  
-	  if (event.key.keysym.sym == km->keymap->LEFT) {
-	    inputNode->data->LEFT = 1;
-	    inputNode->data->EVENTS[LEFT_DOWN] = 1;
-	  }
-	  if (event.key.keysym.sym == km->keymap->UP) {
-	    inputNode->data->UP = 1;
-	    inputNode->data->EVENTS[UP_DOWN] = 1;
-	  }
-	  if (event.key.keysym.sym == km->keymap->RIGHT) {
-	    inputNode->data->RIGHT = 1;
-	    inputNode->data->EVENTS[RIGHT_DOWN] = 1;
-	  }
-	  if (event.key.keysym.sym == km->keymap->DOWN) {
-	    inputNode->data->DOWN = 1;
-	    inputNode->data->EVENTS[DOWN_DOWN] = 1;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->START) {
-	    inputNode->data->START = 1;
-	    inputNode->data->EVENTS[START_DOWN] = 1;
-	  }
-	}
-	break;
+    case SDL_KEYDOWN: {
+      if (event.key.repeat != 0)
+        continue;
+      if (event.key.keysym.sym == SDLK_ESCAPE) {
+        return -1;
       }
-    case SDL_KEYUP:
-      {
-	KeyHashNode *km, *tmp;
-	HASH_ITER(hh, key_maps, km, tmp) {
-	  InputHashNode* inputNode;
-	  HASH_FIND_INT(input_states, &km->name, inputNode);
-	  if (!inputNode) {
-	    printf("Unfortunately there was no input state with the name %i", km->name);
-	    continue;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->A) {
-	    inputNode->data->A = 0;
-	    inputNode->data->EVENTS[A_UP] = 1;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->B) {
-	    inputNode->data->B = 0;
-	    inputNode->data->EVENTS[B_UP] = 1;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->X) {
-	    inputNode->data->X = 0;
-	    inputNode->data->EVENTS[X_UP] = 1;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->Y) {
-	    inputNode->data->Y = 0;
-	    inputNode->data->EVENTS[Y_UP] = 1;
-	  }
+      KeyHashNode *km, *tmp;
+      HASH_ITER(hh, key_maps, km, tmp) {
+        InputHashNode *inputNode;
+        HASH_FIND_INT(input_states, &(km->name), inputNode);
+        if (inputNode == NULL || inputNode->data == NULL) {
+          printf("Unfortunately there was no input state with the name %i",
+                 km->name);
+          continue;
+        }
 
-	  
-	  if (event.key.keysym.sym == km->keymap->LEFT) {
-	    inputNode->data->LEFT = 0;
-	    inputNode->data->EVENTS[LEFT_UP] = 1;
-	  }
-	  if (event.key.keysym.sym == km->keymap->UP) {
-	    inputNode->data->UP = 0;
-	    inputNode->data->EVENTS[UP_UP] = 1;
-	  }
-	  if (event.key.keysym.sym == km->keymap->RIGHT) {
-	    inputNode->data->RIGHT = 0;
-	    inputNode->data->EVENTS[RIGHT_UP] = 1;
-	  }
-	  if (event.key.keysym.sym == km->keymap->DOWN) {
-	    inputNode->data->DOWN = 0;
-	    inputNode->data->EVENTS[DOWN_UP] = 1;
-	  }
-	  
-	  if (event.key.keysym.sym == km->keymap->START) {
-	    inputNode->data->START = 0;
-	    inputNode->data->EVENTS[START_UP] = 1;
-	  }
-	}
+        if (event.key.keysym.sym == km->keymap->A) {
+          inputNode->data->A = 1;
+          inputNode->data->EVENTS[A_DOWN] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->B) {
+          inputNode->data->B = 1;
+          inputNode->data->EVENTS[B_DOWN] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->X) {
+          inputNode->data->X = 1;
+          inputNode->data->EVENTS[X_DOWN] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->Y) {
+          inputNode->data->Y = 1;
+          inputNode->data->EVENTS[Y_DOWN] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->LEFT) {
+          inputNode->data->LEFT = 1;
+          inputNode->data->EVENTS[LEFT_DOWN] = 1;
+        }
+        if (event.key.keysym.sym == km->keymap->UP) {
+          inputNode->data->UP = 1;
+          inputNode->data->EVENTS[UP_DOWN] = 1;
+        }
+        if (event.key.keysym.sym == km->keymap->RIGHT) {
+          inputNode->data->RIGHT = 1;
+          inputNode->data->EVENTS[RIGHT_DOWN] = 1;
+        }
+        if (event.key.keysym.sym == km->keymap->DOWN) {
+          inputNode->data->DOWN = 1;
+          inputNode->data->EVENTS[DOWN_DOWN] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->START) {
+          inputNode->data->START = 1;
+          inputNode->data->EVENTS[START_DOWN] = 1;
+        }
       }
+      break;
+    }
+    case SDL_KEYUP: {
+      KeyHashNode *km, *tmp;
+      HASH_ITER(hh, key_maps, km, tmp) {
+        InputHashNode *inputNode;
+        HASH_FIND_INT(input_states, &km->name, inputNode);
+        if (!inputNode) {
+          printf("Unfortunately there was no input state with the name %i",
+                 km->name);
+          continue;
+        }
+
+        if (event.key.keysym.sym == km->keymap->A) {
+          inputNode->data->A = 0;
+          inputNode->data->EVENTS[A_UP] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->B) {
+          inputNode->data->B = 0;
+          inputNode->data->EVENTS[B_UP] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->X) {
+          inputNode->data->X = 0;
+          inputNode->data->EVENTS[X_UP] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->Y) {
+          inputNode->data->Y = 0;
+          inputNode->data->EVENTS[Y_UP] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->LEFT) {
+          inputNode->data->LEFT = 0;
+          inputNode->data->EVENTS[LEFT_UP] = 1;
+        }
+        if (event.key.keysym.sym == km->keymap->UP) {
+          inputNode->data->UP = 0;
+          inputNode->data->EVENTS[UP_UP] = 1;
+        }
+        if (event.key.keysym.sym == km->keymap->RIGHT) {
+          inputNode->data->RIGHT = 0;
+          inputNode->data->EVENTS[RIGHT_UP] = 1;
+        }
+        if (event.key.keysym.sym == km->keymap->DOWN) {
+          inputNode->data->DOWN = 0;
+          inputNode->data->EVENTS[DOWN_UP] = 1;
+        }
+
+        if (event.key.keysym.sym == km->keymap->START) {
+          inputNode->data->START = 0;
+          inputNode->data->EVENTS[START_UP] = 1;
+        }
+      }
+    }
     }
   }
   return 1;
 }
-

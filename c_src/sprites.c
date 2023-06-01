@@ -9,15 +9,15 @@ and the similar imlpementation of a doubly linked list `utlist.h`
 https://github.com/troydhanson/uthash/blob/master/src/utlist.h
 */
 
-# include "uthash.h"
-# include "utlist.h"
-# include "sprites.h"
-# include "stringmachine.h"
-# include <SDL2/SDL.h>
-# include <SDL2/SDL_image.h>
+#include "sprites.h"
+#include "stringmachine.h"
+#include "uthash.h"
+#include "utlist.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
-Sprite* sprites = NULL;
-SpriteMap* spritemaps = NULL;
+Sprite *sprites = NULL;
+SpriteMap *spritemaps = NULL;
 
 void sprites_taredown() {
   struct Sprite *s, *tmp;
@@ -49,7 +49,7 @@ void add_sprite_map(int name) {
   HASH_ADD_INT(spritemaps, name, sm);
 }
 
-SpriteMap* get_sprite_map(int name) {
+SpriteMap *get_sprite_map(int name) {
   struct SpriteMap *sm;
 
   HASH_FIND_INT(spritemaps, &name, sm);
@@ -66,7 +66,7 @@ void add_to_sprite_map(int name, int state, int frame, int spriteKey) {
     printf("No sprite map %s\n", get_string(name));
     return;
   }
-  
+
   struct SpriteMapEntry *sme;
   sme = malloc(sizeof(SpriteMapEntry));
   if (sme == NULL) {
@@ -79,7 +79,7 @@ void add_to_sprite_map(int name, int state, int frame, int spriteKey) {
   DL_APPEND(sm->entries, sme);
 }
 
-void add_sprite(int name, SDL_Texture* image) {
+void add_sprite(int name, SDL_Texture *image) {
   struct Sprite *s;
   s = malloc(sizeof(Sprite));
   if (s == NULL) {
@@ -90,7 +90,7 @@ void add_sprite(int name, SDL_Texture* image) {
   HASH_ADD_INT(sprites, name, s);
 }
 
-Sprite* get_sprite(int name) {
+Sprite *get_sprite(int name) {
   struct Sprite *s;
 
   HASH_FIND_INT(sprites, &name, s);
@@ -110,23 +110,22 @@ void add_offset(int name, int x, int y) {
   }
 }
 
-void load_sprite(int name, const unsigned char sprite[][4], int w, int h, SDL_Renderer* rend) {
-    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGBA32);
-    Uint32* pixels = (Uint32*)surface->pixels;
+void load_sprite(int name, const unsigned char sprite[][4], int w, int h,
+                 SDL_Renderer *rend) {
+  SDL_Surface *surface =
+      SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_RGBA32);
+  Uint32 *pixels = (Uint32 *)surface->pixels;
 
-    for (int y = 0; y < h; y++) {
-        for (int x = 0; x < w; x++) {
-            Uint32 pixel = SDL_MapRGBA(surface->format,
-				       sprite[y*w+x][0],
-				       sprite[y*w+x][1],
-				       sprite[y*w+x][2],
-				       sprite[y*w+x][3]);
-            pixels[y * w + x] = pixel;
-        }
+  for (int y = 0; y < h; y++) {
+    for (int x = 0; x < w; x++) {
+      Uint32 pixel = SDL_MapRGBA(surface->format, sprite[y * w + x][0],
+                                 sprite[y * w + x][1], sprite[y * w + x][2],
+                                 sprite[y * w + x][3]);
+      pixels[y * w + x] = pixel;
     }
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(rend, surface);
-    add_sprite(name, texture);
+  }
+  SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, surface);
+  add_sprite(name, texture);
 
-    SDL_FreeSurface(surface);
+  SDL_FreeSurface(surface);
 }
-

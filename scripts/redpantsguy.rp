@@ -237,15 +237,22 @@ if self.x_vel != 0
    exec applyGrav
 endif
 if abs self.x_vel < self.speed
+
    set self calc1 self.x_vel > 0 and inpRIGHT
    set self calc1 not inpLEFT and self.calc1
+
    if self.calc1
       set self direction 1
    endif
-   if not inpRIGHT and self.x_vel < 0 and inpLEFT
+   
+   set self calc2 self.x_vel < 0 and inpLEFT
+   set self calc2 not inpRIGHT and self.calc2
+
+   if self.calc2
       set self direction -1
    endif
-   if not inpRIGHT and self.x_vel < 0 and inpLEFT or self.calc1
+   
+   if self.calc1 or self.calc2
       set self state RUNNING
       set self frame 0
    endif
