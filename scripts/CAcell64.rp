@@ -4,7 +4,7 @@ ON:0 CAblack64 0,0
 OFF:0 CAwhite64 0,0
 
 |START:0|
-set self rule CArule0.rule
+set self one str 1
 back
 set self state OFF
 if RAND? and RAND? and RAND?
@@ -88,13 +88,15 @@ if exists self.BR
 endif
 
 set self next_state OFF
-if CArule0.rule at self.status == "1"
+if CArule0.rule at self.status == self.one
    set self next_state ON
 endif
 
 |COLLIDE|
-if player in self.name and RAND? and RAND?
-   set related state ON
+if player in self.name
+   if RAND? and RAND?
+      set related state ON
+   endif
    img empty
    back
 endif

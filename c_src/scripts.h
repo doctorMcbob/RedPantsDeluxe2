@@ -1,4 +1,3 @@
-#include "utlist.h"
 #include "uthash.h"
 #include "worlds.h"
 #include "actors.h"
@@ -105,25 +104,16 @@
 #define PRINT 38
 #define UPDATE_STICKS 39
 
-typedef struct ScriptMapEntry
-{
-  int state;
-  int frame;
-  int scriptIdx;
-  struct ScriptMapEntry *next;
-  struct ScriptMapEntry *prev;
-} ScriptMapEntry;
-
 typedef struct ScriptMap
 {
-  int key;
+  int idx;
   int name;
-  struct ScriptMapEntry *entries;
+  UT_hash_handle hh;
 } ScriptMap;
 
 void add_script_map(int key, int name);
-void add_script_to_script_map(int key, int stateStringKey, int frame, int scriptIdx);
-ScriptMap *get_script_map(int key);
+void load_script_map_into_actor(Actor* a, int scriptMapName);
+
 int resolve_script(
 	int scriptIdx,
 	Actor* self, 

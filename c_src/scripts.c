@@ -16,7 +16,7 @@
 #include "stringdata.h"
 #endif
 
-ScriptMap *SCRIPT_MAPS[SCRIPT_MAP_SIZE];
+ScriptMap *scriptmaps;
 int BUFFER[512];
 int PARAMS[512];
 
@@ -50,36 +50,33 @@ void _clear() {
   }
 }
 
-int get_script_map_key_by_name(int name) {
-  int i;
-  for (i = 0; i < SCRIPT_MAP_SIZE; i++) {
-    if (SCRIPT_MAPS[i] != NULL && SCRIPT_MAPS[i]->name == name) {
-      return i;
-    }
+void add_script_map(int name, int idx) {
+  ScriptMap *map = malloc(sizeof(ScriptMap));
+  map->name = name;
+  map->idx = idx;
+  HASH_ADD_INT(scriptmaps, name, map);
+}
+
+void load_script_map_into_actor(Actor* a, int scriptMapName) {
+  ScriptMap* sm;
+  HASH_FIND_INT(scriptmaps, &scriptMapName, sm);
+  if (sm == NULL) {
+    printf("Failed to find script map %s\n", get_string(scriptMapName));
+    return;
   }
-  return -1;
-}
-
-void add_script_map(int key, int name) {
-  ScriptMap *sm = malloc(sizeof(ScriptMap));
-  sm->entries = NULL;
-  sm->key = key;
-  sm->name = name;
-  SCRIPT_MAPS[key] = sm;
-}
-
-void add_script_to_script_map(int key, int stateStringKey, int frame,
-                              int scriptIdx) {
-  ScriptMap *sm = SCRIPT_MAPS[key];
-  ScriptMapEntry *sme = malloc(sizeof(ScriptMapEntry));
-  sme->state = stateStringKey;
-  sme->frame = frame;
-  sme->scriptIdx = scriptIdx;
-  DL_APPEND(sm->entries, sme);
-}
-
-ScriptMap *get_script_map(int key) {
-  return (key > 512 || key < 0) ? NULL : SCRIPT_MAPS[key];
+  int idx = sm->idx;
+  int i = 0;
+  for (int i = 0; i < LARGEST_SCRIPT_MAP; i++) {
+    a->scriptmap[i] = -1;
+  }
+  while (i < LARGEST_SCRIPT_MAP) {
+    if (SCRIPT_MAPS[idx] == -1000) {
+      break;
+    }
+    a->scriptmap[i++] = SCRIPT_MAPS[idx++];
+    a->scriptmap[i++] = SCRIPT_MAPS[idx++];
+    a->scriptmap[i++] = SCRIPT_MAPS[idx++];    
+  }
 }
 
 void resolve_operators(int statement, World *world, int debug) {
@@ -2425,6 +2422,94 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       break;
     }
     case REASSIGN: {
+      /*
+      python implementation 
+
+      actor.scripts[newkey] = actor.scripts.pop(oldkey)
+                    
+      */
+      int actorType = PARAMS[0];
+      int actorValue = PARAMS[1];
+      int oldKeyType = PARAMS[2];
+      int oldKeyValue = PARAMS[3];
+      int newKeyType = PARAMS[4];
+      int newKeyValue = PARAMS[5];
+
+      if (actorType != STRING || oldKeyType != STRING ||
+          newKeyType != STRING) {
+        print_statement(statement);
+        printf("Missing or Incorrect Parameter for REASSIGN\n");
+        break;
+      }
+      Actor* actor = NULL;
+      if (actorValue == SELF)
+        actor = self;
+      else if (actorValue == RELATED)
+        actor = related;
+      else
+        actor = get_actor(actorValue);
+
+      if (actor == NULL) {
+        print_statement(statement);
+        printf("Could not find actor %s for REASSIGN\n", get_string(actorValue));
+        break;
+      }
+
+      int oldFrame = -1;
+      int oldState = oldKeyValue;
+      int newFrame = -1;
+      int newState = newKeyValue;
+
+      char *delim = ":";
+
+      char *_string = get_string(oldKeyValue);
+      char *scriptValueStr = malloc(strlen(_string) + 1);
+      strcpy(scriptValueStr, _string);
+
+      char *oldStateStr = strtok(scriptValueStr, delim);
+      char *oldFrameStr = strtok(NULL, delim);
+
+      if (oldFrameStr != NULL) {
+        oldState = index_string(oldStateStr);
+        oldFrame = atoi(oldFrameStr);
+      }
+      free(scriptValueStr);
+
+      _string = get_string(newKeyValue);
+      scriptValueStr = malloc(strlen(_string) + 1);
+      strcpy(scriptValueStr, _string);
+
+      char *newStateStr = strtok(scriptValueStr, delim);
+      char *newFrameStr = strtok(NULL, delim);
+
+      if (newFrameStr != NULL) {
+        newState = index_string(newStateStr);
+        newFrame = atoi(newFrameStr);
+      }
+      free(scriptValueStr);
+
+      int scriptKey = find_script_from_map(actor, oldState, oldFrame);
+      if (scriptKey == -1) {
+        break;
+      }
+
+      // ensure the new script is not already in the map
+      pop_from_script_map(actor, newState, newFrame);
+      
+      int i = 0;
+      while (i < LARGEST_SCRIPT_MAP) {
+        if (actor->scriptmap[i] == -1) {
+          return -1;
+        }
+        int state = actor->scriptmap[i++];
+        int frame = actor->scriptmap[i++];
+        int idx = actor->scriptmap[i++];
+        if (state == oldState && frame == oldFrame) {
+            actor->scriptmap[i - 3] = newState;
+            actor->scriptmap[i - 2] = newFrame;
+            break;
+        }
+      }
       break;
     }
     case IF: {
@@ -2883,9 +2968,9 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         printf("Missing or Incorrect Parameter for REBRAND\n");
         break;
       }
-
+      
+      load_script_map_into_actor(self, actorValue);
       self->spritemapkey = actorValue;
-      self->scriptmapkey = get_script_map_key_by_name(actorValue);
 
       int scriptKey = find_script_from_map(self, _START, 0);
       if (scriptKey != -1) {
@@ -3056,13 +3141,11 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int valueType = PARAMS[2];
       int valueValue = PARAMS[3];
 
-      if (worldType != STRING || (valueType != INT && valueType != FLOAT)) {
+      if (worldType != STRING || valueType != INT) {
         print_statement(statement);
         printf("Missing or Incorrect Parameter for OFFSETBGSCROLLX\n");
         break;
       }
-      if (valueType == FLOAT)
-        valueValue = (int)get_float(valueValue);
 
       World *w = get_world(worldValue);
       if (w == NULL) {
@@ -3071,7 +3154,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
                get_string(worldValue));
         break;
       }
-
+      printf("Setting background_x_scroll to %i\n", valueValue);
       w->background_x_scroll += valueValue;
       break;
     }
@@ -3081,13 +3164,11 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int valueType = PARAMS[2];
       int valueValue = PARAMS[3];
 
-      if (worldType != STRING || (valueType != INT && valueType != FLOAT)) {
+      if (worldType != STRING || valueType != INT) {
         print_statement(statement);
         printf("Missing or Incorrect Parameter for OFFSETBGSCROLLY\n");
         break;
       }
-      if (valueType == FLOAT)
-        valueValue = (int)get_float(valueValue);
 
       World *w = get_world(worldValue);
       if (w == NULL) {

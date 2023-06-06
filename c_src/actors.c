@@ -61,7 +61,8 @@ void add_actor(int name, int x, int y, int w, int h, int x_vel, int y_vel,
 
   a->spritemapkey = spritemapkey;
 
-  a->scriptmapkey = scriptmapkey;
+  load_script_map_into_actor(a, scriptmapkey);
+
   a->img = -1;
 
   a->_input_name = inputKey;
@@ -120,7 +121,9 @@ void copy_actor(Actor *copy, Actor *a) {
   a->hurtboxkey = copy->hurtboxkey;
   a->hitboxkey = copy->hitboxkey;
   a->spritemapkey = copy->spritemapkey;
-  a->scriptmapkey = copy->scriptmapkey;
+  for (int i = 0; i < LARGEST_SCRIPT_MAP; i++) {
+    a->scriptmap[i] = copy->scriptmap[i];
+  }
   a->img = -1;
   a->_input_name = copy->_input_name;
   a->state = copy->state;
@@ -413,16 +416,46 @@ int collision_check(Actor *actor, World *world, int debug) {
   return 0;
 }
 
-int find_script_from_map(Actor *actor, int scriptName, int scriptFrame) {
-  ScriptMap *sm = get_script_map(actor->scriptmapkey);
-  ScriptMapEntry *sme;
-
-  DL_FOREACH(sm->entries, sme) {
-    if (sme->state == scriptName && sme->frame == scriptFrame) {
-      return sme->scriptIdx;
+int find_script_from_map(Actor* actor, int scriptName, int scriptFrame) {
+  int i = 0;
+  while (i < LARGEST_SCRIPT_MAP) {
+    if (actor->scriptmap[i] == -1) {
+      return -1;
     }
-  };
+    int state = actor->scriptmap[i++];
+    int frame = actor->scriptmap[i++];
+    int idx = actor->scriptmap[i++];
+    if (state == scriptName && frame == scriptFrame) {
+      return idx;
+    }
+  }
   return -1;
+}
+
+void pop_from_script_map(Actor* actor, int scriptName, int scriptFrame) {
+  int i = 0;
+  int j = -1;
+  while (i < LARGEST_SCRIPT_MAP) {
+    if (actor->scriptmap[i] == -1) {
+      break;
+    }
+    int state = actor->scriptmap[i++];
+    int frame = actor->scriptmap[i++];
+    int idx = actor->scriptmap[i++];
+    if (state == scriptName && frame == scriptFrame) {
+      j = i;
+      continue;
+    }
+    if (j != -1) {
+      actor->scriptmap[j++] = state;
+      actor->scriptmap[j++] = frame;
+      actor->scriptmap[j++] = idx;
+      actor->scriptmap[i - 3] = -1;
+      actor->scriptmap[i - 2] = -1;
+      actor->scriptmap[i - 1] = -1;
+    }
+  }
+
 }
 
 int update_actor(int actorKey, int worldKey, int debug) {
@@ -461,6 +494,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
     if (scriptKey != -1) {
       int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1,
                                       -1, -1, -1, -1, 0);
+      
       if (resolution < 0)
         return resolution;
     }
@@ -493,28 +527,22 @@ int update_actor(int actorKey, int worldKey, int debug) {
   return 0;
 }
 
-int get_script_for_actor(Actor *actor) {
-  ScriptMap *sm = get_script_map(actor->scriptmapkey);
-  if (!sm)
-    return -1;
-  ScriptMapEntry *best, *sme;
-  best = NULL;
-  DL_FOREACH(sm->entries, sme) {
-    if (actor->state != sme->state)
-      continue;
-    if (actor->frame < sme->frame)
-      continue;
-    if (best) {
-      if (sme->frame < best->frame)
-        continue;
-    }
-    best = sme;
-  }
-  if (!best) {
-    return -1;
-  }
 
-  return best->scriptIdx;
+int get_script_for_actor(Actor *actor) {
+  int bestIdx = -1;
+  int bestFrame = -1;
+  int i = 0;
+  while (i < LARGEST_SCRIPT_MAP) {
+    int state = actor->scriptmap[i++];
+    int frame = actor->scriptmap[i++];
+    int idx = actor->scriptmap[i++];
+    if (state != actor->state) continue;
+    if (actor->frame < frame) continue;
+    if (bestFrame > frame) continue;
+    bestFrame = frame;
+    bestIdx = idx;
+  }
+  return bestIdx;
 }
 
 Sprite *get_sprite_for_actor(Actor *actor) {

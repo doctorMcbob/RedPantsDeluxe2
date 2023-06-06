@@ -111,10 +111,10 @@ int main(int argc, char *argv[]) {
   }
   load_string_indexers();
   spritesheet_load(rend);
+  scripts_load();
   actor_load();
   world_load();
   boxes_load();
-  scripts_load();
   audio_load();
   add_input_state(index_string("PLAYER1"), NULL);
   add_frame(ROOT, get_world(_ROOT), NULL, 0, 0, WID, HIGH);

@@ -2,6 +2,7 @@
 # include "uthash.h"
 # include "sprites.h"
 # include "boxes.h"
+# include "scriptdata.h"
 
 #ifndef ACTORS_DEF
 # define ACTORS_DEF 1
@@ -25,7 +26,7 @@ typedef struct Actor {
   int hurtboxkey;
   int hitboxkey;
   int spritemapkey;
-  int scriptmapkey;
+  int scriptmap[LARGEST_SCRIPT_MAP];
   int img;
   int _input_name;
   int state;
@@ -78,6 +79,7 @@ void draw_actor(SDL_Renderer* rend, Actor* actor, Frame* frame);
 int get_script_for_actor(Actor* actor);
 void actors_reset_updated();
 int find_script_from_map(Actor* actor, int scriptName, int scriptFrame);
+void pop_from_script_map(Actor* actor, int scriptName, int scriptFrame);
 void free_actor(Actor* actor);
 BoxMapEntry* get_hurtboxes_for_actor(Actor* actor);
 BoxMapEntry* get_hitboxes_for_actor(Actor* actor);
