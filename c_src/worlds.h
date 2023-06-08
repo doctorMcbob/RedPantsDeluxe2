@@ -31,6 +31,7 @@ void add_actor_to_world(int worldkey, int actorname);
 int update_world(int worldKey, int debug);
 
 # include "frames.h"
+World* world_with(int actorKey);
 void draw_world(World* world, SDL_Renderer* rend, Frame* frame);
 int exists(int actorKey);
 int world_has(World *world, int actorKey);

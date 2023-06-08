@@ -157,3 +157,12 @@ void remove_actor_from_worlds(int actorKey) {
   struct World *w, *tmp;
   HASH_ITER(hh, worlds, w, tmp) { remove_actor_from_world(w, actorKey); }
 }
+
+World* world_with(int actorKey) {
+  struct World *w, *tmp;
+  HASH_ITER(hh, worlds, w, tmp) {
+    if (world_has(w, actorKey))
+      return w;
+  }
+  return NULL;
+}

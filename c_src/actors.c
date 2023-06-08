@@ -249,6 +249,10 @@ int collision_check(Actor *actor, World *world, int debug) {
         return resolution2;
     }
   }
+  if (!world_has(world, actor->name)) {
+    // we do this because the collision_with scripts may change which world the actor is in. (ie, doors)
+    world = world_with(actor->name);
+  }
 
   if (_floor(actor->x_vel) != 0) {
     int direction = actor->x_vel < 0 ? 1 : -1;
@@ -484,7 +488,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
   }
   float x_flag = actor->x_vel, y_flag = actor->y_vel;
   if (actor->physics || actor->tangible) {
-    collision_check(actor, world, debug);
+    collision_check(actor, world, debug);      
     actor->ECB->x += _floor(actor->x_vel);
     actor->ECB->y += _floor(actor->y_vel);
   }
