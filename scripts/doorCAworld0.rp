@@ -10,7 +10,8 @@ set self destination CAworld0
 set self frame 0
 
 |COLLIDE|
-if self.door_key and goldcoindoor0.state == OPEN
+set self calc goldcoindoor0.state == OPEN
+if self.door_key and self.calc
    if self.door_key + _DOWN in inpEVENTS
       move self related.destination
       view self.frame_name related.destination
