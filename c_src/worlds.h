@@ -22,7 +22,8 @@ typedef struct World {
   UT_hash_handle hh;
 } World;
 
-void add_world(int name,
+void add_world(int key,
+         int name,
 	       int background,
 	       int x_lock,
 	       int y_lock);

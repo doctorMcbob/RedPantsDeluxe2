@@ -5,17 +5,14 @@
 #include "frames.h"
 #include "sprites.h"
 #include "stringmachine.h"
-#include "uthash.h"
 #include "utlist.h"
+#include "tree.h"
+#include "worlddata.h"
 
-World *worlds = NULL;
+TreeNode *worlds_by_name = NULL;
 
-void add_world(int name, int background, int x_lock, int y_lock) {
-  struct World *w;
-  w = malloc(sizeof(World));
-  if (!w) {
-    exit(-1);
-  }
+void add_world(int key, int name, int background, int x_lock, int y_lock) {
+  World *w = &WORLDS[key];
   w->actors = NULL;
   w->name = name;
   w->background = background;
@@ -26,13 +23,13 @@ void add_world(int name, int background, int x_lock, int y_lock) {
   w->background_x_scroll = 0;
   w->background_y_scroll = 0;
   w->flagged_for_update = 1;
-
-  HASH_ADD_INT(worlds, name, w);
+  push_to_tree(&worlds_by_name, name, key);
 }
 
 World *get_world(int name) {
   struct World *w;
-  HASH_FIND_INT(worlds, &name, w);
+  int idx = value_for_key(worlds_by_name, name);
+  w = &WORLDS[idx];
   if (w) {
     return w;
   } else {
@@ -134,7 +131,8 @@ int world_has(World *world, int actorKey) {
 
 int exists(int actorKey) {
   struct World *w, *tmp;
-  HASH_ITER(hh, worlds, w, tmp) {
+  for (int i = 0; i < NUM_WORLDS; i++) {
+    World *w = &WORLDS[i];
     if (world_has(w, actorKey))
       return 1;
   }
@@ -155,12 +153,16 @@ int remove_actor_from_world(World *world, int actorKey) {
 
 void remove_actor_from_worlds(int actorKey) {
   struct World *w, *tmp;
-  HASH_ITER(hh, worlds, w, tmp) { remove_actor_from_world(w, actorKey); }
+  for (int i = 0; i < NUM_WORLDS; i++) {
+    World *w = &WORLDS[i];
+    remove_actor_from_world(w, actorKey);
+  }
 }
 
 World* world_with(int actorKey) {
   struct World *w, *tmp;
-  HASH_ITER(hh, worlds, w, tmp) {
+  for (int i = 0; i < NUM_WORLDS; i++) {
+    World *w = &WORLDS[i];
     if (world_has(w, actorKey))
       return w;
   }

@@ -21,6 +21,7 @@ I will be using uthash.h as my dictionary implementation
 #include "stringdata.h"
 #include "stringmachine.h"
 #include "worlds.h"
+#include "worlddata.h"
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +45,6 @@ void audio_load();
 void scripts_load();
 void load_string_indexers();
 extern Frame *frames;
-extern World *worlds;
 
 int main(int argc, char *argv[]) {
   int debug = 0;
@@ -130,8 +130,8 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    World *w, *tmpw;
-    HASH_ITER(hh, worlds, w, tmpw) {
+    for (int i = 0; i < NUM_WORLDS; i++) {
+      World *w = &WORLDS[i];
       if (w->flagged_for_update) {
         if (update_world(w->name, debug) == -2)
           return 0;
