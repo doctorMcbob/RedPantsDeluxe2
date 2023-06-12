@@ -52,10 +52,10 @@ void scrolled(SDL_Rect *rect, Frame *frame) {
 
 int in_frame(Frame *frame, Actor *actor) {
   SDL_Rect *r = malloc(sizeof(SDL_Rect));
-  r->x = actor->ECB->x;
-  r->y = actor->ECB->y;
-  r->w = actor->ECB->w;
-  r->h = actor->ECB->h;
+  r->x = actor->ECB.x;
+  r->y = actor->ECB.y;
+  r->w = actor->ECB.w;
+  r->h = actor->ECB.h;
   scrolled(r, frame);
   SDL_Rect frameRect = {0, 0, frame->rect.w, frame->rect.h};
 
@@ -105,8 +105,8 @@ void update_frame(Frame *f) {
   if (f == NULL)
     return;
   if (f->focus != NULL) {
-    f->scroll_x = f->focus->ECB->x + f->focus->ECB->w / 2 - f->rect.w / 2;
-    f->scroll_y = f->focus->ECB->y + f->focus->ECB->h / 2 - f->rect.h / 2;
+    f->scroll_x = f->focus->ECB.x + f->focus->ECB.w / 2 - f->rect.w / 2;
+    f->scroll_y = f->focus->ECB.y + f->focus->ECB.h / 2 - f->rect.h / 2;
   }
 
   if (f->bound_left && f->scroll_x < f->left_bind) {

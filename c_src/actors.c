@@ -1,33 +1,36 @@
 #include "actors.h"
+#include "actordata.h"
+#include "scriptdata.h"
 #include "boxes.h"
 #include "frames.h"
 #include "lists.h"
 #include "scripts.h"
 #include "stringdata.h"
 #include "stringmachine.h"
+#include "tree.h"
 #include "uthash.h"
+#include "worlddata.h"
 #include "worlds.h"
 #include <SDL2/SDL.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 
-Actor *actors = NULL;
-Actor *templates = NULL;
+struct TreeNode *actors_by_name = NULL;
+struct TreeNode *templates_by_name = NULL;
+int DEEPEST_ACTOR = 0;
 
 Actor *get_actor(int name) {
-  struct Actor *a;
-  HASH_FIND_INT(actors, &name, a);
-  if (a) {
-    return a;
-  } else {
+  int idx = value_for_key(actors_by_name, name);
+  if (idx < 0)
     return NULL;
-  }
+  return &ACTORS[idx];
 }
 
 void actors_reset_updated() {
-  Actor *a, *tmp;
-  HASH_ITER(hh, actors, a, tmp) { a->updated = 0; }
+  for (int i = 0; i < DEEPEST_ACTOR; i++) {
+    ACTORS[i].updated = 0;
+  }
 }
 
 void add_actor(int name, int x, int y, int w, int h, int x_vel, int y_vel,
@@ -35,22 +38,16 @@ void add_actor(int name, int x, int y, int w, int h, int x_vel, int y_vel,
                int spritemapkey, int img, int inputKey, int state, int frame,
                int direction, int rotation, int platform, int tangible,
                int physics, int updated) {
-  struct Actor *a;
-  a = malloc(sizeof(Actor));
+  int key = DEEPEST_ACTOR++;
+  Actor *a = &ACTORS[key];
   if (!a) {
     exit(-1);
   }
   a->attributes = NULL;
-  SDL_Rect *ecb;
-  ecb = malloc(sizeof(SDL_Rect));
-  if (!ecb) {
-    exit(-1);
-  }
-  ecb->x = x;
-  ecb->y = y;
-  ecb->w = w;
-  ecb->h = h;
-  a->ECB = ecb;
+  a->ECB.x = x;
+  a->ECB.y = y;
+  a->ECB.w = w;
+  a->ECB.h = h;
   a->name = name;
   a->x_vel = 0;
   a->y_vel = 0;
@@ -70,7 +67,7 @@ void add_actor(int name, int x, int y, int w, int h, int x_vel, int y_vel,
   if (state > 0)
     a->state = state;
   else
-    a->state = index_string("START");
+    a->state = _START;
 
   if (frame)
     a->frame = frame;
@@ -107,14 +104,15 @@ void add_actor(int name, int x, int y, int w, int h, int x_vel, int y_vel,
   else
     a->updated = 0;
 
-  HASH_ADD_INT(actors, name, a);
+  actors_by_name = push_to_tree(actors_by_name, name, key);
+  validate_actors();
 }
 
 void copy_actor(Actor *copy, Actor *a) {
-  a->ECB->x = copy->ECB->x;
-  a->ECB->y = copy->ECB->y;
-  a->ECB->w = copy->ECB->w;
-  a->ECB->h = copy->ECB->h;
+  a->ECB.x = copy->ECB.x;
+  a->ECB.y = copy->ECB.y;
+  a->ECB.w = copy->ECB.w;
+  a->ECB.h = copy->ECB.h;
   a->name = copy->name;
   a->x_vel = copy->x_vel;
   a->y_vel = copy->y_vel;
@@ -138,74 +136,41 @@ void copy_actor(Actor *copy, Actor *a) {
   a->background = copy->background;
 }
 
-void add_template(Actor *copy) {
-  struct Actor *a;
-  a = malloc(sizeof(Actor));
-  if (!a) {
-    exit(-1);
-  }
-  SDL_Rect *ecb;
-  ecb = malloc(sizeof(SDL_Rect));
-  if (!ecb) {
-    exit(-1);
-  }
-  a->ECB = ecb;
-  copy_actor(copy, a);
-
-  HASH_ADD_INT(templates, name, a);
-}
-
 Actor *add_actor_from_templatekey(int templateKey, int name) {
-  struct Actor *copy;
-  HASH_FIND_INT(templates, &templateKey, copy);
-  if (copy == NULL) {
+  int idx = value_for_key(templates_by_name, templateKey);
+  if (idx == -1) {
     printf("Template %s not found\n", get_string(templateKey));
     return NULL;
   }
-  struct Actor *a;
-  a = malloc(sizeof(Actor));
-  if (!a) {
-    exit(-1);
+  if (DEEPEST_ACTOR >= NUM_ACTORS) {
+    printf("Could not add actor %s from template %s because we ran out of space. Consider adding to buffer size.\n");
+    return NULL;
   }
-  SDL_Rect *ecb;
-  ecb = malloc(sizeof(SDL_Rect));
-  if (!ecb) {
-    exit(-1);
-  }
-  a->ECB = ecb;
-  copy_actor(copy, a);
-  a->name = name;
+  copy_actor(&TEMPLATES[idx], &ACTORS[DEEPEST_ACTOR]);
+  ACTORS[DEEPEST_ACTOR].name = name;
 
-  HASH_ADD_INT(actors, name, a);
-  return a;
+  actors_by_name = push_to_tree(actors_by_name, name, DEEPEST_ACTOR);
+
+  return &ACTORS[DEEPEST_ACTOR++];
 }
 
 Actor *get_template(int name) {
-  struct Actor *copy;
-  HASH_FIND_INT(templates, &name, copy);
-  if (copy == NULL) {
+  int idx = value_for_key(templates_by_name, name);
+  if (idx < 0)
     return NULL;
-  }
-  return copy;
+  return &TEMPLATES[idx];
 }
 
-void add_template_from_actorkey(int actorKey) {
-  struct Actor *copy;
-  HASH_FIND_INT(actors, &actorKey, copy);
-  struct Actor *a;
-  a = malloc(sizeof(Actor));
-  if (!a) {
-    exit(-1);
+void add_template_from_actorkey(int idx, int actorKey) {
+  int a_idx = value_for_key(actors_by_name, actorKey);
+  if (a_idx < 0) {
+    printf("Could not creat template, Actor %s not found\n",
+           get_string(actorKey));
+    return;
   }
-  SDL_Rect *ecb;
-  ecb = malloc(sizeof(SDL_Rect));
-  if (!ecb) {
-    exit(-1);
-  }
-  a->ECB = ecb;
-  copy_actor(copy, a);
+  copy_actor(&ACTORS[a_idx], &TEMPLATES[idx]);
 
-  HASH_ADD_INT(templates, name, a);
+  templates_by_name = push_to_tree(templates_by_name, actorKey, idx);
 }
 
 int collision_with(Actor *a1, Actor *a2, World *world, int debug) {
@@ -219,13 +184,9 @@ int collision_with(Actor *a1, Actor *a2, World *world, int debug) {
   return 0;
 }
 
-SDL_Rect *move(SDL_Rect *rect, int dx, int dy) {
-  SDL_Rect *new = malloc(sizeof(SDL_Rect));
-  new->x = rect->x + dx;
-  new->y = rect->y + dy;
-  new->w = rect->w;
-  new->h = rect->h;
-  return new;
+void move(SDL_Rect *rect, int dx, int dy) {
+  rect->x += dx;
+  rect->y += dy;
 }
 
 float _floor(float x) {
@@ -235,12 +196,21 @@ float _floor(float x) {
 }
 
 int collision_check(Actor *actor, World *world, int debug) {
-  ActorEntry *ae;
-  DL_FOREACH(world->actors, ae) {
-    if (actor->name == ae->actorKey)
+  int buffer[WORLD_BUFFER_SIZE];
+
+  for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+    buffer[idx] = world->actors[idx];
+  }
+
+  for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+    if (buffer[idx] == -1)
+      break;
+    if (actor->name == buffer[idx])
       continue;
-    Actor *actor2 = get_actor(ae->actorKey);
-    if (SDL_HasIntersection(actor->ECB, actor2->ECB)) {
+    Actor *actor2 = get_actor(buffer[idx]);
+    if (actor2 == NULL)
+      continue;
+    if (SDL_HasIntersection(&actor->ECB, &actor2->ECB)) {
       int resolution = collision_with(actor, actor2, world, debug);
       if (resolution < 0)
         return resolution;
@@ -250,26 +220,40 @@ int collision_check(Actor *actor, World *world, int debug) {
     }
   }
   if (!world_has(world, actor->name)) {
-    // we do this because the collision_with scripts may change which world the actor is in. (ie, doors)
+    // we do this because the collision_with scripts may change which world the
+    // actor is in. (ie, doors)
     world = world_with(actor->name);
+    if (world == NULL)
+      return 0;
+    for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+      buffer[idx] = world->actors[idx];
+    }
   }
+  SDL_Rect moved;
 
   if (_floor(actor->x_vel) != 0) {
     int direction = actor->x_vel < 0 ? 1 : -1;
-    for (int i = 0; i < (_floor(actor->x_vel) / actor->ECB->w); i++) {
-      ActorEntry *ae2;
+    for (int i = 0; i < (_floor(actor->x_vel) / actor->ECB.w); i++) {
       int exit = 0;
-      DL_FOREACH(world->actors, ae2) {
-        if (actor->name == ae2->actorKey)
+      moved.x = actor->ECB.x;
+      moved.y = actor->ECB.y;
+      moved.w = actor->ECB.w;
+      moved.h = actor->ECB.h;
+      move(&moved, actor->ECB.w * i, 0);
+      for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+        if (buffer[idx] == -1)
+          break;
+        if (actor->name == buffer[idx])
           continue;
-        Actor *actor2 = get_actor(ae2->actorKey);
+        Actor *actor2 = get_actor(buffer[idx]);
+        if (actor2 == NULL)
+          continue;
         if (!actor2->tangible)
           continue;
         if (actor->tangible == 0 && actor2->platform == 0)
           continue;
-        if (SDL_HasIntersection(move(actor->ECB, actor->ECB->w * i, 0),
-                                actor2->ECB)) {
-          actor->x_vel -= actor->ECB->w * i;
+        if (SDL_HasIntersection(&moved, &actor2->ECB)) {
+          actor->x_vel -= actor->ECB.w * i;
           exit = 1;
           break;
         }
@@ -278,16 +262,24 @@ int collision_check(Actor *actor, World *world, int debug) {
         break;
     }
 
-    ActorEntry *ae2;
-    DL_FOREACH(world->actors, ae2) {
-      if (actor->name == ae2->actorKey)
+    moved.x = actor->ECB.x;
+    moved.y = actor->ECB.y;
+    moved.w = actor->ECB.w;
+    moved.h = actor->ECB.h;
+    move(&moved, actor->x_vel, 0);
+    for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+      if (buffer[idx] == -1)
+        break;
+
+      if (actor->name == buffer[idx])
         continue;
-      Actor *actor2 = get_actor(ae2->actorKey);
-      if (!actor2->tangible)
+
+      Actor *actor2 = get_actor(buffer[idx]);
+      if (actor2 == NULL || !actor2->tangible)
         continue;
       if (actor->tangible == 0 && actor2->platform == 0)
         continue;
-      if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, 0), actor2->ECB)) {
+      if (SDL_HasIntersection(&moved, &actor2->ECB)) {
         int resolution3 = collision_with(actor, actor2, world, debug);
         if (resolution3 < 0)
           return resolution3;
@@ -300,17 +292,24 @@ int collision_check(Actor *actor, World *world, int debug) {
     int check = 0;
     while (check == 0) {
       check = 1;
-      ActorEntry *ae3;
-      DL_FOREACH(world->actors, ae3) {
-        if (actor->name == ae3->actorKey)
+      moved.x = actor->ECB.x;
+      moved.y = actor->ECB.y;
+      moved.w = actor->ECB.w;
+      moved.h = actor->ECB.h;
+      move(&moved, actor->x_vel, 0);
+      for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+        if (buffer[idx] == -1)
+          break;
+
+        if (actor->name == buffer[idx])
           continue;
-        Actor *actor3 = get_actor(ae3->actorKey);
-        if (!actor3->tangible)
+
+        Actor *actor3 = get_actor(buffer[idx]);
+        if (actor3 == NULL || !actor3->tangible)
           continue;
         if (actor->tangible == 0 && actor3->platform == 0)
           continue;
-        if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, 0),
-                                actor3->ECB)) {
+        if (SDL_HasIntersection(&moved, &actor3->ECB)) {
           check = 0;
         }
       }
@@ -323,20 +322,29 @@ int collision_check(Actor *actor, World *world, int debug) {
 
   if (floor(fabs(actor->y_vel)) != 0) {
     int direction = actor->y_vel < 0 ? 1 : -1;
-    for (int i = 0; i < (_floor(actor->y_vel) / actor->ECB->h); i++) {
-      ActorEntry *ae2;
+    for (int i = 0; i < (_floor(actor->y_vel) / actor->ECB.h); i++) {
       int exit = 0;
-      DL_FOREACH(world->actors, ae2) {
-        if (actor->name == ae2->actorKey)
+      moved.x = actor->ECB.x;
+      moved.y = actor->ECB.y;
+      moved.w = actor->ECB.w;
+      moved.h = actor->ECB.h;
+      move(&moved, 0, actor->ECB.h * i);
+      for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+        if (buffer[idx] == -1)
+          break;
+
+        if (actor->name == buffer[idx])
           continue;
-        Actor *actor2 = get_actor(ae2->actorKey);
+
+        Actor *actor2 = get_actor(buffer[idx]);
+        if (actor2 == NULL)
+          continue;
         if (!actor2->tangible)
           continue;
         if (actor->tangible == 0 && actor2->platform == 0)
           continue;
-        if (SDL_HasIntersection(move(actor->ECB, 0, actor->ECB->h * i),
-                                actor2->ECB)) {
-          actor->y_vel -= actor->ECB->h * i;
+        if (SDL_HasIntersection(&moved, &actor2->ECB)) {
+          actor->y_vel -= actor->ECB.h * i;
           exit = 1;
           break;
         }
@@ -345,16 +353,24 @@ int collision_check(Actor *actor, World *world, int debug) {
         break;
     }
 
-    ActorEntry *ae2;
-    DL_FOREACH(world->actors, ae2) {
-      if (actor->name == ae2->actorKey)
+    moved.x = actor->ECB.x;
+    moved.y = actor->ECB.y;
+    moved.w = actor->ECB.w;
+    moved.h = actor->ECB.h;
+    move(&moved, 0, actor->y_vel);
+    for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+      if (buffer[idx] == -1)
+        break;
+
+      if (actor->name == buffer[idx])
         continue;
-      Actor *actor2 = get_actor(ae2->actorKey);
-      if (!actor2->tangible)
+
+      Actor *actor2 = get_actor(buffer[idx]);
+      if (actor2 == NULL || !actor2->tangible)
         continue;
       if (actor->tangible == 0 && actor2->platform == 0)
         continue;
-      if (SDL_HasIntersection(move(actor->ECB, 0, actor->y_vel), actor2->ECB)) {
+      if (SDL_HasIntersection(&moved, &actor2->ECB)) {
         int resolution3 = collision_with(actor, actor2, world, debug);
         if (resolution3 < 0)
           return resolution3;
@@ -367,17 +383,24 @@ int collision_check(Actor *actor, World *world, int debug) {
     int check = 0;
     while (check == 0) {
       check = 1;
-      ActorEntry *ae3;
-      DL_FOREACH(world->actors, ae3) {
-        if (actor->name == ae3->actorKey)
+      moved.x = actor->ECB.x;
+      moved.y = actor->ECB.y;
+      moved.w = actor->ECB.w;
+      moved.h = actor->ECB.h;
+      move(&moved, 0, actor->y_vel);
+      for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+        if (world->actors[idx] == -1)
+          break;
+
+        if (actor->name == world->actors[idx])
           continue;
-        Actor *actor3 = get_actor(ae3->actorKey);
-        if (!actor3->tangible)
+
+        Actor *actor3 = get_actor(world->actors[idx]);
+        if (actor3 == NULL || !actor3->tangible)
           continue;
         if (actor->tangible == 0 && actor3->platform == 0)
           continue;
-        if (SDL_HasIntersection(move(actor->ECB, 0, actor->y_vel),
-                                actor3->ECB)) {
+        if (SDL_HasIntersection(&moved, &actor3->ECB)) {
           check = 0;
         }
       }
@@ -389,21 +412,27 @@ int collision_check(Actor *actor, World *world, int debug) {
   }
 
   if (_floor(actor->x_vel) != 0 && _floor(actor->y_vel) != 0) {
-    ActorEntry *ae4;
-
     int check = 0;
     while (check == 0) {
       check = 1;
-      DL_FOREACH(world->actors, ae4) {
-        if (actor->name == ae4->actorKey)
+      moved.x = actor->ECB.x;
+      moved.y = actor->ECB.y;
+      moved.w = actor->ECB.w;
+      moved.h = actor->ECB.h;
+      move(&moved, actor->x_vel, actor->y_vel);
+      for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+        if (buffer[idx] == -1)
+          break;
+
+        if (actor->name == buffer[idx])
           continue;
-        Actor *actor4 = get_actor(ae4->actorKey);
-        if (!actor4->tangible)
+
+        Actor *actor4 = get_actor(buffer[idx]);
+        if (actor4 == NULL || !actor4->tangible)
           continue;
         if (actor->tangible == 0 && actor4->platform == 0)
           continue;
-        if (SDL_HasIntersection(move(actor->ECB, actor->x_vel, actor->y_vel),
-                                actor4->ECB)) {
+        if (SDL_HasIntersection(&moved, &actor4->ECB)) {
           check = 0;
         }
       }
@@ -420,7 +449,7 @@ int collision_check(Actor *actor, World *world, int debug) {
   return 0;
 }
 
-int find_script_from_map(Actor* actor, int scriptName, int scriptFrame) {
+int find_script_from_map(Actor *actor, int scriptName, int scriptFrame) {
   int i = 0;
   while (i < LARGEST_SCRIPT_MAP) {
     if (actor->scriptmap[i] == -1) {
@@ -436,7 +465,7 @@ int find_script_from_map(Actor* actor, int scriptName, int scriptFrame) {
   return -1;
 }
 
-void pop_from_script_map(Actor* actor, int scriptName, int scriptFrame) {
+void pop_from_script_map(Actor *actor, int scriptName, int scriptFrame) {
   int i = 0;
   int j = -1;
   while (i < LARGEST_SCRIPT_MAP) {
@@ -459,12 +488,11 @@ void pop_from_script_map(Actor* actor, int scriptName, int scriptFrame) {
       actor->scriptmap[i - 1] = -1;
     }
   }
-
 }
 
 int update_actor(int actorKey, int worldKey, int debug) {
   Actor *actor = get_actor(actorKey);
-  if (!actor)
+  if (actor == NULL)
     return 0;
 
   World *world = get_world(worldKey);
@@ -488,9 +516,9 @@ int update_actor(int actorKey, int worldKey, int debug) {
   }
   float x_flag = actor->x_vel, y_flag = actor->y_vel;
   if (actor->physics || actor->tangible) {
-    collision_check(actor, world, debug);      
-    actor->ECB->x += _floor(actor->x_vel);
-    actor->ECB->y += _floor(actor->y_vel);
+    collision_check(actor, world, debug);
+    actor->ECB.x += _floor(actor->x_vel);
+    actor->ECB.y += _floor(actor->y_vel);
   }
 
   if (x_flag != actor->x_vel && _floor(actor->x_vel) == 0) {
@@ -498,7 +526,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
     if (scriptKey != -1) {
       int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1,
                                       -1, -1, -1, -1, 0);
-      
+
       if (resolution < 0)
         return resolution;
     }
@@ -514,12 +542,17 @@ int update_actor(int actorKey, int worldKey, int debug) {
     }
   }
 
-  ActorEntry *ae;
-  Actor *actor2;
-
-  DL_FOREACH(world->actors, ae) {
-    actor2 = get_actor(ae->actorKey);
-    if (actor2->name == actor->name)
+  int buffer[WORLD_BUFFER_SIZE];
+  for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+    buffer[idx] = world->actors[idx];
+  }
+  for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
+    if (buffer[idx] == -1)
+      break;
+    if (actor->name == buffer[idx])
+      continue;
+    Actor *actor2 = get_actor(buffer[idx]);
+    if (actor2 == NULL)
       continue;
     int resolution = hit_check(actor, actor2, world, debug);
     if (resolution < 0)
@@ -531,7 +564,6 @@ int update_actor(int actorKey, int worldKey, int debug) {
   return 0;
 }
 
-
 int get_script_for_actor(Actor *actor) {
   int bestIdx = -1;
   int bestFrame = -1;
@@ -540,9 +572,12 @@ int get_script_for_actor(Actor *actor) {
     int state = actor->scriptmap[i++];
     int frame = actor->scriptmap[i++];
     int idx = actor->scriptmap[i++];
-    if (state != actor->state) continue;
-    if (actor->frame < frame) continue;
-    if (bestFrame > frame) continue;
+    if (state != actor->state)
+      continue;
+    if (actor->frame < frame)
+      continue;
+    if (bestFrame > frame)
+      continue;
     bestFrame = frame;
     bestIdx = idx;
   }
@@ -630,10 +665,10 @@ BoxMapEntry *get_hurtboxes_for_actor(Actor *actor) {
 }
 
 void rotate_box_by_actor(Actor *actor, SDL_Rect *rect, int deg) {
-  int x1 = actor->ECB->x;
-  int y1 = actor->ECB->y;
-  int w1 = actor->ECB->w;
-  int h1 = actor->ECB->h;
+  int x1 = actor->ECB.x;
+  int y1 = actor->ECB.y;
+  int w1 = actor->ECB.w;
+  int h1 = actor->ECB.h;
   int x2 = rect->x - x1;
   int y2 = rect->y - y1;
   int w2 = rect->w;
@@ -685,11 +720,11 @@ void translate_rect_by_actor(Actor *actor, SDL_Rect *rect) {
     return;
 
   if (actor->direction == 1) {
-    rect->x = (actor->ECB->x + actor->ECB->w) - (rect->x + rect->w);
-    rect->y = actor->ECB->y + rect->y;
+    rect->x = (actor->ECB.x + actor->ECB.w) - (rect->x + rect->w);
+    rect->y = actor->ECB.y + rect->y;
   } else {
-    rect->x = actor->ECB->x + rect->x;
-    rect->y = actor->ECB->y + rect->y;
+    rect->x = actor->ECB.x + rect->x;
+    rect->y = actor->ECB.y + rect->y;
   }
   rotate_box_by_actor(actor, rect, actor->rotation);
 }
@@ -789,24 +824,24 @@ void _draw_platform(SDL_Renderer *rend, Actor *actor, Frame *frame) {
     }
   }
 
-  for (int y = 0; y < actor->ECB->h / 32; y++) {
-    for (int x = 0; x < actor->ECB->w / 32; x++) {
+  for (int y = 0; y < actor->ECB.h / 32; y++) {
+    for (int x = 0; x < actor->ECB.w / 32; x++) {
       Sprite *img = NULL;
       if (x == 0 && y == 0)
         img = s00;
-      else if (x == actor->ECB->w / 32 - 1 && y == 0)
+      else if (x == actor->ECB.w / 32 - 1 && y == 0)
         img = s02;
-      else if (x == 0 && y == actor->ECB->h / 32 - 1)
+      else if (x == 0 && y == actor->ECB.h / 32 - 1)
         img = s20;
-      else if (x == actor->ECB->w / 32 - 1 && y == actor->ECB->h / 32 - 1)
+      else if (x == actor->ECB.w / 32 - 1 && y == actor->ECB.h / 32 - 1)
         img = s22;
       else if (x == 0)
         img = s10;
-      else if (x == actor->ECB->w / 32 - 1)
+      else if (x == actor->ECB.w / 32 - 1)
         img = s12;
       else if (y == 0)
         img = s01;
-      else if (y == actor->ECB->h / 32 - 1)
+      else if (y == actor->ECB.h / 32 - 1)
         img = s21;
       else
         img = s11;
@@ -815,8 +850,8 @@ void _draw_platform(SDL_Renderer *rend, Actor *actor, Frame *frame) {
         continue;
       }
       SDL_Rect dest, src;
-      dest.x = actor->ECB->x + x * 32 - frame->scroll_x;
-      dest.y = actor->ECB->y + y * 32 - frame->scroll_y;
+      dest.x = actor->ECB.x + x * 32 - frame->scroll_x;
+      dest.y = actor->ECB.y + y * 32 - frame->scroll_y;
       src.x = 0;
       src.y = 0;
 
@@ -849,15 +884,15 @@ void draw_actor(SDL_Renderer *rend, Actor *actor, Frame *f) {
   case -90:
   case 90:
   case 0:
-    dest.x = actor->ECB->x + s->offx;
-    dest.y = actor->ECB->y + s->offy;
+    dest.x = actor->ECB.x + s->offx;
+    dest.y = actor->ECB.y + s->offy;
     break;
   case -270:
   case 270:
   case -180:
   case 180:
-    dest.x = actor->ECB->x + actor->ECB->w - s->offx - dest.w;
-    dest.y = actor->ECB->y + actor->ECB->h - s->offy - dest.h;
+    dest.x = actor->ECB.x + actor->ECB.w - s->offx - dest.w;
+    dest.y = actor->ECB.y + actor->ECB.h - s->offy - dest.h;
     break;
   }
 
@@ -879,8 +914,6 @@ void draw_actor(SDL_Renderer *rend, Actor *actor, Frame *f) {
 }
 
 void free_actor(Actor *actor) {
-  HASH_DEL(actors, actor);
-
   Attribute *attr, *tmp;
 
   HASH_ITER(hh, actor->attributes, attr, tmp) {
@@ -891,8 +924,24 @@ void free_actor(Actor *actor) {
     free(attr);
   }
 
-  if (actor->ECB) {
-    free(actor->ECB);
+  int idx = value_for_key(actors_by_name, actor->name);
+  actors_by_name = remove_from_tree(actors_by_name, actor->name);
+  if (idx == --DEEPEST_ACTOR) {
+    return;
   }
-  free(actor);
+  copy_actor(&ACTORS[DEEPEST_ACTOR], &ACTORS[idx]);
+  ACTORS[idx].attributes = ACTORS[DEEPEST_ACTOR].attributes;
+  actors_by_name = remove_from_tree(actors_by_name, ACTORS[idx].name);
+  actors_by_name = push_to_tree(actors_by_name, ACTORS[idx].name, idx);
+
+  validate_actors();
+}
+
+void validate_actors() {
+  for (int i = 0; i < DEEPEST_ACTOR; i++) {
+    int idx = value_for_key(actors_by_name, ACTORS[i].name);
+    if (idx != i)
+      printf("Actor %s is at %i in memory but %i in map (DEEPEST ACTOR %i)\n",
+             get_string(ACTORS[i].name), i, idx, DEEPEST_ACTOR);
+  }
 }

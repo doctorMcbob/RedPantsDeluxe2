@@ -1,4 +1,3 @@
-
 #include "scripts.h"
 #include "actors.h"
 #include "debug.h"
@@ -57,8 +56,8 @@ void add_script_map(int name, int idx) {
   HASH_ADD_INT(scriptmaps, name, map);
 }
 
-void load_script_map_into_actor(Actor* a, int scriptMapName) {
-  ScriptMap* sm;
+void load_script_map_into_actor(Actor *a, int scriptMapName) {
+  ScriptMap *sm;
   HASH_FIND_INT(scriptmaps, &scriptMapName, sm);
   if (sm == NULL) {
     printf("Failed to find script map %s\n", get_string(scriptMapName));
@@ -75,7 +74,7 @@ void load_script_map_into_actor(Actor* a, int scriptMapName) {
     }
     a->scriptmap[i++] = SCRIPT_MAPS[idx++];
     a->scriptmap[i++] = SCRIPT_MAPS[idx++];
-    a->scriptmap[i++] = SCRIPT_MAPS[idx++];    
+    a->scriptmap[i++] = SCRIPT_MAPS[idx++];
   }
 }
 
@@ -1740,16 +1739,8 @@ void resolve_operators(int statement, World *world, int debug) {
           break;
         }
 
-        ActorEntry *ae;
-        int in_world = 0;
-        DL_FOREACH(world->actors, ae) {
-          if (ae->actorKey == rightValue) {
-            in_world = 1;
-            break;
-          }
-        }
         PARAMS[paramPointer++] = INT;
-        PARAMS[paramPointer++] = in_world;
+        PARAMS[paramPointer++] = world_has(world, rightValue);
         break;
       }
       case ISINPUTSTATE: {
@@ -1890,16 +1881,17 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         int list = add_list();
         BUFFER[bufferPointer++] = LIST;
         BUFFER[bufferPointer++] = list;
-        ActorEntry *ae;
-        DL_FOREACH(world->actors, ae) {
-          if (ae->actorKey == self->name)
+        for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
+          if (world->actors[i] == -1)
+            break;
+          if (world->actors[i] == self->name)
             continue;
-          Actor *a = get_actor(ae->actorKey);
+          Actor *a = get_actor(world->actors[i]);
           if (a == NULL)
             continue;
           if (a->tangible == 0)
             continue;
-          if (SDL_HasIntersection(self->ECB, a->ECB)) {
+          if (SDL_HasIntersection(&self->ECB, &a->ECB)) {
             add_to_list(list, STRING, a->name);
           }
         }
@@ -1912,6 +1904,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       }
       case DOT: {
         if (bufferPointer < 2) {
+          printf("Actor %s error: ", get_string(self->name));
           print_statement(statement);
           printf("Could not . with no left hand side\n");
           break;
@@ -1922,6 +1915,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         int rightValue = SCRIPTS[++executionPointer];
 
         if (rightType != STRING || leftType != STRING) {
+          printf("Actor %s error: ", get_string(self->name));
           print_statement(statement);
           printf("Dot must be string . string, got %i . %i\n", leftType,
                  rightType);
@@ -1938,6 +1932,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
           a = get_actor(leftValue);
 
         if (a == NULL) {
+          printf("Actor %s error: ", get_string(self->name));
           print_statement(statement);
           printf("Could not find actor for dot\n");
           break;
@@ -1957,37 +1952,37 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
           break;
         case _X:
           BUFFER[bufferPointer - 2] = INT;
-          BUFFER[bufferPointer - 1] = a->ECB->x;
+          BUFFER[bufferPointer - 1] = a->ECB.x;
           break;
         case _Y:
           BUFFER[bufferPointer - 2] = INT;
-          BUFFER[bufferPointer - 1] = a->ECB->y;
+          BUFFER[bufferPointer - 1] = a->ECB.y;
           break;
         case _WIDTH:
         case W:
           BUFFER[bufferPointer - 2] = INT;
-          BUFFER[bufferPointer - 1] = a->ECB->w;
+          BUFFER[bufferPointer - 1] = a->ECB.w;
           break;
         case _HEIGHT:
         case H:
           BUFFER[bufferPointer - 2] = INT;
-          BUFFER[bufferPointer - 1] = a->ECB->h;
+          BUFFER[bufferPointer - 1] = a->ECB.h;
           break;
         case TOP:
           BUFFER[bufferPointer - 2] = INT;
-          BUFFER[bufferPointer - 1] = a->ECB->y;
+          BUFFER[bufferPointer - 1] = a->ECB.y;
           break;
         case _LEFT:
           BUFFER[bufferPointer - 2] = INT;
-          BUFFER[bufferPointer - 1] = a->ECB->x;
+          BUFFER[bufferPointer - 1] = a->ECB.x;
           break;
         case BOTTOM:
           BUFFER[bufferPointer - 2] = INT;
-          BUFFER[bufferPointer - 1] = a->ECB->y + a->ECB->h;
+          BUFFER[bufferPointer - 1] = a->ECB.y + a->ECB.h;
           break;
         case _RIGHT:
           BUFFER[bufferPointer - 2] = INT;
-          BUFFER[bufferPointer - 1] = a->ECB->x + a->ECB->w;
+          BUFFER[bufferPointer - 1] = a->ECB.x + a->ECB.w;
           break;
         case DIRECTION:
           BUFFER[bufferPointer - 2] = INT;
@@ -2233,6 +2228,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int valueValue = PARAMS[5];
 
       if (nameType != STRING || attrType != STRING || valueType == -1) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for SET\n");
         break;
@@ -2246,6 +2242,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       else
         a = get_actor(nameValue);
       if (a == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Could not find actor %s, %i for SET (is self %i? %i)\n",
                get_string(nameValue), nameValue, SELF, nameValue == SELF);
@@ -2270,20 +2267,20 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       case _X:
         switch (valueType) {
         case INT:
-          a->ECB->x = valueValue;
+          a->ECB.x = valueValue;
           break;
         case FLOAT:
-          a->ECB->x = (int)get_float(valueValue);
+          a->ECB.x = (int)get_float(valueValue);
           break;
         }
         break;
       case _Y:
         switch (valueType) {
         case INT:
-          a->ECB->y = valueValue;
+          a->ECB.y = valueValue;
           break;
         case FLOAT:
-          a->ECB->y = (int)get_float(valueValue);
+          a->ECB.y = (int)get_float(valueValue);
           break;
         }
         break;
@@ -2291,10 +2288,10 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       case W:
         switch (valueType) {
         case INT:
-          a->ECB->w = valueValue;
+          a->ECB.w = valueValue;
           break;
         case FLOAT:
-          a->ECB->w = (int)get_float(valueValue);
+          a->ECB.w = (int)get_float(valueValue);
           break;
         }
         break;
@@ -2302,50 +2299,50 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       case H:
         switch (valueType) {
         case INT:
-          a->ECB->h = valueValue;
+          a->ECB.h = valueValue;
           break;
         case FLOAT:
-          a->ECB->h = (int)get_float(valueValue);
+          a->ECB.h = (int)get_float(valueValue);
           break;
         }
         break;
       case TOP:
         switch (valueType) {
         case INT:
-          a->ECB->y = valueValue;
+          a->ECB.y = valueValue;
           break;
         case FLOAT:
-          a->ECB->y = (int)get_float(valueValue);
+          a->ECB.y = (int)get_float(valueValue);
           break;
         }
         break;
       case _LEFT:
         switch (valueType) {
         case INT:
-          a->ECB->x = valueValue;
+          a->ECB.x = valueValue;
           break;
         case FLOAT:
-          a->ECB->x = (int)get_float(valueValue);
+          a->ECB.x = (int)get_float(valueValue);
           break;
         }
         break;
       case BOTTOM:
         switch (valueType) {
         case INT:
-          a->ECB->y = valueValue - a->ECB->h;
+          a->ECB.y = valueValue - a->ECB.h;
           break;
         case FLOAT:
-          a->ECB->y = (int)get_float(valueValue) - a->ECB->h;
+          a->ECB.y = (int)get_float(valueValue) - a->ECB.h;
           break;
         }
         break;
       case _RIGHT:
         switch (valueType) {
         case INT:
-          a->ECB->x = valueValue - a->ECB->w;
+          a->ECB.x = valueValue - a->ECB.w;
           break;
         case FLOAT:
-          a->ECB->x = (int)get_float(valueValue) - a->ECB->w;
+          a->ECB.x = (int)get_float(valueValue) - a->ECB.w;
           break;
         }
         break;
@@ -2422,12 +2419,6 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       break;
     }
     case REASSIGN: {
-      /*
-      python implementation 
-
-      actor.scripts[newkey] = actor.scripts.pop(oldkey)
-                    
-      */
       int actorType = PARAMS[0];
       int actorValue = PARAMS[1];
       int oldKeyType = PARAMS[2];
@@ -2435,13 +2426,13 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int newKeyType = PARAMS[4];
       int newKeyValue = PARAMS[5];
 
-      if (actorType != STRING || oldKeyType != STRING ||
-          newKeyType != STRING) {
+      if (actorType != STRING || oldKeyType != STRING || newKeyType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for REASSIGN\n");
         break;
       }
-      Actor* actor = NULL;
+      Actor *actor = NULL;
       if (actorValue == SELF)
         actor = self;
       else if (actorValue == RELATED)
@@ -2450,8 +2441,10 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         actor = get_actor(actorValue);
 
       if (actor == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
-        printf("Could not find actor %s for REASSIGN\n", get_string(actorValue));
+        printf("Could not find actor %s for REASSIGN\n",
+               get_string(actorValue));
         break;
       }
 
@@ -2495,7 +2488,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       // ensure the new script is not already in the map
       pop_from_script_map(actor, newState, newFrame);
-      
+
       int i = 0;
       while (i < LARGEST_SCRIPT_MAP) {
         if (actor->scriptmap[i] == -1) {
@@ -2505,9 +2498,9 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         int frame = actor->scriptmap[i++];
         int idx = actor->scriptmap[i++];
         if (state == oldState && frame == oldFrame) {
-            actor->scriptmap[i - 3] = newState;
-            actor->scriptmap[i - 2] = newFrame;
-            break;
+          actor->scriptmap[i - 3] = newState;
+          actor->scriptmap[i - 2] = newFrame;
+          break;
         }
       }
       break;
@@ -2549,6 +2542,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int scriptValue = PARAMS[1];
 
       if (scriptType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for EXEC\n");
         break;
@@ -2581,51 +2575,11 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       break;
     }
     case BACK: {
-      ActorEntry *ae, *tmp, *found = NULL;
-      DL_FOREACH_SAFE(world->actors, ae, tmp) {
-        if (ae->actorKey == self->name) {
-          DL_DELETE(world->actors, ae);
-          found = ae;
-          break;
-        }
-      }
-      if (found != NULL) {
-        ae = world->actors;
-        tmp = NULL;
-        found->next = NULL;
-        found->prev = NULL;
-        Actor *a = get_actor(ae->actorKey);
-        while (a->background != 0) {
-          tmp = ae;
-          ae = ae->next;
-          if (ae == NULL) {
-            DL_APPEND(world->actors, found);
-            break;
-          }
-          a = get_actor(ae->actorKey);
-        }
-        if (ae != NULL) {
-          if (tmp == NULL) {
-            DL_PREPEND_ELEM(world->actors, ae, found);
-          } else {
-            DL_APPEND_ELEM(world->actors, tmp, found);
-          }
-        }
-      }
+      // TODO
       break;
     }
     case FRONT: {
-      ActorEntry *ae, *tmp;
-      int found = 0;
-      DL_FOREACH_SAFE(world->actors, ae, tmp) {
-        if (ae->actorKey == self->name) {
-          DL_DELETE(world->actors, ae);
-          found++;
-          break;
-        }
-      }
-      if (found)
-        DL_APPEND(world->actors, ae);
+      // TODO
       break;
     }
     case IMG: {
@@ -2633,6 +2587,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int imgValue = PARAMS[1];
 
       if (imgType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for IMG\n");
         break;
@@ -2645,6 +2600,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int frameValue = PARAMS[1];
 
       if (frameType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for ACTIVATE\n");
         break;
@@ -2652,6 +2608,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       Frame *f = get_frame(frameValue);
       if (f == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Frame %s does not exist for ACTIVATE\n",
                get_string(frameValue));
@@ -2666,6 +2623,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int frameValue = PARAMS[1];
 
       if (frameType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for ACTIVATE\n");
         break;
@@ -2673,6 +2631,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       Frame *f = get_frame(frameValue);
       if (f == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Frame %s does not exist for DEACTIVATE\n",
                get_string(frameValue));
@@ -2687,6 +2646,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int frameValue = PARAMS[1];
 
       if (frameType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for KILLFRAME\n");
         break;
@@ -2694,6 +2654,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       Frame *f = get_frame(frameValue);
       if (f == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Frame %s does not exist for KILLFRAME\n",
                get_string(frameValue));
@@ -2719,6 +2680,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       if (nameType != STRING || worldType != STRING || xType != INT ||
           yType != INT || wType != INT || hType != INT) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for MAKEFRAME\n");
         break;
@@ -2726,6 +2688,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       World *w = get_world(worldValue);
       if (w == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("World %s not found for MAKEFRAME\n", get_string(worldValue));
         break;
@@ -2741,6 +2704,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int nameValue = PARAMS[3];
 
       if (frameType != STRING || nameType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for FOCUS\n");
         break;
@@ -2748,6 +2712,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       Frame *f = get_frame(frameValue);
       if (f == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Frame %s not found for FOCUS\n", get_string(frameValue));
         break;
@@ -2761,6 +2726,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       else
         a = get_actor(nameValue);
       if (a == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Actor %s not found for FOCUS\n", get_string(nameValue));
         break;
@@ -2779,6 +2745,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       if (frameType != STRING || directionType != STRING ||
           (valueType != INT && valueType != NONE)) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for SCROLLBOUND\n");
         break;
@@ -2786,6 +2753,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       Frame *f = get_frame(frameValue);
       if (f == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Frame %s not found for SCROLLBOUND\n", get_string(frameValue));
         break;
@@ -2818,6 +2786,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int worldValue = PARAMS[3];
 
       if (frameType != STRING || worldType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for VIEW\n");
         break;
@@ -2825,6 +2794,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       Frame *f = get_frame(frameValue);
       if (f == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Frame %s not found for VIEW\n", get_string(frameValue));
         break;
@@ -2832,6 +2802,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       World *w = get_world(worldValue);
       if (w == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("World %s not found for VIEW\n", get_string(worldValue));
         break;
@@ -2847,6 +2818,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int worldValue = PARAMS[3];
 
       if (nameType != STRING || worldType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for MOVE\n");
         break;
@@ -2859,6 +2831,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       }
 
       if (remove_actor_from_world(world, nameValue) != 1) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Actor %s not found for MOVE\n", get_string(nameValue));
         break;
@@ -2875,6 +2848,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int worldValue = PARAMS[3];
 
       if (nameType != STRING || worldType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for PLACE\n");
         break;
@@ -2889,12 +2863,14 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         a = get_actor(nameValue);
       }
       if (a == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Actor %s not found for PLACE\n", get_string(nameValue));
         break;
       }
       World *w = get_world(worldValue);
       if (w == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("World %s not found for PLACE\n", get_string(worldValue));
         break;
@@ -2911,6 +2887,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int nameValue = PARAMS[3];
 
       if (worldType != STRING || nameType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for TAKE\n");
         break;
@@ -2925,12 +2902,14 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         a = get_actor(nameValue);
       }
       if (a == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Actor %s not found for TAKE\n", get_string(nameValue));
         break;
       }
       World *w = get_world(worldValue);
       if (w == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("World %s not found for TAKE\n", get_string(worldValue));
         break;
@@ -2945,6 +2924,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int nameValue = PARAMS[1];
 
       if (nameType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for TAKEALL\n");
         break;
@@ -2964,11 +2944,12 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int actorValue = PARAMS[1];
 
       if (actorType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for REBRAND\n");
         break;
       }
-      
+
       load_script_map_into_actor(self, actorValue);
       self->spritemapkey = actorValue;
 
@@ -2987,6 +2968,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int valueType = PARAMS[2];
       int valueValue = PARAMS[3];
       if (listType != LIST) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for REMOVE\n");
         break;
@@ -3000,6 +2982,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int valueType = PARAMS[2];
       int valueValue = PARAMS[3];
       if (listType != LIST) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for ADD\n");
         break;
@@ -3012,6 +2995,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int hitboxValue = PARAMS[1];
 
       if (hitboxType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for HITBOXES\n");
         break;
@@ -3025,6 +3009,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int hurtboxValue = PARAMS[1];
 
       if (hurtboxType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for HURTBOXES\n");
         break;
@@ -3046,6 +3031,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       if (templateNameType != STRING || nameType != STRING ||
           (xType != INT && xType != FLOAT) ||
           (yType != INT && yType != FLOAT)) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for CREATE\n");
         break;
@@ -3065,8 +3051,8 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       }
 
       a = add_actor_from_templatekey(templateNameValue, nameValue);
-      a->ECB->x = xValue;
-      a->ECB->y = yValue;
+      a->ECB.x = xValue;
+      a->ECB.y = yValue;
 
       add_actor_to_world(world->name, nameValue);
 
@@ -3086,6 +3072,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int worldValue = PARAMS[1];
 
       if (worldType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for UPDATE\n");
         break;
@@ -3093,6 +3080,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       World *w = get_world(worldValue);
       if (w == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("World %s not found for UPDATE\n", get_string(worldValue));
         break;
@@ -3106,6 +3094,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int sfxValue = PARAMS[1];
 
       if (sfxType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for SFX\n");
         break;
@@ -3119,6 +3108,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int songValue = PARAMS[1];
 
       if (songType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for SONG\n");
         break;
@@ -3142,6 +3132,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int valueValue = PARAMS[3];
 
       if (worldType != STRING || valueType != INT) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for OFFSETBGSCROLLX\n");
         break;
@@ -3149,12 +3140,12 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       World *w = get_world(worldValue);
       if (w == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("World %s not found for OFFSETBGSCROLLX\n",
                get_string(worldValue));
         break;
       }
-      printf("Setting background_x_scroll to %i\n", valueValue);
       w->background_x_scroll += valueValue;
       break;
     }
@@ -3165,6 +3156,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int valueValue = PARAMS[3];
 
       if (worldType != STRING || valueType != INT) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for OFFSETBGSCROLLY\n");
         break;
@@ -3172,12 +3164,12 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       World *w = get_world(worldValue);
       if (w == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("World %s not found for OFFSETBGSCROLLY\n",
                get_string(worldValue));
         break;
       }
-
       w->background_y_scroll += valueValue;
       break;
     }
@@ -3188,6 +3180,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int iterValue = PARAMS[3];
 
       if (keyType != STRING || (iterType != STRING && iterType != LIST)) {
+        printf("Actor %s error: ", get_string(self->name));
         print_statement(statement);
         printf("Missing or Incorrect Parameter for FOR\n");
         break;

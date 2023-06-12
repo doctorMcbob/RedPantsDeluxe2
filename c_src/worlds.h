@@ -1,27 +1,22 @@
-# include "uthash.h"
+
+
 # include <SDL2/SDL.h>
 
 # ifndef WORLDS_DEF
 #define WORLDS_DEF 1
-
-typedef struct ActorEntry {
-  int actorKey;
-  struct ActorEntry* next;
-  struct ActorEntry* prev;
-} ActorEntry;
+# include "worlddata.h"
 
 typedef struct World {
   int name;
   int background;
-  ActorEntry* actors;
+  int actors[WORLD_BUFFER_SIZE];
   int x_lock;
   int y_lock;
   int background_x_scroll;
   int background_y_scroll;
   int flagged_for_update;
-  UT_hash_handle hh;
 } World;
-
+extern World WORLDS[];
 void add_world(int key,
          int name,
 	       int background,

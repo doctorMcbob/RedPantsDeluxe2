@@ -9,11 +9,13 @@
 #include "tree.h"
 #include "worlddata.h"
 
-TreeNode *worlds_by_name = NULL;
+struct TreeNode *worlds_by_name = NULL;
 
 void add_world(int key, int name, int background, int x_lock, int y_lock) {
   World *w = &WORLDS[key];
-  w->actors = NULL;
+  for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
+    w->actors[i] = -1;
+  }
   w->name = name;
   w->background = background;
   if (x_lock)
@@ -23,7 +25,7 @@ void add_world(int key, int name, int background, int x_lock, int y_lock) {
   w->background_x_scroll = 0;
   w->background_y_scroll = 0;
   w->flagged_for_update = 1;
-  push_to_tree(&worlds_by_name, name, key);
+  worlds_by_name = push_to_tree(worlds_by_name, name, key);
 }
 
 World *get_world(int name) {
@@ -45,11 +47,16 @@ void add_actor_to_world(int worldkey, int actorname) {
            get_string(actorname));
     return;
   }
-  struct ActorEntry *ae;
-  ae = malloc(sizeof(ActorEntry));
-  ae->actorKey = actorname;
-
-  DL_APPEND(w->actors, ae);
+  int i = 0;
+  while (w->actors[i] != -1) {
+    i++;
+    if (i >= WORLD_BUFFER_SIZE) {
+      printf("World %s is full when adding actor %s. If this is not an infinite memory leak issue, consider compiling with a larger world buffer.\n", get_string(worldkey),
+             get_string(actorname));
+      return;
+    }
+  }
+  w->actors[i] = actorname;
 }
 
 int update_world(int worldKey, int debug) {
@@ -57,9 +64,14 @@ int update_world(int worldKey, int debug) {
   w = get_world(worldKey);
   if (w == NULL)
     return 0;
-  struct ActorEntry *ae, *tmp;
-  DL_FOREACH_SAFE(w->actors, ae, tmp) {
-    if (update_actor(ae->actorKey, worldKey, debug) == -2) {
+
+  int update_list[WORLD_BUFFER_SIZE];
+  for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
+    update_list[i] = w->actors[i];
+  }
+  for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
+    if (update_list[i] == -1) return 0;
+    if (update_actor(update_list[i], worldKey, debug) == -2) {
       return -2;
     }
   }
@@ -107,10 +119,12 @@ void _draw_background(World *world, SDL_Renderer *rend, Frame *frame) {
 void draw_world(World *world, SDL_Renderer *rend, Frame *frame) {
   _draw_background(world, rend, frame);
 
-  struct ActorEntry *ae;
-  DL_FOREACH(world->actors, ae) {
+  for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
+    if (world->actors[i] == -1) {
+      break;
+    }
     Actor *a;
-    a = get_actor(ae->actorKey);
+    a = get_actor(world->actors[i]);
 
     if (!a)
       continue;
@@ -120,11 +134,11 @@ void draw_world(World *world, SDL_Renderer *rend, Frame *frame) {
 };
 
 int world_has(World *world, int actorKey) {
-  ActorEntry *ae;
-  DL_FOREACH(world->actors, ae) {
-    if (ae->actorKey == actorKey) {
+  for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
+    if (world->actors[i] == actorKey)
       return 1;
-    }
+    if (world->actors[i] == -1)
+      return 0;
   }
   return 0;
 }
@@ -140,19 +154,36 @@ int exists(int actorKey) {
 }
 
 int remove_actor_from_world(World *world, int actorKey) {
-  ActorEntry *ae, *tmp;
-  DL_FOREACH_SAFE(world->actors, ae, tmp) {
-    if (ae->actorKey == actorKey) {
-      DL_DELETE(world->actors, ae);
-      free(ae);
-      return 1;
+  int i = 0;
+  int shiftIndex = -1; // Index to store the position to shift actors to
+  int found = 0;
+  while (world->actors[i] != -1) {
+    if (world->actors[i] == actorKey) {
+      found = 1;
+      shiftIndex = i; // Store the position to shift actors to
+      world->actors[i] = -1; // Set the actor to be removed as -1
+    }
+    i++;
+    if (i >= WORLD_BUFFER_SIZE) {
+      // actor not in world and world is full
+      return 0;
     }
   }
-  return 0;
+
+  if (shiftIndex != -1) {
+    // Shift the remaining actors forward
+    for (i = shiftIndex + 1; world->actors[i] != -1 && i < WORLD_BUFFER_SIZE; i++) {
+      world->actors[i - 1] = world->actors[i];
+      world->actors[i] = -1; // Clear the previous position
+    }
+  }
+
+  return found;
 }
 
+
 void remove_actor_from_worlds(int actorKey) {
-  struct World *w, *tmp;
+  struct World *w;
   for (int i = 0; i < NUM_WORLDS; i++) {
     World *w = &WORLDS[i];
     remove_actor_from_world(w, actorKey);
@@ -160,7 +191,7 @@ void remove_actor_from_worlds(int actorKey) {
 }
 
 World* world_with(int actorKey) {
-  struct World *w, *tmp;
+  struct World *w;
   for (int i = 0; i < NUM_WORLDS; i++) {
     World *w = &WORLDS[i];
     if (world_has(w, actorKey))

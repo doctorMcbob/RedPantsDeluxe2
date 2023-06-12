@@ -312,15 +312,19 @@ void print_statement(int statementKey) {
 }
 
 void draw_debug_overlay(World *world, SDL_Renderer *rend, Frame *frame) {
-  struct ActorEntry *ae;
   int mouseX, mouseY;
   SDL_GetMouseState(&mouseX, &mouseY);
   int hasTextDrawn = 0;
-  DL_FOREACH(world->actors, ae) {
+  for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
+    if (world->actors[i] == -1) {
+      break;
+    }
     Actor *a;
-    a = get_actor(ae->actorKey);
-
-    SDL_Rect ECB = {a->ECB->x, a->ECB->y, a->ECB->w, a->ECB->h};
+    a = get_actor(world->actors[i]);
+    if (a == NULL) {
+      continue;
+    }
+    SDL_Rect ECB = {a->ECB.x, a->ECB.y, a->ECB.w, a->ECB.h};
 
     scrolled(&ECB, frame);
 
@@ -356,8 +360,8 @@ void draw_debug_overlay(World *world, SDL_Renderer *rend, Frame *frame) {
       if (mouseX >= ECB.x && mouseX < ECB.x + ECB.w && mouseY >= ECB.y &&
           mouseY < ECB.y + ECB.h) {
         char data[100]; // buffer to hold the formatted string
-        sprintf(data, "%s %s:%iT?%i", get_string(ae->actorKey),
-                get_string(a->state), a->frame, a->tangible);
+        sprintf(data, "%s %s:%iT?%i", get_string(a->name), get_string(a->state),
+                a->frame, a->tangible);
 
         SDL_Color textColor = {0, 0, 0};
         SDL_Surface *surface = TTF_RenderText_Solid(font, data, textColor);
@@ -372,4 +376,15 @@ void draw_debug_overlay(World *world, SDL_Renderer *rend, Frame *frame) {
       }
     }
   }
+  char data[100]; // buffer to hold the formatted string
+  sprintf(data, "ACTOR COUNT: %i", DEEPEST_ACTOR);
+  SDL_Color textColor = {0, 0, 0};
+  SDL_Surface *surface = TTF_RenderText_Solid(font, data, textColor);
+
+  SDL_Texture *Message = SDL_CreateTextureFromSurface(rend, surface);
+  SDL_Rect Message_rect = {16, 16, surface->w, surface->h};
+  SDL_RenderCopy(rend, Message, NULL, &Message_rect);
+
+  SDL_FreeSurface(surface);
+  SDL_DestroyTexture(Message);
 }

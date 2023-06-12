@@ -7,6 +7,7 @@
 #ifndef ACTORS_DEF
 # define ACTORS_DEF 1
 
+extern int DEEPEST_ACTOR;
 typedef struct Attribute {
   int name;
   int type;
@@ -19,7 +20,7 @@ typedef struct Attribute {
 
 typedef struct Actor {
   int name;
-  SDL_Rect* ECB;
+  SDL_Rect ECB;
 
   float x_vel;
   float y_vel;
@@ -41,11 +42,11 @@ typedef struct Actor {
   int background;
   // attribute hash
   Attribute* attributes;
-  UT_hash_handle hh;
 } Actor;
 
 Actor* get_actor(int name);
-void add_actor(int name,
+void add_actor(
+         int name,
 	       int x,
 	       int y,
 	       int w,
@@ -66,11 +67,10 @@ void add_actor(int name,
 	       int tangible,
 	       int physics,
 	       int updated);
-void copy_actor(Actor* copy,  Actor *a);
-void add_template(Actor* copy);
+void copy_actor(Actor *copy,  Actor *a);
 Actor* add_actor_from_templatekey(int templateKey, int name);
 Actor* get_template(int name);
-void add_template_from_actorkey(int actorKey);
+void add_template_from_actorkey(int idx, int actorKey);
 int update_actor(int actorKey, int worldKey, int debug);
 Sprite* get_sprite_for_actor(Actor* actor);
 
