@@ -2575,11 +2575,27 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       break;
     }
     case BACK: {
-      // TODO
+      remove_actor_from_world(world, self->name);
+      int i;
+      for (i = 0; i < WORLD_BUFFER_SIZE; i++) {
+        if (world->actors[i] == -1) {
+          break;
+        }
+        Actor *a = get_actor(world->actors[i]);
+        if (a->background) {
+          continue;
+        }
+        for (int j = WORLD_BUFFER_SIZE - 1; j > i; j--) {
+          world->actors[j] = world->actors[j - 1];
+        }
+        break;
+      }
+      world->actors[i] = self->name;
       break;
     }
     case FRONT: {
-      // TODO
+      remove_actor_from_world(world, self->name);
+      add_actor_to_world(world->name, self->name);
       break;
     }
     case IMG: {

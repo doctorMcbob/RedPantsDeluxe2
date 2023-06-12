@@ -36,7 +36,7 @@ LITERAL_TYPES = {
 }
 
 LITERAL_KEYWORDS = {
-    "None": 0,
+    "None": 21,
     "RAND?": 6,
     "WORLD?": 7,
     "song?": 8,
