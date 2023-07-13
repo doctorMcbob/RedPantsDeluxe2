@@ -26,6 +26,7 @@
 #define INP_DOWN 18
 #define INP_START 19
 #define INP_EVENTS 20
+#define QSTICKS 22
 
 // Define Operators
 #define PLUS 0
@@ -61,6 +62,12 @@
 #define ABS 30
 #define RANGE 31
 #define INWORLD 32
+#define SIN 33
+#define COS 34
+#define TAN 35
+#define ASIN 36
+#define ACOS 37
+#define ATAN 38
 
 // Define Verbs
 #define QUIT 0
@@ -103,6 +110,7 @@
 #define ENDFOR 37
 #define PRINT 38
 #define UPDATE_STICKS 39
+#define SET_JOY 40
 
 typedef struct ScriptMap
 {

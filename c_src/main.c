@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 
   srand(time(NULL));
 
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) != 0) {
     printf("Error initializing SDL2: %s\n", SDL_GetError());
     return 1;
   }
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
   world_load();
   boxes_load();
   audio_load();
-  add_input_state(index_string("PLAYER1"), NULL);
+  add_input_state(index_string("PLAYER1"), -1);
   add_frame(ROOT, get_world(_ROOT), NULL, 0, 0, WID, HIGH);
   Clock *c = new_clock();
 

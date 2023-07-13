@@ -30,7 +30,7 @@
 
 
 typedef struct InputState {
-  SDL_Joystick* joy;
+  int joy;
   unsigned char A;
   unsigned char B;
   unsigned char X;
@@ -61,13 +61,30 @@ typedef struct KeyMap {
   SDL_Keycode START;
 } KeyMap;
 
+typedef struct JoyMap {
+  int A;
+  int B;
+  int X;
+  int Y;
+  int LEFT;
+  int UP;
+  int RIGHT;
+  int DOWN;
+  int START;
+  int HORIZ_STICK;
+  int VERT_STICK;
+} JoyMap;
+
 typedef struct KeyHashNode {
   int name;
   KeyMap* keymap;
   UT_hash_handle hh;
 } KeyHashNode;
 
-void add_input_state(int name, SDL_Joystick* joy);
+void add_input_state(int name, int stick);
+void update_sticks();
+void add_stick_to_input_state(int name, int stick);
+int get_num_sticks();
 InputState* get_input_state(int name);
 int input_update();
 #endif

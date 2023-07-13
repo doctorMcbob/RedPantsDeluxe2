@@ -13,6 +13,7 @@ from copy import deepcopy
 from random import randint, choice
 
 import string
+import math
 import traceback
 import sys
 
@@ -35,7 +36,8 @@ operators = {
     "nor": lambda n1, n2: n1 and not n2,
 
     "in": lambda n1, n2: n1 in n2,
-    "at": lambda n1, n2: n1[n2]
+    "at": lambda n1, n2: n1[n2],
+
 }
 
 SCRIPTS = {}
@@ -290,6 +292,13 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 world_ref = cmd.pop(0)
                 worlds.get_world(world_ref).background_yscroll += float(cmd.pop(0))
                 
+            elif verb == "setjoy":
+                input_state_name, joy_count = cmd
+                inputstate = inputs.get_state(input_state_name)
+                if inputstate is None:
+                    raise Exception("Invalid input state {}".format(input_state_name))
+                inputs.add_joystick_to_input_state(input_state_name, joy_count)
+
             elif verb == "for": # gulp
                 key = cmd.pop(0)
                 target = deepcopy(cmd.pop())
@@ -385,6 +394,8 @@ def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
                 cmd[idx] = world.name
             if token == "RAND?":
                 cmd[idx] = randint(0, 1)
+            if token == "STICKS?":
+                cmd[idx] = inputs.get_num_sticks()
             if token == "song?":
                 cmd[idx] = sounds.get_song()
             if token == "COLLIDE?":
@@ -499,6 +510,14 @@ def resolve_operators(cmd, world, logfunc=print, actor=None):
                 evaluated.append(calculated)
             elif token == "range":
                 evaluated.append(list(range(int(cmd.pop(idx+1)))))
+            elif token == "sin":
+                evaluated.append(math.sin(cmd.pop(idx+1)))
+            elif token == "cos":
+                evaluated.append(math.cos(cmd.pop(idx+1)))
+            elif token == "tan":
+                evaluated.append(math.tan(cmd.pop(idx+1)))
+            elif token == "atan":
+                evaluated.append(math.atan(cmd.pop(idx+1)))
             elif type(token) == str and token in operators:
                 left, right = evaluated.pop(), cmd.pop(idx+1)
                 if token != "at":

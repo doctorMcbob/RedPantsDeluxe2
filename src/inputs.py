@@ -34,11 +34,14 @@ DEFAULT_MAP = {
 }
 
 DEFAULT_CONTROLLER_MAP = {
-    "A"      : 0,
-    "B"      : 3,
-    "X"      : 2,
-    "Y"      : 1,
-    "START"  : 10
+    "A"           : 0,
+    "B"           : 3,
+    "X"           : 2,
+    "Y"           : 1,
+    "START"       : 10,
+    "HAT"         : 0,
+    "HORIZ_STICK" : 0,
+    "VERT_STICK"  : 1,
 }
 
 MAPPED_CONTROLLERS = {
@@ -48,7 +51,11 @@ MAPPED_CONTROLLERS = {
         "B"      : 2,
         "X"      : 1,
         "Y"      : 3,
-        "START"  : 7,
+            "START"  : 7,
+
+        "HAT"         : 0,
+        "HORIZ_STICK" : 0,
+        "VERT_STICK"  : 1,
     },
     "Xbox One S Controller": {
         "A"      : 0,
@@ -56,6 +63,10 @@ MAPPED_CONTROLLERS = {
         "X"      : 1,
         "Y"      : 4,
         "START"  : 7,
+
+        "HAT"         : 0,
+        "HORIZ_STICK" : 0,
+        "VERT_STICK"  : 1,
     },
     "Controller (Xbox for windows)": {
         "A"      : 0,
@@ -63,6 +74,10 @@ MAPPED_CONTROLLERS = {
         "X"      : 1,
         "Y"      : 3,
         "START"  : 7,
+
+        "HAT"         : 0,
+        "HORIZ_STICK" : 0,
+        "VERT_STICK"  : 1,
     },
     "Controller (Xbox for Windows)": {
         "A"      : 0,
@@ -70,6 +85,10 @@ MAPPED_CONTROLLERS = {
         "X"      : 1,
         "Y"      : 3,
         "START"  : 7,
+
+        "HAT"         : 0,
+        "HORIZ_STICK" : 0,
+        "VERT_STICK"  : 1,
     },
     "Nintendo Co., Ltd. Pro Controller": {
         "A"      : 0,
@@ -77,6 +96,10 @@ MAPPED_CONTROLLERS = {
         "X"      : 1,
         "Y"      : 3,
         "START"  : 7,
+
+        "HAT"         : 0,
+        "HORIZ_STICK" : 0,
+        "VERT_STICK"  : 1,
     }
 }
 
@@ -101,40 +124,29 @@ def set_defaults():
     add_state("PLAYER1")
     
 def update_sticks():
-    joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+    global STICKS
+    STICKS = [pygame.joystick.Joystick(x) for x in range(min(pygame.joystick.get_count(), 4))]
     pygame.event.pump()
-
-    for joy in joysticks:
+    for joy in STICKS:
         if not joy.get_init():
             joy.init()
-        for btn in range(joy.get_numbuttons()):
-            if not joy.get_button(btn): continue
-            if joy not in STICKS:
-                if "PLAYER1" not in STATES or STATES["PLAYER1"]["JOY"] is None:
-                    name = "PLAYER1"
-                    add_state("PLAYER2", inp_map=deepcopy(DEFAULT_MAP))
-                elif "PLAYER2" not in STATES or STATES["PLAYER2"]["JOY"] is None:
-                    name = "PLAYER2"
-                    add_state("PLAYER3", inp_map=deepcopy(DEFAULT_MAP))
-                elif "PLAYER3" not in STATES or STATES["PLAYER3"]["JOY"] is None:
-                    name = "PLAYER3"
-                    add_state("PLAYER4", inp_map=deepcopy(DEFAULT_MAP))
-                elif "PLAYER4" not in STATES or STATES["PLAYER4"]["JOY"] is None:
-                    name = "PLAYER4"
-                else:
-                    return
 
-                if joy.get_name() in MAPPED_CONTROLLERS:                    
-                    controller_map = deepcopy(MAPPED_CONTROLLERS[joy.get_name()])
-                else:
-                    controller_map = deepcopy(DEFAULT_CONTROLLER_MAP)
-                    
-                STICKS.append(joy)
-                add_state(
-                    name,
-                    inp_map=controller_map,
-                    joy=joy)
-                print(f"added {name} with {joy.get_name()}")
+def get_num_sticks():
+    return len(STICKS)
+
+def add_joystick_to_input_state(name, stick):
+    if (stick > len(STICKS)):
+        return
+    joy = STICKS[stick]
+    if joy.get_name() in MAPPED_CONTROLLERS:
+        controller_map = deepcopy(MAPPED_CONTROLLERS[joy.get_name()])
+    else:
+        controller_map = deepcopy(DEFAULT_CONTROLLER_MAP)
+
+    add_state(
+        name,
+        inp_map=controller_map,
+        joy=joy)
 
 def update_tas(TAS, frame, noquit=False):
     for state_name in TAS.keys():

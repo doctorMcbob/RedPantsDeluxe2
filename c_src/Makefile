@@ -1,13 +1,11 @@
 # A simple Makefile for SDL projects
-
 # set the compiler
 CC := gcc
 
 # set compiler flags 
-SDL_FLAGS := `sdl2-config --libs --cflags`
+SDL_FLAGS := $(shell sdl2-config --static-libs --cflags)
 TTF_FLAGS := -L/usr/lib/x86_64-linux-gnu -lSDL2_ttf
-CFLAGS := $(SDL_FLAGS) $(TTF_FLAGS) -ggdb3 -O0 --std=c99 -Wall -lSDL2_mixer
-
+CFLAGS := $(SDL_FLAGS) $(TTF_FLAGS) -ggdb3 -O0 --std=c99 -Wall -lSDL2_mixer -lm -Wl,-Bstatic -lSDL2 -Wl,-Bdynamic
 
 # add headers here
 HDRS :=
@@ -26,7 +24,7 @@ all: $(EXEC)
 
 # recipe for building the final executable
 $(EXEC): $(OBJS) $(HDRS) 
-	$(CC) -o $(BUILD_DIR)/$@ $(OBJS) $(CFLAGS) -lSDL2_image -lm
+	$(CC) -o $(BUILD_DIR)/$@ $(OBJS) $(CFLAGS) -lSDL2_image
 
 # recipe for building object files
 #$(OBJS): $(@:.o=.c) $(HDRS) Makefile
@@ -37,4 +35,3 @@ clean:
 	rm -f $(EXEC) $(OBJS)
 
 .PHONY: all clean
-

@@ -178,7 +178,7 @@ int collision_with(Actor *a1, Actor *a2, World *world, int debug) {
   if (scriptKey != -1) {
     int resolution =
         resolve_script(scriptKey, a2, a1, world, debug, -1, -1, -1, -1, -1, 0);
-    if (resolution < 0)
+    if (resolution < 0) 
       return resolution;
   }
   return 0;
@@ -297,6 +297,7 @@ int collision_check(Actor *actor, World *world, int debug) {
       moved.w = actor->ECB.w;
       moved.h = actor->ECB.h;
       move(&moved, actor->x_vel, 0);
+      Actor *actor3;
       for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
         if (buffer[idx] == -1)
           break;
@@ -304,17 +305,24 @@ int collision_check(Actor *actor, World *world, int debug) {
         if (actor->name == buffer[idx])
           continue;
 
-        Actor *actor3 = get_actor(buffer[idx]);
+        actor3 = get_actor(buffer[idx]);
         if (actor3 == NULL || !actor3->tangible)
           continue;
         if (actor->tangible == 0 && actor3->platform == 0)
           continue;
         if (SDL_HasIntersection(&moved, &actor3->ECB)) {
           check = 0;
+          break;
         }
       }
       if (check == 0) {
-        actor->x_vel += direction;
+        int dx;
+        if (direction == 1) {
+          dx = actor3->ECB.x + actor3->ECB.w - moved.x;
+        } else {
+          dx = (moved.x + moved.w - actor3->ECB.x) * -1;
+        }
+        actor->x_vel += dx;
         actor->x_vel = _floor(actor->x_vel);
       }
     }
@@ -388,6 +396,7 @@ int collision_check(Actor *actor, World *world, int debug) {
       moved.w = actor->ECB.w;
       moved.h = actor->ECB.h;
       move(&moved, 0, actor->y_vel);
+      Actor *actor3;
       for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
         if (world->actors[idx] == -1)
           break;
@@ -395,17 +404,24 @@ int collision_check(Actor *actor, World *world, int debug) {
         if (actor->name == world->actors[idx])
           continue;
 
-        Actor *actor3 = get_actor(world->actors[idx]);
+        actor3 = get_actor(world->actors[idx]);
         if (actor3 == NULL || !actor3->tangible)
           continue;
         if (actor->tangible == 0 && actor3->platform == 0)
           continue;
         if (SDL_HasIntersection(&moved, &actor3->ECB)) {
           check = 0;
+          break;
         }
       }
       if (check == 0) {
-        actor->y_vel += direction;
+        int dx;
+        if (direction == 1) {
+          dx = actor3->ECB.y + actor3->ECB.h - moved.y;
+        } else {
+          dx = (moved.y + moved.h - actor3->ECB.y) * -1;
+        }
+        actor->y_vel += dx;
         actor->y_vel = _floor(actor->y_vel);
       }
     }
@@ -500,7 +516,9 @@ int update_actor(int actorKey, int worldKey, int debug) {
     return 0;
   if (actor->updated) {
     if ((actor->physics || actor->tangible) && world_has(world, actorKey)) {
-      collision_check(actor, world, debug);
+      int resolution = collision_check(actor, world, debug);
+      if (resolution < 0)
+        return resolution;
     }
     return 0;
   }
@@ -516,7 +534,9 @@ int update_actor(int actorKey, int worldKey, int debug) {
   }
   float x_flag = actor->x_vel, y_flag = actor->y_vel;
   if (actor->physics || actor->tangible) {
-    collision_check(actor, world, debug);
+    int resolution = collision_check(actor, world, debug);
+    if (resolution < 0)
+      return resolution;
     actor->ECB.x += _floor(actor->x_vel);
     actor->ECB.y += _floor(actor->y_vel);
   }
@@ -884,7 +904,7 @@ void draw_actor(SDL_Renderer *rend, Actor *actor, Frame *f) {
   case -90:
   case 90:
   case 0:
-    dest.x = actor->ECB.x + s->offx;
+    dest.x = actor->direction == 1 ? actor->ECB.x + actor->ECB.w - s->offx - dest.w : actor->ECB.x + s->offx;
     dest.y = actor->ECB.y + s->offy;
     break;
   case -270:
@@ -906,7 +926,7 @@ void draw_actor(SDL_Renderer *rend, Actor *actor, Frame *f) {
   double angle = 0 - actor->rotation;
   SDL_Point pivot = {dest.w / 2, dest.h / 2};
 
-  // // draw dest rect
+  // // draw dest rect ;P my favorite debug tool <3
   // SDL_SetRenderDrawColor(rend, 155, 0, 155, 255);
   // SDL_RenderDrawRect(rend, &dest);
 

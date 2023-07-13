@@ -39,6 +39,7 @@ LITERAL_KEYWORDS = {
     "None": 21,
     "RAND?": 6,
     "WORLD?": 7,
+    "STICKS?": 22,
     "song?": 8,
     "COLLIDE?": 9,
     "[]": 10,
@@ -58,8 +59,8 @@ OPERATORS = {
     "+": 0,
     "-": 1,
     "*": 2,
-    "/": 4,
-    "//": 3,
+    "/": 3,
+    "//": 4,
     "%": 5,
     "**": 6,
     "==": 7,
@@ -88,6 +89,12 @@ OPERATORS = {
     "abs": 30,
     "range": 31,
     "inworld": 32,
+    "sin": 33,
+    "cos": 34,
+    "tan": 35,
+    "asin": 36,
+    "acos": 37,
+    "atan": 38,
 }
 
 VERBS = {
@@ -131,6 +138,7 @@ VERBS = {
     "endfor": 37,
     "print": 38,
     "update_sticks": 39,
+    "setjoy": 40,
 }
 UNIQUE_FLOATS = []
 UNIQUE_STRINGS = []
@@ -325,7 +333,6 @@ def _intern_strings(SCRIPTS):
     if "_input_name" not in UNIQUE_STRINGS:
         UNIQUE_STRINGS.append("_input_name")
     if "" not in UNIQUE_STRINGS:
-        print("WARNING: Empty string not found in UNIQUE_STRINGS")
         UNIQUE_STRINGS.append("")
     if "COLLIDE" not in UNIQUE_STRINGS:
         UNIQUE_STRINGS.append("COLLIDE")
@@ -345,6 +352,51 @@ def _intern_strings(SCRIPTS):
         UNIQUE_STRINGS.append("HIT")
     if "background" not in UNIQUE_STRINGS:
         UNIQUE_STRINGS.append("background")
+    if "XCOLLISION" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("XCOLLISION")
+    if "YCOLLISION" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("YCOLLISION")
+    if "top" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("top")
+    if "left" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("left")
+    if "bottom" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("bottom")
+    if "right" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("right")
+    if "name" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("name")
+    if "state" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("state")
+    if "frame" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("frame")
+    if "x_vel" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("x_vel")
+    if "y_vel" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("y_vel")
+    if "direction" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("direction")
+    if "rotation" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("rotation")
+    if "tangible" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("tangible")
+    if "physics" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("physics")
+    if "platform" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("platform")
+    if "self" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("self")
+    if "related" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("related")
+    if "x" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("x")
+    if "y" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("y")
+    if "w" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("w")
+    if "h" not in UNIQUE_STRINGS:
+        UNIQUE_STRINGS.append("h")
+        
     UNIQUE_STRINGS.sort()
     string_data_dot_c = "#include \"stringmachine.h\"\n#include <stddef.h>\n"
     string_data_dot_c += f"int NUM_STRINGS = {len(UNIQUE_STRINGS)};\n"

@@ -1765,7 +1765,116 @@ void resolve_operators(int statement, World *world, int debug) {
         PARAMS[paramPointer++] = is != NULL;
         break;
       }
+      case SIN: {
+        int rightType = BUFFER[++bufferPointer];
+        int rightValue = BUFFER[++bufferPointer];
+
+        if (rightType != INT && rightType != FLOAT) {
+          print_statement(statement);
+          printf("Cannot sin with non-number\n");
+          break;
+        }
+        if (rightType == FLOAT) {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(sin(get_float(rightValue)));
+        } else {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(sin(rightValue));
+        }
+        break;
       }
+      case COS: {
+        int rightType = BUFFER[++bufferPointer];
+        int rightValue = BUFFER[++bufferPointer];
+
+        if (rightType != INT && rightType != FLOAT) {
+          print_statement(statement);
+          printf("Cannot cos with non-number\n");
+          break;
+        }
+        if (rightType == FLOAT) {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(cos(get_float(rightValue)));
+        } else {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(cos(rightValue));
+        }
+        break;
+      }
+      case TAN: {
+        int rightType = BUFFER[++bufferPointer];
+        int rightValue = BUFFER[++bufferPointer];
+
+        if (rightType != INT && rightType != FLOAT) {
+          print_statement(statement);
+          printf("Cannot tan with non-number\n");
+          break;
+        }
+        if (rightType == FLOAT) {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(tan(get_float(rightValue)));
+        } else {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(tan(rightValue));
+        }
+        break;
+      }
+      case ASIN: {
+        int rightType = BUFFER[++bufferPointer];
+        int rightValue = BUFFER[++bufferPointer];
+
+        if (rightType != INT && rightType != FLOAT) {
+          print_statement(statement);
+          printf("Cannot asin with non-number\n");
+          break;
+        }
+        if (rightType == FLOAT) {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(asin(get_float(rightValue)));
+        } else {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(asin(rightValue));
+        }
+        break;
+      }
+      case ACOS: {
+        int rightType = BUFFER[++bufferPointer];
+        int rightValue = BUFFER[++bufferPointer];
+
+        if (rightType != INT && rightType != FLOAT) {
+          print_statement(statement);
+          printf("Cannot acos with non-number\n");
+          break;
+        }
+        if (rightType == FLOAT) {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(acos(get_float(rightValue)));
+        } else {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(acos(rightValue));
+        }
+        break;
+      }
+      case ATAN: {
+        int rightType = BUFFER[++bufferPointer];
+        int rightValue = BUFFER[++bufferPointer];
+
+        if (rightType != INT && rightType != FLOAT) {
+          print_statement(statement);
+          printf("Cannot atan with non-number\n");
+          break;
+        }
+        if (rightType == FLOAT) {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(atan(get_float(rightValue)));
+        } else {
+          PARAMS[paramPointer++] = FLOAT;
+          PARAMS[paramPointer++] = push_float(atan(rightValue));
+        }
+        break;
+      }
+      }
+
       bufferPointer++;
     } else {
       PARAMS[paramPointer++] = type;
@@ -1803,6 +1912,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
             SCRIPTS[executionPointer] != QRAND &&
             SCRIPTS[executionPointer] != QWORLD &&
             SCRIPTS[executionPointer] != QCOLLIDE &&
+            SCRIPTS[executionPointer] != QSTICKS &&
             SCRIPTS[executionPointer] != QSONG &&
             SCRIPTS[executionPointer] != INP_A &&
             SCRIPTS[executionPointer] != INP_B &&
@@ -1875,6 +1985,11 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       case QWORLD: {
         BUFFER[bufferPointer++] = STRING;
         BUFFER[bufferPointer++] = world->name;
+        break;
+      }
+      case QSTICKS: {
+        BUFFER[bufferPointer++] = INT;
+        BUFFER[bufferPointer++] = get_num_sticks();
         break;
       }
       case QCOLLIDE: {
@@ -3314,6 +3429,23 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       break;
     }
     case UPDATE_STICKS: {
+      update_sticks();
+      break;
+    }
+    case SET_JOY: {
+      int inputStateType = PARAMS[0];
+      int inputStateValue = PARAMS[1];
+      int stickType = PARAMS[2];
+      int stickValue = PARAMS[3];
+
+      if (inputStateType != STRING || stickType != INT) {
+        printf("Actor %s error: ", get_string(self->name));
+        print_statement(statement);
+        printf("Missing or Incorrect Parameter for SET_JOY\n");
+        break;
+      }
+
+      add_stick_to_input_state(inputStateValue, stickValue);
       break;
     }
     }

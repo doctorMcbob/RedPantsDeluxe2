@@ -116,6 +116,9 @@ class World(object):
                     )))
                 else:
                     blitz.append((Actor.get_sprite(), frame.scroll((Actor.x+dx, Actor.y+dy))))
+            if DEBUG:
+                for blit in blitz:
+                    pygame.draw.rect(dest, (155, 0, 155), Rect(blit[1], blit[0].get_size()), 1)
             dest.blits(blitz)
 
         if DEBUG:
