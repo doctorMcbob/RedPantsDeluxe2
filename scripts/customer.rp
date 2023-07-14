@@ -28,7 +28,6 @@ add self.messages "I NEED MORE HAM"
 add self.messages "DOES THIS PLACE^DO SMOOTHIES    "
 set self messagecap len self.messages
 set self shouldsay 1
-set self saynumber 0
 set self saytimer 0
 set self coinnumber 0
 set self coinlimit 5
@@ -101,11 +100,10 @@ set self frame 0
 |COLLIDE|
 if player in self.name
    if related.shouldsay
-      set related sayname related.name + say + related.saynumber 
+      set related sayname related.name + say
       create say0 related.sayname related.w / 2 + related.x related.y - 48
       set related.sayname message related.messages at related.messageidx
       set related.sayname back backgroundsayL0
-      set related saynumber related.saynumber + 1
       set related messageidx related.messageidx + 1
       set related messageidx related.messageidx % related.messagecap
       set related shouldsay 0

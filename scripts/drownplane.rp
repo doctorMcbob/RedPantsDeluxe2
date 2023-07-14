@@ -14,7 +14,6 @@ if self.can_die
       set self y_vel 0
       create splash0 self.name + splash self.x self.y 
       create bubble0 self.name + bubble0 self.x self.y 
-
    endif
 endif
 

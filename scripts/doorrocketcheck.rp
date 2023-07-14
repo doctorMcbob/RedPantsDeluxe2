@@ -5,6 +5,7 @@ DOOR:0 door0 8,0
 |START:0|
 set self state DOOR
 set self destination rocket
+set self lock self.name + lockicon
 
 |DOOR:0|
 set self frame 0
@@ -14,7 +15,7 @@ if self.door_key
    if self.door_key + _DOWN in inpEVENTS
       set self calc inv0.scienceTR and inv0.scienceBR or self.calc and inv0.scienceTL and inv0.scienceBL
       if not self.calc
-      	 create lockicon0 related.name + lockicon related.x + 24 related.y
+      	 create lockicon0 related.lock related.x + 24 related.y
       endif
       if self.calc
       	 move self related.destination

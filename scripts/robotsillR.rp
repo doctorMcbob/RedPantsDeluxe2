@@ -20,6 +20,7 @@ HITSTUN:6 robotexplode2 0,0
 set self state WAIT
 set self frame 0
 set self bulletnumber 0
+set self bulletmax 10
 set self direction 1
 hurtboxes robot
 set self creatorname fillmein
@@ -29,10 +30,14 @@ set self state SHOOT
 set self frame 0
 
 |SHOOT:5|
-create robotbullet0 self.name + bullet + self.bulletnumber self.w / 2 + self.x  self.y + 32
-set self.name + bullet + self.bulletnumber creatorname self.name
-set self.name + bullet + self.bulletnumber direction self.direction
+set self bulletname  self.name + bullet + self.bulletnumber
+create robotbullet0 self.bulletname self.w / 2 + self.x  self.y + 32
+set self.bulletname creatorname self.name
+set self.bulletname direction self.direction
 set self bulletnumber self.bulletnumber + 1
+if self.bulletnumber == self.bulletmax
+    set self bulletnumber 0
+endif
 
 |SHOOT:6|
 # pass

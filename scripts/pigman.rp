@@ -47,7 +47,8 @@ set self jumpstrength -6
 set self runspeed 7
 set self scared []
 hurtboxes pigman
-
+set self arrowmax 3
+set self lookboxmax 3
 |STAND:0|
 set self x_vel 0
 exec checkAir
@@ -237,6 +238,9 @@ set self.lookboxname return self.name
 set self.lookboxname trigger scared
 set self.lookboxname w 512
 set self.lookboxname h 32
+if self.lookboxnumber < self.lookboxmax
+   set self.lookboxnumber 0
+endif
 
 |lookFar|
 set self target 0
@@ -272,6 +276,9 @@ endif
 |fireArrow|
 set self arrowname self.name + arrow + self.arrownumber
 set self arrownumber self.arrownumber + 1
+if self.arrownumber < self.arrowmax
+   set self arrownumber 0
+endif
 if self.direction == 1
    set self arrowx self.x + self.w
 endif
@@ -286,6 +293,9 @@ set self.arrowname direction self.direction * -1
 |fireArrowUp|
 set self arrowname self.name + arrow + self.arrownumber
 set self arrownumber self.arrownumber + 1
+if self.arrownumber < self.arrowmax
+   set self arrownumber 0
+endif
 if self.direction == 1
    set self arrowx self.x + self.w
 endif

@@ -15,6 +15,7 @@ add self.messages "GET ME OUTTA HERE  "
 add self.messages "MY FEET HURT  "
 set self messagecap len self.messages
 set self saynumber 0
+set self saymax 2
 set self saytimer 0
 set self counter 0
 
@@ -43,6 +44,9 @@ if player in self.name
       set related messageidx related.messageidx % related.messagecap
       set related state TALK
       set related counter 160
+      if related.saynumber > related.saymax
+         set related saynumber 0
+      endif
    endif
 endif
 

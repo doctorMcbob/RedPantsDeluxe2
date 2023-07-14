@@ -82,7 +82,8 @@ set self slideflipxmod 3
 set self slideflipstrength 24
 set self longjumpystrength 9
 set self longjumpxstrength 12
-
+set self bloodmax 10
+set self thwackmax 10
 set self rotation 180
 set self can_die 1
 
@@ -108,6 +109,9 @@ set self can_die 0
 if self.frame % 4 == 0
    create blood0 self.name + blood + self.bloodnumber self.x + 16 self.y + 16
    set self bloodnumber self.bloodnumber + 1
+      if self.bloodnumber > self.bloodmax
+      set self bloodnumber 0
+   endif
 endif
 
 |DEAD:45|
@@ -459,7 +463,10 @@ if related.y > self.y
 endif
 
 create thwack0 self.name + thwack + self.thwacks self.thw_x self.thw_y
-set self thwacks self.thwacks + 1
+set related thwacks related.thwacks + 1
+if related.thwacks > related.thwackmax
+   set related thwacks 0
+endif
 
 |HITSTUN:0|
 set self x_vel 0

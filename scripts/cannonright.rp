@@ -15,6 +15,7 @@ FIRE:6  cannonfire2 0,0
 |START:0|
 set self direction 1
 set self count 0
+set self max_ 4
 
 |FUSE:21|
 exec shootBall
@@ -50,3 +51,7 @@ create cannonblast0 self.cannonblastname self.x + 80 self.y - 32
 set self.cannonblastname direction self.direction
 
 set self count self.count + 1
+
+if self.count > self.max_
+   set self count 0
+endif

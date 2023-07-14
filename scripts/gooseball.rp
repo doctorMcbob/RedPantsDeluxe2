@@ -27,6 +27,7 @@ set self state LOOK
 set self limit 20
 set self neglimit self.limit * -1
 set self lookboxnumber 0
+set self lookboxmax 2
 set self seeleft []
 set self seeright []
 set self grav 1
@@ -208,6 +209,9 @@ set self.lookboxname return self.name
 set self.lookboxname trigger seeright
 set self.lookboxname w 256
 set self.lookboxname h 32
+if self.lookboxnumber > self.lookboxmax
+   set self lookboxnumber 0
+endif
 
 |lookLeft|
 set self lookboxname self.name + lookbox + self.lookboxnumber
@@ -218,6 +222,9 @@ set self.lookboxname return self.name
 set self.lookboxname trigger seeleft
 set self.lookboxname w 256
 set self.lookboxname h 32
+if self.lookboxnumber > self.lookboxmax
+   set self lookboxnumber 0
+endif
 
 |checkCharge|
 for name self.seeleft

@@ -27,6 +27,7 @@ set self x_vel 0
 set self y_vel 0
 set self speed 4
 set self firenumber 0
+set self firenmax 3
 
 |SHOOT_DOWN:18|
 set self fireball self.name + fireball + self.firenumber
@@ -34,6 +35,9 @@ set self firenumber self.firenumber + 1
 create dragonfire0 self.fireball self.x + self.w + 64 self.w / 2 + self.y
 set self.fireball x_vel self.x_vel
 set self.fireball y_vel self.y_vel
+if self.firenumber >= self.firenmax
+   set self firenumber 0
+endif
 
 |SHOOT_DOWN:19|
 
@@ -47,6 +51,9 @@ set self firenumber self.firenumber + 1
 create dragonfire0 self.fireball self.x + self.w + 64 self.y + 32
 set self.fireball x_vel self.x_vel
 set self.fireball y_vel self.y_vel
+if self.firenumber >= self.firenmax
+   set self firenumber 0
+endif
 
 |SHOOT:19|
 

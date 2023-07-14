@@ -7,6 +7,7 @@ LAUNCHED:0 empty 0,0
 set self frame 0
 set self state WAIT
 set self count 0
+set self max_ 2
 
 |WAIT:0|
 set self frame 0
@@ -20,6 +21,9 @@ if related.state == WAIT
    create say0 related.name + say + related.count related.x related.y
    set related.name + say + related.count message "HOLD CROUCH AND JUMP^  WHILE MOVING TO  ^  BUFFER LONG JUMP  "
    set related count related.count + 1
+   if related.count > related.max_
+      set related count 0
+   endif 
    set related state LAUNCHED
 endif
 

@@ -9,6 +9,7 @@ OFF:0 empty 0,0
 set self L C
 set self R P
 set self piecenumber 0
+set self piecemax 60
 set self tangible 1
 set self state PLACE
 set self timermax 45
@@ -27,9 +28,15 @@ endif
 set self leftpiece self.name + piece + self.piecenumber
 create pizzapiece0 self.leftpiece self.x self.y
 set self piecenumber self.piecenumber + 1
+if self.piecenumber > self.piecemax
+   set self piecenumber 0
+endif
 set self rightpiece self.name + piece + self.piecenumber
 create pizzapiece0 self.rightpiece self.x + 64 self.y
 set self piecenumber self.piecenumber + 1
+if self.piecenumber > self.piecemax
+   set self piecenumber 0
+endif
 
 set self.leftpiece state self.L
 set self.rightpiece state self.R

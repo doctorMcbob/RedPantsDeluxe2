@@ -5,6 +5,7 @@ DOOR:0 door0 8,0
 |START:0|
 set self state DOOR
 set self destination nightclub
+set self lock self.name + lockicon
 
 |DOOR:0|
 set self frame 0
@@ -13,7 +14,7 @@ set self frame 0
 if self.door_key
    if self.door_key + _DOWN in inpEVENTS
       if self.hat != milk
-      	 create lockicon0 related.name + lockicon related.x + 24 related.y
+      	 create lockicon0 related.lock related.x + 24 related.y
       endif
       if self.hat == milk
       	 move self related.destination

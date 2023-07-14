@@ -7,6 +7,7 @@ LAUNCHED:0 empty 0,0
 set self frame 0
 set self state WAIT
 set self count 0
+set self max_ 2
 
 |WAIT:0|
 set self frame 0
@@ -22,5 +23,8 @@ if related.state == WAIT
       set related.name + say + related.count message "HOLD DIRECTIONS^TO DEFLAME"
       set related count related.count + 1
       set related state LAUNCHED
+      if related.count > related.max_
+         set related count 0
+      endif
    endif
 endif
