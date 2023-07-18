@@ -1,0 +1,67 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+OFF:0 empty 0,0
+ON:0 empty 0,0
+END:0 empty 0,0
+
+|START:0|
+set self state OFF
+
+|OFF:0|
+if exists bosspawner0.spawnname
+    if bosspawner0.spawnname.hp > 0
+        exec activate
+        set self state ON
+    endif
+endif
+
+|END:0|
+exec deactivate
+set self state OFF
+
+|ON:0|
+set self check exists bosspawner0.spawnname
+
+if not self.check
+    exec deactivate
+    set self state OFF
+    break
+endif
+
+set self value bosspawner0.spawnname.hp
+if self.value <= 0
+    exec deactivate
+    set self state OFF
+    break
+endif
+
+for i_ range 12
+    set self target rockethpbarsegment + i_
+    set self.target state EMPTY
+    if i_ * 6 < self.value
+        set self.target state ON
+        if i_ * 6 + 3 > self.value
+            set self.target state LOW
+        endif
+    endif
+endfor
+
+if self.value < 38
+    set bosspawner0.spawnname state HEAD1
+endif
+if self.value < 36
+    set bosspawner0.spawnname state HEAD2
+endif
+
+|activate|
+set rockethpdisplay0 state ON
+for i_ range 12
+    set rockethpbarsegment + i_ state ON
+endfor
+
+|deactivate|
+set rockethpdisplay0 state OFF
+for i_ range 12
+    set rockethpbarsegment + i_ state OFF
+endfor
+

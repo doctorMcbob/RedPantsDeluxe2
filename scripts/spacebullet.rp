@@ -1,0 +1,149 @@
+BULLET|0,0,0,0|False|
+START:0 empty 0,0
+TINY:0 tinybullet 0,0
+BALL:0 bulletball 0,0
+FOLLOW:0 bulletball 0,0
+SQUIG:0 bulletflat 0,0
+SQUIG:5 bulletsquig 0,0
+BEAM:0 beam0 -32,0
+BEAM:3 beam1 -32,0
+CROSS:0 bulletplus 0,0
+CROSS:5 bulletx 0,0
+SHOT:0 playershot0 0,0
+SHOT:3 playershot1 0,0
+SHOT:5 playershot2 0,0
+SHOT:8 playershot3 0,0
+BYE:0 empty 0,0
+
+|START:0|
+set self physics 1
+hitboxes spacebullet
+hurtboxes spacebullet
+set self counter 200
+
+|FOLLOW:0|
+exec updateCounter
+if exists self.follow
+    set self x self.follow.x + self.offx
+    set self y self.follow.y + self.offy
+endif
+
+|BALL:0|
+exec updateCounter
+
+|TINY:0|
+exec updateCounter
+
+|SQUIG:0|
+exec updateCounter
+
+|CROSS:0|
+exec updateCounter
+
+|BEAM:0|
+exec updateCounter
+
+|SHOT:0|
+exec updateCounter
+
+|SQUIG:10|
+exec updateCounter
+set self direction self.direction * -1
+set self frame 0
+
+|CROSS:10|
+exec updateCounter
+set self frame 0
+
+|BEAM:0|
+exec updateCounter
+back
+
+|BEAM:1|
+exec updateCounter
+
+|BEAM:6|
+exec updateCounter
+set self frame 1
+
+|SHOT:11|
+exec updateCounter
+set self direction self.direction * -1
+set self frame 5
+
+|BYE:0|
+goodbye
+
+|XCOLLISION|
+goodbye
+
+|YCOLLISION|
+goodbye
+
+|HIT|
+set self calc self.name == ship1
+set self calc self.name == ship2 or self.calc
+if self.name == ship0 or self.calc
+    set self calc related.state == BEAM
+    if related.state == SHOT or self.calc
+        break
+    endif
+    set rockethudblinker0 frame 0
+    set rockethudblinker1 frame 0
+    set rockethudblinker2 frame 0
+    set rockethudblinker3 frame 0
+    if self.level == 0
+        set self state BROKE
+        if rockethudblinker0.state != START
+            set rockethudblinker0 state DANGER
+            set rockethudblinker1 state DANGER
+            set rockethudblinker2 state DANGER
+            set rockethudblinker3 state DANGER
+        endif
+        set self frame 0
+        set self x_vel 0
+        set self y_vel 0
+    endif
+    if self.level != 0
+        set ship0 level 0
+        if rockethudblinker0.state != START
+            set rockethudblinker0 state HIT
+            set rockethudblinker1 state HIT
+            set rockethudblinker2 state HIT
+            set rockethudblinker3 state HIT
+        endif
+        set self state CRASH
+        set self frame 0
+        set self x_vel 0
+        set self y_vel 0
+    endif
+endif
+if self.name != ship0
+    set self calc1 related.state == BEAM
+    set self calc2 related.state == SHOT 
+    if not self.calc1 nor self.calc2
+       break
+    endif
+    if self.hp
+        set self hp self.hp - 1
+    endif
+    if self.hp == 0
+        set ship0 powerupcounter ship0.powerupcounter - 1
+        if ship0.powerupcounter == 0
+            create powerup0 gamePowerUp self.x self.y
+            set ship0 powerupcounter ship0.powerupcountermax
+        endif
+        set self state BROKE
+        set self frame 0
+        set self x_vel 0
+        set self y_vel 0
+    endif
+endif
+set self hitname self.name + Hit!
+create fxhit0 self.hitname related.x related.y 
+set related state BYE
+
+|updateCounter|
+if self.frame >= self.counter
+    set self state BYE
+endif

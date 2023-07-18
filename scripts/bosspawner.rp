@@ -1,0 +1,20 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+SPAWN:0 warpin0 0,0
+SPAWN:3 warpin1 0,0
+SPAWN:6 warpin0 0,0
+SPAWN:9 warpin2 0,0
+SPAWN:12 warpin3 0,0
+SPAWN:15 empty 0,0
+
+|START:0|
+set self state WAIT
+set self spawnname self.name + boss
+
+|SPAWN:14|
+set self state WAIT
+if exists self.spawnname
+    break
+endif
+create bosshead0 self.spawnname self.x self.y 

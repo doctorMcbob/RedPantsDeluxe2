@@ -1,0 +1,36 @@
+BOSS|0,0,0,0|False|
+START:0 bossdress 0,0
+DRESS:0 bossdress 0,0
+BYE:0 empty 0,0
+
+|START:0|
+set self state DRESS
+set self headname none
+set self smokenum 0
+set self smokemax 8
+set self smokecounter 0
+set self smokefreq 8
+
+|DRESS:0|
+exec updatePosition
+exec updateSmoke
+
+|BYE:0|
+goodbye
+
+|updatePosition|
+if exists self.headname
+    set self x self.headname.x + 8
+    set self y self.headname.y + self.headname.h
+endif
+
+|updateSmoke|
+if self.smokecounter == self.smokefreq
+    set self smokecounter 0
+    create smokeball0 self.name + smokeball + self.smokenum self.x + RAND? + RAND? - RAND? - RAND? self.h * 0.5 + self.y
+    set self smokenum self.smokenum + 1
+    if self.smokenum == self.smokemax
+        set self smokenum 0
+    endif
+endif
+set self smokecounter self.smokecounter + 1

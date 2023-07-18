@@ -1,0 +1,396 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+PLAY0:0 empty 0,0
+PLAY1:0 empty 0,0
+PLAY2:0 empty 0,0
+PLAY3:0 empty 0,0
+PLAY4:0 empty 0,0
+PLAY5:0 empty 0,0
+
+|START:0|
+set self level 0
+set self state PLAY + self.level
+set self frame 0
+
+|PLAY0:0|
+exec checkRestart
+
+|PLAY0:40|
+add rocketspawnmanager0.funcs trianglesLow
+exec checkRestart
+
+|PLAY0:42|
+exec checkContinue
+exec checkRestart
+
+|PLAY1:0|
+exec checkRestart
+
+|PLAY1:40|
+add rocketspawnmanager0.funcs trianglesLow
+add rocketspawnmanager0.funcs beedlesLow
+exec checkRestart
+
+|PLAY1:42|
+exec checkContinue
+exec checkRestart
+
+|PLAY2:0|
+exec checkRestart
+
+|PLAY2:40|
+add rocketspawnmanager0.funcs beedlesLow
+add rocketspawnmanager0.funcs destroyerLow
+exec checkRestart
+
+|PLAY2:42|
+exec checkContinue
+exec checkRestart
+
+|PLAY3:0|
+exec checkRestart
+
+|PLAY3:40|
+add rocketspawnmanager0.funcs trianglesMid
+add rocketspawnmanager0.funcs beedlesLow
+exec checkRestart
+
+|PLAY3:42|
+exec checkContinue
+exec checkRestart
+
+|PLAY4:0|
+exec checkRestart
+
+|PLAY4:40|
+add rocketspawnmanager0.funcs trianglesMid
+exec checkRestart
+
+|PLAY4:42|
+exec checkRestart
+
+|PLAY4:55|
+add rocketspawnmanager0.funcs trianglesMidAlt
+exec checkRestart
+
+|PLAY4:57|
+exec checkContinue
+exec checkRestart
+
+|PLAY5:0|
+exec checkRestart
+
+|PLAY5:40|
+add rocketspawnmanager0.funcs trianglesMid
+exec checkRestart
+
+|PLAY5:42|
+exec checkRestart
+
+|PLAY5:55|
+add rocketspawnmanager0.funcs destroyerMid
+add rocketspawnmanager0.funcs beedlesLow
+exec checkRestart
+
+|PLAY5:57|
+exec checkContinue
+exec checkRestart
+
+|PLAY6:0|
+exec checkRestart
+
+|PLAY6:40|
+add rocketspawnmanager0.funcs trianglesHigh
+add rocketspawnmanager0.funcs beedlesLow
+exec checkRestart
+
+|PLAY6:42|
+exec checkContinue
+exec checkRestart
+
+|PLAY7:0|
+exec checkRestart
+
+|PLAY7:40|
+add rocketspawnmanager0.funcs beedlesHigh
+add rocketspawnmanager0.funcs trianglesMidAlt
+exec checkRestart
+
+|PLAY7:42|
+exec checkContinue
+exec checkRestart
+
+|PLAY8:0|
+exec checkRestart
+
+|PLAY8:40|
+add rocketspawnmanager0.funcs destroyerHigh
+add rocketspawnmanager0.funcs trianglesMid
+exec checkRestart
+
+|PLAY8:42|
+exec checkContinue
+exec checkRestart
+
+|PLAY9:0|
+exec checkRestart
+
+|PLAY9:40|
+add rocketspawnmanager0.funcs trianglesMid
+add rocketspawnmanager0.funcs beedlesMid
+exec checkRestart
+
+|PLAY9:42|
+exec checkRestart
+
+|PLAY9:55|
+add rocketspawnmanager0.funcs trianglesMidAlt
+exec checkRestart
+
+|PLAY9:57|
+exec checkRestart
+exec checkContinue
+
+|PLAY10:0|
+exec checkRestart
+
+|PLAY10:40|
+add rocketspawnmanager0.funcs beedlesMid
+exec checkRestart
+
+|PLAY10:42|
+exec checkRestart
+
+|PLAY10:55|
+add rocketspawnmanager0.funcs destroyerHigh
+add rocketspawnmanager0.funcs trianglesMid
+exec checkRestart
+
+|PLAY10:57|
+exec checkRestart
+exec checkContinue
+
+|PLAY11:0|
+exec checkRestart
+
+|PLAY11:40|
+add rocketspawnmanager0.funcs trianglesHigh
+add rocketspawnmanager0.funcs beedlesHigh
+add rocketspawnmanager0.funcs destroyerMid
+exec checkRestart
+
+|PLAY11:42|
+exec checkContinue
+exec checkRestart
+
+|PLAY12:40|
+add rocketspawnmanager0.funcs spawnBoss
+exec checkRestart
+
+|PLAY12:42|
+exec checkRestart
+exec checkContinue
+
+|PLAY13:60|
+set ship0 state FLYAWAY
+set self state END
+set self frame 0
+
+|END:120|
+view BLITZORB blitzorb_endscene
+exec reset
+
+|checkContinue|
+set self skip 0
+for i_ range 10
+    set self calc trianglespawner + i_
+    if self.calc.state == SPAWN
+        set self skip 1
+        break
+    endif
+    set self calc self.calc.spawnname
+    if exists self.calc
+        set self skip 1
+        break
+    endif
+
+    set self calc beedleshipspawner + i_
+    if self.calc.state == SPAWN
+        set self skip 1
+        break
+    endif
+    set self calc self.calc.spawnname
+    if exists self.calc
+        set self skip 1
+        break
+    endif
+endfor
+
+for i_ range 4
+    set self calc destroyerspawner + i_
+    if self.calc.state == SPAWN
+        set self skip 1
+        break
+    endif
+    set self calc self.calc.spawnname
+    if exists self.calc
+        set self skip 1
+        break
+    endif
+endfor
+
+if bosspawner0.state == SPAWN
+    set self skip 1
+endif
+if exists bosspawner0.spawnname
+    set self skip 1
+endif
+
+if self.skip
+    break
+endif
+
+set self thermoname thermometerpiece + self.level
+if exists self.thermoname
+    set self.thermoname frame 0
+    set self.thermoname state FULL
+endif
+set self level self.level + 1
+set self state PLAY + self.level
+set self frame 0
+set bgscroller0 scroll_y bgscroller0.scroll_y - 1
+set self thermoname thermometerpiece + self.level
+if self.level == 12
+    set self thermoname thermometerend0
+endif
+if exists self.thermoname
+    set self.thermoname frame 0
+    set self.thermoname state ACTIVE
+endif
+
+|checkRestart|
+set self calc ship0.frame > 90
+if ship0.state == BROKE and self.calc
+    view BLITZORB blitzorb_root
+    set ship1 state WAIT
+    exec reset
+endif
+
+|reset|
+set bgscroller0 scroll_y 0
+if exists powerup0
+    set powerup0 state BYE
+endif
+set ship0 state WAIT
+set ship0 frame 0
+set ship0 x ship0.startx
+set ship0 y ship0.starty
+set ship0 x_vel 0
+set ship0 y_vel 0
+set ship0 level 0
+set ship0 powerupcounter ship0.powerupcountermax
+set ship0 tangible 1
+
+for i_ range ship0.bulletmax
+    set self _name ship0bullet + i_
+    if exists self._name
+        set self._name state BYE
+    endif
+endfor
+
+for i_ range 10
+    set self calc trianglespawner + i_
+    set self calc self.calc.spawnname
+    if exists self.calc
+        set self.calc state BYE
+    endif
+
+    set self calc beedleshipspawner + i_
+    set self calc self.calc.spawnname
+    if exists self.calc
+        set self.calc state BYE
+    endif
+endfor
+
+for i_ range 4
+    set self calc destroyerspawner + i_
+    set self calc self.calc.spawnname
+    if exists self.calc
+        set self.calc state BYE
+    endif
+endfor
+
+if exists bosspawner0.spawnname
+    set bosspawner0.spawnname state BYE
+    set bosspawner0.spawnname.bodyname state BYE
+    set bosspawner0.spawnname.armsname state BYE
+endif
+for _i range bosshead0.bulletmax
+    set self _name bosspawner0.spawnname + bullet + _i
+    if exists self._name
+        set self._name state BYE
+    endif
+    set self _name bosspawner0.spawnname + bullet_ + _i
+    if exists self._name
+        set self._name state BYE
+    endif
+endfor
+
+set platformrockethudL0 x platformrockethudL0.startx
+set platformrockethudL0 y platformrockethudL0.starty
+set platformrockethudL0 shift 0
+set platformrockethudR0 x platformrockethudR0.startx
+set platformrockethudR0 y platformrockethudR0.starty
+set platformrockethudR0 shift 0
+
+if exists rocketcrowspawner0.spawnname
+    set rocketcrowspawner0.spawnname state BYE
+endif
+if exists rocketcrowspawner1.spawnname
+    set rocketcrowspawner1.spawnname state BYE  
+endif
+
+set rockethudblinker0 frame 0
+set rockethudblinker1 frame 0
+set rockethudblinker2 frame 0
+set rockethudblinker3 frame 0
+set cautionsign0 frame 0
+set spaceport0 frame 0
+set thermometerbottom0 frame 0
+set thermometerpiece0 frame 0
+set thermometerpiece1 frame 0
+set thermometerpiece2 frame 0
+set thermometerpiece3 frame 0
+set thermometerpiece4 frame 0
+set thermometerpiece5 frame 0
+set thermometerpiece6 frame 0
+set thermometerpiece7 frame 0
+set thermometerpiece8 frame 0
+set thermometerpiece9 frame 0
+set thermometerpiece10 frame 0
+set thermometerpiece11 frame 0
+set thermometerend0 frame 0
+set rockethudblinker0 state START
+set rockethudblinker1 state START
+set rockethudblinker2 state START
+set rockethudblinker3 state START
+set cautionsign0 state START
+set spaceport0 state START
+set thermometerbottom0 state START
+set thermometerpiece0 state START
+set thermometerpiece1 state START
+set thermometerpiece2 state START
+set thermometerpiece3 state START
+set thermometerpiece4 state START
+set thermometerpiece5 state START
+set thermometerpiece6 state START
+set thermometerpiece7 state START
+set thermometerpiece8 state START
+set thermometerpiece9 state START
+set thermometerpiece10 state START
+set thermometerpiece11 state START
+set thermometerend0 state START
+
+set rockethpmanager0 state END
+set self frame 0
+set self state START

@@ -1,0 +1,87 @@
+ATK|0,0,0,0|False|
+START:0 crow0 0,0
+CROW:0 crow0 0,0
+CROW:15 crow1 -16,0
+BROKE:0 crow0 0,0
+BYE:0 empty 0,0
+
+|START:0|
+set self speed 5
+set self physics 1
+set self tangible 0
+set self xd 1
+if RAND?
+    set self xd -1
+endif
+set self yd 1
+if RAND?
+    set self yd -1
+endif
+set self x_vel self.speed * self.xd
+set self y_vel self.speed * self.yd
+set self state CROW
+set self hp 5
+set self explodenum 0
+set self explodemax 8
+set self explodecounter 0
+set self explodefreq 8
+
+|CROW:31|
+set self frame 0
+hitboxes crow
+hurtboxes crow
+
+|XCOLLISION|
+set self xd self.xd * -1
+set self x_vel self.speed * self.xd
+
+|YCOLLISION|
+set self yd self.yd * -1
+set self y_vel self.speed * self.yd
+
+|BROKE:0|
+exec explode
+
+|BROKE:30|
+set self state BYE
+
+|BYE:0|
+goodbye
+
+|explode|
+if self.explodecounter == self.explodefreq
+    set self explodecounter 0
+    set self _x self.x
+    set self _y self.y
+    for i range 3
+        set self _x RAND? * -16 + self._x
+        set self _x RAND? * -3 + self._x        
+        set self _x RAND? * 16 + self._x
+        set self _x RAND? * 3 + self._x    
+        set self _y RAND? * -16 + self._y
+        set self _y RAND? * -3 + self._y
+        set self _y RAND? * 16 + self._y
+        set self _y RAND? * -3 + self._y
+    endfor
+    create explode0 self.name + explode + self.explodenum self._x self._y
+    set self explodenum self.explodenum + 1
+endif
+set self explodecounter self.explodecounter + 1
+
+|HIT|
+set self calc self.name == ship1
+if self.name == ship0 or self.calc
+    if self.level == 0
+        set self state BROKE
+        set self frame 0
+        set self x_vel 0
+        set self y_vel 0
+    endif
+    if self.level != 0
+        set ship0 level 0
+        set self state CRASH
+        set self frame 0
+        set self x_vel 0
+        set self y_vel 0
+    endif
+endif

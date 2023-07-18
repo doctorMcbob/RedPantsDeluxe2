@@ -1,0 +1,7 @@
+HUD|0,0,0,0|False|
+START:0 empty 0,0
+OFF:0 empty 0,0
+EMPTY:0 rockethealthbargray 0,0
+ON:0 rockethealthbarred 0,0
+LOW:0 rockethealthbarpink 0,0
+

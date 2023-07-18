@@ -1,0 +1,16 @@
+SMOKEBALL|0,0,0,0|False|
+START:0 smokeball0 0,0
+BALL:0 smokeball0 0,0
+BALL:15 smokeball1 8,8
+BALL:30 smokeball2 16,16
+
+|START:0|
+set self state BALL
+set self frame 0
+back
+
+|BALL:0|
+set self y self.y - 1
+
+|BALL:45|
+goodbye

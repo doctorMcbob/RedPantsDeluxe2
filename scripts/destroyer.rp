@@ -1,0 +1,98 @@
+SHIP|0,0,0,0|False|
+START:0 destroyer0 0,0
+FLY:0 destroyer0 0,0
+BROKE:0 destroyer0 0,0
+BYE:0 empty 0,0
+
+|START:0|
+set self state FLY
+set self bulletfreq 90
+set self bulletcounter 60
+set self bulletnum 0
+set self bulletmax 21
+set self shotspeed 3
+set self smokenum 0
+set self smokemax 8
+set self smokecounter 0
+set self smokefreq 8
+
+set self explodenum 0
+set self explodemax 8
+set self explodecounter 0
+set self explodefreq 8
+set self hp 16
+hitboxes rocketdestroyer
+hurtboxes rocketdestroyer
+
+|FLY:0|
+exec updateSmoke
+exec updateShot
+
+|BROKE:0|
+exec explode
+
+|BROKE:60|
+goodbye
+
+|BYE:0|
+goodbye
+
+|updateSmoke|
+if self.smokecounter == self.smokefreq
+    set self smokecounter 0
+    create smokeballrev0 self.name + smokeball + self.smokenum self.h / 2 - 24 + self.x + RAND? + RAND? - RAND? - RAND? self.y
+    set self smokenum self.smokenum + 1
+    if self.smokenum == self.smokemax
+        set self smokenum 0
+    endif
+endif
+set self smokecounter self.smokecounter + 1
+
+|updateShot|
+if self.bulletcounter >= self.bulletfreq
+    exec shoot
+    set self bulletcounter 0
+endif
+set self bulletcounter self.bulletcounter + 1
+
+|shoot|
+set self bulletname self.name + bullet + self.bulletnum
+create bowlershot0 self.bulletname self.w / 2 + self.x - 24 self.h / 2 - 24 + self.y
+set self bulletnum self.bulletnum + 1
+if self.bulletnum == self.bulletmax
+    set self bulletnum 0
+endif
+
+|explode|
+if self.explodecounter == self.explodefreq
+    set self explodecounter 0
+    set self _x self.w / 2 + self.x - 24
+    set self _y self.h / 2 + self.y - 24
+    for i range 5
+        set self _x RAND? * -16 + self._x
+        set self _x RAND? * -3 + self._x        
+        set self _x RAND? * 16 + self._x
+        set self _x RAND? * 3 + self._x    
+        set self _y RAND? * -16 + self._y
+        set self _y RAND? * -3 + self._y
+        set self _y RAND? * 16 + self._y
+        set self _y RAND? * -3 + self._y
+    endfor
+    create explode0 self.name + explode + self.explodenum self._x self._y
+    set self explodenum self.explodenum + 1
+    set self _x self.w / 2 + self.x - 24
+    set self _y self.h / 2 + self.y - 24
+    for i range 5
+        set self _x RAND? * -16 + self._x
+        set self _x RAND? * -3 + self._x        
+        set self _x RAND? * 16 + self._x
+        set self _x RAND? * 3 + self._x    
+        set self _y RAND? * -16 + self._y
+        set self _y RAND? * -3 + self._y
+        set self _y RAND? * 16 + self._y
+        set self _y RAND? * -3 + self._y
+    endfor
+    create explode0 self.name + explode + self.explodenum self._x self._y
+    set self explodenum self.explodenum + 1
+endif
+set self explodecounter self.explodecounter + 1

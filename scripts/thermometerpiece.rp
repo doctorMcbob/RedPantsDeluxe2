@@ -1,0 +1,23 @@
+HUD|0,0,0,0|False|
+START:0 empty 0,0
+EMPTY:0 thermometerempty 0,-8
+FULL:0 thermometerfull 0,-8
+END:0 empty 0,0
+ACTIVE:0 thermometer0 0,-8
+ACTIVE:2 thermometer1 0,-8
+ACTIVE:4 thermometer2 0,-8
+ACTIVE:7 thermometer3 0,-8
+ACTIVE:10 thermometer4 0,-8
+ACTIVE:15 thermometer5 0,-8
+ACTIVE:17 thermometer4 0,-8
+ACTIVE:20 thermometer3 0,-8
+ACTIVE:25 thermometer4 0,-8
+ACTIVE:30 thermometer5 0,-8
+
+|START:210|
+set self frame 0
+set self state EMPTY
+set self direction -1
+
+|ACTIVE:32|
+set self frame 10

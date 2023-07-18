@@ -1,0 +1,25 @@
+HUD|0,0,0,0|False|
+DANGER:0 blinkerdanger 0,0
+GREEN:0 blinkergreen 0,0
+MAX:0 blinkermax 0,0
+OFF:0 empty 0,0
+GRAY:0 blinkeroff 0,0
+START:0 empty 0,0
+HIT:0 blinkerdanger 0,0
+HIT:2 blinkeroff 0,0
+HIT:4 blinkerdanger 0,0
+HIT:6 blinkeroff 0,0
+HIT:8 blinkerdanger 0,0
+HIT:10 blinkeroff 0,0
+HIT:12 blinkerdanger 0,0
+HIT:14 blinkeroff 0,0
+
+|START:210|
+set self state HIT
+set self frame 0
+
+|HIT:16|
+set self state GRAY
+if self.name == rockethudblinker0
+    set self state DANGER
+endif

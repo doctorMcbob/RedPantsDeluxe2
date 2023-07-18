@@ -1,0 +1,14 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+update_sticks
+if STICKS? > 0
+    setjoy PLAYER1 0
+endif
+set self state WAIT
+set self frame 0
+
+|WAIT:30|
+set self state START

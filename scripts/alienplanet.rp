@@ -1,0 +1,16 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 alienplanet00 0,0
+PLATFORM01 alienplanet01 0,0
+PLATFORM02 alienplanet02 0,0
+PLATFORM10 alienplanet10 0,0
+PLATFORM11 alienplanet11 0,0
+PLATFORM12 alienplanet12 0,0
+PLATFORM20 alienplanet20 0,0
+PLATFORM21 alienplanet21 0,0
+PLATFORM22 alienplanet22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self tangible 1
+set self frame 0

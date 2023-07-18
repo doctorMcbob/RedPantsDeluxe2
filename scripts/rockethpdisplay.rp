@@ -1,0 +1,4 @@
+HUD|0,0,0,0|False|
+START:0 empty 0,0
+OFF:0 empty 0,0
+ON:0 hpbarhuddisplay 0,0

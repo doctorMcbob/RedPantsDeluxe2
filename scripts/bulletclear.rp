@@ -1,0 +1,5 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+
+|COLLIDE|
+set self state BYE

@@ -1,0 +1,9 @@
+HUD|0,0,0,0|False|
+START:0 empty 0,0
+THERMO:0 thermometerbottom 0,-8
+
+|START:210|
+set self direction -1
+set self state THERMO
+set thermometerpiece0 state ACTIVE
+set thermometerpiece0 frame 0

@@ -1,0 +1,61 @@
+BOSS|0,0,0,0|False|
+START:0 bossarmsdown -16,0
+DOWN:0 bossarmsdown -16,0
+UP:0 bossarmsup -16,-32
+READY:0 bossarmsready -16,0
+THROWRIGHT:0 bossarmsthrowright0 -24,-28
+THROWRIGHT:8 bossarmsthrowright1 -24,0
+THROWLEFT:0 bossarmsthrowleft0 -8,-28
+THROWLEFT:8 bossarmsthrowleft1 -8,0
+SWAYLEFT:0 bossarmsswayleft -16,0
+SWAYRIGHT:0 bossarmsswayright -16,0
+SPIN:0 bossarmspin0 -32,-32
+SPIN:3 bossarmspin1 -32,-32
+SPIN:6 bossarmspin2 -32,-32
+SPIN:9 bossarmspin3 -32,-32
+SPIN:12 bossarmspin4 -32,-32
+SPIN:15 bossarmspin5 -32,-32
+SPIN:18 bossarmspin6 -32,-32
+SPIN:23 bossarmspray -16,0
+PRAY:0 bossarmspray -16,0
+BYE:0 empty 0,0
+
+|START:0|
+set self bodyname none
+set self state DOWN
+
+|DOWN:0|
+exec updatePosition
+
+|UP:0|
+exec updatePosition
+
+|THROWLEFT:0|
+exec updatePosition
+
+|THROWRIGHT:0|
+exec updatePosition
+
+|SWAYLEFT:0|
+exec updatePosition
+
+|SWAYRIGHT:0|
+exec updatePosition
+
+|READY:0|
+exec updatePosition
+
+|SPIN:0|
+exec updatePosition
+
+|PRAY:0|
+exec updatePosition
+
+|BYE:0|
+goodbye
+
+|updatePosition|
+if exists self.bodyname
+    set self x self.bodyname.x
+    set self y self.bodyname.y
+endif

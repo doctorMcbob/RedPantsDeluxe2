@@ -12,6 +12,7 @@ set self frame 0
 
 |COLLIDE|
 if self.door_key
+   create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
       if self.hat != milk
       	 create lockicon0 related.lock related.x + 24 related.y

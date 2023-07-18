@@ -10,6 +10,7 @@ set self frame 0
 
 |COLLIDE|
 if self.door_key
+   create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
       move self world2
       view self.frame_name world2

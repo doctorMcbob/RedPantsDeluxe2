@@ -1,0 +1,33 @@
+ARCADE|0,0,0,0|False|
+START:0 arcadeshmup 0,0
+ARCADE:0 arcadeshmup 0,0
+
+|START:0|
+set self state ARCADE
+set self taken 0
+
+|COLLIDE|
+if self.door_key
+   create upicon0 upicon related.x related.y - 32
+   if self.door_key + _DOWN in inpEVENTS
+
+      if isframe MAIN
+      	 deactivate MAIN
+      endif
+      if isframe MAIN2
+      	 deactivate MAIN2
+      endif
+      if isframe MAIN3
+      	 deactivate MAIN3
+      endif
+      if isframe MAIN4
+      	 deactivate MAIN4
+      endif
+
+      makeframe BLITZORB blitzorb_root 0 0 1152 640
+      set ship0 _input_name self._input_name
+      set ship1 _input_name self._input_name
+      set ship2 _input_name self._input_name
+      set endscenemanager0 _input_name self._input_name
+    endif
+endif

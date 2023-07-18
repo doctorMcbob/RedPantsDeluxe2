@@ -3,13 +3,7 @@ START:0 empty 0,0
 WAIT:0 empty 0,0
 
 |START:0|
-set self noWO 1
 set self state WAIT
 
 |WAIT:0|
-set self frame 0
-
-|COLLIDE|
-if self.frame_name
-   focus self.frame_name related.name
-endif
+focus BLITZORB self

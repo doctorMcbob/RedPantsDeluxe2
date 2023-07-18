@@ -1,0 +1,19 @@
+BTN|0,0,0,0|False|
+START:0 start_unselected 0,0
+BTN:0 start_unselected 0,0
+
+|START:0|
+set self direction -1
+set self state BTN
+
+|COLLIDE|
+if self.state == BYE
+    break
+endif
+view BLITZORB blitzorb_spacelevel
+for i_ range ship1.bulletmax
+    set self _name ship1bullet + i_
+    if exists self._name
+        set self._name state BYE
+    endif
+endfor

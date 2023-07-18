@@ -1,0 +1,276 @@
+SHIP|0,0,0,0|False|
+START:0 shipstraight0 0,0
+WAIT:0 shipstraight0 0,0
+CRASH:0 shipbreak0 0,0
+CRASH:10 empty 0,0
+CRASH:12 shipbreak0 0,0
+CRASH:20 empty 0,0
+CRASH:22 shipbreak0 0,0
+CRASH:30 empty 0,0
+FLY:0 shipstraight0 0,0
+FLY:3 shipstraight1 0,0
+FLY:6 shipstraight2 0,0
+FLYLEFT:0 shipleft0 0,0
+FLYLEFT:3 shipleft1 0,0
+FLYLEFT:6 shipleft2 0,0
+FLYRIGHT:0 shipright0 0,0
+FLYRIGHT:3 shipright1 0,0
+FLYRIGHT:6 shipright2 0,0
+BROKE:0 shipbreak0 0,0
+FLYAWAY:0 shipstraight0 0,0
+
+|START:0|
+set self state WAIT
+set self startx self.x
+set self starty self.y
+set self frame 0
+set self _input_name PLAYER1
+set self regspeed 6
+set self slowspeed 2
+set self tangible 1
+set self smokenum 0
+set self smokemax 8
+set self smokecounter 0
+set self smokefreq 8
+set self bulletnum 0
+set self bulletmax 80
+set self bulletcounter 0
+set self bulletfreq 10
+set self shotspeed -8
+hitboxes ship
+hurtboxes ship
+set self level 0
+set self explodenum 0
+set self explodemax 8
+set self explodecounter 0
+set self explodefreq 8
+set self frame_name ROOT
+set self powerupcounter 6
+set self powerupcountermax 6
+
+|CRASH:0|
+exec applyController
+set self state CRASH
+
+|CRASH:32|
+set self state FLY
+set self frame 0
+
+|WAIT:0|
+exec updateSmoke
+
+|WAIT:30|
+exec updateSmoke
+set self state FLY
+
+|FLY:0|
+exec applyController
+exec updateSmoke
+exec updateShot
+
+|FLYLEFT:0|
+exec applyController
+exec updateSmoke
+exec updateShot
+
+|FLYRIGHT:0|
+exec applyController
+exec updateSmoke
+exec updateShot
+
+|FLY:9|
+set self frame 0
+exec applyController
+exec updateSmoke
+exec updateShot
+
+|FLYLEFT:9|
+set self frame 0
+exec applyController
+exec updateSmoke
+exec updateShot
+
+|FLYRIGHT:9|
+set self frame 0
+exec applyController
+exec updateSmoke
+exec updateShot
+
+|BROKE:0|
+exec explode
+
+|FLYAWAY:0|
+set self tangible 0
+if self.x == 600
+    set self y self.y - self.speed
+endif
+if self.x < 600
+    set self x self.x + self.speed
+    set self x min self.x 600
+endif
+if self.x > 600
+    set self x self.x - self.speed
+    set self x max self.x 600
+endif
+
+|COLLIDE|
+if self.state == POWERUP
+    set related level related.level + 1    
+    set related level min related.level 3
+    if rockethudblinker0.state != START
+        set rockethudblinker0 frame 0
+        set rockethudblinker1 frame 0
+        set rockethudblinker2 frame 0
+        set rockethudblinker3 frame 0
+        if related.level == 1
+            set rockethudblinker0 state GREEN
+            set rockethudblinker1 state GREEN
+            set rockethudblinker2 state GRAY
+            set rockethudblinker3 state GRAY
+        endif
+        if related.level == 2
+            set rockethudblinker0 state GREEN
+            set rockethudblinker1 state GREEN
+            set rockethudblinker2 state GREEN
+            set rockethudblinker3 state GRAY
+        endif
+        if related.level == 3
+            set rockethudblinker0 state MAX
+            set rockethudblinker1 state MAX
+            set rockethudblinker2 state MAX
+            set rockethudblinker3 state MAX
+        endif
+    endif
+    goodbye
+endif
+
+|explode|
+if self.explodecounter == self.explodefreq
+    set self explodecounter 0
+    set self _x self.x
+    set self _y self.y
+    for i range 3
+        set self _x RAND? * -16 + self._x
+        set self _x RAND? * -3 + self._x        
+        set self _x RAND? * 16 + self._x
+        set self _x RAND? * 3 + self._x    
+        set self _y RAND? * -16 + self._y
+        set self _y RAND? * -3 + self._y
+        set self _y RAND? * 16 + self._y
+        set self _y RAND? * -3 + self._y
+    endfor
+    create explode0 self.name + explode + self.explodenum self._x self._y
+    set self explodenum self.explodenum + 1
+endif
+set self explodecounter self.explodecounter + 1
+
+|updateSmoke|
+if self.smokecounter == self.smokefreq
+    set self smokecounter 0
+    create smokeball0 self.name + smokeball + self.smokenum self.x + RAND? + RAND? - RAND? - RAND? self.h * 0.75 + self.y
+    set self smokenum self.smokenum + 1
+    if self.smokenum == self.smokemax
+        set self smokenum 0
+    endif
+endif
+set self smokecounter self.smokecounter + 1
+
+|applyController|
+set self x_vel 0
+set self y_vel 0
+set self state FLY
+set self speed self.regspeed
+if inpB
+   set self speed self.slowspeed
+endif
+if inpUP
+   set self y_vel 0 - self.speed
+endif
+if inpDOWN
+   set self y_vel self.speed
+endif
+if inpLEFT
+   set self state FLYLEFT
+   set self x_vel 0 - self.speed
+endif
+if inpRIGHT
+   set self state FLYRIGHT
+   set self x_vel self.speed
+endif
+
+|updateShot|
+if inpA
+    set self calc self.level == 3
+    set self calc self.frame % 2 == 0 and self.calc
+    if self.bulletcounter >= self.bulletfreq or self.calc
+        exec shoot
+        set self bulletcounter 0
+    endif
+endif
+set self bulletcounter self.bulletcounter + 1
+
+|shoot|
+if self.level == 0
+    set self bulletname self.name + bullet + self.bulletnum
+    create spacebullet0 self.bulletname self.w / 2 + self.x - 8 self.y
+    set self.bulletname state SHOT
+    set self.bulletname y_vel self.shotspeed
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum == self.bulletmax
+        set self bulletnum 0
+    endif
+endif
+if self.level == 1
+    set self bulletname self.name + bullet + self.bulletnum
+    create spacebullet0 self.bulletname self.w / 2 + self.x - 16 self.y
+    set self.bulletname state SHOT
+    set self.bulletname y_vel self.shotspeed
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum == self.bulletmax
+        set self bulletnum 0
+    endif
+    set self bulletname self.name + bullet + self.bulletnum
+    create spacebullet0 self.bulletname self.w / 2 + self.x self.y
+    set self.bulletname state SHOT
+    set self.bulletname y_vel self.shotspeed
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum == self.bulletmax
+        set self bulletnum 0
+    endif
+endif
+if self.level == 2
+    set self bulletname self.name + bullet + self.bulletnum
+    create spacebullet0 self.bulletname self.x self.y
+    set self.bulletname state SHOT
+    set self.bulletname y_vel self.shotspeed
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum == self.bulletmax
+        set self bulletnum 0
+    endif
+    set self bulletname self.name + bullet + self.bulletnum
+    create spacebullet0 self.bulletname self.w / 3  + self.x self.y + 16
+    set self.bulletname state SHOT
+    set self.bulletname y_vel self.shotspeed
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum == self.bulletmax
+        set self bulletnum 0
+    endif
+    set self bulletname self.name + bullet + self.bulletnum
+    create spacebullet0 self.bulletname self.w / 3 * 2 + self.x self.y
+    set self.bulletname state SHOT
+    set self.bulletname y_vel self.shotspeed
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum == self.bulletmax
+        set self bulletnum 0
+    endif
+endif
+if self.level == 3
+    set self bulletname self.name + bullet + self.bulletnum
+    create spacebullet0 self.bulletname self.w / 2 + self.x - 8 self.y - 32
+    set self.bulletname state BEAM
+    set self.bulletname y_vel self.shotspeed 
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum == self.bulletmax
+        set self bulletnum 0
+    endif
+endif

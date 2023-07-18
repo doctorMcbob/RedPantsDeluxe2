@@ -1,0 +1,339 @@
+BOSS|0,0,0,0|False|
+START:0 bosshead0 0,0
+HEAD0:0 bosshead0 0,0
+HEAD1:0 bosshead1 0,0
+HEAD2:0 bosshead2 0,0
+BROKE:0 bosshead2 0,0
+BYE:0 empty 0,0
+
+|START:0|
+set self bodyname self.name + body
+create bossbody0 self.bodyname self.x + 8 self.y + self.h 
+set self.bodyname headname self.name
+set self armsname self.name + arms
+create bossarms0 self.armsname self.x + 8 self.y + self.h
+set self.armsname bodyname self.bodyname
+set self state HEAD0
+set self physics 1
+set self tangible 1
+set self counter 0
+set self done 0
+set self atkdone 0
+set self atkcounter 0
+hurtboxes rocketboss
+hitboxes rocketboss
+set self hp 72
+set self speed 4
+set self movfuncs []
+add self.movfuncs leftright
+add self.movfuncs center
+add self.movfuncs upsydownsy
+add self.movfuncs bounce
+set self movfunc choiceof self.movfuncs
+set self atkfuncs []
+add self.atkfuncs waveLeft
+add self.atkfuncs waveRight
+add self.atkfuncs circle
+set self atkfunc choiceof self.atkfuncs
+set self atkfreq 30
+set self atkctdwn 0
+set self bulletnum 0
+set self bulletmax 80
+set self circlecounter 0
+set self explodenum 0
+set self explodemax 8
+set self explodecounter 0
+set self explodefreq 8
+
+|HEAD0:0|
+exec updateMovement
+exec updateAttack
+
+|HEAD1:0|
+exec updateMovement
+exec updateAttack
+exec activateCrows
+
+|HEAD2:0|
+exec updateMovement
+exec updateAttack
+exec activateCrows
+
+|BROKE:0|
+exec explode
+
+|BROKE:60|
+set self.armsname state BYE
+set self.bodyname state BYE
+set self state BYE
+
+|BYE:0|
+goodbye
+
+|XCOLLISION|
+set self xcollide 1
+
+|YCOLLISION|
+set self ycollide 1
+
+|updateMovement|
+exec self.movfunc
+set self xcollide 0
+set self ycollide 0
+if self.done == 1
+    set self counter 0
+    set self done 0
+    set self movfunc choiceof self.movfuncs
+endif
+
+|updateAttack|
+if self.circlecounter > 0
+    set self circlecounter self.circlecounter - 1
+endif
+if self.atkctdwn == 0
+    exec self.atkfunc
+    if self.atkdone == 1
+        set self atkcounter 0
+        set self atkdone 0
+        set self atkfunc choiceof self.atkfuncs
+        set self atkctdwn self.atkfreq
+    endif
+    break
+endif
+if self.atkctdwn > 0
+    set self atkctdwn self.atkctdwn - 1
+    if self.atkctdwn < 10
+        set self.armsname state UP
+        break
+    endif
+    if self.atkctdwn < 20
+        set self.armsname state READY
+    endif
+endif
+
+|activateCrows|
+set self calc exists rocketcrowspawner0.spawnname
+if not self.calc
+    set rocketcrowspawner0 state SPAWN
+endif
+set self calc exists rocketcrowspawner1.spawnname
+if not self.calc
+    set rocketcrowspawner1 state SPAWN
+endif
+
+|leftright|
+if self.counter == 0
+    set self x_vel self.speed * -1
+    set self y_vel 0
+    set self.armsname state SWAYLEFT
+    set self dx 1
+endif
+if self.counter >= 270
+    set self done 1
+    set self x_vel 0
+    set self.armsname state DOWN
+endif
+if self.xcollide == 1
+    if self.dx == 1
+        set self x_vel self.speed
+        set self xcollide 0
+        set self dx -1
+    endif
+endif
+if self.xcollide == 1
+    if self.dx == -1
+        set self x_vel self.speed * -1
+        set self xcollide 0
+        set self dx 1
+    endif
+endif
+if self.x_vel > 0
+    set self.armsname state SWAYRIGHT
+endif
+if self.x_vel < 0
+    set self.armsname state SWAYLEFT
+endif
+
+set self counter self.counter + 1
+
+|upsydownsy|
+exec leftright
+if self.counter == 1
+    set self y_vel -6
+endif
+if self.y > bosspawner0.y
+    set self y_vel self.y_vel - 0.5
+endif
+if self.y < bosspawner0.y
+    set self y_vel self.y_vel + 0.5
+endif
+
+|center|
+set self x_vel bosspawner0.x - self.x / 10
+set self y_vel bosspawner0.y - self.y / 10
+if self.x_vel > 0
+    set self.armsname state SWAYRIGHT
+endif
+if self.x_vel < 0
+    set self.armsname state SWAYLEFT
+endif
+if abs self.y_vel == 0
+    set self.armsname state DOWN
+endif
+if abs self.x_vel == 0
+    if abs self.y_vel == 0
+        set self done 1
+    endif
+endif
+
+|bounce|
+if self.counter == 0
+    set self dx 1
+    set self dy 1
+    set self y_vel self.speed
+    set self x_vel self.speed
+    if RAND?
+        set self x_vel self.speed * -1
+    endif
+endif
+if self.ycollide == 1
+    set self dy self.dy * -1
+    set self y_vel self.speed * self.dy
+endif
+if self.xcollide == 1
+    set self dx self.dx * -1
+    set self x_vel self.speed * self.dx
+endif
+if self.x_vel > 0
+    set self.armsname state SWAYRIGHT
+endif
+if self.x_vel < 0
+    set self.armsname state SWAYLEFT
+endif
+if self.counter >= 270
+    exec center
+endif
+set self counter self.counter + 1
+
+|waveLeft|
+if self.atkcounter % 4 == 0
+    set self bulname self.name + bullet + self.bulletnum
+    create spacebullet0 self.bulname self.w / 2 + self.x - 8  self.y + self.h
+    set self.bulname state BALL
+    set self.bulname y_vel 0.5 * self.atkcounter + -20
+    if self.atkcounter < 40
+        set self.bulname x_vel -0.5 * self.atkcounter + 1
+    endif
+    if self.atkcounter >= 40
+        set self.bulname x_vel self.atkcounter - 40 * 0.5 + -19
+    endif
+
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum >= self.bulletmax
+        set self bulletnum 0
+    endif
+endif
+if self.atkcounter % 16 == 0
+    set self.armsname frame 0
+endif
+set self.armsname state THROWLEFT
+if self.atkcounter >= 80
+    set self atkdone 1
+endif
+set self atkcounter self.atkcounter + 1
+
+|waveRight|
+if self.atkcounter % 4 == 0
+    set self bulname self.name + bullet + self.bulletnum
+    create spacebullet0 self.bulname self.w / 2 + self.x - 8  self.y + self.h
+    set self.bulname state BALL
+    set self.bulname y_vel 0.5 * self.atkcounter + -20
+    if self.atkcounter < 40
+        set self.bulname x_vel 0.5 * self.atkcounter + -1
+    endif
+    if self.atkcounter >= 40
+        set self.bulname x_vel self.atkcounter - 40 * -0.5 + 19
+    endif
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum >= self.bulletmax
+        set self bulletnum 0
+    endif
+endif
+if self.atkcounter % 16 == 0
+    set self.armsname frame 0
+endif
+set self.armsname state THROWRIGHT
+if self.atkcounter >= 80
+    set self atkdone 1
+endif
+set self atkcounter self.atkcounter + 1
+
+|circle|
+if self.circlecounter != 0
+    set self atkcounter 0
+    set self atkdone 0
+    set self atkfunc choiceof self.atkfuncs
+    set self atkctdwn self.atkfreq
+    if self.atkfunc == circle
+        set self atkfunc waveLeft
+    endif
+    break
+endif
+set self movfunc center    
+if self.atkcounter == 0
+    set self done 0
+    set self.armsname frame 0
+endif
+
+set self.armsname state SPIN
+
+if self.atkcounter % 2 == 0
+    set self bulname self.name + bullet_ + self.bulletnum
+    set self angle_offset 6.283185 // 15 * self.atkcounter
+
+    set self calc cos self.angle_offset
+    set self offx 128 * self.calc
+    set self _x self.w / 2 + self.x + self.offx
+
+    set self calc sin self.angle_offset
+    set self offy 128 * self.calc
+    set self _y self.h / 2 + self.y + self.offy
+
+    create spacebullet0 self.bulname self._x self._y
+    set self.bulname state FOLLOW
+    set self.bulname counter 300
+    set self.bulname follow self.name
+    set self.bulname offx self._x - self.x
+    set self.bulname offy self._y - self.y
+    set self bulletnum self.bulletnum + 1
+    if self.bulletnum >= self.bulletmax
+        set self bulletnum 0
+    endif
+endif
+
+set self atkcounter self.atkcounter + 1
+if self.atkcounter >= 50
+    set self atkdone 1
+    set self movfunc bounce
+    set self circlecounter 350
+endif
+
+|explode|
+if self.explodecounter == self.explodefreq
+    set self explodecounter 0
+    set self _x self.x
+    set self _y self.y
+    for i range 3
+        set self _x RAND? * -16 + self._x
+        set self _x RAND? * -3 + self._x        
+        set self _x RAND? * 16 + self._x
+        set self _x RAND? * 3 + self._x    
+        set self _y RAND? * -16 + self._y
+        set self _y RAND? * -3 + self._y
+        set self _y RAND? * 16 + self._y
+        set self _y RAND? * -3 + self._y
+    endfor
+    create explode0 self.name + explode + self.explodenum self._x self._y
+    set self explodenum self.explodenum + 1
+endif
+set self explodecounter self.explodecounter + 1

@@ -1,0 +1,24 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+SPAWN:0 warpinb0 0,0
+SPAWN:3 warpinb1 0,0
+SPAWN:6 warpinb0 0,0
+SPAWN:9 warpinb2 0,0
+SPAWN:12 warpinb3 0,0
+SPAWN:15 empty 0,0
+
+
+|START:0|
+set self state WAIT
+set self spawnname self.name + destroyer
+
+|WAIT:0|
+set self frame 0
+
+|SPAWN:14|
+set self state WAIT
+if exists self.spawnname
+    break
+endif
+create destroyer0 self.spawnname self.x self.y 

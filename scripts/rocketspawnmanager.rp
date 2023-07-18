@@ -1,0 +1,97 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+PLAY:0 empty 0,0
+
+|START:0|
+set self funcs []
+set self state PLAY
+
+|PLAY:0|
+set self length len self.funcs
+for i_ range self.length
+    exec self.funcs at 0
+    remove self.funcs self.funcs at 0
+endfor
+
+|beedlesLow|
+set beedleshipspawner0 state SPAWN
+set beedleshipspawner1 state SPAWN
+
+|beedlesMid|
+set beedleshipspawner0 state SPAWN
+set beedleshipspawner3 state SPAWN
+set beedleshipspawner4 state SPAWN
+set beedleshipspawner7 state SPAWN
+set beedleshipspawner8 state SPAWN
+
+|beedlesMidAlt|
+set beedleshipspawner1 state SPAWN
+set beedleshipspawner2 state SPAWN
+set beedleshipspawner5 state SPAWN
+set beedleshipspawner6 state SPAWN
+set beedleshipspawner9 state SPAWN
+
+|beedlesHigh|
+set beedleshipspawner0 state SPAWN
+set beedleshipspawner2 state SPAWN
+set beedleshipspawner4 state SPAWN
+set beedleshipspawner6 state SPAWN
+set beedleshipspawner8 state SPAWN
+set beedleshipspawner1 state SPAWN
+set beedleshipspawner3 state SPAWN
+set beedleshipspawner5 state SPAWN
+set beedleshipspawner7 state SPAWN
+set beedleshipspawner9 state SPAWN
+
+|trianglesLow|
+set trianglespawner2 state SPAWN
+set trianglespawner3 state SPAWN
+
+|trianglesMid|
+set trianglespawner1 state SPAWN
+set trianglespawner2 state SPAWN
+set trianglespawner5 state SPAWN
+set trianglespawner6 state SPAWN
+set trianglespawner9 state SPAWN
+
+|trianglesMidAlt|
+set trianglespawner0 state SPAWN
+set trianglespawner3 state SPAWN
+set trianglespawner4 state SPAWN
+set trianglespawner7 state SPAWN
+set trianglespawner8 state SPAWN
+
+|trianglesHigh|
+set trianglespawner0 state SPAWN
+set trianglespawner1 state SPAWN
+set trianglespawner2 state SPAWN
+set trianglespawner3 state SPAWN
+set trianglespawner4 state SPAWN
+set trianglespawner5 state SPAWN
+set trianglespawner6 state SPAWN
+set trianglespawner7 state SPAWN
+set trianglespawner8 state SPAWN
+set trianglespawner9 state SPAWN
+
+|destroyerLow|
+set destroyerspawner0 state SPAWN
+
+|destroyerLowAlt|
+set destroyerspawner1 state SPAWN
+
+|destroyerMid|
+set destroyerspawner0 state SPAWN
+set destroyerspawner1 state SPAWN
+
+|destroyerMidAlt|
+set destroyerspawner2 state SPAWN
+set destroyerspawner3 state SPAWN
+
+|destroyerHigh|
+set destroyerspawner0 state SPAWN
+set destroyerspawner1 state SPAWN
+set destroyerspawner2 state SPAWN
+set destroyerspawner3 state SPAWN
+
+|spawnBoss|
+set bosspawner0 state SPAWN

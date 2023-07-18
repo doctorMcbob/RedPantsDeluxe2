@@ -1,0 +1,31 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 rockethudplat00 0,0
+PLATFORM01 rockethudplat01 0,0
+PLATFORM02 rockethudplat02 0,0
+PLATFORM10 rockethudplat10 0,0
+PLATFORM11 rockethudplat11 0,0
+PLATFORM12 rockethudplat12 0,0
+PLATFORM20 rockethudplat20 0,0
+PLATFORM21 rockethudplat21 0,0
+PLATFORM22 rockethudplat22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self startx self.x
+set self starty self.y
+set self frame 0
+set self shift 0
+
+|PLATFORM:0|
+if self.shift > -128
+    set self shift self.shift - 2
+    set self x self.x - 2
+    break
+endif
+if self.shift > -256
+    set self shift self.shift - 1
+    set self x self.x - 1
+    break
+endif
+

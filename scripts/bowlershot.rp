@@ -1,0 +1,137 @@
+SHOT|0,0,0,0|False|
+START:0 bballshot0 0,0
+BBALL:0 bballshot0 0,0
+BBALL:3 bballshot1 0,0
+BBALL:5 bballshot2 0,0
+BBALL:6 bballshot3  0,0
+EXPLODE:0 empty 0,0
+BYE:0 empty 0,0
+
+|START:0|
+set self state BBALL
+set self physics 1
+set self traction 0.9
+set self shotspeed 4
+set self x_vel ship0.x - self.x / 10
+set self y_vel ship0.y - self.y / 10
+hitboxes rocketbowlershot
+hurtboxes rocketbowlershot
+
+|BBALL:0|
+exec applyTraction
+
+|BBALL:16|
+set self frame 0
+exec BBALL:0
+
+|BYE:0|
+goodbye
+
+|EXPLODE:0|
+set self bname self.name + bullet0
+create spacebullet0 self.bname self.x self.y
+set self.bname x_vel 0 - self.shotspeed
+set self.bname y_vel 0 - self.shotspeed
+set self.bname state BALL
+
+set self bname self.name + bullet1
+create spacebullet0 self.bname self.x self.y
+set self.bname x_vel self.shotspeed
+set self.bname y_vel 0 - self.shotspeed
+set self.bname state BALL
+
+set self bname self.name + bullet2
+create spacebullet0 self.bname self.x self.y
+set self.bname x_vel 0 - self.shotspeed
+set self.bname y_vel 0
+set self.bname state BALL
+
+set self bname self.name + bullet3
+create spacebullet0 self.bname self.x self.y
+set self.bname x_vel self.shotspeed
+set self.bname y_vel 0
+set self.bname state BALL
+
+set self bname self.name + bullet4
+create spacebullet0 self.bname self.x self.y
+set self.bname x_vel 0 - self.shotspeed
+set self.bname y_vel self.shotspeed
+set self.bname state BALL
+
+set self bname self.name + bullet5
+create spacebullet0 self.bname self.x self.y
+set self.bname x_vel 0 + self.shotspeed
+set self.bname y_vel self.shotspeed
+set self.bname state BALL
+
+set self bname self.name + bullet6
+create spacebullet0 self.bname self.x self.y
+set self.bname x_vel 0 
+set self.bname y_vel 0 - self.shotspeed
+set self.bname state BALL
+
+set self bname self.name + bullet7
+create spacebullet0 self.bname self.x self.y
+set self.bname x_vel 0
+set self.bname y_vel self.shotspeed
+set self.bname state BALL
+
+goodbye
+
+|applyTraction|
+set self x_vel self.x_vel * self.traction
+set self y_vel self.y_vel * self.traction
+set self calc abs self.x_vel < 0.1
+if abs self.y_vel < 0.1 and self.calc
+  set self y_vel 0
+  set self state EXPLODE
+endif
+
+
+|HIT|
+set self calc self.name == ship1
+if self.name == ship0 or self.calc
+    set self calc related.state == BEAM
+    if related.state == SHOT or self.calc
+        break
+    endif
+    if self.level == 0
+        set self state BROKE
+        set self frame 0
+        set self x_vel 0
+        set self y_vel 0
+    endif
+    if self.level != 0
+        set ship0 level 0
+        set self state CRASH
+        set self frame 0
+        set self x_vel 0
+        set self y_vel 0
+
+    endif
+endif
+if self.name != ship0
+    set self calc1 related.state == BEAM
+    set self calc2 related.state == SHOT 
+    if not self.calc1 nor self.calc2
+       break
+    endif
+    if self.hp
+        set self hp self.hp - 1
+    endif
+    if self.hp == 0
+        set ship0 powerupcounter ship0.powerupcounter - 1
+        if ship0.powerupcounter == 0
+            create powerup0 gamePowerUp self.x self.y
+            set ship0 powerupcounter ship0.powerupcountermax
+        endif
+        set self state BROKE
+        set self frame 0
+        set self x_vel 0
+        set self y_vel 0
+    endif
+endif
+set self hitname self.name + Hit!
+create fxhit0 self.hitname related.x related.y 
+set related state BYE
+

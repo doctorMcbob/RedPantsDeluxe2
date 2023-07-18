@@ -1,0 +1,7 @@
+FLAVOR|0,0,0,0|False|
+START:0 rocketmenugerder 0,0
+PLAT:0 rocketmenugerder 0,0
+
+|START:0|
+set self state PLAT
+set self tangible 1

@@ -1,0 +1,12 @@
+BGSCROLLER|0,0,0,0|False|
+START:0 empty 0,0
+SCROLL:0 empty 0,0
+
+|START:0|
+set self scroll_x 0
+set self scroll_y 0
+set self state SCROLL
+
+|SCROLL:0|
+offsetbgscrolly WORLD? self.scroll_y
+offsetbgscrollx WORLD? self.scroll_x

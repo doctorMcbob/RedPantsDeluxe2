@@ -1,0 +1,18 @@
+POWERUP|0,0,0,0|False|
+START:0 powerup0 0,0
+POWERUP:0 powerup0 0,0
+POWERUP:1 powerup1 0,0
+POWERUP:3 powerup2 0,0
+POWERUP:5 powerup3 0,0
+BYE:0 empty 0,0
+
+|START:0|
+set self physics 1
+set self y_vel 2
+set self state POWERUP
+
+|POWERUP:22|
+set self frame 0
+
+|BYE:0|
+goodbye

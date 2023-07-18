@@ -12,6 +12,7 @@ set self frame 0
 
 |COLLIDE|
 if self.door_key
+   create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
       set self calc inv0.scienceTR and inv0.scienceBR or self.calc and inv0.scienceTL and inv0.scienceBL
       if not self.calc

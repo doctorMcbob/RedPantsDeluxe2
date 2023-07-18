@@ -1,0 +1,13 @@
+HUD|0,0,0,0|False|
+START:0 upicon 0,0
+ICON:0 upicon 0,0
+
+|START:0|
+set self state ICON
+set self frame 0
+
+|ICON:0|
+set self y self.y - 3
+
+|ICON:15|
+goodbye
