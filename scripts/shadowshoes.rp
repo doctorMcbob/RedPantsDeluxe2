@@ -236,7 +236,8 @@ if self.x_vel != 0
       endif
    endif
    exec checkAir
-endifif abs self.x_vel < self.speed
+endif
+if abs self.x_vel < self.speed
 
    set self calc1 self.x_vel > 0 and inpRIGHT
    set self calc1 not inpLEFT and self.calc1
