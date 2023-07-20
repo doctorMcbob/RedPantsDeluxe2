@@ -11,7 +11,7 @@ typedef struct Frame {
   int scroll_y;
   SDL_Rect rect;
   World* world;
-  Actor* focus;
+  int focus;
   int bound_left;
   int left_bind;
   int bound_top;

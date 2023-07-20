@@ -4,3 +4,5 @@ LOOK:0 fountain 0,0
 
 |START:0|
 set self state LOOK
+back
+set self background 1

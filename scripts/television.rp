@@ -6,6 +6,8 @@ LOOK:4 television1 0,0
 |START:0|
 set self state LOOK
 set self frame 0
+back
+set self background 1
 
 |LOOK:8|
 set self frame 0

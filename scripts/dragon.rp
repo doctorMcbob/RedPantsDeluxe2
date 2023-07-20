@@ -28,6 +28,8 @@ set self y_vel 0
 set self speed 4
 set self firenumber 0
 set self firenmax 3
+back
+set self background 1
 
 |SHOOT_DOWN:18|
 set self fireball self.name + fireball + self.firenumber

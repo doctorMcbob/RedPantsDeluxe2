@@ -4,6 +4,8 @@ VENT:0 vent0 8,0
 
 |START:0|
 set self state VENT
+back
+set self background 1
 
 |VENT:0|
 set self frame 0

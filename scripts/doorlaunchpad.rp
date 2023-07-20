@@ -5,6 +5,8 @@ DOOR:0 door0 8,0
 |START:0|
 set self state DOOR
 set self destination launchpad
+back
+set self background 1
 
 |DOOR:0|
 set self frame 0
@@ -14,6 +16,11 @@ if self.door_key
    create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
       move self related.destination
+      if self.lakitu
+         move self.lakitu related.destination
+         set self.lakitu x self.x
+         set self.lakitu y self.y
+      endif
       view self.frame_name related.destination
 
       remove inpEVENTS self.door_key + _DOWN

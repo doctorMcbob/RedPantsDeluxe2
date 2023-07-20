@@ -3,7 +3,6 @@ START:0 empty 0,0
 
 |START:0|
 # to is _left, from is _right
-print self.name
 set self _left yard1
 set self _right yard0
 set self offset_left 128

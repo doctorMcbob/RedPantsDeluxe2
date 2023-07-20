@@ -5,6 +5,8 @@ OPEN:0 coindoor1 0,0
 
 |START:0|
 set self state CLOSED
+back
+set self background 1
 
 |CLOSED:0|
 if inv0.gcmilk or inv0.gcdragon or inv0.gcpizza or inv0.gcwitch or inv0.gcsanta or inv0.gcmoon

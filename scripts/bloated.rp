@@ -58,6 +58,48 @@ set self thwacks 0
 set self thwackmax 10
 set self bloodnumber 0
 set self bloodmax 10
+set self dustnumber 0
+set self dustmax 10
+set self dustfreq 0
+set self dustcounter 0
+
+|makeDust|
+set self dustcounter self.dustcounter + 1
+if self.dustcounter > self.dustfreq
+   set self dustcounter 0
+   set self dustname  dust + self.dustnumber
+   set self dustnumber self.dustnumber + 1
+   if self.dustnumber > self.dustmax
+      set self dustnumber 0
+   endif
+   create dustbunny0 self.dustname dustbunny0.w / 2 * -1 + self.x + 16  self.y + self.h - dustbunny0.h
+   set self.dustname x_vel 3 + RAND? + RAND?
+   set self.dustname y_vel -11 + RAND? + RAND? + RAND?
+   set self dustname  dust + self.dustnumber
+   set self dustnumber self.dustnumber + 1
+   if self.dustnumber > self.dustmax
+      set self dustnumber 0
+   endif
+   create dustbunny0 self.dustname dustbunny0.w / 2 * -1 + self.x + 16  self.y + self.h - dustbunny0.h
+   set self.dustname x_vel 3 + RAND? + RAND?
+   set self.dustname y_vel -11 + RAND? + RAND? + RAND?
+   set self dustname  dust + self.dustnumber
+   set self dustnumber self.dustnumber + 1
+   if self.dustnumber > self.dustmax
+      set self dustnumber 0
+   endif
+   create dustbunny0 self.dustname dustbunny0.w / 2 * -1 + self.x + 16  self.y + self.h - dustbunny0.h
+   set self.dustname x_vel 3 + RAND? + RAND? * -1
+   set self.dustname y_vel -11 + RAND? + RAND? + RAND?
+   set self dustname  dust + self.dustnumber
+   set self dustnumber self.dustnumber + 1
+   if self.dustnumber > self.dustmax
+      set self dustnumber 0
+   endif
+   create dustbunny0 self.dustname dustbunny0.w / 2 * -1 + self.x + 16  self.y + self.h - dustbunny0.h
+   set self.dustname x_vel 3 + RAND? + RAND? * -1
+   set self.dustname y_vel -11 + RAND? + RAND? + RAND?
+endif
 
 |DRINK:0|
 set self x_vel 0
@@ -118,6 +160,7 @@ exec checkFart
 set self x_vel 0
 if not inpA
    set self state JUMPING
+   exec makeDust
    set self frame 0
    set self y_vel self.liljumpstr
    if inpLEFT != inpRIGHT
@@ -140,6 +183,7 @@ set self frame 0
 |MEDSQUAT:0|
 if not inpA
    set self state JUMPING
+   exec makeDust
    set self frame 0
    set self y_vel self.medjumpstr
    if inpLEFT != inpRIGHT
@@ -162,6 +206,7 @@ set self frame 0
 |BIGSQUAT:0|
 if not inpA
    set self state JUMPING
+   exec makeDust
    set self frame 0
    set self y_vel self.bigjumpstr
    if inpLEFT != inpRIGHT
@@ -178,6 +223,7 @@ endif
 
 |BIGSQUAT:15|
 set self state JUMPING
+exec makeDust
 set self frame 0
 set self y_vel self.bigjumpstr
 set self x_vel 0
@@ -217,6 +263,11 @@ set self x self.respawnx
 set self y self.respawny
 view self.frame_name self.respawnworld
 move self.name self.respawnworld
+if self.lakitu
+   set self.lakitu x self.x
+   set self.lakitu y self.y
+   move self.lakitu self.respawnworld
+endif
 set self can_die 1
 
 |BONKLAND:0|
@@ -291,8 +342,9 @@ endif
 
 |YCOLLISION|
 if self.state == FALLING
-    set self state LANDING
-    set self frame 0
+   exec makeDust
+   set self state LANDING
+   set self frame 0
 endif
 if self.state == BONK
    set self state BONKLAND

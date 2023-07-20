@@ -168,6 +168,11 @@ set self x self.respawnx
 set self y self.respawny
 view self.frame_name self.respawnworld
 move self.name self.respawnworld
+if self.lakitu
+   set self.lakitu x self.x
+   set self.lakitu y self.y
+   move self.lakitu self.respawnworld
+endif
 set self can_die 1
 
 |HITSTUN:0|

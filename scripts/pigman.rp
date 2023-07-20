@@ -239,7 +239,7 @@ set self.lookboxname trigger scared
 set self.lookboxname w 512
 set self.lookboxname h 32
 if self.lookboxnumber < self.lookboxmax
-   set self.lookboxnumber 0
+   set self lookboxnumber 0
 endif
 
 |lookFar|

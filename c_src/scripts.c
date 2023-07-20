@@ -2862,7 +2862,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         printf("Actor %s not found for FOCUS\n", get_string(nameValue));
         break;
       }
-      f->focus = a;
+      f->focus = a->name;
 
       break;
     }

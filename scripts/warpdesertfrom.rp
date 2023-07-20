@@ -9,6 +9,8 @@ ON:6 warp2 0,0
 set self state OFF
 set self destination desert1
 set self partner warpdesert0
+back
+set self background 1
 
 |OFF:0|
 set self frame 0
@@ -22,6 +24,11 @@ if self.door_key
       create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
       	 move self related.destination
+		       if self.lakitu
+         move self.lakitu related.destination
+         set self.lakitu x self.x
+         set self.lakitu y self.y
+      endif
       	 view self.frame_name related.destination
 	 
 	 set self calcx related.x - self.x

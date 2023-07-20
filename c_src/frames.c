@@ -22,8 +22,7 @@ void add_frame(int name, World *world, Actor *focus, int x, int y, int w,
   f->rect.h = h;
 
   f->world = world;
-  f->focus = focus;
-
+  f->focus = focus == NULL ? -1 : focus->name;
   f->bound_bottom = 0;
   f->bound_left = 0;
   f->bound_right = 0;
@@ -104,9 +103,10 @@ void draw_frame(SDL_Renderer *rend, Frame *f, int debug) {
 void update_frame(Frame *f) {
   if (f == NULL)
     return;
-  if (f->focus != NULL) {
-    f->scroll_x = f->focus->ECB.x + f->focus->ECB.w / 2 - f->rect.w / 2;
-    f->scroll_y = f->focus->ECB.y + f->focus->ECB.h / 2 - f->rect.h / 2;
+  if (f->focus != -1) {
+    Actor *a = get_actor(f->focus);
+    f->scroll_x = a->ECB.x + a->ECB.w / 2 - f->rect.w / 2;
+    f->scroll_y = a->ECB.y + a->ECB.h / 2 - f->rect.h / 2;
   }
 
   if (f->bound_left && f->scroll_x < f->left_bind) {
@@ -144,8 +144,8 @@ int delete_frame(Frame *frame) {
 void remove_actor_from_frames(int name) {
   Frame *f, *tmpf;
   HASH_ITER(hh, frames, f, tmpf) {
-    if (f->focus != NULL && f->focus->name == name) {
-      f->focus = NULL;
+    if (f->focus != -1 && f->focus == name) {
+      f->focus = -1;
     }
   }
 }

@@ -23,6 +23,8 @@ set self state PLATFORM
 set self platform 1
 set self frame 0
 set self touched 0
+back
+set self background 1
 
 |PLATFORM:0|
 if self.touched > 0

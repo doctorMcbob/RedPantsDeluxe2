@@ -19,6 +19,11 @@ if self.door_key
       endif
       if not inv0.moonhouselocked
       	 move self related.destination
+                if self.lakitu
+         move self.lakitu related.destination
+         set self.lakitu x self.x
+         set self.lakitu y self.y
+      endif
       	 view self.frame_name related.destination
 
       	 remove inpEVENTS self.door_key + _DOWN

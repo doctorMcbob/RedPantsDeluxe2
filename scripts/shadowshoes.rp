@@ -102,6 +102,25 @@ set self width 32
 set self height 64
 set self bloodmax 10
 set self thwackmax 10
+set self thwacks 0
+set self dustnumber 0
+set self dustmax 10
+set self dustfreq 4
+set self dustcounter 0
+
+|makeDust|
+set self dustcounter self.dustcounter + 1
+if self.dustcounter > self.dustfreq
+   set self dustcounter 0
+   set self dustname  dust + self.dustnumber
+   set self dustnumber self.dustnumber + 1
+   if self.dustnumber > self.dustmax
+      set self dustnumber 0
+   endif
+   create dustbunny0 self.dustname dustbunny0.w / 2 * -1 + self.x + 16  self.y + self.h - dustbunny0.h
+   set self.dustname x_vel self.x_vel * 1.1 
+   set self.dustname y_vel -11 + RAND? + RAND? + RAND?
+endif
 
 |DEAD:0|
 set self x_vel 0
@@ -125,6 +144,11 @@ set self x self.respawnx
 set self y self.respawny
 view self.frame_name self.respawnworld
 move self.name self.respawnworld
+if self.lakitu
+   set self.lakitu x self.x
+   set self.lakitu y self.y
+   move self.lakitu self.respawnworld
+endif
 set self can_die 1
 
 |IDLE:0|
@@ -547,6 +571,7 @@ if self.x_vel != 0
    if self.x_vel < 0
       set self x_vel self.traction * -1 + self.x_vel
    endif
+   exec makeDust
 endif
 if abs self.x_vel / 1 == 0
    set self x_vel 0

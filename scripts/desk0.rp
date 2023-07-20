@@ -5,6 +5,8 @@ LOOK:0 desk0 0,0
 |START:0|
 set self state LOOK
 set self frame 0
+back
+set self background 1
 
 |LOOK:0|
 set self frame 0

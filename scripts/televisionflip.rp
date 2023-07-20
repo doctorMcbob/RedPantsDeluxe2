@@ -7,6 +7,9 @@ LOOK:4 television1 0,0
 set self state LOOK
 set self frame 0
 set self direction -1
+back
+set self background 1
+
 
 |LOOK:8|
 set self frame 0

@@ -14,3 +14,5 @@ set self platform 1
 set self state PLATFORM
 set self frame 0
 set self background 1
+back
+set self background 1

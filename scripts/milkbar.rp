@@ -6,6 +6,8 @@ LOOK:0 milkbar 0,0
 set self state LOOK
 set self direction -1
 set self frame 0
+back
+set self background 1
 
 |LOOK:0|
 set self frame 0
