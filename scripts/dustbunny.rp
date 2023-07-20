@@ -1,0 +1,39 @@
+FX|0,0,0,0|False|
+START:0 dustbunny0 -8,0
+BUNNY:0 dustbunny0 -8,0
+BUNNY:2 dustbunny1 -8,0
+BUNNY:4 dustbunny2 -8,0
+BUNNY:6 dustbunny3 -8,0
+BUNNY:8 dustbunny4 -8,0
+BUNNY:10 dustbunny5 -8,0
+BUNNY:12 dustbunny6 -8,0
+BUNNY:14 dustbunny7 -8,0
+BUNNY:16 dustbunny8 -8,0
+BUNNY:18 dustbunny9 -8,0
+
+|START:0|
+set self direction 1
+if RAND?
+    set self direction -1
+endif
+set self physics 1
+set self grav 2
+set self state BUNNY
+set self frame 0
+set self last_y_vel 0
+back
+
+|BUNNY:0|
+set self last_y_vel self.y_vel
+exec applyGrav
+
+|BUNNY:20|
+goodbye
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+
+|YCOLLISION|
+if self.last_y_vel
+    set self y_vel self.last_y_vel * -1
+endif

@@ -1,0 +1,44 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+FOLLOW:0 empty 0,0
+
+|START:0|
+set self follow 0
+set self max_dist 256
+set self state FOLLOW
+set self physics 1
+
+|FOLLOW:0|
+if self.follow == 0
+    goodbye
+endif
+set self y_diff self.follow.y + self.follow.y_vel - self.y
+set self x_diff self.follow.x + self.follow.x_vel - self.x
+if self.follow.direction == 1
+    set self x_diff self.x_diff + 16 + self.follow.w
+endif
+
+if self.follow.direction == -1
+    set self x_diff self.x_diff - 16
+endif
+
+if self._input_name
+    if inpUP
+        set self y_diff self.y_diff - 64
+    endif
+    if inpDOWN
+        set self y_diff self.y_diff + 64
+    endif
+endif
+
+set self x_vel self.x_diff / 9
+set self y_vel self.y_diff / 7
+
+if abs self.x_diff > self.max_dist
+    set self x self.follow.x
+    set self y self.follow.y
+endif
+if abs self.y_diff > self.max_dist
+    set self x self.follow.x
+    set self y self.follow.y
+endif
