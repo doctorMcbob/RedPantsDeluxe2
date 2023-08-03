@@ -8,13 +8,29 @@ set self state LOOK
 
 |LOOK:0|
 if exists BW_player10
-   break
+   if BW_player10.state != WAIT
+      break
+   endif
 endif
 if exists BW_player20
-   break
+   if BW_player20.state != WAIT
+      break
+   endif
 endif
 set self state WAIT
 set self frame 0
+
+|WAIT:0|
+if exists BW_player10
+   if BW_player10.state != WAIT
+      set self state LOOK
+   endif
+endif
+if exists BW_player20
+   if BW_player20.state != WAIT
+      set self state LOOK
+   endif
+endif
 
 |WAIT:40|
 if isframe BW_MAIN
@@ -24,6 +40,18 @@ if isframe BW_MAIN2
    killframe BW_MAIN2
 endif
 
+if exists BW_player10pistol
+   set BW_player10pistol state OFF
+endif
+if exists BW_player20pistol
+   set BW_player20pistol state OFF
+endif
+if exists BW_player10ghost
+   set BW_player10ghost state OFF
+endif
+if exists BW_player20ghost
+   set BW_player20ghost state OFF
+endif
 
 create BW_player10 BW_player10 736 544
 move BW_player10 BW_graveyardstart
@@ -41,19 +69,6 @@ set BW_ghost0 x -2288
 set BW_ghost0 y -256
 set BW_ghost0 state START
 set BW_ghost0 frame 0
-
-if exists BW_player10pistol
-   set BW_player10pistol state OFF
-endif
-if exists BW_player20pistol
-   set BW_player20pistol state OFF
-endif
-if exists BW_player10ghost
-   set BW_player10ghost state OFF
-endif
-if exists BW_player20ghost
-   set BW_player20ghost state OFF
-endif
 
 create BW_witch0 BW_witch0 11216 -3520
 move BW_witch0 BW_castletop

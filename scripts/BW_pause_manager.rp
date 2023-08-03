@@ -15,7 +15,7 @@ if exists BW_player10
    endif
 endif
 if exists BW_player20
-   set self _input_name PLAYER1
+   set self _input_name PLAYER2
    if START_DOWN in inpEVENTS
       exec pause
       break
@@ -34,8 +34,8 @@ if exists BW_pause_button_continue0
    set BW_pause_button_continue0 state SELECTED
 endif
 
-if isframe PAUSE
-   activate PAUSE
+if isframe BW_PAUSE
+   activate BW_PAUSE
    break
 endif
-makeframe PAUSE BW_pausemenu 0 0 1152 640
+makeframe BW_PAUSE BW_pausemenu 0 0 1152 640

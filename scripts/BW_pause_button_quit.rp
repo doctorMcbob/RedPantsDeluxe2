@@ -51,6 +51,19 @@ if UP_DOWN in inpEVENTS
 endif
 
 |press|
+if exists BW_player10pistol
+   set BW_player10pistol state OFF
+endif
+if exists BW_player20pistol
+   set BW_player20pistol state OFF
+endif
+if exists BW_player10ghost
+   set BW_player10ghost state OFF
+endif
+if exists BW_player20ghost
+   set BW_player20ghost state OFF
+endif
+
 create BW_player10 BW_player10 736 544
 move BW_player10 BW_graveyardstart
 create BW_player20 BW_player20 592 544
@@ -68,19 +81,6 @@ set BW_ghost0 y -256
 set BW_ghost0 state START
 set BW_ghost0 frame 0
 
-if exists BW_player10pistol
-   set BW_player10pistol state OFF
-endif
-if exists BW_player20pistol
-   set BW_player20pistol state OFF
-endif
-if exists BW_player10ghost
-   set BW_player10ghost state OFF
-endif
-if exists BW_player20ghost
-   set BW_player20ghost state OFF
-endif
-
 create BW_witch0 BW_witch0 11216 -3520
 move BW_witch0 BW_castletop
 create BW_eyeballtarget0 BW_eyeballtarget0 11136 -3552
@@ -97,8 +97,6 @@ endif
 
 set BW_song_manager0 song firstLevel
 
-killframe BLINDWITCH
-
 if isframe BLINDWITCH
    killframe BLINDWITCH
 endif
@@ -110,6 +108,9 @@ if isframe BW_MAIN
 endif
 if isframe BW_MAIN2
    killframe BW_MAIN2
+endif
+if isframe BW_PAUSE
+   killframe BW_PAUSE
 endif
 
 if isframe MAIN

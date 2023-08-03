@@ -6,7 +6,7 @@ BACK:0 backdrop 0,0
 set self state BACK
 
 |BACK:0|
-if isframe PAUSE
-   focus PAUSE self
+if isframe BW_PAUSE
+   focus BW_PAUSE self
 endif
 

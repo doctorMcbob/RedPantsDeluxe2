@@ -42,7 +42,7 @@ for char self.name
        set self number self.number + char
     endif
 endfor
-set self vamp vamp + self.number
+set self vamp BW_vamp + self.number
 set self state OFF
 if exists self.vamp
    set self state LOOK
