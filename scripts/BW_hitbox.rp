@@ -1,0 +1,9 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+CHECK:0 empty 0,0
+
+|COLLIDE|
+if vamp in self.name
+   set self state SPLODE
+endif
+

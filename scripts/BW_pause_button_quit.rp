@@ -1,0 +1,124 @@
+BTN|0,0,0,0|False|
+START:0 quit0 0,0
+NOTSELECTED:0 quit0 0,0
+SELECTED:0 quit1 0,0
+
+|START:0|
+set self state NOTSELECTED
+set self frame 0
+set self _input_name PLAYER1
+set self left_button 0
+set self right_button 0
+set self down_button BW_pause_button_continue0
+set self up_button BW_pause_button_continue0
+
+|SELECTED:5|
+if A_DOWN in inpEVENTS
+   exec press
+endif
+
+if LEFT_DOWN in inpEVENTS
+   if exists self.left_button
+      set self.left_button state SELECTED 
+      set self state NOTSELECTED
+      set self.left_button frame 0
+      break
+   endif
+endif
+if RIGHT_DOWN in inpEVENTS
+   if exists self.right_button
+      set self.right_button state SELECTED
+      set self state NOTSELECTED
+      set self.right_button frame 0
+      break
+   endif
+endif
+if DOWN_DOWN in inpEVENTS
+   if exists self.down_button
+      set self.down_button state SELECTED
+      set self state NOTSELECTED
+      set self.down_button frame 0
+      break
+   endif
+endif
+if UP_DOWN in inpEVENTS
+   if exists self.up_button
+      set self.up_button state SELECTED
+      set self state NOTSELECTED
+      set self.up_button frame 0
+      break
+   endif
+endif
+
+|press|
+create BW_player10 BW_player10 736 544
+move BW_player10 BW_graveyardstart
+create BW_player20 BW_player20 592 544
+move BW_player20 BW_graveyardstart
+create BW_shotgun0 BW_shotgun0 -2112 -48
+move BW_shotgun0 BW_graveyardleft
+
+create BW_machinegun0 BW_machinegun0 7760 -3664
+move BW_machinegun0 BW_castlemiddle
+create BW_machinegun1 BW_machinegun1 10608 -1312
+move BW_machinegun1 BW_castleentrence
+
+set BW_ghost0 x -2288
+set BW_ghost0 y -256
+set BW_ghost0 state START
+set BW_ghost0 frame 0
+
+if exists BW_player10pistol
+   set BW_player10pistol state OFF
+endif
+if exists BW_player20pistol
+   set BW_player20pistol state OFF
+endif
+if exists BW_player10ghost
+   set BW_player10ghost state OFF
+endif
+if exists BW_player20ghost
+   set BW_player20ghost state OFF
+endif
+
+create BW_witch0 BW_witch0 11216 -3520
+move BW_witch0 BW_castletop
+create BW_eyeballtarget0 BW_eyeballtarget0 11136 -3552
+move BW_eyeballtarget0 BW_castletop
+create BW_eyeballtarget1 BW_eyeballtarget1 11376 -3552
+move BW_eyeballtarget1 BW_castletop
+create BW_eyeballtarget2 BW_eyeballtarget2 11200 -3344
+move BW_eyeballtarget2 BW_castletop
+create BW_eyeballtarget3 BW_eyeballtarget3 11312 -3344
+move BW_eyeballtarget3 BW_castletop
+if exists FINALBOSS
+   set FINALBOSS state BYE
+endif
+
+set BW_song_manager0 song firstLevel
+
+if isframe BLINDWITCH
+   killframe BLINDWITCH
+endif
+if isframe BW_MENU
+   killframe BW_MENU
+endif
+if isframe BW_MAIN
+   killframe BW_MAIN
+endif
+if isframe BW_MAIN2
+   killframe BW_MAIN2
+endif
+
+if isframe MAIN
+    activate MAIN
+endif
+if isframe MAIN2
+    activate MAIN2
+endif
+if isframe MAIN3
+    activate MAIN3
+endif
+if isframe MAIN4
+    activate MAIN4
+endif

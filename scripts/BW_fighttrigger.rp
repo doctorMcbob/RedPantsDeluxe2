@@ -1,0 +1,35 @@
+inviswall|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+WALL:0 empty 0,0
+
+|START:0|
+set self state WAIT
+set self frame 0
+
+|COLLIDE|
+if self.gun
+    set BW_fighttriggerdoor0 target self.name
+    if exists BW_witch0
+        if BW_witch0.state == WAIT
+      	    set BW_witch0 state RAGE
+	        set BW_song_manager0 song bossone
+	 	    if isframe BW_MAIN
+	 	        killframe BW_MAIN
+	 	    endif
+	 	    if isframe BW_MAIN2
+	            killframe BW_MAIN2
+        	endif
+      	    if BW_player10 == self.name
+	            makeframe BW_MAIN BW_castletop 0 0 1152 640
+	    		focus BW_MAIN self
+			    break
+	 		endif
+      		if BW_player20 == self.name
+	    		makeframe BW_MAIN2 BW_castletop 0 0 1152 640
+				focus BW_MAIN2 self
+				break
+			endif
+    	endif
+	endif
+endif

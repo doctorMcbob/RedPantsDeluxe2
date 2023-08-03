@@ -1,0 +1,48 @@
+BTN|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+set self state NOTSELECTED
+set self frame 0
+set self _input_state PLAYER1
+set self left_button 0
+set self right_button 0
+set self down_button 0
+set self up_button 0
+
+|SELECTED:0|
+if A_DOWN in inpEVENTS
+   exec press
+endif
+
+if LEFT_DOWN in inpEVENTS
+   if exists self.left_button
+      set self.left_button state SELECTED
+      set self state NOTSELECTED
+      break
+   endif
+endif
+if RIGHT_DOWN in inpEVENTS
+   if exists self.left_button
+      set self.right_button state SELECTED
+      set self state NOTSELECTED
+      break
+   endif
+endif
+if DOWN_DOWN in inpEVENTS
+   if exists self.left_button
+      set self.down_button state SELECTED
+      set self state NOTSELECTED
+      break
+   endif
+endif
+if UP_DOWN in inpEVENTS
+   if exists self.up_button
+      set self.up_button state SELECTED
+      set self state NOTSELECTED
+      break
+   endif
+endif
+
+|press|
+print self.name  + " was pressed!"

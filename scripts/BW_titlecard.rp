@@ -1,0 +1,13 @@
+BACK|0,0,0,0|False|
+START:0 titlecard 0,0
+BACK:0 titlecard 0,0
+
+|START:0|
+set self state BACK
+
+|BACK:0|
+if isframe BW_MENU
+   update_sticks
+   focus BW_MENU self
+endif
+

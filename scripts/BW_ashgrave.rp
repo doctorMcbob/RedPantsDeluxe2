@@ -1,0 +1,7 @@
+GRAVE|0,0,0,0|True|
+START:0 empty 0,0
+GRAVE:0 ashgrave 0,0
+
+|START:0|
+set self state GRAVE
+set self direction -1

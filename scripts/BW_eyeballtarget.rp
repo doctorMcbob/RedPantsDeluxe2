@@ -1,0 +1,57 @@
+EYE|0,0,0,0|False|
+START:0 empty -16,-16
+TARGET:0 eyetarget0 -16,-16
+SPLODE:0 eyetarget1 -16,-16
+SHIT:0 eyetarget1 -16,-16
+OFF:0 empty 0,0
+
+|START:0|
+set self state TARGET
+set self frame 0
+hurtboxes BW_eyeball
+
+|SPLODE:0|
+exec splode
+set self state SHIT
+set self frame 0
+
+|SHIT:20|
+if BW_witch0.state != RAGE
+   break
+endif
+sfx witch_hit
+set BW_witch0 state SHIT
+set self state TARGET
+set self frame 0
+
+
+|splode|
+set self goo0 self.name + goo
+create BW_splodey0 self.goo0 self.x self.y
+add self.goo0.imgs eyesp0
+add self.goo0.imgs eyesp1
+add self.goo0.imgs eyesp2
+add self.goo0.imgs eyesp3
+
+set self goo1 self.name + goo
+create BW_splodey0 self.goo1 self.x self.y
+add self.goo1.imgs eyesp0
+add self.goo1.imgs eyesp1
+add self.goo1.imgs eyesp2
+add self.goo1.imgs eyesp3
+
+set self goo2 self.name + goo
+create BW_splodey0 self.goo2 self.x self.y
+add self.goo2.imgs eyesp0
+add self.goo2.imgs eyesp1
+add self.goo2.imgs eyesp2
+add self.goo2.imgs eyesp3
+
+for _n acouple
+   set self blood_n self.name + blood_n
+   create BW_splodey0 self.blood_n self.x self.y
+   add self.blood_n.imgs blood0
+   add self.blood_n.imgs blood1
+   add self.blood_n.imgs blood2
+   add self.blood_n.imgs blood3
+endfor

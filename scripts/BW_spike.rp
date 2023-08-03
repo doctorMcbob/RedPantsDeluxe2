@@ -1,0 +1,15 @@
+DOOR|0,0,0,0|False|
+START:0 spike 0,0
+SPIKE:0 spike 0,0
+
+|START:0|
+set self state SPIKE
+set self direction -1
+
+|SPIKE:0|
+set self frame 0
+hitboxes BW_spike
+
+|HIT|
+set self state SPLODE
+

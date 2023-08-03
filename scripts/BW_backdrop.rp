@@ -1,0 +1,12 @@
+BACK|0,0,0,0|False|
+START:0 backdrop 0,0
+BACK:0 backdrop 0,0
+
+|START:0|
+set self state BACK
+
+|BACK:0|
+if isframe PAUSE
+   focus PAUSE self
+endif
+

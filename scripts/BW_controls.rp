@@ -1,0 +1,5 @@
+PIC|0,0,0,0|False|
+START:0 controls 0,0
+
+|START:0|
+set self direction -1

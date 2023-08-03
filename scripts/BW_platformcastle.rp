@@ -1,0 +1,16 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 platformcastle00 0,0
+PLATFORM01 platformcastle01 0,0
+PLATFORM02 platformcastle02 0,0
+PLATFORM10 platformcastle10 0,0
+PLATFORM11 platformcastle11 0,0
+PLATFORM12 platformcastle12 0,0
+PLATFORM20 platformcastle20 0,0
+PLATFORM21 platformcastle21 0,0
+PLATFORM22 platformcastle22 0,0
+
+|START:0|
+set self noWO 1
+set self state PLATFORM
+set self platform 1
+

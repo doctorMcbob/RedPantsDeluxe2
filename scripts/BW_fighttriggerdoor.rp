@@ -1,0 +1,29 @@
+inviswall|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+WALL:0 empty 0,0
+
+|START:0|
+set self state WAIT
+set self frame 0
+set self target 0
+
+|WAIT:0|
+if self.target
+   if exists self.target
+      set self state WALL
+   endif
+endif
+
+|WALL:0|
+if self.tangible == 0
+   if not COLLIDE?
+      set self tangible 1
+   endif
+endif
+if exists self.target
+   break
+endif
+set self target 0
+set self state WAIT
+set self tangible 0

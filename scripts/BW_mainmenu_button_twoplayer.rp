@@ -1,28 +1,18 @@
 BTN|0,0,0,0|False|
-START:0 startbutton0 0,0
-NOTSELECTED:0 startbutton0 0,0
-SELECTED:0 startbutton1 0,0
+START:0 localcoop0 0,0
+NOTSELECTED:0 localcoop0 0,0
+SELECTED:0 localcoop1 0,0
 
 |START:0|
-set self state SELECTED
+set self state NOTSELECTED
 set self frame 0
 set self _input_name PLAYER1
 set self left_button 0
 set self right_button 0
-set self down_button mainmenu_button_twoplayer0
-set self up_button mainmenu_button_quit0
-set self direction -1
+set self down_button BW_mainmenu_button_quit0
+set self up_button BW_mainmenu_button_singleplayer0
 
-|SELECTED:2|
-if self.frame % 10 == 3
-   update_sticks
-   if STICKS? > 0
-      setjoy PLAYER1 0
-   endif
-   if STICKS? > 1
-      setjoy PLAYER2 1
-   endif
-endif
+|SELECTED:5|
 if A_DOWN in inpEVENTS
    exec press
 endif
@@ -60,9 +50,8 @@ if UP_DOWN in inpEVENTS
    endif
 endif
 
-
 |press|
-makeframe MAIN desert1 0 0 1152 640
-#makeframe MAIN redpantshouseroot 0 0 1152 640
-deactivate ROOT
+makeframe BW_MAIN BW_graveyardstart 0 0 1152 320
+makeframe BW_MAIN2 BW_graveyardstart 0 320 1152 320
+deactivate BW_MENU
 

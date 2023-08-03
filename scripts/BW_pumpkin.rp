@@ -1,0 +1,12 @@
+PUMPKIN|0,0,0,0|False|
+START:0 empty 0,0
+OFF:0 pumpkinoff 0,0
+ON:0 pumpkinon 0,0
+
+|START:0|
+set self state OFF
+
+|COLLIDE|
+if self.gun
+   set related state ON
+endif

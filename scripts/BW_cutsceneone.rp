@@ -1,0 +1,23 @@
+SCENE|0,0,0,0|False|
+START:0 cutscene0 0,0
+SCENE:0 cutscene0 0,0
+SCENE:100 cutscene1 0,0
+SCENE:200 cutscene2 0,0
+
+|START:0|
+set self state SCENE
+set self frame 0
+set self direction -1
+set self _input_name PLAYER1
+
+|SCENE:0|
+if A_DOWN in inpEVENTS
+   exec SCENE:300
+   break
+endif
+focus BLINDWITCH self
+
+|SCENE:300|
+sfx witch_cackle
+deactivate BLINDWITCH
+makeframe BW_MENU BW_mainmenu 0 0 1152 640

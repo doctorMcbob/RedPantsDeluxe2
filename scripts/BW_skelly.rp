@@ -1,0 +1,67 @@
+SKELLY|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 skellystand -16,0
+THROW:0 skellythrow0 -16,0
+THROW:12 skellythrow1 -16,0
+SPLODE:0 skellybreak0 -32,0
+BREAK:0 skellybreak0 -32,0
+BREAK:4 skellybreak1 -32,0
+BREAK:8 skellybreak2 -32,0
+BUSTED:0 skellybreak -32,0
+REBUILD:0 skellybreak2 -32,0
+REBUILD:8 skellybreak1 -32,0
+REBUILD:16 skellybreak0 -32,0
+
+|START:0|
+set self state WAIT
+set self frame 0
+set self bone_num 0
+set self direction 1
+set self throw_1_x 15
+set self throw_1_y -5
+set self throw_2_x 10
+set self throw_2_y -10
+hurtboxes BW_skelly
+
+|WAIT:60|
+set self direction self.direction * -1
+set self state THROW
+set self frame 0
+
+|THROW:16|
+exec throw
+set self state WAIT
+set self frame 0
+
+|SPLODE:0|
+sfx skeleton_break
+set self state BREAK
+set self frame 0
+
+|BREAK:12|
+set self state BUSTED
+set self frame 0
+
+|BUSTED:80|
+sfx skeleton_rebuild
+set self state REBUILD
+set self frame 0
+
+|REBUILD:24|
+set self state THROW
+set self frame 0
+
+|throw|
+sfx skeleton_throwbone
+set self bone_name self.name + bone + self.bone_num
+set self bone_num self.bone_num + 1
+create BW_bone0 self.bone_name self.x self.y
+set self.bone_name x_vel RAND? + RAND? * 3 + self.throw_1_x * self.direction
+set self.bone_name y_vel RAND? + RAND? * 3 + self.throw_1_y
+
+set self bone_name self.name + bone + self.bone_num
+set self bone_num self.bone_num + 1
+create BW_bone0 self.bone_name self.x self.y
+set self.bone_name x_vel RAND? + RAND? * 3 + self.throw_2_x * self.direction
+set self.bone_name y_vel RAND? + RAND? * 3 + self.throw_2_y
+

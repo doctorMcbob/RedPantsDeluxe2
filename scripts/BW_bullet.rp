@@ -1,0 +1,28 @@
+BULLET|0,0,0,0|False|
+START:0 empty 0,0
+BULLET:0 bullet 0,0
+
+|START:0|
+set self state BULLET
+set self physics 1
+set self grav 0.5
+hitboxes BW_bullet
+
+|BULLET:0|
+set self y_vel self.y_vel + self.grav
+
+|BULLET:500|
+goodbye
+
+|XCOLLISION|
+goodbye
+
+|YCOLLISION|
+goodbye
+
+|HIT|
+if self.name in related.name
+   break
+endif
+set self state SPLODE
+

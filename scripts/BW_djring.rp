@@ -1,0 +1,11 @@
+RING|0,0,0,0|False|
+START:0 empty 0,0
+RING:0 ring0 -16,0
+RING:5 ring1 -16,0
+
+|START:0|
+set self state RING
+set self frame 0
+
+|RING:10|
+goodbye

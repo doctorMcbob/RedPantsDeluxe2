@@ -1,0 +1,41 @@
+BONE|0,0,0,0|False|
+START:0 empty 0,0
+BONE:0 bone0 0,-8
+BONE:4 bone1 -8,0
+BONK:0 empty 0,0
+
+|START:0|
+set self state BONE
+set self frame 0
+set self physics 1
+set self grav 0.5
+hitboxes BW_bone
+
+|BONE:0|
+set self y_vel self.y_vel + self.grav
+
+|BONE:8|
+set self frame 0
+exec BONE:0
+
+|BONK:0|
+sfx skeleton_bonebonk
+goodbye
+
+|XCOLLISION|
+sfx skeleton_bonebonk
+goodbye
+
+|YCOLLISION|
+sfx skeleton_bonebonk
+goodbye
+
+|HIT|
+if self.name in related.name
+   break
+endif
+if player in self.name
+   set self state SPLODE
+   set related state BONK
+endif
+

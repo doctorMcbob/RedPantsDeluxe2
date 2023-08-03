@@ -1,0 +1,41 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+LOOK:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self state LOOK
+
+|LOOK:0|
+if exists BW_player10
+   set self _input_name PLAYER1
+   if START_DOWN in inpEVENTS
+      exec pause
+      break
+   endif
+endif
+if exists BW_player20
+   set self _input_name PLAYER1
+   if START_DOWN in inpEVENTS
+      exec pause
+      break
+   endif
+endif
+
+|pause|
+if isframe BW_MAIN
+   deactivate BW_MAIN
+endif
+if isframe BW_MAIN2
+   deactivate BW_MAIN2
+endif
+
+if exists BW_pause_button_continue0
+   set BW_pause_button_continue0 state SELECTED
+endif
+
+if isframe PAUSE
+   activate PAUSE
+   break
+endif
+makeframe PAUSE BW_pausemenu 0 0 1152 640

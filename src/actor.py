@@ -252,7 +252,8 @@ class Actor(Rect):
                         img = self.sprites["{}21".format(self.state)]
                     else:
                         img = self.sprites["{}11".format(self.state)]
-                    blitz.append((sprites.get_sprite(img), (x*32, y*32)))
+                    if (sprites.get_sprite(img) is not None):
+                        blitz.append((sprites.get_sprite(img), (x*32, y*32)))
             surf.blits(blitz)
             surf.set_colorkey((1, 255, 1))
             sprites.set_sprite(key, surf)

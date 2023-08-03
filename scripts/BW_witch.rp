@@ -1,0 +1,131 @@
+WITCH|0,0,0,0|False|
+START:0 empty 0,0
+FLY:0 witchfly 0,0
+RAGE:0 witchrage0 0,0
+RAGE:10 witchrage1 0,0
+SHIT:0 witchhit0 0,0
+SHIT:4 witchhit1 0,0
+SHIT:8 witchhit0 0,0
+SHIT:12 witchhit1 0,0
+SHIT:16 witchhit0 0,0
+THROW:0 witchthrow0 0,0
+THROW:10 witchthrow1 0,0
+TRANSFORM:0 witchtransform0 0,0
+TRANSFORM:25 witchtransform1 0,0
+TRANSFORM:50 witchtransform2 0,0
+TRANSFORM:55 witchtransform3 0,0
+TRANSFORM:65 witchtransform4 0,0
+TRANSFORM:75 witchtransform7 0,0
+TRANSFORM:82 witchtransform5 0,0
+TRANSFORM:90 witchtransform6 0,0
+TRANSFORM:98 witchtransform7 0,0
+TRANSFORM:105 witchtransform5 0,0
+TRANSFORM:113 witchtransform6 0,0
+TRANSFORM:121 witchtransform7 0,0
+OFF:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self state WAIT
+set self frame 0
+set self hits 12
+set self throw_x 5
+set self throw_y -8
+set self eye_num 0
+set self eye_max 10
+set self speed 8
+set self timer_max 20
+set self timer 0
+set self d -1
+hitboxes BW_witch
+hurtboxes BW_witch
+
+|FLY:0|
+sfx witch_cackle
+if self.timer_max * -1 > self.timer
+   set self timer 9
+   set self state RAGE
+   set self d self.d * -1
+   break
+endif
+if self.timer == 0
+   set self d self.d * -1
+endif
+set self x self.speed * 3 * self.d + self.x
+set self timer self.timer - 1
+
+|RAGE:0|
+set self y self.speed * self.d + self.y
+set self timer self.timer - 1
+if self.timer == 10
+   set self timer self.timer_max
+   set self state FLY
+endif
+if self.timer < 0
+   set self timer self.timer_max
+   set self d self.d * -1
+   set self direction self.direction * -1
+   set self state THROW
+   set self frame 0
+endif
+
+|RAGE:20|
+set self frame 0
+exec RAGE:0
+
+|THROW:20|
+exec throw
+set self state RAGE
+set self frame 0
+
+|SHIT:20|
+if self.hits > 0
+   if self.hits < 4
+      sfx witch_no
+   endif
+   set self hits self.hits - 1
+   set self state THROW
+   set self frame 0
+   break
+endif
+set BW_eyeballtarget0 state OFF
+set BW_eyeballtarget1 state OFF
+
+set BW_eyeballtarget2 state OFF
+set BW_eyeballtarget3 state OFF
+set self state TRANSFORM
+sfx witch_transform
+
+|TRANSFORM:130|
+create BW_demon0 FINALBOSS self.x self.y
+set self state OFF
+set self frame 0
+
+|HIT|
+if self.name in related.name
+   break
+endif
+if player in self.name
+   set self state SPLODE
+endif
+
+|throw|
+for ___ thr   
+   set self eye_name self.name + eye + self.eye_num
+   set self eye_num self.eye_num + 1
+   create BW_eyeballattack0 self.eye_name self.x + 64 self.y + 64
+   set self.eye_name x_vel RAND? + RAND? * 3 + self.throw_x * self.direction
+   set self.eye_name y_vel RAND? + RAND? * 3 + self.throw_y
+   set self.eye_name direction self.direction * -1
+   
+   set self eye_name self.name + eye + self.eye_num
+   set self eye_num self.eye_num + 1
+   create BW_eyeballattack0 self.eye_name self.x + 64 self.y + 64
+   set self.eye_name x_vel RAND? + RAND? * 3 + self.throw_x * self.direction * -1
+   set self.eye_name y_vel RAND? + RAND? * 3 + self.throw_y
+   set self.eye_name direction self.direction
+endfor
+
+if self.eye_num > self.eye_max
+   set self eye_num 0
+endif

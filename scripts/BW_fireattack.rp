@@ -1,0 +1,35 @@
+EYE|0,0,0,0|False|
+START:0 empty 0,0
+FIREBALL:0 fireball0 0,0
+FIREBALL:0 fireball1 0,0
+FIREBALL:0 fireball2 0,0
+FIREBALL:0 fireball3 0,0
+
+|START:0|
+set self state FIREBALL
+set self physics 1
+hitboxes BW_fireball
+set self imgs []
+add self.imgs fireball0
+add self.imgs fireball1
+add self.imgs fireball2
+add self.imgs fireball3
+
+|FIREBALL:0|
+img choiceof self.imgs
+
+|FIREBALL:500|
+goodbye
+
+|XCOLLISION|
+goodbye
+
+|YCOLLISION|
+goodbye
+
+|HIT|
+if self.name in related.name
+   break
+endif
+set self state SPLODE
+

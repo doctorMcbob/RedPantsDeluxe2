@@ -1,0 +1,40 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 zgrave 0,0
+SPAWN:0 zgraverise0 0,0
+SPAWN:10 zgraverise1 0,0
+SPAWN:20 zgraverise2 0,-16
+
+|START:0|
+set self number ""
+for char self.name
+    set self calc char in BW_grave
+    if not self.calc
+       set self number self.number + char
+    endif
+endfor
+set self zombo BW_zombo + self.number
+set self timer_max 20
+set self timer self.timer_max
+set self state WAIT
+set self frame 0
+set self direction -1
+
+|WAIT:0|
+set self calc exists self.zombo
+if self.calc
+   break
+endif
+if self.timer > 0
+   set self timer self.timer - 1
+   break
+endif
+set self state SPAWN
+set self frame 0
+
+|SPAWN:35|
+set self state WAIT
+set self frame 0
+set self timer self.timer_max
+create BW_zombo0 self.zombo self.x + 16 self.y - 16
+

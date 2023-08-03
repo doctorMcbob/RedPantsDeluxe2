@@ -1,0 +1,14 @@
+PLAYER1|128,256,32,64|False|
+START:0 empty 0,0
+BEGIN:0 empty 0,0
+
+|START:0|
+if isframe BW_MAIN
+   set self _input_name PLAYER1
+   focus BW_MAIN self
+   set self frame_name BW_MAIN
+   rebrand BW_body0
+   set self tangible 1
+   set self respawnx self.x
+   set self respawny self.y
+endif

@@ -1,0 +1,212 @@
+BODY|0,0,0,0|False|
+START:0 empty 0,0
+STAND:0 body1stand -32,-16
+RUN:0 body1run0 -32,-16
+RUN:8 body1run1 -32,-16
+RUN:16 body1run2 -32,-16
+RUN:24 body1run3 -32,-16
+RUN:32 body1run4 -32,-16
+JUMPSQUAT:0 body1jumpsquat -32,-16
+AIRIAL:0 body1air -32,-16
+SPLODE:0 empty 0,0
+
+|START:0|
+set self physics 1
+set self w 32
+set self h 64
+set self state STAND
+set self frame 0
+set self speed 10
+set self jumps 2
+set self jumpstr -15
+set self traction 0.8 * -1
+set self limit 20
+set self neglimit -20
+set self grav 1
+set self gun self.name + pistol
+create BW_pistol0 self.gun self.x self.y
+set self.gun state HELD
+set self.gun direction self.direction
+exec updateGun
+hurtboxes BW_body
+set self run_sounds []
+add self.run_sounds player_run1
+add self.run_sounds player_run2
+set self death_sounds []
+add self.death_sounds player_death1
+add self.death_sounds player_death2
+
+|STAND:0|
+if x_vel != 0
+   exec applyTraction
+endif
+if inpLEFT != inpRIGHT
+   if inpLEFT
+      set self direction 1
+   endif
+   if inpRIGHT
+      set self direction -1
+   endif
+   set self state RUN
+   set self frame 0
+   sfx choiceof self.run_sounds
+endif
+exec checkJump
+exec checkAir
+exec applyGrav
+exec updateGun
+
+|RUN:0|
+set self calc inpLEFT != inpRIGHT
+if self.calc
+   if inpLEFT
+      set self direction 1
+   endif
+   if inpRIGHT
+      set self direction -1
+   endif
+endif
+if not self.calc
+   set self state STAND
+endif
+set self x_vel self.speed * self.direction * -1
+exec checkJump
+exec checkAir
+exec applyGrav
+exec updateGun
+
+|RUN:20|
+sfx choiceof self.run_sounds
+exec RUN:0
+
+|RUN:21|
+exec RUN:0
+
+|RUN:40|
+sfx choiceof self.run_sounds
+set self frame 0
+exec RUN:0
+
+|JUMPSQUAT:0|
+exec updateGun
+
+|JUMPSQUAT:5|
+sfx player_jump
+set self state AIRIAL
+set self frame 0
+set self y_vel self.jumpstr
+exec updateGun
+
+|AIRIAL:0|
+set self calc inpLEFT != inpRIGHT
+if self.calc
+   if inpLEFT
+      set self direction 1
+   endif
+   if inpRIGHT
+      set self direction -1
+   endif
+   set self x_vel self.speed * self.direction * -1
+endif
+if not self.calc
+   if LEFT_UP in inpEVENTS
+      set self x_vel 0
+   endif
+   if RIGHT_UP in inpEVENTS
+      set self x_vel 0
+   endif
+endif
+if A_DOWN in inpEVENTS and self.jumps
+   sfx player_jump
+   set self y_vel self.jumpstr
+   set self jumps self.jumps - 1
+   create BW_djring0 self.name + ring self.x - 24 self.y + 32
+endif
+exec applyGrav
+exec updateGun
+
+|SPLODE:0|
+sfx choiceof self.death_sounds
+exec splode
+create BW_ghost0 self.name + ghost self.x self.y
+goodbye
+
+|YCOLLISION|
+if self.state == AIRIAL
+   set self state STAND
+   set self frame 0
+   set self jumps 1
+endif
+
+|checkJump|
+if A_DOWN in inpEVENTS
+   set self state JUMPSQUAT
+   set self frame 0
+endif
+
+|applyTraction|
+if self.x_vel != 0
+   if self.x_vel > 0
+      set self x_vel self.traction + self.x_vel
+   endif
+   if self.x_vel < 0
+      set self x_vel self.traction * -1 + self.x_vel
+   endif
+endif
+if abs self.x_vel / 1 == 0
+   set self x_vel 0
+endif
+
+|checkAir|
+if self.y_vel
+   set self state AIRIAL
+   set self frame 0
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+if self.y_vel > self.limit
+   set self y_vel self.limit
+endif
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
+endif
+
+|updateGun|
+set self.gun _input_name self._input_name
+set self.gun state HELD
+set self.gun player self.name
+
+|splode|
+set self.gun state GUN
+
+set self head body1 + head
+create BW_splodey0 self.head self.x self.y
+add self.head.imgs body1head0
+add self.head.imgs body1head1
+add self.head.imgs body1head2
+add self.head.imgs body1head3
+
+set self hand0 body1 + hand0
+create BW_splodey0 self.hand0 self.x self.y
+add self.hand0.imgs hand0
+add self.hand0.imgs hand1
+add self.hand0.imgs hand2
+add self.hand0.imgs hand3
+
+set self hand1 body1 + hand1
+create BW_splodey0 self.hand1 self.x self.y
+add self.hand1.imgs hand0
+add self.hand1.imgs hand1
+add self.hand1.imgs hand2
+add self.hand1.imgs hand3
+
+for _n morelikesixteen
+   set self blood_n body1 + blood_n
+   create BW_splodey0 self.blood_n self.x self.y
+   add self.blood_n.imgs blood0
+   add self.blood_n.imgs blood1
+   add self.blood_n.imgs blood2
+   add self.blood_n.imgs blood3
+endfor
+

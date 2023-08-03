@@ -1,0 +1,88 @@
+EYE|0,0,0,0|False|
+START:0 empty 0,0
+EYE:0 eyeu -16,0
+EYE:0 eyed -16,-16
+EYE:0 eyen -16,0
+SPLODE:0 empty 0,0
+
+|START:0|
+sfx eye_shoot
+set self state EYE
+set self physics 1
+set self grav 0.5
+hitboxes BW_eyeball
+hurtboxes BW_eyeball
+
+|EYE:0|
+img eyen
+if self.y_vel < -5
+   img eyeu
+endif
+if self.y_vel > 5
+   img eyed
+endif
+set self y_vel self.y_vel + self.grav
+
+|EYE:500|
+goodbye
+
+|SPLODE:0|
+exec splode
+goodbye
+
+|XCOLLISION|
+exec splode
+goodbye
+
+|YCOLLISION|
+exec splode
+goodbye
+
+|HIT|
+if eye in self.name
+   break
+endif
+if self.name in related.name
+   break
+endif
+set self state SPLODE
+
+|splode|
+sfx eye_splat
+
+set self puple self.name + puple
+create BW_splodey0 self.puple self.x self.y
+add self.puple.imgs eyepup0
+add self.puple.imgs eyepup1
+add self.puple.imgs eyepup2
+add self.puple.imgs eyepup3
+
+set self goo0 self.name + goo
+create BW_splodey0 self.goo0 self.x self.y
+add self.goo0.imgs eyesp0
+add self.goo0.imgs eyesp1
+add self.goo0.imgs eyesp2
+add self.goo0.imgs eyesp3
+
+set self goo1 self.name + goo
+create BW_splodey0 self.goo1 self.x self.y
+add self.goo1.imgs eyesp0
+add self.goo1.imgs eyesp1
+add self.goo1.imgs eyesp2
+add self.goo1.imgs eyesp3
+
+set self goo2 self.name + goo
+create BW_splodey0 self.goo2 self.x self.y
+add self.goo2.imgs eyesp0
+add self.goo2.imgs eyesp1
+add self.goo2.imgs eyesp2
+add self.goo2.imgs eyesp3
+
+for _n acouple
+   set self blood_n self.name + blood_n
+   create BW_splodey0 self.blood_n self.x self.y
+   add self.blood_n.imgs blood0
+   add self.blood_n.imgs blood1
+   add self.blood_n.imgs blood2
+   add self.blood_n.imgs blood3
+endfor

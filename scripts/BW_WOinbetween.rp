@@ -1,0 +1,30 @@
+WALKOFF|0,0,0,0|False|
+START:0 empty 0,0
+WALKOFF:0 empty 0,0
+
+|START:0|
+set self state WALKOFF
+set self init 0
+
+|WALKOFF:0|
+set self frame 0
+
+|COLLIDE|
+if self.noWO
+   break
+endif
+if background in self.name
+   break
+endif
+
+if related.init
+   place self related.A
+
+   place self related.B
+   set self calc hasframe related.A
+   set self calc hasframe related.B or self.calc
+   if self.calc
+      update related.A
+      update related.B
+   endif
+endif

@@ -1,0 +1,88 @@
+GHOST|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+PHASE:0 ghost0 0,0
+PHASE:5 ghost1 0,0
+PHASE:10 ghost2 0,0
+PHASE:15 ghost3 -16,-16
+PHASE:25 ghost2 0,0
+PHASE:30 ghost1 0,0
+PHASE:35 ghost0 0,0
+OFF:0 empty 0,0
+
+|START:0|
+set self state WAIT
+set self frame 0
+set self speed 96
+set self short_speed 128
+set self long_speed 432
+hitboxes BW_ghost
+set self ghost_sounds []
+add self.ghost_sounds ghost_in
+add self.ghost_sounds ghost_out
+
+|PHASE:40|
+set self state WAIT
+set self frame 0
+
+|WAIT:30|
+set self calc1 1000000
+if exists BW_player10
+   set self calc self.x - BW_player10.x
+   set self calc1 abs self.calc
+   set self d1 1
+   if self.x - BW_player10.x < 0
+      set self d1 -1
+   endif
+endif
+set self calc2 1000000
+if exists BW_player20
+   set self calc self.x - BW_player20.x
+   set self calc2 abs self.calc
+   set self d2 1
+   if self.x - BW_player20.x < 0
+      set self d2 -1
+   endif
+endif
+set self target BW_player10
+set self dist self.calc1
+if self.calc2 < self.calc1
+   set self target BW_player20
+   set self dist self.calc2
+endif
+set self calc exists self.target
+if not self.calc
+   set self state OFF
+   break
+endif
+set self speed self.long_speed
+if self.dist < 512
+   set self speed self.short_speed
+   sfx choiceof self.ghost_sounds
+endif
+if self.target.x > self.x
+   set self calc min self.dist self.speed
+   set self x self.x + self.calc
+endif
+if self.target.x < self.x
+   set self calc min self.dist self.speed
+   set self x self.x - self.calc
+endif
+set self ydist self.y - self.target.y
+set self ydist abs self.ydist
+if self.target.y > self.y
+   set self calc min self.ydist self.speed
+   set self y self.y + self.calc
+endif
+if self.target.y < self.y
+   set self calc min self.ydist self.speed
+   set self y self.y - self.calc
+endif
+
+set self state PHASE
+set self frame 0
+
+|HIT|
+if player in self.name
+   set self state SPLODE
+endif

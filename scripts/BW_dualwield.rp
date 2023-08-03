@@ -1,0 +1,229 @@
+GUN|0,0,0,0|False|
+START:0 empty 0,0
+HELD:0 pistolduel -8,-8
+GUN:0 pistol 0,0
+OFF:0 empty 0,0
+
+|START:0|
+set self timer_max 7
+set self timer self.timer_max
+set self state GUN
+set self aim 0
+set self bullet_num 0
+set self bul_xv 25
+set self bul_yv -3
+set self rotation 0
+set self kb 5
+set self shot_sounds []
+add self.shot_sounds pistol_fire1
+add self.shot_sounds pistol_fire2
+
+|OFF:0|
+goodbye
+
+|HELD:0|
+front
+exec updateRotation
+exec updatePosition
+if self.timer <= 0 and inpB
+   exec shoot
+   set self timer self.timer_max
+endif
+set self timer self.timer - 1
+
+|updateRotation|
+if inpUP != inpDOWN
+   if inpUP
+      set self aim 1
+   endif
+   if inpDOWN
+      set self aim -1
+   endif
+endif
+if inpUP == inpDOWN
+   set self aim 0
+endif
+
+|COLLIDE|
+if related.frame < 30
+   break
+endif
+if related.state == GUN
+   if self.gun
+         if self.gun == related.name
+      	 break
+      endif
+      set self.gun frame 0
+      sfx pickup_weapon
+      set self.gun state GUN
+      set self gun related.name
+      set related state HELD
+      set related player self.name
+   endif
+endif
+
+|updatePosition|
+set self direction self.player.direction
+
+if self.player.state == JUMPSQUAT
+   if self.player.direction == -1
+      if self.aim == 0
+         set self x self.player.x + 16
+ 	 set self y self.player.y + 40
+      endif
+      if self.aim == 1
+         set self x self.player.x + 16
+         set self y self.player.y + 16
+      endif
+       if self.aim == -1
+          set self x self.player.x + 16
+	  set self y self.player.y + 40
+       endif
+   endif
+   if self.player.direction == 1
+      if self.aim == 0
+         set self x self.player.x - 32
+ 	 set self y self.player.y + 40
+      endif
+      if self.aim == 1
+         set self x self.player.x
+         set self y self.player.y + 16
+      endif
+       if self.aim == -1
+          set self x self.player.x + 16
+	  set self y self.player.y + 40
+       endif
+   endif
+endif
+if self.player.state != JUMPSQUAT
+   if self.player.direction == -1
+      if self.aim == 0
+         set self x self.player.x + 16
+ 	 set self y self.player.y + 32
+      endif
+      if self.aim == 1
+         set self x self.player.x + 16
+         set self y self.player.y
+      endif
+       if self.aim == -1
+          set self x self.player.x + 16
+	  set self y self.player.y + 40
+       endif
+   endif
+   if self.player.direction == 1
+      if self.aim == 0
+         set self x self.player.x - 32
+ 	 set self y self.player.y + 32
+      endif
+      if self.aim == 1
+         set self x self.player.x
+         set self y self.player.y
+      endif
+       if self.aim == -1
+          set self x self.player.x + 16
+	  set self y self.player.y + 40
+       endif
+   endif
+endif
+if self.aim == 0
+   set self w 48
+   set self h 16
+endif
+if self.aim != 0
+   set self w 16
+   set self h 48
+endif
+set self rotation self.aim * 90
+if self.direction
+   set self rotation self.rotation * self.direction * -1
+endif
+
+|shoot|
+sfx choiceof self.shot_sounds
+
+set self blast self.name + blast + self.bullet_num
+create BW_blast0 self.blast self.x self.y
+set self.blast direction self.direction
+set self.blast rotation self.rotation
+
+if self.direction == -1
+   if self.aim == 0
+
+         set self bname self.player.name + bullet + self.bullet_num
+         set self bullet_num self.bullet_num + 1
+         create BW_bullet0 self.bname self.x self.y
+         set self.bname x_vel self.bul_xv + self.player.x_vel + RAND? + RAND? + RAND?
+         set self.bname y_vel self.bul_yv + self.player.y_vel + RAND? + RAND? + RAND?
+         set self.blast x self.x + 16
+         set self.blast y self.y - 16
+
+   endif
+   if self.aim == 1
+
+         set self bname self.player.name + bullet + self.bullet_num
+         set self bullet_num self.bullet_num + 1
+         create BW_bullet0 self.bname self.x self.y
+         set self.bname x_vel self.player.x_vel + RAND? + RAND? + RAND?
+         set self.bname y_vel self.bul_xv * -1 + self.player.y_vel + RAND? + RAND? + RAND?
+         set self.blast x self.x
+         set self.blast y self.y - 32
+
+   endif
+   if self.aim == -1
+
+         set self bname self.player.name + bullet + self.bullet_num
+         set self bullet_num self.bullet_num + 1
+         create BW_bullet0 self.bname self.x self.y + 32
+         set self.bname x_vel self.player.x_vel + RAND? + RAND? + RAND?
+         set self.bname y_vel self.bul_xv + self.player.y_vel + RAND? + RAND? + RAND?
+         set self.blast x self.x - 16
+         set self.blast y self.y + 8
+
+   endif
+endif
+if self.direction == 1
+   if self.aim == 0
+
+         set self bname self.player.name + bullet + self.bullet_num
+         set self bullet_num self.bullet_num + 1
+         create BW_bullet0 self.bname self.x + self.w self.y
+         set self.bname x_vel self.bul_xv * -1 + self.player.x_vel + RAND? + RAND? + RAND?
+         set self.bname y_vel self.bul_yv + self.player.y_vel + RAND? + RAND? + RAND?
+         set self.blast x self.x
+         set self.blast y self.y - 16
+
+   endif
+   if self.aim == 1
+
+         set self bname self.player.name + bullet + self.bullet_num
+         set self bullet_num self.bullet_num + 1
+         create BW_bullet0 self.bname self.x self.y
+         set self.bname x_vel self.player.x_vel + RAND? + RAND? + RAND?
+	 set self.bname y_vel self.bul_xv * -1 + self.player.y_vel + RAND? + RAND? + RAND?
+         set self.blast x self.x - 16
+         set self.blast y self.y - 32
+
+   endif
+   if self.aim == -1
+
+         set self bname self.player.name + bullet + self.bullet_num
+         set self bullet_num self.bullet_num + 1
+         create BW_bullet0 self.bname self.x self.y + 32
+         set self.bname x_vel self.player.x_vel + RAND? + RAND? + RAND?
+         set self.bname y_vel self.bul_xv + self.player.y_vel + RAND? + RAND? + RAND?
+         set self.blast x self.x
+         set self.blast y self.y + 8
+
+   endif
+endif
+
+if self.aim == 0
+   set self.player x_vel self.kb * self.direction + self.player.x_vel
+endif
+if self.aim == 1
+   set self.player y_vel self.kb  + self.player.y_vel
+endif
+if self.aim == -1
+   set self.player y_vel self.kb * -1 + self.player.y_vel
+endif
+

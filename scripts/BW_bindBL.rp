@@ -1,0 +1,66 @@
+FOCUSON|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self noWO 1
+set self state WAIT
+
+set self number ""
+for char self.name
+    set self calc char in BW_bindBL
+    if not self.calc
+       set self number self.number + char
+    endif
+endfor
+set self TR BW_bindTR + self.number
+set self t self.TR.top
+set self r self.TR.right
+
+|WAIT:0|
+exec p1update
+exec p2update
+
+|p2update|
+if exists BW_player20
+   if BW_player20.x < self.x
+      break
+   endif
+   if BW_player20.y > self.bottom
+      break
+   endif
+   if BW_player20.x > self.r
+      break
+   endif
+   if BW_player20.y < self.t
+      break
+   endif
+   if isframe BW_MAIN2
+      scrollbound BW_MAIN2 left self.x
+      scrollbound BW_MAIN2 bottom self.y + self.h
+      scrollbound BW_MAIN2 top self.t
+      scrollbound BW_MAIN2 right self.r
+   endif
+endif
+
+|p1update|
+if exists BW_player10
+   if BW_player10.x < self.x
+      break
+   endif
+   if BW_player10.y > self.bottom
+      break
+   endif
+   if BW_player10.x > self.r
+      break
+   endif
+   if BW_player10.y < self.t
+      break
+   endif
+   if isframe BW_MAIN
+      scrollbound BW_MAIN left self.x
+      scrollbound BW_MAIN bottom self.y + self.h
+      scrollbound BW_MAIN top self.t
+      scrollbound BW_MAIN right self.r
+   endif
+endif

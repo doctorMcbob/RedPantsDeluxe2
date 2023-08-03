@@ -1,0 +1,203 @@
+DEMON|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 deamonclosed 0,0
+WAIT:5 deamonopen 0,0
+WAIT:10 deamonclosed 0,0
+WAIT:15 deamonopen 0,0
+WAIT:20 deamonclosed 0,0
+WAIT:25 deamonopen 0,0
+WAIT:30 deamonclosed 0,0
+WAIT:35 deamonopen 0,0
+WAIT:40 deamonclosed 0,0
+WAIT:45 deamonopen 0,0
+WAIT:50 deamonclosed 0,0
+WAIT:55 deamonopen 0,0
+FIREBALL:0 deamonfireballstart 0,0
+FIREBALL:12 deamonfireballshoot 0,0
+ZAP:0 deamonzapstart 0,0
+ZAP:10 deamonzapshoot 0,0
+SPLODE:0 deamonhit0 0,0
+SHIT:0 deamonhit0 0,0
+SHIT:8 deamonhit1 0,0
+SHIT:11 deamonhit0 0,0
+SHIT:19 deamonhit1 0,0
+SHIT:21 deamonhit0 0,0
+DIE:0 deamondie0 0,0
+DIE:4 deamondie1 0,0
+DIE:8 deamondie2 0,0
+DIE:16 deamondie3 0,0
+DIE:23 empty 0,0
+END:0 deamondie0 0,0
+END:4 deamondie1 0,0
+END:8 deamondie2 0,0
+END:16 deamondie3 0,0
+BYE:0 empty 0,0
+
+|START:0|
+set self state WAIT
+set self frame 0
+hitboxes BW_demon
+hurtboxes BW_demon
+set self hits 18
+set self fire_num 0
+set self ox self.x
+set self oy self.y
+set self tx 0
+set self ty 0
+set self speed 16
+back
+set self roar_sounds []
+add self.roar_sounds demon_roar1
+add self.roar_sounds demon_roar2
+
+|WAIT:0|
+set BW_song_manager0 song bosstwo
+
+|WAIT:29|
+exec updateTarget
+sfx choiceof self.roar_sounds
+
+|WAIT:30|
+if self.x > self.tx
+   set self direction 1
+   set self x self.x - self.speed
+endif
+if self.x < self.tx
+   set self direction -1
+   set self x self.x + self.speed
+endif
+if self.y > self.ty
+   set self y self.y - self.speed
+endif
+if self.y < self.ty
+   set self y self.y + self.speed
+endif
+
+|WAIT:60|
+set self frame 0
+if RAND?
+   set self state ZAP
+   if RAND?
+      set self state FIREBALL
+   endif
+   break
+endif
+sfx demon_smash
+
+|FIREBALL:12|
+exec fireball
+
+|FIREBALL:25|
+set self state WAIT
+set self frame 0
+
+|ZAP:10|
+exec zap
+
+|ZAP:11|
+break
+
+|ZAP:25|
+set self state WAIT
+set self frame 0
+
+|SPLODE:0|
+exec splode
+set self state SHIT
+set self frame 0
+
+|SHIT:29|
+set self hits self.hits - 1
+set self state WAIT
+set self frame 0
+if self.hits < 0
+   sfx demon_death
+   set self state DIE
+   set self frame 0
+endif
+
+|DIE:90|
+if isframe BW_MAIN
+   killframe BW_MAIN
+endif
+if isframe BW_MAIN2
+   killframe BW_MAIN2
+endif
+if isframe ENDSCENE
+   activate ENDSCENE   
+   goodbye
+   break
+endif
+makeframe ENDSCENE BW_endscene 0 0 1152 640
+goodbye
+
+|END:30|
+goodbye
+
+|HIT|
+if player in self.name
+   set self state SPLODE
+endif
+
+|splode|
+for _n afewmorethenthose
+   set self blood_n self.name + blood_n
+   create BW_splodey0 self.blood_n self.x self.y
+   add self.blood_n.imgs blood0
+   add self.blood_n.imgs blood1
+   add self.blood_n.imgs blood2
+   add self.blood_n.imgs blood3
+endfor
+
+|fireball|
+sfx demon_flame
+set self fireball self.name + fireball + self.fire_num
+create BW_fireattack0 self.fireball self.x + 64 self.y + 64
+set self.fireball x_vel RAND? + RAND? * 3 + 15 * self.direction * -1
+set self fire_num self.fire_num + 1
+
+|zap|
+sfx demon_zap
+for _n thismany
+   set self zap_n self.name + zap_n
+   create BW_zapattack0 self.zap_n self.x + 64 self.y + 64
+   set self.zap_n x_vel RAND? + RAND? + RAND? + RAND? * 2 + 12 * self.direction * -1
+   set self.zap_n y_vel RAND? + RAND? + RAND? + RAND? * -2 + -3
+endfor
+
+|updateTarget|
+set self calc1 1000000
+if exists BW_player10
+   set self calc self.x - BW_player10.x
+   set self calc1 abs self.calc
+   set self d1 1
+   if self.x - BW_player10.x < 0
+      set self d1 -1
+   endif
+endif
+set self calc2 1000000
+if exists BW_player20
+   set self calc self.x - BW_player20.x
+   set self calc2 abs self.calc
+   set self d2 1
+   if self.x - BW_player20.x < 0
+      set self d2 -1
+   endif
+endif
+set self target BW_player10
+set self dist self.calc1
+if self.calc2 < self.calc1
+   set self target BW_player20
+   set self dist self.calc2
+endif
+set self calc exists self.target
+if not self.calc
+   set self state END
+   set self frame 0
+   break
+endif
+set self tx self.target.x
+set self ty self.target.y
+
+|BYE:0|
+goodbye

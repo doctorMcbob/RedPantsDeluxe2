@@ -1,0 +1,54 @@
+THWACK|0,0,0,0|False|
+HEAD:0 vamphead0 0,0
+HEAD:1 vamphead1 0,0
+HEAD:2 vamphead2 0,0
+HEAD:3 vamphead3 0,0
+ARM:0 vamparm0 -16,0
+ARM:1 vamparm1 -16,0
+ARM:2 vamparm2 0,-16
+ARM:3 vamparm3 0,-16
+FANG:0 fang0 0,0
+FANG:1 fang1 0,0
+FANG:2 fang2 0,0
+FANG:3 fang3 0,0
+BLOOD:0 blood0 0,0
+BLOOD:1 blood1 0,0
+BLOOD:2 blood2 0,0
+BLOOD:3 blood3 0,0
+BLOOD:4 blood4 0,0
+BLOOD:5 blood5 0,0
+BLOOD:6 blood6 0,0
+BLOOD:7 blood7 0,0
+BLOOD:8 blood8 0,0
+START:0 empty 0,0
+BLOOD:0 empty 0,0
+
+|START:0|
+set self state BLOOD
+set self frame 0
+set self grav 0.5 + RAND?
+set self y_vel -6 + RAND? + RAND? + RAND?
+set self direction -1
+if RAND?
+   set self direction 1
+endif
+set self x_vel 2 + RAND? + RAND? * self.direction * -1
+set self imgs []
+set self physics 1
+
+|BLOOD:0|
+set self direction -1
+if RAND?
+   set self direction 2
+endif
+set self y_vel self.y_vel + self.grav
+if self.imgs
+   img choiceof self.imgs
+endif
+
+|XCOLLISION|
+set self x_vel self.x_vel * -1
+
+|YCOLLISION|
+goodbye
+

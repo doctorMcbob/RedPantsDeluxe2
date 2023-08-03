@@ -11,18 +11,19 @@ if self.door_key
    create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
 
-#      if isframe MAIN
-#      	 deactivate MAIN
-#      endif
-#      if isframe MAIN2
-#      	 deactivate MAIN2
-#      endif
-#      if isframe MAIN3
-#      	 deactivate MAIN3
-#      endif
-#      if isframe MAIN4
-#      	 deactivate MAIN4
-#      endif
+      if isframe MAIN
+      	 deactivate MAIN
+      endif
+      if isframe MAIN2
+      	 deactivate MAIN2
+      endif
+      if isframe MAIN3
+      	 deactivate MAIN3
+      endif
+      if isframe MAIN4
+      	 deactivate MAIN4
+      endif
 
+    makeframe BLINDWITCH BW_root 0 0 1152 640
     endif
 endif

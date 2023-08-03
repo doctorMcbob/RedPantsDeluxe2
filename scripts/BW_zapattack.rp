@@ -1,0 +1,37 @@
+EYE|0,0,0,0|False|
+START:0 empty 0,0
+ZAP:0 zap0 0,0
+ZAP:0 zap1 0,0
+ZAP:0 zap2 0,0
+ZAP:0 zap3 0,0
+
+|START:0|
+set self state ZAP
+set self physics 1
+set self grav 0.5
+hitboxes BW_zap
+set self imgs []
+add self.imgs zap0
+add self.imgs zap1
+add self.imgs zap2
+add self.imgs zap3
+
+|ZAP:0|
+img choiceof self.imgs
+set self y_vel self.y_vel + self.grav
+
+|ZAP:500|
+goodbye
+
+|XCOLLISION|
+goodbye
+
+|YCOLLISION|
+goodbye
+
+|HIT|
+if self.name in related.name
+   break
+endif
+set self state SPLODE
+
