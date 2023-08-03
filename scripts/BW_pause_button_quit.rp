@@ -97,6 +97,8 @@ endif
 
 set BW_song_manager0 song firstLevel
 
+killframe BLINDWITCH
+
 if isframe BLINDWITCH
    killframe BLINDWITCH
 endif
