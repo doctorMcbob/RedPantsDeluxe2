@@ -6,7 +6,6 @@ FOLLOW:0 empty 0,0
 set self follow 0
 set self max_dist 256
 set self state FOLLOW
-set self physics 1
 
 |FOLLOW:0|
 if self.follow == 0
@@ -31,8 +30,8 @@ if self._input_name
     endif
 endif
 
-set self x_vel self.x_diff / 9
-set self y_vel self.y_diff / 7
+set self x_v self.x_diff / 9
+set self y_v self.y_diff / 7
 
 if abs self.x_diff > self.max_dist
     set self x self.follow.x
@@ -42,3 +41,6 @@ if abs self.y_diff > self.max_dist
     set self x self.follow.x
     set self y self.follow.y
 endif
+
+set self x self.x + self.x_v
+set self y self.y + self.y_v

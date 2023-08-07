@@ -15,4 +15,9 @@ if self.noWO
 endif
 if related.init
    take related.from self
+   if self.lakitu
+      if exists self.lakitu
+      	 take related.from self.lakitu
+      endif
+   endif
 endif

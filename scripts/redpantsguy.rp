@@ -142,7 +142,9 @@ exec respawn
 |respawn|
 set self x self.respawnx
 set self y self.respawny
-view self.frame_name self.respawnworld
+if self.frane_name
+   view self.frame_name self.respawnworld
+endif
 move self.name self.respawnworld
 if self.lakitu
    set self.lakitu x self.x

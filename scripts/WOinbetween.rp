@@ -19,8 +19,13 @@ endif
 
 if related.init
    place self related.A
-
    place self related.B
+   if self.lakitu
+      if exists self.lakitu
+      	 place self.lakitu related.A
+	 place self.lakitu related.B
+      endif
+   endif
    set self calc hasframe related.A
    set self calc hasframe related.B or self.calc
    if self.calc
