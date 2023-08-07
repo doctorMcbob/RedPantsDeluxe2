@@ -52,35 +52,6 @@ if UP_DOWN in inpEVENTS
 endif
 
 |press|
-if isframe BLINDWITCH
-   killframe BLINDWITCH
-endif
-if isframe BW_MENU
-   killframe BW_MENU
-endif
-if isframe BW_MAIN
-   killframe BW_MAIN
-endif
-if isframe BW_MAIN2
-   killframe BW_MAIN2
-endif
-if isframe BW_PAUSE
-   killframe BW_PAUSE
-endif
-
-if isframe MAIN
-    activate MAIN
-endif
-if isframe MAIN2
-    activate MAIN2
-endif
-if isframe MAIN3
-    activate MAIN3
-endif
-if isframe MAIN4
-    activate MAIN4
-endif
-
 if exists BW_player10pistol
    set BW_player10pistol state OFF
 endif
@@ -111,6 +82,14 @@ set BW_ghost0 y -256
 set BW_ghost0 state START
 set BW_ghost0 frame 0
 
+place BW_ghost0 BW_graveyardleft
+place BW_ghost0 BW_graveyardright
+place BW_ghost0 BW_graveyardstart
+place BW_ghost0 BW_castleentrence
+place BW_ghost0 BW_castlemiddle
+place BW_ghost0 BW_castletop
+
+
 create BW_witch0 BW_witch0 11216 -3520
 move BW_witch0 BW_castletop
 create BW_eyeballtarget0 BW_eyeballtarget0 11136 -3552
@@ -126,3 +105,32 @@ if exists FINALBOSS
 endif
 
 set BW_song_manager0 song firstLevel
+
+if isframe BLINDWITCH
+   killframe BLINDWITCH
+endif
+if isframe BW_MENU
+   killframe BW_MENU
+endif
+if isframe BW_MAIN
+   killframe BW_MAIN
+endif
+if isframe BW_MAIN2
+   killframe BW_MAIN2
+endif
+if isframe BW_PAUSE
+   killframe BW_PAUSE
+endif
+
+if isframe MAIN
+    activate MAIN
+endif
+if isframe MAIN2
+    activate MAIN2
+endif
+if isframe MAIN3
+    activate MAIN3
+endif
+if isframe MAIN4
+    activate MAIN4
+endif

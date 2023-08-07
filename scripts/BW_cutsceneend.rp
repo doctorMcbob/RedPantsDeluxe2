@@ -16,12 +16,6 @@ endif
 focus BLINDWITCH self
 
 |SCENE:300|
-sfx witch_cackle
-deactivate ENDSCENE
-if isframe BW_MENU
-   activate BW_MENU   
-   break
-endif
 
 if exists BW_player10pistol
    set BW_player10pistol state OFF
@@ -53,6 +47,13 @@ set BW_ghost0 y -256
 set BW_ghost0 state START
 set BW_ghost0 frame 0
 
+place BW_ghost0 BW_graveyardleft
+place BW_ghost0 BW_graveyardright
+place BW_ghost0 BW_graveyardstart
+place BW_ghost0 BW_castleentrence
+place BW_ghost0 BW_castlemiddle
+place BW_ghost0 BW_castletop
+
 
 create BW_witch0 BW_witch0 11216 -3520
 move BW_witch0 BW_castletop
@@ -67,8 +68,13 @@ move BW_eyeballtarget3 BW_castletop
 if exists FINALBOSS
    set FINALBOSS state BYE
 endif
-
 set BW_song_manager0 song firstLevel
 
+sfx witch_cackle
+deactivate ENDSCENE
+if isframe BW_MENU
+   activate BW_MENU   
+   break
+endif
 makeframe BW_MENU BW_mainmenu 0 0 1152 640
 
