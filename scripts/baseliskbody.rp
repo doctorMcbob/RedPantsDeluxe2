@@ -1,0 +1,169 @@
+HEAD|0,0,0,0|False|
+START:0 empty 0,0
+LR:0 baseliskLR0 0,0
+LR:2 baseliskLR1 0,0
+LR:4 baseliskLR2 0,0
+RL:0 baseliskLR0 0,0
+RL:2 baseliskLR1 0,0
+RL:4 baseliskLR2 0,0
+UL:0 baseliskUL0 0,0
+UL:2 baseliskUL1 0,0
+UL:4 baseliskUL2 0,0
+LU:0 baseliskUL0 0,0
+LU:2 baseliskUL1 0,0
+LU:4 baseliskUL2 0,0
+UD:0 baseliskUD0 0,0
+UD:2 baseliskUD1 0,0
+UD:4 baseliskUD2 0,0
+DU:0 baseliskUD0 0,0
+DU:2 baseliskUD1 0,0
+DU:4 baseliskUD2 0,0
+RU:0 baseliskRU0 0,0
+RU:2 baseliskRU1 0,0
+RU:4 baseliskRU2 0,0
+UR:0 baseliskRU0 0,0
+UR:2 baseliskRU1 0,0
+UR:4 baseliskRU2 0,0
+DL:0 baseliskDL0 0,0
+DL:2 baseliskDL1 0,0
+DL:4 baseliskDL2 0,0
+LD:0 baseliskDL0 0,0
+LD:2 baseliskDL1 0,0
+LD:4 baseliskDL2 0,0
+RD:0 baseliskRD0 0,0
+RD:2 baseliskRD1 0,0
+RD:4 baseliskRD2 0,0
+DR:0 baseliskRD0 0,0
+DR:2 baseliskRD1 0,0
+DR:4 baseliskRD2 0,0
+TAILR:0 baselisktailR0 0,0
+TAILR:2 baselisktailR1 0,0
+TAILR:4 baselisktailR2 0,0
+TAILL:0 baselisktailL0 0,0
+TAILL:2 baselisktailL1 0,0
+TAILL:4 baselisktailL2 0,0
+TAILU:0 baselisktailU0 0,0
+TAILU:2 baselisktailU1 0,0
+TAILU:4 baselisktailU2 0,0
+TAILD:0 baselisktailD0 0,0
+TAILD:2 baselisktailD1 0,0
+TAILD:4 baselisktailD2 0,0
+
+|START:0|
+if self.name == baseliskbody0
+    goodbye
+endif
+set self direction 1
+set self state RL
+set self frame 0
+set self ox self.x
+set self oy self.y
+set self x self.x - self.w
+set self can_fit COLLIDE?
+set self x self.ox
+set self y self.oy
+set self timer 2
+set self timermax self.timer
+hitboxes baselisk
+if self.can_fit
+    set self state TAILR
+    set self frame 0
+    break
+endif
+set self next self.name + _
+create baseliskbody0 self.next self.x - self.w self.y
+set self.next head self.name
+
+|LR:6|
+set self frame 0
+exec checkStep
+
+|RL:6|
+set self frame 0
+exec checkStep
+
+|UL:6|
+set self frame 0
+exec checkStep
+
+|LU:6|
+set self frame 0
+exec checkStep
+
+|UD:6|
+set self frame 0
+exec checkStep
+
+|DU:6|
+set self frame 0
+exec checkStep
+
+|RU:6|
+set self frame 0
+exec checkStep
+
+|UR:6|
+set self frame 0
+exec checkStep
+
+|DL:6|
+set self frame 0
+exec checkStep
+
+|LD:6|
+set self frame 0
+exec checkStep
+
+|RD:6|
+set self frame 0
+exec checkStep
+
+|DR:6|
+set self frame 0
+exec checkStep
+
+|TAILR:6|
+set self frame 0
+exec checkStep
+
+|TAILL:6|
+set self frame 0
+exec checkStep
+
+|TAILU:6|
+set self frame 0
+exec checkStep
+
+|TAILD:6|
+set self frame 0
+exec checkStep
+
+|checkStep|
+set self timer self.timer - 1
+if self.timer == 0
+    exec step
+    set self timer self.timermax
+    break
+endif
+set self oldstate self.state
+
+|step|
+set self ox self.x
+set self oy self.y
+
+set self x self.head.ox
+set self y self.head.oy
+
+if not self.next
+    set self letter self.head.oldstate at 0
+    set self state TAIL + self.letter
+    break
+endif
+
+set self.next state self.oldstate
+
+|HIT|
+if self.can_die
+   set self state DEAD
+   set self frame 0
+endif

@@ -1,0 +1,17 @@
+PLAT|64,608,1024,64|False|
+PLATFORM00 deserttemplebackground00 0,0
+PLATFORM01 deserttemplebackground01 0,0
+PLATFORM02 deserttemplebackground02 0,0
+PLATFORM10 deserttemplebackground10 0,0
+PLATFORM11 deserttemplebackground11 0,0
+PLATFORM12 deserttemplebackground12 0,0
+PLATFORM20 deserttemplebackground20 0,0
+PLATFORM21 deserttemplebackground21 0,0
+PLATFORM22 deserttemplebackground22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+set self frame 0
+set self background 1 
+

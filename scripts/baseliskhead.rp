@@ -1,0 +1,114 @@
+HEAD|0,0,0,0|False|
+START:0 empty 0,0
+R:0 baseliskheadR0 0,0
+R:2 baseliskheadR1 0,0
+R:4 baseliskheadR2 0,0
+L:0 baseliskheadL0 0,0
+L:2 baseliskheadL1 0,0
+L:4 baseliskheadL2 0,0
+D:0 baseliskheadD0 0,0
+D:2 baseliskheadD1 0,0
+D:4 baseliskheadD2 0,0
+U:0 baseliskheadU0 0,0
+U:2 baseliskheadU1 0,0
+U:4 baseliskheadU2 0,0
+
+|START:0|
+set self direction 1
+set self state R
+set self frame 0
+set self next self.name + body
+create baseliskbody0 self.next self.x - self.w self.y
+set self.next head self.name
+set self timer 2
+set self timermax self.timer
+hitboxes baselisk
+
+|L:6|
+set self frame 0
+exec checkStep
+
+|U:6|
+set self frame 0
+exec checkStep
+
+|R:6|
+set self frame 0
+exec checkStep
+
+|D:6|
+set self frame 0
+exec checkStep
+
+|checkHit|
+set self ishit 0
+for name COLLIDE?
+    if name.platform
+        set self ishit 1
+        break
+    endif
+endfor
+
+|checkStep|
+set self timer self.timer - 1
+if self.timer == 0
+    exec step
+    set self timer self.timermax
+endif
+
+|step|
+set self ox self.x
+set self oy self.y
+if self.state == R
+    set self x self.x + self.w
+    exec checkHit
+    set self.next state RL
+    if self.ishit
+        set self x self.ox
+        set self state D
+        set self.next state DL
+        set self y self.y + self.h        
+    endif
+    break
+endif
+if self.state == D
+    set self y self.y + self.h
+    set self.next state DU
+    exec checkHit
+    if self.ishit
+        set self y self.oy
+        set self state L
+        set self.next state LU
+        set self x self.x - self.w
+    endif
+    break
+endif
+if self.state == L
+    set self x self.x - self.w
+    set self.next state LR
+    exec checkHit
+    if self.ishit
+        set self x self.ox
+        set self state U
+        set self.next state UR
+        set self y self.y - self.h
+    endif
+    break
+endif
+if self.state == U
+    set self y self.y - self.h
+    set self.next state UD
+    exec checkHit
+    if self.ishit
+        set self y self.oy
+        set self state R
+        set self.next state RD
+        set self x self.x + self.w
+    endif
+endif
+
+|HIT|
+if self.can_die
+   set self state DEAD
+   set self frame 0
+endif

@@ -1,0 +1,15 @@
+PLAT|64,608,1024,64|True|
+PLATFORM00 platformdeserttemple00 0,0
+PLATFORM01 platformdeserttemple01 0,0
+PLATFORM02 platformdeserttemple02 0,0
+PLATFORM10 platformdeserttemple10 0,0
+PLATFORM11 platformdeserttemple11 0,0
+PLATFORM12 platformdeserttemple12 0,0
+PLATFORM20 platformdeserttemple20 0,0
+PLATFORM21 platformdeserttemple21 0,0
+PLATFORM22 platformdeserttemple22 0,0
+
+|START:0|
+set self state PLATFORM
+set self platform 1
+
