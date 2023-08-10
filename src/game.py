@@ -129,6 +129,7 @@ def execute_console_command(G):
     if cmd.startswith("REF:"):
         G["REFERENCE"] = cmd.split(":")[-1]
     else:
-        scripts.resolve(G["REFERENCE"], [scripts.parse_tokens(cmd)],
-                        frames.get_frames()[0].world)
-
+        for frame in frames.get_frames():
+            if frame.active:
+                scripts.resolve(G["REFERENCE"], [scripts.parse_tokens(cmd)], frame.world)
+                break

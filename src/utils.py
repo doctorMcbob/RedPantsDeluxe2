@@ -23,7 +23,9 @@ ALPHABET_KEY_MAP = {
 ALPHABET_SHIFT_MAP = {
     K_0: ")", K_1: "!", K_2: "@", K_3: "#", K_4: "$",
     K_5: "%", K_6: "^", K_7: "&", K_8: "*", K_9: "(",
-    K_SEMICOLON: ":", K_MINUS:"_", K_QUOTE:'"',
+    K_SEMICOLON: ":", K_MINUS:"_", K_QUOTE:'"', K_COMMA: "<",
+    K_PERIOD: ">", K_SLASH: "?", K_EQUALS: "+", K_BACKSLASH: "|",
+    K_LEFTBRACKET: "{", K_RIGHTBRACKET: "}", K_BACKQUOTE: "~",
 }
 
 def get_text_input(G, pos, numeric=False):

@@ -11,6 +11,11 @@ if self.door_key
    create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
 
+      if inv0.arcadeBlindWitch == 0
+      	 create lockicon0 related.name + lockicon related.x + 24 related.y
+          break
+      endif
+
       if isframe MAIN
       	 deactivate MAIN
       endif

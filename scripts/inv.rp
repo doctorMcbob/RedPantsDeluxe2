@@ -4,7 +4,7 @@ INV:0 empty 0,0
 
 |START:0|
 # disable me
-set self cheater_mode 1
+set self cheater_mode 0
 
 set self state INV
 set self frame 0
@@ -35,6 +35,9 @@ set self gcwitch 0
 set self gcmoon 0
 set self gcsanta 0
 
+set self arcadeBlindWitch 0
+set self arcadeBlitzorb 0
+
 if self.cheater_mode
    # CHEATER MODE
    set self scienceTR 1
@@ -52,12 +55,14 @@ if self.cheater_mode
    set self moonhousebacklocked 0
    set self workshoplocked 0
 
-
    set self gcmilk 1
    set self gcpizza 1
    set self gcdragon 1
    set self gcwitch 1
    set self gcmoon 1
    set self gcsanta 1
+
+   set self arcadeBlindWitch 1
+   set self arcadeBlitzorb 1
 endif
 
