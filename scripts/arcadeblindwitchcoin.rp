@@ -1,0 +1,36 @@
+COIN|0,0,0,0|False|
+START:0 blindwitchcoin0 0,0
+COIN:0 blindwitchcoin0 0,0
+COIN:8 blindwitchcoin1 0,0
+COIN:13 blindwitchcoin2 0,0
+COIN:21 blindwitchcoin1 0,0
+COLLECT:0 blindwitchcoin2 0,0
+
+|START:0|
+set self state COIN
+set self frame 0
+set self collected 0
+
+|COIN:0|
+if self.collected
+   set self state COLLECT
+   set self frame 0
+endif
+
+|COIN:26|
+set self frame 0
+exec COIN:0
+
+|COLLECT:0|
+set self y self.y - 3
+
+|COLLECT:20|
+goodbye
+
+|COLLIDE|
+if player in self.name
+   if related.name in inv0.collected == 0
+      add inv0.collected related.name
+      set inv0 arcadeBlindWitch 1
+   endif
+endif
