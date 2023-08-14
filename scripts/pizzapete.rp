@@ -1,0 +1,26 @@
+PETE|0,0,0,0|False|
+START:0 peteheadless0 -24,-32
+SQUAT:0 petesquat0 -24,-32
+DANCE:0 petedance0 -24,-32
+DANCE:3 petedance1 -24,-32
+DANCE:6 petedance0 -24,-32
+DANCE:9 petedance1 -24,-32
+DANCE:12 petedance0 -24,-32
+DANCE:17 petedance1 -24,-32
+DANCE:25 petedance0 -24,-32
+DANCE:36 petedance1 -24,-32
+THUMBS:0 petethumbs0 -24,-32
+THUMBS:8 petethumbs1 -24,-32
+THUMBS:12 petethumbs2 -24,-32
+
+|START:0|
+set self state DANCE
+
+|DANCE:48|
+set self direction self.direction * -1
+set self frame 0
+
+|THUMBS:18|
+set self frame 0
+set self direction self.direction * -1
+set self frame 0

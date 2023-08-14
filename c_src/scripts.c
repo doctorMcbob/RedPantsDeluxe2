@@ -2723,6 +2723,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         printf("Missing or Incorrect Parameter for IMG\n");
         break;
       }
+      
       self->img = imgValue;
       break;
     }

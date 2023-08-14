@@ -87,12 +87,13 @@ void add_sprite(int name, SDL_Texture *image) {
   }
   s->name = name;
   s->image = image;
+  s->offx = 0;
+  s->offy = 0;
   HASH_ADD_INT(sprites, name, s);
 }
 
 Sprite *get_sprite(int name) {
   struct Sprite *s;
-
   HASH_FIND_INT(sprites, &name, s);
   if (s) {
     return s;
@@ -129,3 +130,4 @@ void load_sprite(int name, const unsigned char sprite[][4], int w, int h,
 
   SDL_FreeSurface(surface);
 }
+
