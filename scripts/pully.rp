@@ -16,7 +16,9 @@ DES20 bullybot 0,0
 |START:0|
 set self platform 1
 set self state PULLY
+set self h self.h / 32 * 32
 set self max_h self.h
+
 
 |PULLY:0|
 # pass

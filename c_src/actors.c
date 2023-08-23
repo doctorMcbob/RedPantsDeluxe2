@@ -953,8 +953,8 @@ void draw_actor(SDL_Renderer *rend, Actor *actor, Frame *f) {
   
   scrolled(&dest, f);
   // // draw dest rect ;P my favorite debug tool <3
-  SDL_SetRenderDrawColor(rend, 155, 0, 155, 255);
-  SDL_RenderDrawRect(rend, &dest);
+  // SDL_SetRenderDrawColor(rend, 155, 0, 155, 255);
+  // SDL_RenderDrawRect(rend, &dest);
 
   SDL_RenderCopyEx(rend, s->image, &src, &dest, angle, &pivot, flip);
 }
