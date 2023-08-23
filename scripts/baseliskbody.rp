@@ -70,7 +70,19 @@ if self.can_fit
     set self frame 0
     break
 endif
-set self next self.name + _
+
+set self i len self.name
+set self j 0
+set self number ""
+for letter self.name
+   if self.j > self.i
+      set self number self.number + letter
+   endif
+   set self j self.j + 1
+endfor
+
+set self number int self.number + 1
+set self next self.name + self.number
 create baseliskbody0 self.next self.x - self.w self.y
 set self.next head self.name
 

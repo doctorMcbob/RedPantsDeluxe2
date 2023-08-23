@@ -17,7 +17,7 @@ U:4 baseliskheadU2 0,0
 set self direction 1
 set self state R
 set self frame 0
-set self next self.name + body
+set self next self.name + body0
 create baseliskbody0 self.next self.x - self.w self.y
 set self.next head self.name
 set self timer 2

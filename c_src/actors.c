@@ -900,35 +900,61 @@ void draw_actor(SDL_Renderer *rend, Actor *actor, Frame *f) {
   src.x = 0;
   src.y = 0;
 
-  switch (actor->rotation) {
-  case -90:
-  case 90:
-  case 0:
-    dest.x = actor->direction == 1 ? actor->ECB.x + actor->ECB.w - s->offx - dest.w : actor->ECB.x + s->offx;
-    dest.y = actor->ECB.y + s->offy;
-    break;
-  case -270:
-  case 270:
-  case -180:
-  case 180:
-    dest.x = actor->ECB.x + actor->ECB.w - s->offx - dest.w;
-    dest.y = actor->ECB.y + actor->ECB.h - s->offy - dest.h;
-    break;
-  }
-
   src.w = dest.w;
   src.h = dest.h;
-
-  scrolled(&dest, f);
 
   SDL_RendererFlip flip =
       actor->direction == 1 ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
   double angle = 0 - actor->rotation;
-  SDL_Point pivot = {dest.w / 2, dest.h / 2};
 
+  actor->rotation = (actor->rotation + 360) % 360;
+  
+  SDL_Point pivot;
+  switch (actor->rotation) {
+	case 0: {
+  		dest.x = actor->direction == 1 ? actor->ECB.x + actor->ECB.w - s->offx - dest.w : actor->ECB.x + s->offx;
+  		dest.y = actor->ECB.y + s->offy;
+ 		
+		pivot.x = dest.w / 2;
+		pivot.y = dest.h / 2;
+		break;
+	}
+	case 180: {
+  		dest.x = actor->direction == 1 ? actor->ECB.x + actor->ECB.w - s->offx - dest.w : actor->ECB.x + s->offx;
+		dest.y = actor->ECB.y + actor->ECB.h - s->offy - dest.h;
+ 		
+		pivot.x = dest.w / 2;
+		pivot.y = dest.h / 2;
+		break;
+	}
+	case 90: {
+		dest.x = actor->ECB.x + s->offy;
+		dest.y = actor->ECB.y + actor->ECB.h - s->offx - dest.w;
+
+		pivot.x = 0;
+		pivot.y = 0;
+		dest.w = src.w;
+		dest.h = src.h;
+		dest.y += dest.w;
+		break;
+	}
+	case 270: {
+		dest.x = actor->ECB.x + actor->ECB.w - s->offy - dest.h;
+		dest.y = actor->ECB.y + actor->ECB.h - s->offx - dest.w ;
+
+		pivot.x = 0;
+		pivot.y = 0;
+		dest.w = src.w;
+		dest.h = src.h;
+		dest.x += dest.h;
+		break;
+	}
+  }
+  
+  scrolled(&dest, f);
   // // draw dest rect ;P my favorite debug tool <3
-  // SDL_SetRenderDrawColor(rend, 155, 0, 155, 255);
-  // SDL_RenderDrawRect(rend, &dest);
+  SDL_SetRenderDrawColor(rend, 155, 0, 155, 255);
+  SDL_RenderDrawRect(rend, &dest);
 
   SDL_RenderCopyEx(rend, s->image, &src, &dest, angle, &pivot, flip);
 }

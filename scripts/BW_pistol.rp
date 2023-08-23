@@ -107,7 +107,7 @@ if self.player.state == JUMPSQUAT
    endif
    if self.player.direction == 1
       if self.aim == 0
-         set self x self.player.x - 32
+         set self x self.player.x - 16
  	 set self y self.player.y + 40
       endif
       if self.aim == 1
@@ -137,7 +137,7 @@ if self.player.state != JUMPSQUAT
    endif
    if self.player.direction == 1
       if self.aim == 0
-         set self x self.player.x - 32
+         set self x self.player.x - 16
  	 set self y self.player.y + 32
       endif
       if self.aim == 1
@@ -151,17 +151,18 @@ if self.player.state != JUMPSQUAT
    endif
 endif
 if self.aim == 0
-   set self w 48
+   set self w 32
    set self h 16
 endif
 if self.aim != 0
    set self w 16
-   set self h 48
+   set self h 32
 endif
 set self rotation self.aim * 90
 if self.direction
    set self rotation self.rotation * self.direction * -1
 endif
+print self.rotation
 
 |shoot|
 sfx choiceof self.shot_sounds
