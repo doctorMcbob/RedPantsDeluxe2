@@ -162,7 +162,6 @@ set self rotation self.aim * 90
 if self.direction
    set self rotation self.rotation * self.direction * -1
 endif
-print self.rotation
 
 |shoot|
 sfx choiceof self.shot_sounds

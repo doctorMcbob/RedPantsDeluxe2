@@ -292,6 +292,10 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 world_ref = cmd.pop(0)
                 worlds.get_world(world_ref).background_yscroll += float(cmd.pop(0))
                 
+            elif verb == "add_input_state":
+                input_state_name = cmd.pop(0)
+                inputs.add_state(input_state_name)
+
             elif verb == "setjoy":
                 input_state_name, joy_count = cmd
                 inputstate = inputs.get_state(input_state_name)

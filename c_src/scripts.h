@@ -111,6 +111,7 @@
 #define PRINT 38
 #define UPDATE_STICKS 39
 #define SET_JOY 40
+#define ADD_INPUT_STATE 41
 
 typedef struct ScriptMap
 {

@@ -3445,8 +3445,22 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         printf("Missing or Incorrect Parameter for SET_JOY\n");
         break;
       }
-
+      
       add_stick_to_input_state(inputStateValue, stickValue);
+      break;
+    }
+    case ADD_INPUT_STATE: {
+      int inputStateType = PARAMS[0];
+      int inputStateValue = PARAMS[1];
+
+      if (inputStateType != STRING) {
+        printf("Actor %s error: ", get_string(self->name));
+        print_statement(statement);
+        printf("Missing or Incorrect Parameter for ADD_INPUT_STATE\n");
+        break;
+      }
+
+      add_input_state(inputStateValue, -1);
       break;
     }
     }

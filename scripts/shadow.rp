@@ -32,6 +32,9 @@ set self state self.mode
 exec checkAir
 exec applyGrav
 
+|TALK:0|
+set self x_vel 0
+
 |TALK:6|
 set self frame 0
 
