@@ -4,11 +4,15 @@ START:0 empty -16,0
 |START:0|
 if isframe MAIN2
    set self _input_name PLAYER2
-   focus MAIN2 self
    set self frame_name MAIN2
    rebrand redpantsguy
    set self tangible 1
    set self respawnx self.x
    set self respawny self.y
    set self respawnworld WORLD?
+   set self lakitu p2lakitu
+   create lakitu0 self.lakitu self.x self.y
+   focus MAIN2 self.lakitu
+   set self.lakitu follow self.name
+   set self.lakitu _input_name PLAYER2
 endif
