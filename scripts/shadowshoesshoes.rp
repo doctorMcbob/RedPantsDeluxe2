@@ -16,6 +16,9 @@ endif
 set self frame 0
 
 |COLLIDE|
+if self.w != 32
+   break
+endif
 if player in self.name
    if self.hat != shadowshoes
       if related.state == HAT

@@ -44,6 +44,7 @@ PUNCH:6 moonmanpunch2 0,-32
 PUNCH:8 moonmanpunch3 0,-16
 DANGLE:0 moonmandangle 0,-16
 INVISIBLE:0 empty 0,0
+EMPTY:0 empty 0,0
 DROWN:0 empty 0,0
 
 |DROWN:45|
@@ -149,6 +150,17 @@ if self.lakitu
    move self.lakitu self.respawnworld
 endif
 set self can_die 1
+set self tangible 0
+set self state EMPTY
+exec EMPTY:0
+
+|EMPTY:0|
+if COLLIDE?
+   break
+endif
+set self tangible 1
+set self state IDLE
+
 
 |IDLE:0|
 set self door_key RIGHT

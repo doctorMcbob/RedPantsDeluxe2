@@ -28,6 +28,9 @@ if self.counter <= 0
 endif
 
 |HIT|
+if self.w != 32
+   break
+endif
 if player in self.name
    if self.hat != enflamed
       rebrand enflamed

@@ -71,18 +71,21 @@ if self.can_fit
     break
 endif
 
-set self i len self.name
-set self j 0
+set self num 0
 set self number ""
+set self _name ""
 for letter self.name
-   if self.j > self.i
+   if self.num
       set self number self.number + letter
    endif
-   set self j self.j + 1
+   if not self.num
+      set self _name self._name + letter
+   endif
+   set self num letter == y
 endfor
 
 set self number int self.number + 1
-set self next self.name + self.number
+set self next self._name + self.number
 create baseliskbody0 self.next self.x - self.w self.y
 set self.next head self.name
 
