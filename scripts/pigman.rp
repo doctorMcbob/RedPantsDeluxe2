@@ -280,7 +280,7 @@ endif
 |fireArrow|
 set self arrowname self.name + arrow + self.arrownumber
 set self arrownumber self.arrownumber + 1
-if self.arrownumber < self.arrowmax
+if self.arrownumber > self.arrowmax
    set self arrownumber 0
 endif
 if self.direction == 1
