@@ -17,5 +17,6 @@ if player in self.name
    set self respawnx related.x
    set self respawny related.y
    set self respawnworld WORLD?
+   create respawnflagflap0 self.name + flagflap related.x related.y + 16
 endif
 

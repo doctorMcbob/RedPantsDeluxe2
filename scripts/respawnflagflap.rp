@@ -1,0 +1,11 @@
+FLAP|0,0,0,0|False|
+START:0 empty 0,0
+FLAG:0 respawnflagflap0 0,0
+FLAG:4 respawnflagflap1 0,0
+FLAG:8 respawnflagflap2 0,0
+
+|START:0|
+back
+set self state FLAG
+set self frame 0
+

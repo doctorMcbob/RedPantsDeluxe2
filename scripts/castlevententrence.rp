@@ -1,0 +1,27 @@
+VENT|0,0,0,0|False|
+START:0 vent1 0,0
+VENT:0 vent1 0,0
+
+|START:0|
+set self direction 1
+set self state VENT
+
+|COLLIDE|
+if self.door_key
+   create upicon0 upicon related.x related.y - 32
+   if self.door_key + _DOWN in inpEVENTS
+      set self state EMPTY
+      set self tangible 0
+      move self castle0
+      set self x castleventexit0.x
+      set self y castleventexit0.y
+      if self.lakitu
+         move self.lakitu castle0
+	 set self.lakitu x self.x
+	 set self.lakitu y self.y
+      endif
+      view self.frame_name castle0
+ 
+      remove inpEVENTS self.door_key + _DOWN
+   endif
+endif
