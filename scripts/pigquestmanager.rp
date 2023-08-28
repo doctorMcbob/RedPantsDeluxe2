@@ -1,0 +1,79 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+LOOK:0 empty 0,0
+CHECK:0 empty 0,0
+THANKS:0 empty 0,0
+DONE:0 empty 0,0
+
+|START:0|
+set self messages []
+add self.messages "DANG OL PIGS GOT OUT"
+add self.messages "THOSE PIGS MESSING UP   ^MY WHOLE DANG DAY     "
+add self.messages "IM TIRED A THOSE DANG PIGS MAN"
+set self state LOOK
+set self passMessage "   THANK YOU       ^YOU CAN HAVE THIS    ^IMPORTANT SCIENCE THING     "
+set self thanks 0
+
+|CHECK:1|
+if piggycounter0.state == LOOK
+   exec onCheck
+endif
+if piggycounter0.state == PASS
+   exec onPass
+endif
+
+|CHECK:2|
+# pass
+
+|CHECK:200|
+if self.thanks
+   set self state THANKS
+   set self frame 0
+   break
+endif
+set self state LOOK
+set self frame 0
+
+|THANKS:1|
+exec onPigGet
+
+|THANKS:2|
+# pass
+
+|THANKS:200|
+set self thanks 0
+set self state LOOK
+set self frame 0
+
+|COLLIDE|
+if related.state == LOOK
+   if player in self.name
+      set related state CHECK
+      set related frame 0
+   endif
+endif
+
+|onCheck|
+create say0 pigmanmessage pigherder0.x + 32 pigherder0.y - 96
+set pigmanmessage message choiceof self.messages
+set pigmanmessage back backgroundsayL0
+set pigherder0 state WELP
+set pigherder0 frame 0
+
+|onPass|
+create say0 pigmanmessage pigherder0.x + 32 pigherder0.y - 96
+set pigmanmessage message self.passMessage
+set pigmanmessage back backgroundsayL0
+set pigherder0 state THUMBSUP
+set pigherder0 frame 0
+set scienceTR0 state COLLECTABLE
+set self state DONE
+
+|onPigGet|
+create say0 pigmanmessage pigherder0.x + 32 pigherder0.y - 96
+set self calc len piggycounter0.piggies
+set pigmanmessage message "WOW YOUVE GOT " + self.calc + " PIGGIES"
+set pigmanmessage back backgroundsayL0
+set pigherder0 state THUMBSUP
+set pigherder0 frame 0
+

@@ -1,0 +1,30 @@
+HITBOX|0,0,0,0|False|
+START:0 empty 0,0
+LOOK:0 empty 0,0
+PASS:0 empty 0,0
+
+|START:0|
+set self state LOOK
+set self target_piggies 9
+set self piggies []
+
+|LOOK:0|
+if len self.piggies >= self.target_piggies
+   set self state PASS
+endif
+
+|COLLIDE|
+if related.state != LOOK
+   break
+endif
+if pigman in self.name
+   if self.name in related.piggies
+      break
+   endif
+   add related.piggies self.name
+   set pigquestmanager0 thanks 1
+   if pigquestmanager0.state == LOOK
+      set pigquestmanager0 state THANKS
+      set pigquestmanager0 frame 0
+   endif
+endif

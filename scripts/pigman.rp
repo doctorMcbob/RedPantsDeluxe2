@@ -49,6 +49,10 @@ set self scared []
 hurtboxes pigman
 set self arrowmax 3
 set self lookboxmax 3
+set self orig_x self.x
+set self orig_y self.y
+set self orig_world WORLD?
+
 |STAND:0|
 set self x_vel 0
 exec checkAir

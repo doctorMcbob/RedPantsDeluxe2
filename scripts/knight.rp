@@ -222,7 +222,7 @@ create slashfx0 related.name + SLASH + related.slashfxnumber self.x self.y
 set related.name + SLASH + related.slashfxnumber direction related.direction * -1
 set related slashfxnumber related.slashfxnumber + 1
 if related.slashfxnumber > related.slashfxmax
-   set related.slashfxnumber 0
+   set related slashfxnumber 0
 endif
 
 |XCOLLISION|

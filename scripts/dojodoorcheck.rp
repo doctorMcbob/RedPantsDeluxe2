@@ -26,7 +26,7 @@ set self frame 0
 if related.state == LOOK
    if player in self.name
       set related state CHECK
-      set self frame 0
+      set related frame 0
    endif
 endif
 

@@ -2,9 +2,10 @@ COIN|0,0,0,0|False|
 START:0 scienceTR 0,0
 COLLECTABLE:0 scienceTR 0,0
 COLLECT:0 scienceTR 0,0
+INACTIVE:0 empty 0,0
 
 |START:0|
-set self state COLLECTABLE
+set self state INACTIVE
 set self frame 0
 set self collected 0
 
@@ -25,6 +26,9 @@ set self y self.y - 3
 goodbye
 
 |COLLIDE|
+if related.state != COLLECTABLE
+   break
+endif
 if player in self.name
    if related.name in inv0.collected == 0
       add inv0.collected related.name
