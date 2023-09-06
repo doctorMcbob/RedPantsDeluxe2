@@ -230,11 +230,13 @@ def update_actors_bar(G, mpos, btn):
 
         elif Rect((1168+8 + 100 + 100, (i+scroll) * seg_h + 4 + 32), (80, 48)).collidepoint(mpos) and btn in [0, 1]:
             WORLDS[G['WORLD']]['actors'].remove(friend.name)
+            found = 0
             for w in WORLDS.keys():
                 if friend.name in WORLDS[w]['actors']:
-                    WORLDS[w]['actors'].remove(friend.name)
-                
-            ACTORS.pop(friend.name)
+                     found = 1
+                     break
+            if found == 0:
+                ACTORS.pop(friend.name)
             if friend.name in world.actors:
                 world.actors.remove(friend.name)
             load_game()
@@ -837,13 +839,57 @@ def add_actor_from_world(G):
     if name not in WORLDS[G["WORLD"]]["actors"]:
         WORLDS[G["WORLD"]]["actors"].append(name)
         load_game()
-    
+
+def add_actor_to_world(G):
+    def update(G):
+        draw(G)
+        G["SCREEN"].blit(
+            G["HEL32"].render("Actor:", 0, (0, 0, 0)),
+            (0, 0)
+        )
+    world = worlds.get_world(G["WORLD"])
+    name = select_from_list(G, world.actors, (0, 32), args=G, cb=update)
+    if not name: return
+    def update(G):
+        draw(G)
+        G["SCREEN"].blit(
+            G["HEL32"].render("World to send actor to:", 0, (0, 0, 0)),
+            (0, 0)
+        )
+    world_ref = select_from_list(G, worlds.get_all_worlds(), (0, 32), args=G, cb=update)
+    if not world_ref: return
+    world = worlds.get_world(world_ref)
+    if not world: return
+    if name not in WORLDS[world_ref]["actors"]:
+        WORLDS[world_ref]["actors"].append(name)
+        load_game()
+
+def add_actor_to_all_worlds(G):
+    def update(G):
+        draw(G)
+        G["SCREEN"].blit(
+            G["HEL32"].render("Actor:", 0, (0, 0, 0)),
+            (0, 0)
+        )
+    world = worlds.get_world(G["WORLD"])
+    name = select_from_list(G, world.actors, (0, 32), args=G, cb=update)
+    if not name: return
+    print("Here") 
+    for world_ref in WORLDS.keys():
+        if name not in WORLDS[world_ref]["actors"]:
+            WORLDS[world_ref]["actors"].append(name)
+    print("Done")
+    load_game()
+        
+
 def off(*args, **kwargs): pass
 BUTTONS = {
     ((16, 656), (256, 32)): spritesheet_menu,
     ((16, 656 + 32), (256, 32)): load_template_button,
     ((16, 656 + 32 * 2), (256, 32)): load_all_templates_button,
-    ((16, 656 + 32 * 3), (256, 32)): add_actor_from_world,
+    ((16, 656 + 32 * 3), (256//3, 32)): add_actor_to_all_worlds,
+    ((16+256//3, 656 + 32 * 3), (256//3, 32)): add_actor_to_world,
+    ((16+(256//3*2), 656 + 32 * 3), (256//3, 32)): add_actor_from_world,
     ((16, 656 + 32 * 4), (256, 32)): switch_worlds,
     ((16, 656 + 32 * 5), (256, 32)): delete_world,
     ((16, 656 + 32 * 6), (256, 32)): change_world_background,
@@ -853,7 +899,9 @@ BUTTON_TEXT = {
     ((16, 656), (256, 32)): "Spritesheet Menu",
     ((16, 656 + 32), (256, 32)): "Load Template",
     ((16, 656 + 32 * 2), (256, 32)): "Load All Templates",
-    ((16, 656 + 32 * 3), (256, 32)): "Add Actor From World",
+    ((16, 656 + 32 * 3), (256//3, 32)): "Actor All",
+    ((16+256//3, 656 + 32 * 3), (256//3, 32)): "Actor To",
+    ((16+(256//3*2), 656 + 32 * 3), (256//3, 32)): "Actor From",
     ((16, 656 + 32 * 4), (256, 32)): "Switch Worlds",
     ((16, 656 + 32 * 5), (256, 32)): "Delete World",    
     ((16, 656 + 32 * 6), (256, 32)): "Change World Background",

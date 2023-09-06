@@ -1,0 +1,12 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+PLAY:0 empty 0,0
+
+|START:0|
+set self state PLAY
+set self song yard
+
+|PLAY:0|
+if self.song != song?
+  song self.song
+endif

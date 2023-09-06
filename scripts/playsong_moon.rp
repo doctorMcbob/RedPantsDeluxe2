@@ -1,0 +1,8 @@
+SONG|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0  empty 0,0
+OFF:0 empty 0,0
+
+|START:0|
+set song_manager0 song moon
+
