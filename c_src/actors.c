@@ -770,10 +770,6 @@ int hit_check(Actor *self, Actor *related, World *world, int debug) {
       translate_rect_by_actor(related, &hitbox);
       if (SDL_HasIntersection(&hurtbox, &hitbox)) {
  
-	printf("Hit %s (%s:%i) hit by %s (%s:%i) \n",
-			  get_string(self->name), get_string(self->state), self->frame,
-			  get_string(related->name), get_string(related->state), related->frame);
-
         int scriptKey = find_script_from_map(related, HIT, -1);
         if (scriptKey != -1) {
           int resolution = resolve_script(scriptKey, self, related, world,
