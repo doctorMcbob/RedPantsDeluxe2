@@ -44,6 +44,8 @@ typedef struct Actor {
   Attribute* attributes;
 } Actor;
 
+void translate_rect_by_actor(Actor *actor, SDL_Rect *rect);
+void validate_actors();
 Actor* get_actor(int name);
 void add_actor(
          int name,
