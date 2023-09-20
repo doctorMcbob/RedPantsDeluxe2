@@ -1,0 +1,27 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self state WAIT
+set self speed 3
+
+|COLLIDE|
+if player in self.name
+   set self calc self.state == AIRIAL
+   set self calc self.state == LONGJUMP or self.calc
+   set self calc self.state == SIDEFLIP or self.calc
+   set self calc self.state == DIVESTART or self.calc
+   set self calc self.state == DIVE or self.calc
+   if self.calc
+      break
+   endif
+   set self orig_x self.x
+   set self orig_y self.y
+   
+   set self x self.x + related.speed
+   if COLLIDE?
+      set self x self.orig_x
+      set self y self.orig_y
+   endif
+endif

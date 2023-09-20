@@ -12,6 +12,8 @@ set self frame 0
 set self collected []
 set self coins 0
 set self bananas 0
+set self greenbooks 0
+set self redbooks 0
 
 set self scienceTR 0
 set self scienceTL 0

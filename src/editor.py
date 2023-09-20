@@ -513,7 +513,7 @@ def spritesheet_menu(G):
         for f in files:
             if f[-4:] == ".png":
                 filenames.append(f)
-
+    filenames.sort()
     def update(G):
         draw(G)
         G["SCREEN"].blit(

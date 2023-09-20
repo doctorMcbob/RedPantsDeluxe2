@@ -510,6 +510,7 @@ endif
 set self calc self.state == BANANA
 set self calc self.state == CHEESE or self.calc
 set self calc self.state == COLLECTABLE or self.calc
+set self calc self.state == BOOK or self.calc
 if self.state == COIN or self.calc
    set self collected 1
 endif

@@ -1,0 +1,21 @@
+ELF|0,0,0,0|False|
+START:0 elfstand0 0,0
+STAND:0 elfstand0 0,0
+STAND:6 elfstand1 0,0
+STAND:9 elfstand2 0,0
+STAND:16 elfstand1 0,0
+TALK:0 elftalk0 0,0
+TALK:4 elftalk1 0,0
+TALK:8 elftalk0 0,0
+TALK:12 elftalk1 0,0
+TALK:16 elftalk0 0,0
+TALK:20 elftalk1 0,0
+
+|START:0|
+set self state STAND
+
+|STAND:22|
+set self frame 0
+
+|TALK:24|
+set self frame 0

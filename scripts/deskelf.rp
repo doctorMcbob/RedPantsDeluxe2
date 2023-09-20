@@ -1,0 +1,16 @@
+ELF|0,0,0,0|False|
+START:0 deskelf0 0,0
+WAIT:0 deskelf0 0,0
+TALK:0 deskelf1 0,0
+TALK:4 deskelf2 0,0
+TALK:8 deskelf1 0,0
+TALK:12 deskelf2 0,0
+TALK:16 deskelf1 0,0
+TALK:20 deskelf2 0,0
+
+|START:0|
+set self direction -1
+set self state WAIT
+
+|TALK:24|
+set self frame 0

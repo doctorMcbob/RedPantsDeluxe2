@@ -1,0 +1,39 @@
+BOOK|0,0,0,0|False|
+START:0 greenbook0 0,0
+BOOK0:0 greenbook0 0,0
+BOOK1:0 greenbook1 0,0
+BOOK2:0 greenbook2 0,0
+BOOK3:0 greenbook3 0,0
+BOOK4:0 greenbook4 0,0
+BOOK5:0 greenbook5 0,0
+BOOK6:0 greenbook6 0,0
+BOOK7:0 greenbook7 0,0
+
+|START:0|
+set self num self.name at 9
+set self image greenbook + self.num
+set self frame 0
+set self collected 0
+set self state BOOK
+
+|BOOK:0|
+img self.image
+if self.collected
+   set self state COLLECT
+   set self frame 0
+endif
+
+|COLLECT:0|
+img self.image
+set self y self.y - 3
+
+|COLLECT:20|
+goodbye
+
+|COLLIDE|
+if player in self.name
+   if related.name in inv0.collected == 0
+      add inv0.collected related.name
+      set inv0 coins inv0.greenbooks + 1
+   endif
+endif

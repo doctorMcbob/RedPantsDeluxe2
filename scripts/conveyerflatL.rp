@@ -14,7 +14,3 @@ set self state PLATFORM
 set self platform 1
 set self frame 0
 
-|COLLIDE|
-print self.name + " " + related.name
-set self x_vel self.x_vel - 1
-
