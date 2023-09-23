@@ -1,0 +1,24 @@
+BOOK|0,0,0,0|False|
+START:0 greenbookplat 0,0
+OFF:0 empty 0,0
+WAIT:0 empty 0,0
+ON:0 greenbookplat 0,0
+
+|START:0|
+set self state OFF
+set self number self.name at 10
+set self number int self.number + 1
+set self target self.number * 2
+
+|OFF:0|
+if inv0.greenbooks >= self.target
+   set self state WAIT
+endif
+
+|WAIT:0|
+if COLLIDE?
+   break
+endif
+
+set self tangible 1
+set self state ON

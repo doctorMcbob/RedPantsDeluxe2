@@ -34,6 +34,6 @@ goodbye
 if player in self.name
    if related.name in inv0.collected == 0
       add inv0.collected related.name
-      set inv0 coins inv0.greenbooks + 1
+      set inv0 greenbooks inv0.greenbooks + 1
    endif
 endif
