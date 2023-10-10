@@ -171,6 +171,9 @@ if COLLIDE?
 endif
 set self tangible 1
 set self state IDLE
+if self.emptyto
+   set self state self.emptyto
+endif
 
 
 |IDLE:0|

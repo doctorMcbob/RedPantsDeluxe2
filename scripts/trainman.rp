@@ -1,0 +1,184 @@
+MAN|0,0,0,0|False|
+START:0 trainmanlook0 -16,-16
+LOOK:0 trainmanlook0 -16,-16
+LOOK:3 trainmanlook1 -16,-16
+LOOK:5 trainmanlook2 -16,-16
+LOOK:7 trainmanlook3 -16,-16
+LOOK:10 trainmanlook4 -16,-16
+LOOK:15 trainmanlook5 -16,-16
+LOOK:20 trainmanlook6 -16,-16
+LOOK:25 trainmanlook5 -16,-16
+LOOK:30 trainmanlook4 -16,-16
+LOOK:35 trainmanlook5 -16,-16
+LOOK:40 trainmanlook6 -16,-16
+LOOK:45 trainmanlook5 -16,-16
+LOOK:48 trainmanlook2 -16,-16
+LOOK:50 trainmanlook1 -16,-16
+LOOK:52 trainmanlook0 -16,-16
+WALK:0 trainmanwalk0 -16,-16
+WALK:5 trainmanwalk1 -16,-16
+WALK:10 trainmanwalk2 -16,-16
+WALK:15 trainmanwalk3 -16,-16
+WALK:20 trainmanwalk4 -16,-16
+WALK:25 trainmanwalk5 -16,-16
+SHOCK:0 trainmanshock0 -16,-16
+SHOCK:3 trainmanshock1 -16,-16
+SHOCK:6 trainmanshock2 -16,-16
+SHOCK:9 trainmanshock3 -16,-16
+SHOCK:12 trainmanshock2 -16,-16
+SHOCK:15 trainmanshock3 -16,-16
+RUN:0 trainmanrun0 -16,-16
+RUN:4 trainmanrun1 -16,-16
+RUN:8 trainmanrun2 -16,-16
+RUN:12 trainmanrun3 -16,-16
+RUN:16 trainmanrun4 -16,-16
+RUN:20 trainmanrun5 -16,-16
+
+|START:0|
+set self state LOOK
+set self frame 0
+set self walkspeed 3
+set self runspeed 5
+set self direction 1
+set self physics 1
+set self lookboxname self.name + lookbox
+set self limit 20
+set self neglimit self.limit * -1
+set self grav 1
+set self c 0
+set self orig_x self.x
+set self orig_y self.y
+set self jumpstr -24
+set self ly_v self.jumpstr
+set self whatisee []
+
+|LOOK:0|
+exec applyGrav
+set self x_vel 0
+exec look
+
+|LOOK:60|
+set self state WALK
+set self frame 0
+exec LOOK:0
+
+|WALK:0|
+exec lookTurn
+exec applyGrav
+set self x_vel self.direction * self.walkspeed
+exec look
+
+|WALK:30|
+exec WALK:0
+set self c self.c + 1
+set self frame 0
+if self.c < 4
+   break
+endif
+set self c 0
+set self state LOOK
+
+|SHOCK:0|
+set self x_vel 0
+
+|SHOCK:18|
+set self frame 0
+set self state RUN
+set self y_vel self.jumpstr
+
+|RUN:0|
+set self ly_v self.y_vel
+exec applyGrav
+set self x_vel self.direction * self.runspeed
+
+|RUN:24|
+set self ly_v self.y_vel
+exec applyGrav
+set self frame 0
+
+|XCOLLISION|
+set self direction self.direction  * -1
+
+|YCOLLISION|
+if self.ly_v < 0
+   break
+endif
+if self.state == RUN
+   set self y_vel self.jumpstr
+endif
+
+|COLLIDE|
+if self.train_enterence
+   set self state EMPTY
+   set self emptyto HITSTUN
+   set self direction related.direction * -1
+   set self hit_x_vel 8 * related.direction
+   set self hit_y_vel -6
+
+   set self x self.train_enterence_x
+   set self y self.train_enterence_y
+   move self.name self.train_enterence
+   if self.lakitu
+      set self.lakitu x self.x
+      set self.lakitu y self.y
+      move self.lakitu self.train_enterence
+   endif
+   if self.frame_name
+      view self.frame_name self.train_enterence
+   endif
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+if self.y_vel > self.limit
+   set self y_vel self.limit
+endif
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
+endif
+
+|look|
+if exists self.lookboxname
+   exec checkShock
+   break
+endif
+create hitbox0 self.lookboxname self.x + self.w self.y
+if self.direction == -1
+   set self.lookboxname x self.lookboxname.x - 512 - self.w
+endif
+set self.lookboxname timer 30
+set self.lookboxname return self.name
+set self.lookboxname trigger whatisee
+set self.lookboxname w 512
+set self.lookboxname h 32
+
+|checkShock|
+for name self.whatisee
+   set self calc puppetredpants in name
+   if player in name or self.calc
+      set self whatisee []
+      set self state SHOCK
+      set self frame 0
+   endif
+endfor
+
+|lookTurn|
+set self old_x self.x
+set self old_y self.y
+set self old_w self.w
+set self old_h self.h
+set self y self.y + self.h
+if self.direction == 1
+   set self x self.w / 2 + self.x
+endif
+set self w self.w / 2
+set self h 32
+set self turnaround COLLIDE?
+set self x self.old_x
+set self y self.old_y
+set self w self.old_w
+set self h self.old_h
+
+if not self.turnaround
+   set self direction self.direction * -1
+endif

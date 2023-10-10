@@ -1,0 +1,98 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+
+|COLLIDE|
+if player in self.name
+   set self train_enterence_x self.x
+   set self train_enterence_y self.y
+   set self train_enterence WORLD?
+
+   set self calc hasframe trainride0
+   if not self.calc 
+      set self trainman trainman0
+      set self.trainman x self.trainman.orig_x
+      set self.trainman y self.trainman.orig_y
+      set self.trainman state LOOK
+      set self.trainman direction 1
+      set self.trainman y_vel 0
+      set self.trainman whatisee []
+   endif
+
+   set self calc hasframe trainride1
+   if not self.calc 
+      set self trainman trainman1
+      set self.trainman x self.trainman.orig_x
+      set self.trainman y self.trainman.orig_y
+      set self.trainman state LOOK
+      set self.trainman direction 1
+      set self.trainman y_vel 0
+      set self.trainman whatisee []
+      set self trainman trainman2
+      set self.trainman x self.trainman.orig_x
+      set self.trainman y self.trainman.orig_y
+      set self.trainman state LOOK
+      set self.trainman direction 1
+      set self.trainman y_vel 0    
+      set self.trainman whatisee []
+   endif
+
+   set self calc hasframe trainride2
+   if not self.calc 
+      set self trainman trainman3
+      set self.trainman x self.trainman.orig_x
+      set self.trainman y self.trainman.orig_y
+      set self.trainman state LOOK
+      set self.trainman direction 1
+      set self.trainman y_vel 0   
+      set self.trainman whatisee []
+      set self trainman trainman4
+      set self.trainman x self.trainman.orig_x
+      set self.trainman y self.trainman.orig_y
+      set self.trainman state LOOK
+      set self.trainman direction 1
+      set self.trainman y_vel 0  
+      set self.trainman whatisee []
+   endif
+
+   set self calc hasframe trainride3
+   if not self.calc 
+      set self trainman trainman5
+      set self.trainman x self.trainman.orig_x
+      set self.trainman y self.trainman.orig_y
+      set self.trainman state LOOK
+      set self.trainman direction 1
+      set self.trainman y_vel 0 
+      set self.trainman whatisee []
+   endif
+
+   set self calc hasframe trainride4
+   if not self.calc 
+      set self trainman trainman6
+      set self.trainman x self.trainman.orig_x
+      set self.trainman y self.trainman.orig_y
+      set self.trainman state LOOK
+      set self.trainman direction 1
+      set self.trainman y_vel 0
+      set self.trainman whatisee []
+      set self trainman trainman7
+      set self.trainman x self.trainman.orig_x
+      set self.trainman y self.trainman.orig_y
+      set self.trainman state LOOK
+      set self.trainman direction 1
+      set self.trainman y_vel 0  
+      set self.trainman whatisee []
+   endif
+
+   set self calc hasframe trainride5
+   if not self.calc 
+      set self trainman trainman8
+      set self.trainman x self.trainman.orig_x
+      set self.trainman y self.trainman.orig_y
+      set self.trainman state LOOK
+      set self.trainman direction 1
+      set self.trainman y_vel 0
+      set self.trainman whatisee []
+   endif
+
+endif
+

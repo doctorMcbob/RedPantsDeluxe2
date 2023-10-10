@@ -59,7 +59,7 @@ if self.dangle_from
    set self y self.dangle_from.y + self.dangle_from.h - 32
    set self x self.dangle_from.x
 
-   if A_DOWN in inpEVENTS
+   if RAND? and RAND?
       set self state AIRIAL
       set self frame 0
       set self y_vel self.jumpstrength
@@ -98,6 +98,10 @@ set self bloodnumber 0
 set self rotation 0
 set self door_key UP
 
+set self respawnx self.x
+set self respawny self.y
+set self respawnworld WORLD?
+ 
 set self width 32
 set self height 64
 set self bloodmax 10
@@ -144,13 +148,7 @@ exec respawn
 |respawn|
 set self x self.respawnx
 set self y self.respawny
-view self.frame_name self.respawnworld
 move self.name self.respawnworld
-if self.lakitu
-   set self.lakitu x self.x
-   set self.lakitu y self.y
-   move self.lakitu self.respawnworld
-endif
 set self can_die 1
 set self tangible 0
 set self state EMPTY
@@ -162,6 +160,9 @@ if COLLIDE?
 endif
 set self tangible 1
 set self state IDLE
+if self.emptyto
+   set self state self.emptyto
+endif
 
 
 |IDLE:0|
@@ -182,7 +183,7 @@ set self frame 0
 exec checkAir
 exec applyTraction
 exec applyGrav
-if not inpDOWN
+if RAND? and RAND?
    if self.x_vel == 0
       set self state IDLE
       set self frame 0
@@ -193,7 +194,7 @@ if not inpDOWN
    endif
 endif
 # bufferable pog?
-if self.x_vel != 0 and inpA
+if self.x_vel != 0 and RAND? and RAND?
    set self state LONGJUMPSTART
    set self frame 0
 endif
@@ -209,15 +210,16 @@ set self y_vel self.longjumpystrength
 set self x_vel self.longjumpxstrength * self.direction
 set self state LONGJUMP
 set self frame 0
+set self leftDrift RAND?
 
 |LONGJUMP:0|
 exec applyGrav
 set self calc1 self.x_vel < self.negairspeedcontrol
-if not self.calc1 and inpLEFT
+if not self.calc1 and self.leftDrift
    set self x_vel self.x_vel - self.airdrift
 endif
 set self calc1 self.x_vel > self.airspeedcontrol
-if not self.calc1 and inpRIGHT
+if not self.calc1 nor self.leftDrift
    set self x_vel self.x_vel + self.airdrift
 endif
 
@@ -226,6 +228,12 @@ set self x_vel self.speed * self.direction
 exec checkJump
 exec checkAir
 exec applyGrav
+if RAND? and RAND? and RAND?
+   set self state CROUCH
+endif
+if RAND? and RAND? and RAND?
+   set self state SLIDE
+endif
 
 |RUNNING:16|
 exec RUNNING:0
@@ -245,32 +253,13 @@ if self.x_vel != 0
    endif
    exec checkCrouch
    exec checkJump
-   if self.state == JUMPSQUAT
-      if self.direction == 1 and inpLEFT
-      	 set self state FLIPSQUAT
-	 set self frame 0
-      endif
-      if self.direction == -1 and inpRIGHT
+   if RAND? and RAND?
       	 set self state FLIPSQUAT
 	 set self frame 0
       endif
    endif
    exec checkAir
    exec applyGrav
-endif
-if abs self.x_vel < self.speed
-   set self calc1 self.x_vel > 0 and inpRIGHT
-   set self calc1 not inpLEFT and self.calc1
-   if self.calc1
-      set self direction 1
-   endif
-   if not inpRIGHT and self.x_vel < 0 and inpLEFT
-      set self direction -1
-   endif
-   if not inpRIGHT and self.x_vel < 0 and inpLEFT or self.calc1
-      set self state RUNNING
-      set self frame 0
-   endif
 endif
 
 |AIRIAL:0|
@@ -285,7 +274,7 @@ if not self.calc1 nor self.calc2
    if self.x_vel + self.airdrift < self.speed and self.calc
       set self x_vel self.x_vel + self.airdrift
    endif
-   if B_DOWN in inpEVENTS
+   if RAND? and RAND? and RAND?
       set self state DIVESTART
       set self frame 0
    endif
@@ -299,6 +288,9 @@ endif
 exec applyGrav
 
 |AIRIAL:12|
+if RAND?
+   break
+endif
 set self calc1 self.y_vel > self.airspeedcontrol
 set self calc2 self.airspeedcontrol * -1 > self.y_vel
 if not self.calc1 nor self.calc2
@@ -312,13 +304,12 @@ exec applyGrav
 
 |JUMPSQUAT:6|
 set self state AIRIAL
-if inpA
-   set self y_vel self.jumpstrength
-endif
-if not inpA
-   set self y_vel self.hopstrength
-endif
 set self frame 0
+if RAND?
+   set self y_vel self.jumpstrength
+   break
+endif
+set self y_vel self.hopstrength
 
 |LANDING:0|
 exec checkAir
@@ -412,11 +403,12 @@ set self direction self.direction * -1
 set self x_vel self.slideflipxmod * self.direction
 set self y_vel self.slideflipstrength
 set self frame 0
+set self driftLeft RAND?
 
 |SLIDEFLIP:0|
 exec applyGrav
 if self.direction == -1
-   if inpLEFT
+   if self.driftLeft
       	set self x_vel self.x_vel - self.airdrift
 	if self.x_vel < self.negairspeedcontrol
       	   set self x_vel self.negairspeedcontrol
@@ -424,7 +416,7 @@ if self.direction == -1
    endif
 endif
 if self.direction == 1
-   if inpRIGHT
+   if not self.driftLeft
       set self x_vel self.x_vel + self.airdrift
       if self.x_vel > self.airspeedcontrol
       	 set self x_vel self.airspeedcontrol
@@ -485,13 +477,6 @@ endif
 |COLLIDE|
 if self.state == PLATFORM
    set self touched 1
-endif
-set self calc self.state == BANANA
-set self calc self.state == CHEESE or self.calc
-set self calc self.state == COLLECTABLE or self.calc
-set self calc self.state == BOOK or self.calc
-if self.state == COIN or self.calc
-   set self collected 1
 endif
 
 |HIT|

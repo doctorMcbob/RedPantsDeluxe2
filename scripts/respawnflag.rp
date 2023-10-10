@@ -13,7 +13,8 @@ set self frame 0
 set self frame -1
 
 |COLLIDE|
-if player in self.name
+set self check puppetredpants in self.name
+if player in self.name or self.check
    set self respawnx related.x
    set self respawny related.y
    set self respawnworld WORLD?
