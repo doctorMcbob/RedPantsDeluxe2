@@ -4,7 +4,6 @@ START:0 empty 0,0
 |COLLIDE|
 if player in self.name
    set self train_enterence_x self.x
-   print self.y
    set self train_enterence_y self.y
    set self train_enterence WORLD?
    set self calc hasframe trainride0
