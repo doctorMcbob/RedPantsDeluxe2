@@ -35,6 +35,8 @@ I will be using uthash.h as my dictionary implementation
 
 #define WID 1152
 #define HIGH 640
+#define FPS_CAP 20
+
 
 TTF_Font *font;
 void spritesheet_load(SDL_Renderer *rend);
@@ -121,8 +123,6 @@ int main(int argc, char *argv[]) {
   Clock *c = new_clock();
 
   while (input_update() != -1) {
-    SDL_RenderClear(rend);
-
     Frame *f, *tmpf;
     HASH_ITER(hh, frames, f, tmpf) {
       if (f->active && f->world != NULL) {
@@ -141,14 +141,13 @@ int main(int argc, char *argv[]) {
     actors_reset_updated();
 
     HASH_ITER(hh, frames, f, tmpf) {
-      if (f->active) {
-        update_frame(f);
-        draw_frame(rend, f, debug);
-      }
+        if (f->active) {
+            update_frame(f);
+            draw_frame(rend, f, debug);
+        }
     }
-
     SDL_RenderPresent(rend);
-    Clock_tick(c, 20);
+    Clock_tick(c, FPS_CAP);
   }
 
   sprites_taredown();

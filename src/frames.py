@@ -32,6 +32,8 @@ class Frame(object):
 
         self.world = worlds.get_world(world)
 
+        self.should_zoom = 0
+        self.zoom_scale = 1.0
         self.focus = focus # can changed toggled with scripts
         self.scrollbound = {
             "left": None,
@@ -48,21 +50,22 @@ class Frame(object):
         return (position[0] - self.scroll_x, position[1] - self.scroll_y)
 
     def drawn(self, DEBUG=False):
-        resize = self.w < 800 and self.h < 500
-        if resize:
-            self.w *= 2
-            self.h *= 2
-            self.update(resize)
+        if self.should_zoom:
+            orig_w = self.w
+            orig_h = self.h
+            self.w *= self.zoom_scale
+            self.h *= self.zoom_scale
+            self.update()
         
         surf = Surface((self.w, self.h))
         self.world.draw(surf, self, DEBUG=DEBUG)
-        if resize:
-            self.w /= 2
-            self.h /= 2
+        if self.should_zoom:
+            self.w = orig_w
+            self.h = orig_h
             return pygame.transform.smoothscale(surf, (int(self.w), int(self.h)))
         return surf
 
-    def update(self, resize=False):
+    def update(self):
         if self.focus is not None:
             self.scroll_x = self.focus.x + (self.focus.w // 2) - self.w // 2
             self.scroll_y = self.focus.y + (self.focus.h // 2) - self.h // 2

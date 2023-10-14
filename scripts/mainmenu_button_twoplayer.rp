@@ -54,5 +54,9 @@ endif
 |press|
 makeframe MAIN redpantshouseroot 0 0 1152 320
 makeframe MAIN2 redpantshouseroot 0 320 1152 320
+makezoom MAIN 1
+setzoom MAIN 2
+makezoom MAIN2 1
+setzoom MAIN2 2
 deactivate ROOT
 

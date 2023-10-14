@@ -341,7 +341,26 @@ def resolve(reference, script, world, related=None, logfunc=print):
                     if resolve(reference, to_run, world, related=related, logfunc=logfunc) == 'goodbye':
                         return 'goodbye'
 
-                    
+            elif verb == "setzoom":
+                frame_key = cmd.pop(0)
+                frame = frames.get_frame(frame_key)
+                if frame == None:
+                    raise Exception('Frame does not exist for setzoom {}'.format(frame_key))
+                value = cmd.pop(0)
+                if type(value) not in [int, float]:
+                    raise Exception('Value for setzoom must be int or float, not {}'.format(type(value)))
+                frame.zoom_scale = float(value)
+
+            elif verb == "makezoom":
+                frame_key = cmd.pop(0)
+                frame = frames.get_frame(frame_key)
+                if frame == None:
+                    raise Exception('Frame does not exist for setzoom {}'.format(frame_key))
+                value = cmd.pop(0)
+                if type(value) not in [int, float]:
+                    raise Exception('Value for setzoom must be int or float, not {}'.format(type(value)))
+                frame.should_zoom = bool(value)
+
         except Exception as e:
             logfunc("{} Error on line {}".format(reference, cmd_idx))
             logfunc(cmd)
