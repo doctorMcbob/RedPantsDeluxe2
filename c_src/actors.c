@@ -1,6 +1,8 @@
 #include "actors.h"
 #include "actordata.h"
+#ifndef SCRIPT_DATA_LOAD
 #include "scriptdata.h"
+#endif
 #include "boxes.h"
 #include "frames.h"
 #include "lists.h"

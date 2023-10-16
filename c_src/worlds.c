@@ -1,7 +1,9 @@
 #include "worlds.h"
 #include "actors.h"
 #include "boxes.h"
+#ifndef DEBUG_LOAD
 #include "debug.h"
+#endif
 #include "frames.h"
 #include "sprites.h"
 #include "stringmachine.h"

@@ -1,6 +1,8 @@
 #include "floatmachine.h"
 #include "frames.h"
+#ifndef SCRIPT_DATA_LOAD
 #include "scriptdata.h"
+#endif
 #include "scripts.h"
 #include "stdio.h"
 #include "stringmachine.h"

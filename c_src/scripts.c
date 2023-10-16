@@ -1,12 +1,16 @@
 #include "scripts.h"
 #include "actors.h"
 #include "debug.h"
+#ifndef FLOATM_LOAD
 #include "floatmachine.h"
+#endif
 #include "frames.h"
 #include "inputs.h"
 #include "lists.h"
 #include "math.h"
+#ifndef SCRIPT_DATA_LOAD
 #include "scriptdata.h"
+#endif
 #include "sounds.h"
 #include "stringmachine.h"
 #include "utlist.h"
@@ -15,6 +19,7 @@
 #include "stringdata.h"
 #endif
 
+extern int SCRIPT_MAPS[];
 ScriptMap *scriptmaps;
 int BUFFER[512];
 int PARAMS[512];

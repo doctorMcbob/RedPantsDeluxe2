@@ -1,6 +1,8 @@
 #include "lists.h"
 #include "floatmachine.h"
+#ifndef SCRIPTS_LOAD
 #include "scripts.h"
+#endif
 #include "stringmachine.h"
 #include "uthash.h"
 #include "utlist.h"

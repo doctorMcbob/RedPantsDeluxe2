@@ -1,3 +1,4 @@
+#include "worlds.h"
 #ifndef DEBUG_LOAD
 #define DEBUG_LOAD 1
 

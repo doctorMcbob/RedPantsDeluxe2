@@ -13,6 +13,7 @@ this is going to need a lot,
 I will be using uthash.h as my dictionary implementation
 
  */
+
 #include "clock.h"
 #include "frames.h"
 #include "inputs.h"
@@ -38,7 +39,7 @@ I will be using uthash.h as my dictionary implementation
 #define FPS_CAP 20
 
 
-TTF_Font *font;
+extern TTF_Font *font;
 void spritesheet_load(SDL_Renderer *rend);
 void actor_load();
 void world_load();

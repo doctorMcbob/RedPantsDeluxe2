@@ -2,7 +2,9 @@
 # include "uthash.h"
 # include "sprites.h"
 # include "boxes.h"
+#ifndef SCRIPT_DATA_LOAD
 # include "scriptdata.h"
+#endif
 
 #ifndef ACTORS_DEF
 # define ACTORS_DEF 1

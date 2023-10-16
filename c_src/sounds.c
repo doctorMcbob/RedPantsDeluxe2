@@ -1,5 +1,7 @@
 #include "sounds.h"
+#ifndef AUDIODATA_H
 #include "audiodata.h"
+#endif
 #include "stringmachine.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>

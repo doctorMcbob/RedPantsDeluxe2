@@ -1,5 +1,7 @@
 #include "frames.h"
+#ifndef ACTORS_DEF
 #include "actors.h"
+#endif
 #include "stringmachine.h"
 #include "uthash.h"
 #include "worlds.h"

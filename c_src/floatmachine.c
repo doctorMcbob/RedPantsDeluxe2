@@ -1,5 +1,6 @@
+#ifndef FLOAT_DATA_LOAD
 #include "floatdata.h"
-
+#endif
 /**
    Floats
 There will be room for 16 floats per statement.
