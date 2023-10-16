@@ -149,38 +149,46 @@ def build():
     global ACTOR_BUFFER_SIZE, WORLD_ACTOR_SIZE
     if "--buffer" in sys.argv: ACTOR_BUFFER_SIZE = int(sys.argv[sys.argv.index("--buffer") + 1])
     if "--world" in sys.argv: WORLD_ACTOR_SIZE = int(sys.argv[sys.argv.index("--world") + 1])
-    print("Building Script Data...")
-    make_script_data()
-    print("    ...Done")
-    print("Building Sprite Data...")
-    make_spritesheet_data()
-    print("    ...Done")
-    print("Building Box Data...")
-    make_box_data()
-    print("    ...Done")
-    print("Building World Data...")
-    make_world_data()
-    print("    ...Done")
-    print("Building Actor Data...")
-    make_actor_data()
-    print("    ...Done")
-    print("Building Image data...")
-    make_image_data()
-    print("    ...Done")
-    print("Building Audio data...")
-    make_audio_data()
-    print("    ...Done")
+    no_make = "-nm" in sys.argv or "--no-make" in sys.argv
+    make_only = "-mo" in sys.argv or "--make-only" in sys.argv
 
-    print(f"Running Makefile at {MAKEFILE_PATH}")
-    make_result = subprocess.run(
-        ['make', '-f', str(MAKEFILE_PATH), f'C_DIR={str(C_PATH)}', f'BUILD_DIR={str(BUILD_TO)}'],
-        capture_output=True, text=True)
+    if not make_only:
+        print("Building Script Data...")
+        make_script_data()
+        print("    ...Done")
+        print("Building Sprite Data...")
+        make_spritesheet_data()
+        print("    ...Done")
+        print("Building Box Data...")
+        make_box_data()
+        print("    ...Done")
+        print("Building World Data...")
+        make_world_data()
+        print("    ...Done")
+        print("Building Actor Data...")
+        make_actor_data()
+        print("    ...Done")
+        print("Building Image data...")
+        make_image_data()
+        print("    ...Done")
+        print("Building Audio data...")
+        make_audio_data()
+        print("    ...Done")
+    else: print("Skipping to makefile")
 
-    # Check for errors
-    if make_result.returncode != 0:
-        print(make_result.stderr)
-    else:
-        print("Build finished.")
+    if not no_make:
+        print(f"Running Makefile at {MAKEFILE_PATH}")
+        make_result = subprocess.run(
+            ['make', '-f', str(MAKEFILE_PATH), f'C_DIR={str(C_PATH)}', f'BUILD_DIR={str(BUILD_TO)}'],
+            capture_output=True, text=True)
+
+        # Check for errors
+        if make_result.returncode != 0:
+            print(make_result.stderr)
+        else:
+            print("Build finished.")
+
+    else: print("Ran without Makefile")
 
 def make_script_data():
     string_data_dot_c, string_data_dot_h =  _intern_strings(SCRIPTS)
