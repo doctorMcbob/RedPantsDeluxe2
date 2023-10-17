@@ -106,6 +106,9 @@ int main(int argc, char *argv[]) {
   Uint32 render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
   SDL_Renderer *rend = SDL_CreateRenderer(screen, -1, render_flags);
 
+  // Set the hint to enable linear texture filtering
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+
   if (!rend) {
     printf("error creating renderer: %s\n", SDL_GetError());
     SDL_DestroyWindow(screen);

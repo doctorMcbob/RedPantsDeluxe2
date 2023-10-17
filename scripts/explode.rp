@@ -1,8 +1,8 @@
 explode|0,0,0,0|False|
-START:0 fireball0 0,0
-BALL:0 fireball1 16,16
-BALL:15 fireball0 8,8
-BALL:30 fireball1 16,16
+START:0 blitz_fireball0 0,0
+BALL:0 blitz_fireball1 16,16
+BALL:15 blitz_fireball0 8,8
+BALL:30 blitz_fireball1 16,16
 
 |START:0|
 set self state BALL

@@ -3468,6 +3468,46 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       add_input_state(inputStateValue, -1);
       break;
     }
+    case SETZOOM: {
+      int frameKeyType = PARAMS[0];
+      int frameKeyValue = PARAMS[1];
+      int valueType = PARAMS[2];
+      int valueValue = PARAMS[3];
+
+      if (frameKeyType != STRING || (valueType != INT && valueType != FLOAT)) {
+        printf("Actor %s error: ", get_string(self->name));
+        print_statement(statement);
+        printf("Missing or Incorrect Parameter for SETZOOM\n");
+      }
+      Frame* f = get_frame(frameKeyValue);
+
+      if (valueType == INT) {
+        f->zoom_scale = (float)valueValue;
+      } else {
+        f->zoom_scale = get_float(valueValue);
+      }
+      break;
+    }
+    case MAKEZOOM: {
+      int frameKeyType = PARAMS[0];
+      int frameKeyValue = PARAMS[1];
+      int valueType = PARAMS[2];
+      int valueValue = PARAMS[3];
+
+      if (frameKeyType != STRING || (valueType != INT && valueType != FLOAT)) {
+        printf("Actor %s error: ", get_string(self->name));
+        print_statement(statement);
+        printf("Missing or Incorrect Parameter for MAKEZOOM\n");
+      }
+      Frame* f = get_frame(frameKeyValue);
+
+      if (valueType == INT) {
+        f->should_zoom = valueValue;
+      } else {
+        f->should_zoom = (int)get_float(valueValue);
+      }
+      break;
+    }
     }
     executionPointer++;
   }

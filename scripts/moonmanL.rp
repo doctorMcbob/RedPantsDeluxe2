@@ -162,6 +162,7 @@ set self tangible 1
 set self state IDLE
 if self.emptyto
    set self state self.emptyto
+   set self emptyto 0
 endif
 
 

@@ -140,6 +140,8 @@ VERBS = {
     "update_sticks": 39,
     "setjoy": 40,
     "add_input_state": 41,
+    "setzoom": 42,
+    "makezoom": 43,
 }
 UNIQUE_FLOATS = []
 UNIQUE_STRINGS = []

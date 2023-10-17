@@ -21,6 +21,8 @@ typedef struct Frame {
   int bound_bottom;
   int bottom_bind;
   int active;
+  int should_zoom;
+  float zoom_scale;
   UT_hash_handle hh;
 } Frame;
 

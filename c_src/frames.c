@@ -33,6 +33,8 @@ void add_frame(int name, World *world, Actor *focus, int x, int y, int w,
   f->scroll_x = 0;
   f->scroll_y = 0;
 
+  f->should_zoom = 0;
+  f->zoom_scale = 1;
   f->active = 1;
   HASH_ADD_INT(frames, name, f);
 }
@@ -70,6 +72,16 @@ int in_frame(Frame *frame, Actor *actor) {
 }
 
 void draw_frame(SDL_Renderer *rend, Frame *f, int debug) {
+  int orig_w, orig_h;
+  if (f->should_zoom) {
+    orig_w = f->rect.w;
+    orig_h = f->rect.h;
+
+    f->rect.w *= f->zoom_scale;
+    f->rect.h *= f->zoom_scale;
+    update_frame(f);
+  }
+
   SDL_Texture *render_target = SDL_GetRenderTarget(rend);
   SDL_Texture *frame_buffer =
       SDL_CreateTexture(rend, SDL_PIXELFORMAT_RGBA8888,
@@ -92,8 +104,14 @@ void draw_frame(SDL_Renderer *rend, Frame *f, int debug) {
     printf("Error resetting render target: %s\n", SDL_GetError());
   }
 
-  SDL_Rect dest = {f->rect.x, f->rect.y, f->rect.w, f->rect.h};
   SDL_Rect src = {0, 0, f->rect.w, f->rect.h};
+  
+  if (f->should_zoom) {
+    f->rect.w = orig_w;
+    f->rect.h = orig_h;
+  }
+  
+  SDL_Rect dest = {f->rect.x, f->rect.y, f->rect.w, f->rect.h};
 
   if (SDL_RenderCopy(rend, frame_buffer, &src, &dest) != 0) {
     printf("Error copying frame buffer: %s\n", SDL_GetError());

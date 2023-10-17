@@ -112,6 +112,8 @@
 #define UPDATE_STICKS 39
 #define SET_JOY 40
 #define ADD_INPUT_STATE 41
+#define SETZOOM 42
+#define MAKEZOOM 43
 
 typedef struct ScriptMap
 {

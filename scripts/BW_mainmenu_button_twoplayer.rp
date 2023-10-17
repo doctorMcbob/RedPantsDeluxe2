@@ -54,8 +54,8 @@ endif
 makeframe BW_MAIN BW_graveyardstart 0 0 1152 320
 makeframe BW_MAIN2 BW_graveyardstart 0 320 1152 320
 makezoom BW_MAIN 1
-setzoom BW_MAIN 2
+setzoom BW_MAIN 1.5
 makezoom BW_MAIN2 1
-makezoom BW_MAIN2 2
+setzoom BW_MAIN2 1.5
 deactivate BW_MENU
 
