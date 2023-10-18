@@ -7,18 +7,20 @@ SELECTED:0 quitbutton1 0,0
 set self state NOTSELECTED
 set self frame 0
 set self _input_name PLAYER1
-set self left_button 0
+set self left_button mainmenu_button_cheater0
 set self right_button 0
 set self down_button mainmenu_button_singleplayer0
 set self up_button mainmenu_button_twoplayer0
 set self direction -1
+set self secret 0
+set self counter 0
 
 |SELECTED:2|
 if A_DOWN in inpEVENTS
    exec press
 endif
 
-if LEFT_DOWN in inpEVENTS
+if LEFT_DOWN in inpEVENTS and self.secret
    if exists self.left_button
       set self.left_button state SELECTED 
       set self state NOTSELECTED
@@ -43,6 +45,10 @@ if DOWN_DOWN in inpEVENTS
    endif
 endif
 if UP_DOWN in inpEVENTS
+   set self counter self.counter + 1
+   if self.counter > 3
+      set self secret 1
+   endif
    if exists self.up_button
       set self.up_button state SELECTED
       set self state NOTSELECTED

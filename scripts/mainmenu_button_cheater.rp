@@ -1,16 +1,17 @@
 BTN|0,0,0,0|False|
-START:0 startbutton0 0,0
-NOTSELECTED:0 startbutton0 0,0
-SELECTED:0 startbutton1 0,0
+START:0 cheatbutton0 0,0
+OFF:0 empty 0,0
+SELECTED:0 cheatbutton1 0,0
+NOTSELECTED:0 cheatbutton0 0,0
 
 |START:0|
-set self state SELECTED
+set self state OFF
 set self frame 0
 set self _input_name PLAYER1
 set self left_button 0
-set self right_button 0
-set self down_button mainmenu_button_twoplayer0
-set self up_button mainmenu_button_quit0
+set self right_button mainmenu_button_quit0
+set self down_button 0
+set self up_button 0 
 set self direction -1
 
 |SELECTED:2|
@@ -29,7 +30,6 @@ if LEFT_DOWN in self.events
    endif
 endif
 if RIGHT_DOWN in self.events
-   print here
    if exists self.right_button
       set self.right_button state SELECTED
       set self state NOTSELECTED
@@ -54,8 +54,8 @@ if UP_DOWN in self.events
    endif
 endif
 
+
 |press|
-#makeframe MAIN swamp2 0 0 1152 640
-makeframe MAIN redpantshouseroot 0 0 1152 640
-deactivate ROOT
+set inv0 cheater_mode 1
+set inv0 state START
 

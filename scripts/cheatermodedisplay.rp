@@ -1,0 +1,10 @@
+HUD|0,0,0,0|False|
+OFF:0 empty 0,0
+START:0 empty 0,0
+ON_OFF:0 cheatermodeoff 0,0
+ON_ON:0 cheatermodeon 0,0
+
+|START:0|
+set self direction -1
+set self state OFF
+

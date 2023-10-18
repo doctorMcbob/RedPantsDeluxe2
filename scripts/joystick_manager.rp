@@ -1,0 +1,16 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+update_sticks
+if STICKS? > 0
+   setjoy PLAYER1 0
+   set self calc isinputstate PLAYER2
+   if not self.calc
+      add_input_state PLAYER2
+   endif   
+endif
+if STICKS? > 1
+   setjoy PLAYER2 1
+endif
+
