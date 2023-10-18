@@ -17,7 +17,7 @@ endif
 if related.state != LOOK
    break
 endif
-if pigman in self.name
+if self.ispig
    if self.name in related.piggies
       break
    endif

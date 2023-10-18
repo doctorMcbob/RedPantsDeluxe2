@@ -502,6 +502,10 @@ exec applyGrav
 |BONK:0|
 exec applyGrav
 
+|BONK:360|
+set self state IDLE
+set self frame 0
+
 |BONKLAND:0|
 exec checkAir
 exec applyTraction

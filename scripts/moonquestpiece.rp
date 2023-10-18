@@ -20,8 +20,8 @@ for char self.name
        set self number self.number + char
     endif
 endfor
-
-set self calc int self.number + 1
+set self number int self.number
+set self calc self.number + 1
 set self calc str self.calc
 set self next moonquestpiece + self.calc
 set self location moonquestlocation + self.number

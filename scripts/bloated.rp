@@ -242,6 +242,10 @@ endif
 |BONK:0|
 exec applyGrav
 
+|BONK:360|
+set self state IDLE
+set self frame 0
+
 |DEAD:0|
 set self x_vel 0
 set self y_vel 0

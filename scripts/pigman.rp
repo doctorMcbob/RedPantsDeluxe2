@@ -1,4 +1,4 @@
-PIGMAN|0,0,0,0|True|
+PIGMAN|0,0,0,0|False|
 START:0 pigmanstand0 -16,-16
 STAND:0 pigmanstand0 -16,-16
 STAND:15 pigmanstand1 -16,-16
@@ -36,6 +36,7 @@ SHOOTRELEASEUP:2 pigmanshootup1 -16,-16
 SHOOTRELEASEUP:5 pigmanshootup2 -16,-16
 
 |START:0|
+set self physics 1
 set self frame 0
 set self state STAND
 set self limit 20
@@ -52,6 +53,7 @@ set self lookboxmax 3
 set self orig_x self.x
 set self orig_y self.y
 set self orig_world WORLD?
+set self ispig 1
 
 |STAND:0|
 set self x_vel 0

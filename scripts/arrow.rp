@@ -15,6 +15,7 @@ set self state ARROW
 set self frame 0
 set self grav 1
 hitboxes arrow
+set self image arrowflat
 
 |ARROW:0|
 set self choice 1
@@ -46,6 +47,7 @@ if self.y_vel >= 8 and self.choice
    set self image arrowdown2
    set self choice 0
 endif
+
 img self.image
 exec applyGrav
 
