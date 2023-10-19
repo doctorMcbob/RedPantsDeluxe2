@@ -43,6 +43,7 @@ ACTORS = {}
 SCRIPTS = {}
 SPRITEMAPS = {}
 OFFSETS = {}
+TILEMAPS = {}
 HITBOXES = {}
 HURTBOXES = {}
 
@@ -80,7 +81,7 @@ CURSOR_SCROLLER = {
 }
 
 def load_game():
-    sprites.swap_in(offsets=OFFSETS, sprite_maps=SPRITEMAPS)
+    sprites.swap_in(offsets=OFFSETS, sprite_maps=SPRITEMAPS, tile_maps=TILEMAPS)
     scripts.swap_in(SCRIPTS)
     worlds.swap_in(WORLDS)
     actor.swap_in(ACTORS)
@@ -94,7 +95,7 @@ def make_rect(pos, pos2):
     return (x1, y1), ((x2 - x1), (y2 - y1))
 
 def load():
-    global WORLDS, SPRITESHEETS, SPRITEMAPS, ACTORS, SCRIPTS, OFFSETS, HITBOXES, HURTBOXES
+    global WORLDS, SPRITESHEETS, SPRITEMAPS, ACTORS, SCRIPTS, OFFSETS, HITBOXES, HURTBOXES, TILEMAPS
     from src.lib import WORLDS as W
     from src.lib import SPRITESHEETS as S
     from src.lib import ACTORS as A
@@ -104,6 +105,7 @@ def load():
     SPRITESHEETS = S.SPRITESHEETS
     SPRITEMAPS = S.SPRITEMAPS
     OFFSETS = S.OFFSETS
+    TILEMAPS = S.TILEMAPS
     ACTORS = A.ACTORS
     SCRIPTS = SC.SCRIPTS
     HITBOXES = B.HITBOXES
@@ -114,7 +116,9 @@ def save(noload=False):
     with open("src/lib/WORLDS.py", "w+") as f:
         f.write("WORLDS = {}".format(pformat(WORLDS)))
     with open("src/lib/SPRITESHEETS.py", "w+") as f:
-        f.write("SPRITESHEETS = {}\nSPRITEMAPS = {}\nOFFSETS = {}".format(pformat(SPRITESHEETS), pformat(SPRITEMAPS), pformat(OFFSETS)))
+        f.write("SPRITESHEETS = {}\nSPRITEMAPS = {}\nOFFSETS = {}\nTILEMAPS = {}".format(
+            pformat(SPRITESHEETS), pformat(SPRITEMAPS), pformat(OFFSETS), pformat(TILEMAPS))
+        )
     with open("src/lib/ACTORS.py", "w+") as f:
         f.write("ACTORS = {}".format(pformat(ACTORS)))
     with open("src/lib/SCRIPTS.py", "w+") as f:

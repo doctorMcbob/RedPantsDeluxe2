@@ -124,7 +124,6 @@ int main(int argc, char *argv[]) {
   world_load();
   boxes_load();
   audio_load();
-  add_input_state(index_string("PLAYER1"), -1);
   add_frame(ROOT, get_world(_ROOT), NULL, 0, 0, WID, HIGH);
   Clock *c = new_clock();
 

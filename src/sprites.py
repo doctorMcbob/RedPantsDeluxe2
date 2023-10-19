@@ -8,9 +8,10 @@ IMG_LOCATION = "img/"
 SPRITES = {}
 OFFSETS = {}
 SPRITEMAPS = {}
+TILEMAPS = {}
 
-def swap_in(offsets=None, sprite_maps=None):
-    global OFFSETS, SPRITEMAPS
+def swap_in(offsets=None, sprite_maps=None, tile_maps=None):
+    global OFFSETS, SPRITEMAPS, TILEMAPS
     load()
     OFFSET = {}
     SPRITEMAPS = {}
@@ -19,16 +20,19 @@ def swap_in(offsets=None, sprite_maps=None):
         OFFSETS = deepcopy(offsets)
     if sprite_maps is not None:
         SPRITEMAPS = deepcopy(sprite_maps)
-
+    if tile_maps is not None:
+        TILEMAPS = deepcopy(tile_maps)
+        
 def load():
-    global SPRITEMAPS, OFFSETS
+    global SPRITEMAPS, OFFSETS, TILEMAPS
     from src.lib import SPRITESHEETS
     for filename in SPRITESHEETS.SPRITESHEETS:
         data = SPRITESHEETS.SPRITESHEETS[filename]
         _load_spritesheet(filename, data)
     SPRITEMAPS = SPRITESHEETS.SPRITEMAPS
     OFFSETS = SPRITESHEETS.OFFSETS
-        
+    TILEMAPS = SPRITESHEETS.TILEMAPS
+
 def _load_spritesheet(filename, data, colorkey=(1, 255, 1)):
     """data should be dict with key: ((x, y), (w, h)), assumes w, h are 32, 32"""
     surf = pygame.image.load(IMG_LOCATION+filename).convert()
