@@ -56,6 +56,14 @@ endif
 
 
 |press|
-set inv0 cheater_mode 1
+set inv0 cheater_mode 1 
 set inv0 state START
+
+if inv0.cheater_mode
+   set cheatermodedisplay0 state ON_ON
+endif
+if not inv0.cheater_mode
+   set cheatermodedisplay0 state ON_OFF
+endif
+
 

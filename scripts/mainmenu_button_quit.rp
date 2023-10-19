@@ -21,6 +21,9 @@ if A_DOWN in inpEVENTS
 endif
 
 if LEFT_DOWN in inpEVENTS and self.secret
+   if cheatermodedisplay0.state == OFF
+      set cheatermodedisplay0 state ON_OFF
+   endif
    if exists self.left_button
       set self.left_button state SELECTED 
       set self state NOTSELECTED
