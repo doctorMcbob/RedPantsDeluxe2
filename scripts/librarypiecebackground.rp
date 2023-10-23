@@ -12,7 +12,7 @@ PLATFORM22 librarypiece22 0,0
 |START:0|
 set self platform 1
 set self state PLATFORM
+set self tileset librarypiece
 set self frame 0
 set self background 1
-
 

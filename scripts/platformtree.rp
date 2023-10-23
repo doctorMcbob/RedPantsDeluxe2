@@ -29,6 +29,7 @@ BURNING22 burning022 0,0
 
 |START:0|
 set self state PLATFORM
+set self tileset platform4
 set self platform 1
 set self frame 0
 set self touched 0
@@ -37,11 +38,15 @@ set self burnable 1
 |PLATFORM:0|
 if self.touched > 0
     set self state TOUCHED
+set self tileset touched4
 endif
 set self frame 0
 
 |TOUCHED:0|
 set self frame 0
+
+|BURNING:0|
+set self tileset burning
 
 |BURNING:45|
 goodbye

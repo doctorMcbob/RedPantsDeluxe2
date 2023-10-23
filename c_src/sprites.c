@@ -9,15 +9,24 @@ and the similar imlpementation of a doubly linked list `utlist.h`
 https://github.com/troydhanson/uthash/blob/master/src/utlist.h
 */
 
+#ifndef SPRITES_DEF
 #include "sprites.h"
+#endif
+#ifndef IMAGEDATA_H
+#include "imagedata.h"
+#endif
 #include "stringmachine.h"
 #include "uthash.h"
 #include "utlist.h"
+#include "tree.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
 Sprite *sprites = NULL;
 SpriteMap *spritemaps = NULL;
+struct TileMap tile_maps[NUM_TILEMAPS];
+struct TreeNode *tile_maps_by_name = NULL;
+int tilemapidx = 0;
 
 void sprites_taredown() {
   struct Sprite *s, *tmp;
@@ -36,6 +45,30 @@ void sprites_taredown() {
     HASH_DEL(spritemaps, sm);
     free(sm);
   }
+}
+
+void add_tile_map(int name,
+		  int sprite00, int sprite01, int sprite02,
+		  int sprite10, int sprite11, int sprite12,
+		  int sprite20, int sprite21, int sprite22) {
+  int idx = tilemapidx++;
+  tile_maps[idx].sprites[0] = sprite00;
+  tile_maps[idx].sprites[1] = sprite01;
+  tile_maps[idx].sprites[2] = sprite02;
+  tile_maps[idx].sprites[3] = sprite10;
+  tile_maps[idx].sprites[4] = sprite11;
+  tile_maps[idx].sprites[5] = sprite12;
+  tile_maps[idx].sprites[6] = sprite20;
+  tile_maps[idx].sprites[7] = sprite21;
+  tile_maps[idx].sprites[8] = sprite22;
+
+  tile_maps_by_name = push_to_tree(tile_maps_by_name, name, idx);
+}
+
+TileMap *get_tile_map(int name) {
+  int idx = value_for_key(tile_maps_by_name, name);
+
+  return &tile_maps[idx];
 }
 
 void add_sprite_map(int name) {

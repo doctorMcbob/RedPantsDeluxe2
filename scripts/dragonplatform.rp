@@ -57,6 +57,7 @@ WARN22 dragonplatwarning22 0,0
 |START:0|
 set self platform 1
 set self state OFF
+set self tileset empty
 set self frame 0
 set self target dragon0
 set self spawn_distance 512
@@ -69,6 +70,7 @@ exec calculateDist
 if self.dist < self.spawn_distance
    if self.dist > 0
       set self state SPAWN
+set self tileset dragonplatphasing
       set self frame 0
    endif
 endif
@@ -76,6 +78,7 @@ endif
 |SPAWN:8|
 if not COLLIDE?
    set self state PLAT
+set self tileset dragonplat
    set self tangible 1
 endif
 
@@ -84,6 +87,7 @@ exec calculateDist
 set self calc self.dist > self.spawn_distance
 if self.dist <= 64 or self.calc
    set self state WARN
+set self tileset dragonplatwarning
    set self frame 0
 endif
 
@@ -92,12 +96,14 @@ exec calculateDist
 set self calc self.dist > self.spawn_distance
 if self.dist <= 0 or self.calc
    set self state DESPAWN
+set self tileset dragonplatphasing
    set self frame 0
    set self tangible 0
 endif
 
 |DESPAWN:8|
 set self state OFF
+set self tileset empty
 
 |calculateDist|
 set self dist 0
@@ -105,4 +111,3 @@ set self dl self.target.x + self.target.w
 if self.x > self.dl
    set self dist self.x - self.dl
 endif
-

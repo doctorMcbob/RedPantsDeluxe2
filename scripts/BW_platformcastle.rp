@@ -12,5 +12,5 @@ PLATFORM22 platformcastle22 0,0
 |START:0|
 set self noWO 1
 set self state PLATFORM
+set self tileset platformcastle
 set self platform 1
-

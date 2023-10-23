@@ -11,6 +11,7 @@ PLATFORM22 rockethudplat22 0,0
 
 |START:0|
 set self state PLATFORM
+set self tileset rockethudplat
 set self platform 1
 set self startx self.x
 set self starty self.y
@@ -28,4 +29,3 @@ if self.shift > -256
     set self x self.x - 1
     break
 endif
-

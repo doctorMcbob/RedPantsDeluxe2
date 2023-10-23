@@ -12,6 +12,7 @@ PLATFORM22 backgroundsay022 0,0
 |START:0|
 set self platform 1
 set self state PLATFORM
+set self tileset backgroundsay0
 set self timer -1
 back
 set self background 1 

@@ -2136,7 +2136,11 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
           BUFFER[bufferPointer - 2] = STRING;
           BUFFER[bufferPointer - 1] = a->_input_name;
           break;
-        default: {
+	case _TILESET:
+	  if (a->tileset == -1) BUFFER[bufferPointer - 2] = INT;
+	  else BUFFER[bufferPointer - 2] = STRING;
+	  BUFFER[bufferPointer - 1] = a->tileset;
+	default: {
           Attribute *attr;
           HASH_FIND_INT(a->attributes, &rightValue, attr);
           if (attr == NULL) {
@@ -2517,6 +2521,11 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
           break;
         a->background = valueValue;
         break;
+      case _TILESET:
+	if (valueType == INT && valueValue == -1) a->tileset = -1;
+	if (valueType != STRING)
+	  break;
+	a->tileset = valueValue;
       default: {
         Attribute *attr;
         HASH_FIND_INT(a->attributes, &attrValue, attr);

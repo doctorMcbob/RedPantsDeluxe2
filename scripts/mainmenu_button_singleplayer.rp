@@ -29,7 +29,6 @@ if LEFT_DOWN in self.events
    endif
 endif
 if RIGHT_DOWN in self.events
-   print here
    if exists self.right_button
       set self.right_button state SELECTED
       set self state NOTSELECTED

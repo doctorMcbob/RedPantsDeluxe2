@@ -12,6 +12,7 @@ PLATFORM22 backgroundsay122 0,0
 |START:0|
 set self platform 1
 set self state PLATFORM
+set self tileset backgroundsay1
 set self timer -1
 back
 set self background 1 
@@ -21,4 +22,3 @@ set self background 1
 if self.frame > self.timer
     goodbye
 endif
-

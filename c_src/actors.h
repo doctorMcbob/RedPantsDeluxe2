@@ -1,6 +1,8 @@
 # include <SDL2/SDL.h>
 # include "uthash.h"
+#ifndef SPRITES_DEF
 # include "sprites.h"
+#endif
 # include "boxes.h"
 #ifndef SCRIPT_DATA_LOAD
 # include "scriptdata.h"
@@ -37,6 +39,7 @@ typedef struct Actor {
   int direction;
   int rotation;
   // flags
+  int tileset;
   int platform;
   int tangible;
   int physics;

@@ -11,5 +11,6 @@ PLATFORM22 platform2522 0,0
 
 |START:0|
 set self state PLATFORM
+set self tileset platform25
 set self platform 1
 set self frame 0

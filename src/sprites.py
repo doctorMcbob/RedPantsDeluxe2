@@ -61,3 +61,6 @@ def get_offset(key, name):
         return (0, 0)
     return (0, 0) if name not in OFFSETS[key] else OFFSETS[key][name]
 
+def get_tile_map(key):
+    return None if key not in TILEMAPS else TILEMAPS[key]
+

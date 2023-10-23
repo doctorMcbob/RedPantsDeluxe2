@@ -106,6 +106,7 @@ void add_actor(int name, int x, int y, int w, int h, int x_vel, int y_vel,
   else
     a->updated = 0;
 
+  a->tileset = -1;
   actors_by_name = push_to_tree(actors_by_name, name, key);
   validate_actors();
 }
@@ -136,6 +137,7 @@ void copy_actor(Actor *copy, Actor *a) {
   a->updated = copy->updated;
   a->attributes = NULL;
   a->background = copy->background;
+  a->tileset = -1;
 }
 
 Actor *add_actor_from_templatekey(int templateKey, int name) {
@@ -607,7 +609,7 @@ int get_script_for_actor(Actor *actor) {
 }
 
 Sprite *get_sprite_for_actor(Actor *actor) {
-  if (actor->platform) {
+  if (actor->tileset != -1) {
     return NULL;
   }
   if (actor->img >= 0) {
@@ -787,65 +789,22 @@ int hit_check(Actor *self, Actor *related, World *world, int debug) {
   return 0;
 }
 
-void _draw_platform(SDL_Renderer *rend, Actor *actor, Frame *frame) {
-  struct SpriteMap *sm;
-  sm = get_sprite_map(actor->spritemapkey);
-  if (!sm)
-    return;
-
-  char key00[32], key01[32], key02[32], key10[32], key11[32], key12[32],
-      key20[32], key21[32], key22[32];
-
-  sprintf(key00, "%s%i%i", get_string(actor->state), 0, 0);
-  sprintf(key01, "%s%i%i", get_string(actor->state), 0, 1);
-  sprintf(key02, "%s%i%i", get_string(actor->state), 0, 2);
-  sprintf(key10, "%s%i%i", get_string(actor->state), 1, 0);
-  sprintf(key11, "%s%i%i", get_string(actor->state), 1, 1);
-  sprintf(key12, "%s%i%i", get_string(actor->state), 1, 2);
-  sprintf(key20, "%s%i%i", get_string(actor->state), 2, 0);
-  sprintf(key21, "%s%i%i", get_string(actor->state), 2, 1);
-  sprintf(key22, "%s%i%i", get_string(actor->state), 2, 2);
-
-  Sprite *s00, *s01, *s02, *s10, *s11, *s12, *s20, *s21, *s22;
-
-  SpriteMapEntry *sme;
-  DL_FOREACH(sm->entries, sme) {
-    if (strcmp(get_string(sme->state), key00) == 0) {
-      s00 = get_sprite(sme->spriteKey);
-      continue;
-    }
-    if (strcmp(get_string(sme->state), key01) == 0) {
-      s01 = get_sprite(sme->spriteKey);
-      continue;
-    }
-    if (strcmp(get_string(sme->state), key02) == 0) {
-      s02 = get_sprite(sme->spriteKey);
-      continue;
-    }
-    if (strcmp(get_string(sme->state), key10) == 0) {
-      s10 = get_sprite(sme->spriteKey);
-      continue;
-    }
-    if (strcmp(get_string(sme->state), key11) == 0) {
-      s11 = get_sprite(sme->spriteKey);
-      continue;
-    }
-    if (strcmp(get_string(sme->state), key12) == 0) {
-      s12 = get_sprite(sme->spriteKey);
-      continue;
-    }
-    if (strcmp(get_string(sme->state), key20) == 0) {
-      s20 = get_sprite(sme->spriteKey);
-      continue;
-    }
-    if (strcmp(get_string(sme->state), key21) == 0) {
-      s21 = get_sprite(sme->spriteKey);
-      continue;
-    }
-    if (strcmp(get_string(sme->state), key22) == 0) {
-      s22 = get_sprite(sme->spriteKey);
-    }
+void _draw_tileset(SDL_Renderer *rend, Actor *actor, Frame *frame) {
+  if (actor->tileset == -1) {
+     return;
   }
+  TileMap* tm = get_tile_map(actor->tileset);
+  
+  Sprite *s00, *s01, *s02, *s10, *s11, *s12, *s20, *s21, *s22;
+  s00 = get_sprite(tm->sprites[0]);
+  s01 = get_sprite(tm->sprites[1]);
+  s02 = get_sprite(tm->sprites[2]);
+  s10 = get_sprite(tm->sprites[3]);
+  s11 = get_sprite(tm->sprites[4]);
+  s12 = get_sprite(tm->sprites[5]);
+  s20 = get_sprite(tm->sprites[6]);
+  s21 = get_sprite(tm->sprites[7]);
+  s22 = get_sprite(tm->sprites[8]);
 
   for (int y = 0; y < actor->ECB.h / 32; y++) {
     for (int x = 0; x < actor->ECB.w / 32; x++) {
@@ -887,8 +846,8 @@ void _draw_platform(SDL_Renderer *rend, Actor *actor, Frame *frame) {
 }
 
 void draw_actor(SDL_Renderer *rend, Actor *actor, Frame *f) {
-  if (actor->platform) {
-    return _draw_platform(rend, actor, f);
+  if (actor->tileset != -1) {
+    return _draw_tileset(rend, actor, f);
   }
 
   Sprite *s;

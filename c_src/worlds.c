@@ -5,7 +5,9 @@
 #include "debug.h"
 #endif
 #include "frames.h"
+#ifndef SPRITES_DEF
 #include "sprites.h"
+#endif
 #include "stringmachine.h"
 #include "utlist.h"
 #include "tree.h"

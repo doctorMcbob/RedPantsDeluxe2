@@ -11,8 +11,8 @@ TRACK22 railroad22 0,0
 
 |START:0|
 set self state TRACK
+set self tileset railroad
 set self platform 1
 set self physics 1
 set self frame 0
 set self x_vel -8
-

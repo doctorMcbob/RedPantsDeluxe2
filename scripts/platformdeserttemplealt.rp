@@ -11,5 +11,5 @@ PLATFORM22 platformdeserttemplealt22 0,0
 
 |START:0|
 set self state PLATFORM
+set self tileset platformdeserttemplealt
 set self platform 1
-

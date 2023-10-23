@@ -11,6 +11,6 @@ PLATFORM22 conveyerflat22 0,0
 
 |START:0|
 set self state PLATFORM
+set self tileset conveyerflat
 set self platform 1
 set self frame 0
-

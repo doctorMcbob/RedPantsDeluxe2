@@ -11,6 +11,7 @@ PLATFORM22 alienplanet22 0,0
 
 |START:0|
 set self state PLATFORM
+set self tileset alienplanet
 set self platform 1
 set self tangible 1
 set self frame 0

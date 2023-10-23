@@ -29,6 +29,7 @@ PLATFORM22 bwcastlegate22 0,0
 
 |START:0|
 set self state CASTLEGATE
+set self tileset bwcastlegate
 set self platform 1
 set self frame 0
 set self noWO 1
@@ -39,6 +40,7 @@ set self frame 0
 |RISING:0|
 if self.h <= 64
    set self state CASTLEGATE
+set self tileset bwcastlegate
 endif
 
 |RISING:30|

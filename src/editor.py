@@ -546,6 +546,7 @@ def spritesheet_menu(G):
             pos, dim = sheet[key]
             pygame.draw.rect(G["SCREEN"], (100, 0, 0), Rect((pos[0]+SX, pos[1]+SY), dim), width=1)
         G["SCREEN"].blit(drawn_spritesheet_data(G, sheet, idx), (1072-256, 0))
+        G["SCREEN"].blit(drawn_spritesheet_data(G, TILEMAPS, idx), (1072--256-256, 0))
         G["SCREEN"].blit(G["HEL32"].render("{}, {}".format((CX, CY), corner), 0, (200, 0, 80)), (1072, 840-32))
         pygame.draw.rect(G["SCREEN"], (255, 0, 0), Rect(make_rect((SX+corner[0], SY+corner[1]) if corner else (SX+CX+16, SY+CY+16), (SX+CX, SY+CY))), width=2)
         inp = expect_input()
@@ -601,6 +602,19 @@ def spritesheet_menu(G):
                         sheet[name+"20"] = make_rect((X, Y+64), (CX, CY+64))
                         sheet[name+"21"] = make_rect((X+32, Y+64), (CX+32, CY+64))
                         sheet[name+"22"] = make_rect((X+64, Y+64), (CX+64, CY+64))
+
+                        TILEMAPS[name] = {
+                            "00": name + "00",
+                            "01": name + "01",
+                            "02": name + "01",
+                            "10": name + "10",
+                            "11": name + "11",
+                            "12": name + "12",
+                            "20": name + "20",
+                            "21": name + "21",
+                            "22": name + "22",
+                        }
+
                     else:
                         sheet[name] = make_rect(corner, (CX, CY))
                     keys = list(sheet.keys())

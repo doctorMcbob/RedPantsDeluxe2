@@ -11,5 +11,6 @@ PLATFORM22 rocketwallgrey22 0,0
 
 |START:0|
 set self state PLATFORM
+set self tileset rocketwallgrey
 set self platform 1
 set self frame 0

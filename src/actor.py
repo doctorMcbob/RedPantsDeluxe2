@@ -102,6 +102,7 @@ class Actor(Rect):
         self.rotation = template["rotation"] if "rotation" in template else 0
         
         self.platform = False if "platform" not in template else template["platform"] 
+        self.tileset = False if "tileset" not in template else template["tileset"]
         self.tangible = False if "tangible" not in template else template["tangible"]
         self.physics = 0 if "physics" not in template else template["physics"]
         self.updated = False if "updated" not in template else template["updated"]
@@ -125,6 +126,7 @@ class Actor(Rect):
             "direction": self.direction,
             "rotation": self.rotation,
             "platform": self.platform,
+            "tileset": self.tileset,
             "tangible": self.tangible,
             "physics": self.physics,
             "updated": self.updated,
@@ -215,50 +217,40 @@ class Actor(Rect):
         return boxes
 
     def get_sprite(self):
-        # second half of this line is only for the editor, does not need to go into ports. same with flag buisness and state changing
-        if self.platform or (("plat" in self.name or "background" in self.name) and self.state == "START"):
-            flag = False
-            if self.state == "START":
-                flag = True
-                self.state = "PLATFORM"
-
-            key = "{}:{}:{},{}".format(self.name, self.state, self.w, self.h)
-            sprite = sprites.get_sprite(key)
-            if sprite is not None:
-                if flag:
-                    self.state = "START"
-                return sprite
-            
+        if self.platform and self.tileset:
+            tile_map = sprites.get_tile_map(self.tileset)
+            if tile_map == None:
+                print(self.name + " has no tile_map for " + str(self.tileset))
             surf = Surface((self.w, self.h))
             surf.fill((1, 255, 1))
+            
             blitz = []
             for y in range(self.h // 32):
                 for x in range(self.w // 32):
                     if (x, y) == (0, 0):
-                        img = self.sprites["{}00".format(self.state)]
+                        img = tile_map['00']
                     elif (x, y) == ((self.w // 32) - 1, 0):
-                        img = self.sprites["{}02".format(self.state)]
+                        img = tile_map["02"]
                     elif (x, y) == (0, (self.h // 32) - 1):
-                        img = self.sprites["{}20".format(self.state)]
+                        img = tile_map["20"]
                     elif (x, y) == ((self.w // 32) - 1, (self.h // 32) - 1):
-                        img = self.sprites["{}22".format(self.state)]
+                        img = tile_map["22"]
                     elif x == 0:
-                        img = self.sprites["{}10".format(self.state)]
+                        img = tile_map["10"]
                     elif x == (self.w // 32) - 1:
-                        img = self.sprites["{}12".format(self.state)]
+                        img = tile_map["12"]
                     elif y == 0:
-                        img = self.sprites["{}01".format(self.state)]
+                        img = tile_map["01"]
                     elif y == (self.h // 32) - 1:
-                        img = self.sprites["{}21".format(self.state)]
+                        img = tile_map["21"]
                     else:
-                        img = self.sprites["{}11".format(self.state)]
+                        img = tile_map["11"]
+                        
                     if (sprites.get_sprite(img) is not None):
                         blitz.append((sprites.get_sprite(img), (x*32, y*32)))
             surf.blits(blitz)
             surf.set_colorkey((1, 255, 1))
-            sprites.set_sprite(key, surf)
-            if flag:
-                self.state = "START"
+            
             return surf
 
         sprite = sprites.get_sprite(self.img) if self.img is not None else sprites.get_sprite(self._index(self.sprites))

@@ -17,7 +17,9 @@ I will be using uthash.h as my dictionary implementation
 #include "clock.h"
 #include "frames.h"
 #include "inputs.h"
+#ifndef SPRITES_DEF
 #include "scripts.h"
+#endif
 #include "sprites.h"
 #include "stringdata.h"
 #include "stringmachine.h"

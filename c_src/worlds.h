@@ -1,5 +1,3 @@
-
-
 # include <SDL2/SDL.h>
 
 # ifndef WORLDS_DEF
