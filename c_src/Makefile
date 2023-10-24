@@ -3,9 +3,9 @@
 CC := gcc
 
 # set compiler flags 
-SDL_FLAGS := $(shell sdl2-config --static-libs --cflags)
+SDL_FLAGS := $(shell pkg-config --static --cflags --libs /usr/local/lib/pkgconfig/sdl2.pc)
 TTF_FLAGS := -L/usr/lib/x86_64-linux-gnu -lSDL2_ttf
-CFLAGS := $(SDL_FLAGS) $(TTF_FLAGS) -ggdb3 -O0 --std=c99 -Wall -lSDL2_mixer -lm -static -lSDL2 -Wl,-Bdynamic
+CFLAGS := $(SDL_FLAGS) $(TTF_FLAGS) -ggdb3 -O0 --std=c99 -Wall -lm -Wl,-Bdynamic
 
 # add headers here
 HDRS :=
@@ -24,11 +24,7 @@ all: $(EXEC)
 
 # recipe for building the final executable
 $(EXEC): $(OBJS) $(HDRS) 
-	$(CC) -o $(BUILD_DIR)/$@ $(OBJS) $(CFLAGS) -lSDL2_image
-
-# recipe for building object files
-#$(OBJS): $(@:.o=.c) $(HDRS) Makefile
-#	$(CC) -c $(CFLAGS) -o $(BUILD_DIR)/$@ $(@:.o=.c)
+	$(CC) -o $(BUILD_DIR)/$@ $(OBJS) $(CFLAGS) -I./include -L./lib -lSDL2 -lSDL2_image -lSDL2_mixer 
 
 # recipe to clean the workspace
 clean:

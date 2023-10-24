@@ -1,0 +1,18 @@
+GUY|0,0,0,0|False|
+START:0 prisoner0 0,0
+WAIT:0 prisoner0 0,0
+KICK:0 prisoner1 0,0
+KICK:10 prisoner2 0,0
+
+|START:0|
+set self state WAIT
+
+|KICK:20|
+set self state WAIT
+set self frame 0
+
+|COLLIDE|
+if related.state != KICK and self.lakitu
+   set related state KICK
+   set related frame 0
+endif
