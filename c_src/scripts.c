@@ -1374,7 +1374,9 @@ void resolve_operators(int statement, World *world, int debug) {
 
         switch (rightType) {
         case INT: {
-          break;
+	  PARAMS[paramPointer++] = INT;
+	  PARAMS[paramPointer++] = rightValue;
+	  break;
         }
         case FLOAT: {
           float f = get_float(rightValue);
