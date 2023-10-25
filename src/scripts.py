@@ -167,6 +167,14 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 name, world, x, y, w, h = cmd
                 frames.add_frame(name, world, (w, h), (x, y))
 
+            elif verb == "resizeframe":
+                frame_key, x, y, w, h = cmd
+                f = frames.get_frame(frame_key)
+                if f == None:
+                    raise Exception(f"Frame not found for resizeframe {frame_key}")
+                f.pos = (x, y)
+                f.w, f.h = w, h
+                
             elif verb == "focus":
                 frame = frames.get_frame(cmd.pop(0))
                 actor = cmd.pop(0)
@@ -541,6 +549,12 @@ def resolve_operators(cmd, world, logfunc=print, actor=None):
                 evaluated.append(math.tan(cmd.pop(idx+1)))
             elif token == "atan":
                 evaluated.append(math.atan(cmd.pop(idx+1)))
+            elif token == "worldof":
+                frame_key = cmd.pop(idx+1)
+                frame = frames.get_frame(frame_key)
+                if frame is None:
+                    raise Exception(f"Frame not found for worldof {frame_key}")
+                evaluated.append(frame.world.name)
             elif type(token) == str and token in operators:
                 left, right = evaluated.pop(), cmd.pop(idx+1)
                 if token != "at":

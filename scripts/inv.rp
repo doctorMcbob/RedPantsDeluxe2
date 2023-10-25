@@ -63,5 +63,8 @@ if self.cheater_mode
 
    set self arcadeBlindWitch 1
    set self arcadeBlitzorb 1
+
+   set self coins 100
+   set self bananas 100
 endif
 

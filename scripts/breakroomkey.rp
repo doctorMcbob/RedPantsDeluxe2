@@ -27,7 +27,7 @@ goodbye
 
 |COLLIDE|
 if player in self.name
-   if inv0.breakroomlocked
+   if related.state == KEY
       set related state COLLECT
       set related frame 0
       set inv0 breakroomlocked 0

@@ -1,0 +1,37 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+LOOK:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self state LOOK
+
+|LOOK:0|
+if isframem MAIN
+   set self _input_name PLAYER1
+   if START_DOWN in inpEVENTS
+      exec pause
+      break
+   endif
+endif
+if exists MAIN2
+   set self _input_name PLAYER2
+   if START_DOWN in inpEVENTS
+      exec pause
+      break
+   endif
+endif
+
+|pause|
+if isframe MAIN
+   set mainmenu_button_singleplayer0 player1_location worldof MAIN
+   set mainmenu_button_twoplayer0 player1_location worldof MAIN
+   deactivate MAIN
+endif
+if isframe MAIN2
+   set mainmenu_button_twoplayer0 player2_location worldof MAIN2
+   deactivate MAIN2
+endif
+
+activate ROOT
+

@@ -12,6 +12,8 @@ set self right_button 0
 set self down_button mainmenu_button_quit0
 set self up_button mainmenu_button_singleplayer0
 set self direction -1
+set self player1_location redpantshouseroot
+set self player2_location redpantshouseroot
 
 |SELECTED:2|
 if A_DOWN in inpEVENTS
@@ -52,11 +54,28 @@ if UP_DOWN in inpEVENTS
 endif
 
 |press|
-makeframe MAIN redpantshouseroot 0 0 1152 320
-makeframe MAIN2 redpantshouseroot 0 320 1152 320
-makezoom MAIN 1
-setzoom MAIN 1.5
-makezoom MAIN2 1
-setzoom MAIN2 1.5
 deactivate ROOT
 
+set self c1 isframe MAIN
+if self.c1
+   activate MAIN
+   resizeframe MAIN 0 0 1152 320
+endif
+set self c2 isframe MAIN2
+if self.c2
+   activate MAIN2
+   resizeframe MAIN2 0 320 1152 320
+endif
+
+if not self.c1
+   makeframe MAIN self.player1_location 0 0 1152 320
+endif
+
+if not self.c2
+   makeframe MAIN2 self.player2_location 0 320 1152 320
+endif
+
+makezoom MAIN2 1
+setzoom MAIN2 1.5
+makezoom MAIN 1
+setzoom MAIN 1.5

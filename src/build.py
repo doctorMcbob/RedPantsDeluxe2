@@ -95,6 +95,7 @@ OPERATORS = {
     "asin": 36,
     "acos": 37,
     "atan": 38,
+    "worldof": 39,
 }
 
 VERBS = {
@@ -142,6 +143,7 @@ VERBS = {
     "add_input_state": 41,
     "setzoom": 42,
     "makezoom": 43,
+    "resizeframe": 44,
 }
 UNIQUE_FLOATS = []
 UNIQUE_STRINGS = []

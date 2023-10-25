@@ -1880,6 +1880,28 @@ void resolve_operators(int statement, World *world, int debug) {
         }
         break;
       }
+      case WORLDOF: {
+        int rightType = BUFFER[++bufferPointer];
+        int rightValue = BUFFER[++bufferPointer];
+
+        if (rightType != STRING) {
+          print_statement(statement);
+          printf("Cannot worldof with non-string\n");
+          break;
+        }
+
+	Frame *f = get_frame(rightValue);
+	if (f == NULL) {
+	  print_statement(statement);
+          printf("Cannot worldof with non-string\n");
+          break;
+	}
+
+	PARAMS[paramPointer++] = STRING;
+	PARAMS[paramPointer++] = f->world->name;
+
+        break;
+      }
       }
 
       bufferPointer++;
@@ -2843,6 +2865,40 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       }
 
       add_frame(nameValue, w, NULL, xValue, yValue, wValue, hValue);
+      break;
+    }
+    case RESIZEFRAME: {
+      int frameType = PARAMS[0];
+      int frameValue = PARAMS[1];
+      int xType = PARAMS[2];
+      int xValue = PARAMS[3];
+      int yType = PARAMS[4];
+      int yValue = PARAMS[5];
+      int wType = PARAMS[6];
+      int wValue = PARAMS[7];
+      int hType = PARAMS[8];
+      int hValue = PARAMS[9];
+
+      if (frameType != STRING || xType != INT ||
+          yType != INT || wType != INT || hType != INT) {
+        printf("Actor %s error: ", get_string(self->name));
+        print_statement(statement);
+        printf("Missing or Incorrect Parameter for RESIZEFRAME\n");
+        break;
+      }
+
+      Frame *f = get_frame(frameValue);
+      if (f == NULL) {
+        printf("Actor %s error: ", get_string(self->name));
+        print_statement(statement);
+        printf("Frame %s not found for FOCUS\n", get_string(frameValue));
+        break;
+      }
+
+      f->rect.x = xValue;
+      f->rect.y = yValue;
+      f->rect.w = wValue;
+      f->rect.h = hValue;
       break;
     }
     case FOCUS: {

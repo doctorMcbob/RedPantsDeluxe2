@@ -68,6 +68,7 @@
 #define ASIN 36
 #define ACOS 37
 #define ATAN 38
+#define WORLDOF 39
 
 // Define Verbs
 #define QUIT 0
@@ -114,6 +115,7 @@
 #define ADD_INPUT_STATE 41
 #define SETZOOM 42
 #define MAKEZOOM 43
+#define RESIZEFRAME 44
 
 typedef struct ScriptMap
 {
