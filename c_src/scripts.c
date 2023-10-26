@@ -1629,12 +1629,17 @@ void resolve_operators(int statement, World *world, int debug) {
           break;
         }
         int len = len_list(rightValue);
-
-        if (len == -1) {
+        
+	if (len == -1) {
           print_statement(statement);
           printf("choiceof found no list\n");
           break;
         }
+	if (len == 0) {
+          print_statement(statement);
+	  printf("choiceof on empty list\n");
+	  break;
+	}
         int i = rand() % len;
         ListNode *ln = get_from_list(rightValue, i);
         if (ln == NULL) {
@@ -1901,6 +1906,29 @@ void resolve_operators(int statement, World *world, int debug) {
 	PARAMS[paramPointer++] = f->world->name;
 
         break;
+      }
+      case COLLIDESWITH: {
+        
+        int leftType = PARAMS[paramPointer - 2];
+        int leftValue = PARAMS[paramPointer - 1];
+        int rightType = BUFFER[++bufferPointer];
+        int rightValue = BUFFER[++bufferPointer];
+
+        if (rightType != STRING || leftType != STRING) {
+          print_statement(statement);
+	  printf("Cannot collideswith with non-string\n");
+	  break;
+	}
+	Actor *a1 = get_actor(leftValue);
+	Actor *a2 = get_actor(rightValue);
+	if (a1 == NULL || a2 == NULL) {
+          print_statement(statement);
+	  printf("One or both actors not found for collideswith");
+	  break;
+	}
+	PARAMS[paramPointer++] = INT;
+	PARAMS[paramPointer++] = SDL_HasIntersection(&a1->ECB, &a2->ECB);
+	break;
       }
       }
 

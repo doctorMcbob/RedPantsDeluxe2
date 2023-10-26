@@ -555,6 +555,12 @@ def resolve_operators(cmd, world, logfunc=print, actor=None):
                 if frame is None:
                     raise Exception(f"Frame not found for worldof {frame_key}")
                 evaluated.append(frame.world.name)
+            elif token == "collideswith":
+                left, right = evaluated.pop(), cmd.pop(idx+1)
+                actor_a, actor_b = a.get_actor(left), a.get_actor(right)
+                if not actor_a or not actor_b:
+                    raise Exception(f"Both left and right hand side must be actors for collideswith: {actor_a} collideswith {actor_b}")
+                evaluated.append(int(actor_a.colliderect(actor_b)))
             elif type(token) == str and token in operators:
                 left, right = evaluated.pop(), cmd.pop(idx+1)
                 if token != "at":

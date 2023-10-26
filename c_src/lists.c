@@ -96,6 +96,7 @@ void remove_from_list(int id, int type, int value) {
     DL_DELETE(le->head, ln);
     free(ln);
     le->size--;
+    return;
   }
 }
 

@@ -96,6 +96,7 @@ OPERATORS = {
     "acos": 37,
     "atan": 38,
     "worldof": 39,
+    "collideswith": 40,
 }
 
 VERBS = {

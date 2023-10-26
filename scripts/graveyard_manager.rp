@@ -1,0 +1,27 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+set self treasure []
+
+add self.treasure scienceBR0
+add self.treasure gooseball0
+add self.treasure gooseball0
+add self.treasure coinbouncy0
+add self.treasure coinbouncy0
+add self.treasure coinbouncy0
+add self.treasure coinbouncy0
+add self.treasure coinbouncy0
+add self.treasure coinbouncy0
+add self.treasure blood0
+add self.treasure fart0
+add self.treasure puppetredpants0
+
+print self.treasure
+for n_ range 12
+   set self gravename grave + n_
+   set self.gravename digs choiceof self.treasure
+   remove self.treasure self.gravename.digs
+endfor
+
+goodbye

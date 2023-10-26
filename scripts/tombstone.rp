@@ -1,0 +1,24 @@
+SPOOKY|0,0,0,0|False|
+START:0 grave0 0,16
+GRAVE0:0 grave0 0,16
+GRAVE1:0 grave1 0,-16
+GRAVE2:0 grave2 0,0
+GRAVE3:0 grave3 0,0
+GRAVE4:0 grave4 0,0
+GRAVE5:0 grave5 0,0
+GRAVE6:0 grave6 0,0
+GRAVE7:0 grave7 0,0
+GRAVE8:0 grave8 0,0
+GRAVE9:0 grave9 0,0
+GRAVE10:0 grave10 0,0
+GRAVE11:0 grave11 0,0
+
+|START:0|
+set self number self.name at 9
+if len self.name > 10
+   set self d2 self.name at 10 
+   set self number self.number + self.d2
+endif
+set self state GRAVE + self.number
+set self direction -1
+

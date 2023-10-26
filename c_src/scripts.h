@@ -69,6 +69,7 @@
 #define ACOS 37
 #define ATAN 38
 #define WORLDOF 39
+#define COLLIDESWITH 40
 
 // Define Verbs
 #define QUIT 0

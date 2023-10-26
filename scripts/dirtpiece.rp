@@ -1,0 +1,47 @@
+FX|0,0,0,0|False|
+START:0 dirtp0 0,0
+DIRT0:0 dirtp0 0,0
+DIRT1:0 dirtp1 0,0
+DIRT2:0 dirtp2 0,0
+DIRT3:0 dirtp3 0,0
+DIRT4:0 dirtp4 0,0
+DIRT5:0 dirtp5 0,0
+
+|START:0|
+set self physics 1
+set self nums range 5
+set self num choiceof self.nums
+set self state DIRT + self.num
+set self grav 1
+
+|DIRT0:0|
+exec applyGrav
+
+
+|DIRT1:0|
+exec applyGrav
+
+
+|DIRT2:0|
+exec applyGrav
+
+
+|DIRT3:0|
+exec applyGrav
+
+
+|DIRT4:0|
+exec applyGrav
+
+
+|DIRT5:0|
+exec applyGrav
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+
+|XCOLLISION|
+goodbye
+
+|YCOLLISION|
+goodbye

@@ -1,0 +1,10 @@
+GRAVE|0,0,0,0|False|
+START:0 gravedirt0 0,0
+D0:0 gravedirt0 0,0
+D1:0 gravedirt1 0,0
+D2:0 gravedirt2 0,0
+
+|START:0|
+set self n 0 + RAND? + RAND?
+set self state D + self.n
+

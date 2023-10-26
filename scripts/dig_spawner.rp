@@ -1,0 +1,24 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+DONE:0 empty 0,0
+
+|START:0|
+for n_ range 12
+   set self grave_name grave + n_
+   set self calc self.name collideswith self.grave_name
+   if not self.calc
+      break
+   endif
+   if self.grave_name.digs
+      set self treasurename self.grave_name + treasure
+      if exists self.treasurename
+         break
+      endif
+      create self.grave_name.digs self.treasurename self.x self.y - self.grave_name.digs.h
+      set self.grave_name digs 0
+   endif
+endfor
+set self state DONE
+
+|DONE:0|
+goodbye
