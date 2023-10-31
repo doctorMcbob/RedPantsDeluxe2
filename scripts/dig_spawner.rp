@@ -6,6 +6,7 @@ DONE:0 empty 0,0
 for n_ range 12
    set self grave_name grave + n_
    set self calc self.name collideswith self.grave_name
+   print self.calc
    if not self.calc
       break
    endif

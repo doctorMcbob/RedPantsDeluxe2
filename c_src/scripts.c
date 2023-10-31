@@ -1907,8 +1907,7 @@ void resolve_operators(int statement, World *world, int debug) {
 
         break;
       }
-      case COLLIDESWITH: {
-        
+      case COLLIDESWITH: {        
         int leftType = PARAMS[paramPointer - 2];
         int leftValue = PARAMS[paramPointer - 1];
         int rightType = BUFFER[++bufferPointer];
@@ -1926,8 +1925,8 @@ void resolve_operators(int statement, World *world, int debug) {
 	  printf("One or both actors not found for collideswith");
 	  break;
 	}
-	PARAMS[paramPointer++] = INT;
-	PARAMS[paramPointer++] = SDL_HasIntersection(&a1->ECB, &a2->ECB);
+	PARAMS[paramPointer-2] = INT;
+	PARAMS[paramPointer-1] = SDL_HasIntersection(&a1->ECB, &a2->ECB);
 	break;
       }
       }
