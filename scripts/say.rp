@@ -10,10 +10,10 @@ set self timer 140
 set self y_off 16
 set self x_off 16
 set self back backgroundsay0
+set self backname self.name + back
 
 |SAY:0|
 if self.frame == 0 and self.back
-   set self backname self.name + back
    create self.back self.backname self.x self.y
    set self calc countof self.message "^"
    set self calc2 self.calc + 1

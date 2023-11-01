@@ -1,4 +1,4 @@
-GOOSEBALL|0,0,0,0|True|
+GOOSEBALL|0,0,0,0|False|
 START:0 gooseballlook0 -8,-16
 LOOK:0 gooseballlook0 -8,-16
 LOOK:30 gooseballlook1 -8,-16
@@ -20,10 +20,11 @@ BONK:0 gooseballbonk -8,-16
 HITSTUN:0 gooseballbonk -8,-16
 BONKLAND:0 gooseballbonkland0 -8,-16
 BONKLAND:4 gooseballbonkland1 -8,-16
+EMPTY:0 empty 0,0
 
 |START:0|
 set self frame 0
-set self state LOOK
+set self state EMPTY
 set self limit 20
 set self neglimit self.limit * -1
 set self lookboxnumber 0
@@ -37,6 +38,18 @@ set self jumpstrength -8
 set self jumpvel 10
 hitboxes gooseball
 hurtboxes gooseball
+exec EMPTY:0
+
+|EMPTY:0|
+if COLLIDE?
+   break
+endif
+set self tangible 1
+set self state LOOK
+if self.emptyto
+   set self state self.emptyto
+   set self emptyto 0
+endif
 
 |LOOK:0|
 exec checkAir

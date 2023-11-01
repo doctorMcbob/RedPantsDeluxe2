@@ -17,7 +17,6 @@ add self.treasure blood0
 add self.treasure fart0
 add self.treasure puppetredpants0
 
-print self.treasure
 for n_ range 12
    set self gravename grave + n_
    set self.gravename digs choiceof self.treasure

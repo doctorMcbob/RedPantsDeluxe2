@@ -19,5 +19,5 @@ set self background 1
 
 |PLATFORM:0|
 if self.frame > self.timer
-    goodbye
+   goodbye
 endif

@@ -6,8 +6,7 @@ LAUNCHED:0 empty 0,0
 |START:0|
 set self frame 0
 set self state WAIT
-set self count 0
-set self max_ 2
+set self sayname self.name + say
 
 |WAIT:0|
 set self frame 0
@@ -17,13 +16,13 @@ set self state WAIT
 set self frame 0
 
 |COLLIDE|
+if not self.lakitu
+   break
+endif
 if related.state == WAIT
-   create say0 related.name + say + related.count related.x related.y
-   set related.name + say + related.count message "FIRE BURNS"
-   set related count related.count + 1
+   create say0 related.sayname related.x related.y
+   set related.sayname message "FIRE BURNS"
    set related state LAUNCHED
-   if related.count > related.max_
-      set related count 0
-   endif
+set related frame 0
 endif
 
