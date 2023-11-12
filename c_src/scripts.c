@@ -18,6 +18,9 @@
 #ifndef STRING_DATA_LOAD
 #include "stringdata.h"
 #endif
+#ifndef BENCHMARKS
+#include "benchmarks.h"
+#endif
 
 extern int SCRIPT_MAPS[];
 ScriptMap *scriptmaps;
@@ -1943,10 +1946,13 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
                    int debug, int eject, int keyTypes[], int keyValues[],
                    int replacerTypes[], int replacerValues[],
                    int replacerCount) {
+  int m = get_benchmark_mode();
+  switch_benchmark_mode(INTERPERETER_MODE);
   int executionPointer = scriptIdx;
   int ifNested = 0;
   while (SCRIPTS[executionPointer] != -2000) {
     if (eject > 0 && eject <= executionPointer) {
+      switch_benchmark_mode(m);
       return 0;
     }
 
@@ -2379,6 +2385,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
     // resolve verb
     switch (verb) {
     case QUIT: {
+      switch_benchmark_mode(m);
       return -2;
     }
     case GOODBYE: {
@@ -2386,12 +2393,15 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       remove_actor_from_frames(self->name);
       free_actor(self);
       clear_ownerless_lists();
+      switch_benchmark_mode(m);
       return -1;
     }
     case BREAK: {
+      switch_benchmark_mode(m);
       return 0;
     }
     case RESET: {
+      // deprecated
       break;
     }
     case SET: {
@@ -2672,6 +2682,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int i = 0;
       while (i < LARGEST_SCRIPT_MAP) {
         if (actor->scriptmap[i] == -1) {
+	  switch_benchmark_mode(m);
           return -1;
         }
         int state = actor->scriptmap[i++];
@@ -2749,8 +2760,10 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       if (script != -1) {
         int resolution = resolve_script(script, self, related, world, debug, -1,
                                         0, 0, 0, 0, 0);
-        if (resolution < 0)
+        if (resolution < 0) {
+	  switch_benchmark_mode(m);
           return resolution;
+	}
       }
       break;
     }
@@ -3188,8 +3201,10 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       if (scriptKey != -1) {
         int resolution = resolve_script(scriptKey, self, NULL, world, debug, -1,
                                         0, 0, 0, 0, 0);
-        if (resolution < 0)
-          return resolution;
+        if (resolution < 0) {
+	  switch_benchmark_mode(m);
+	  return resolution;
+	}
       }
       break;
     }
@@ -3291,8 +3306,10 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       if (script != -1) {
         int resolution =
             resolve_script(script, a, NULL, world, debug, -1, 0, 0, 0, 0, 0);
-        if (resolution < 0)
-          return resolution;
+        if (resolution < 0) {
+	  switch_benchmark_mode(m);
+	  return resolution;
+	}
       }
 
       a->updated = 1;
@@ -3430,7 +3447,8 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         while (SCRIPTS[exit++] != -1000) {
           if (SCRIPTS[exit] == -2000 || exit >= SCRIPTS_SIZE) {
             printf("Missing ENDFOR\n");
-            return -1;
+	    switch_benchmark_mode(m);
+	    return -1;
           }
         }
       }
@@ -3494,6 +3512,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
         if (resolution < 0) {
           remove_owner(iterValue);
+	  switch_benchmark_mode(m);
           return resolution;
         }
       }
@@ -3610,6 +3629,6 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
   if (debug == 2) {
     printf("Done. number of lists %i\n", get_num_lists());
   }
-
+  switch_benchmark_mode(m);
   return 0;
 }

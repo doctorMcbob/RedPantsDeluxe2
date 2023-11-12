@@ -17,6 +17,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+#ifndef BENCHMARKS
+#include "benchmarks.h"
+#endif
 
 struct TreeNode *actors_by_name = NULL;
 struct TreeNode *templates_by_name = NULL;
@@ -200,6 +203,8 @@ float _floor(float x) {
 }
 
 int collision_check(Actor *actor, World *world, int debug) {
+  int m = get_benchmark_mode();
+  switch_benchmark_mode(COLLISION_MODE);
   int buffer[WORLD_BUFFER_SIZE];
 
   for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
@@ -216,19 +221,25 @@ int collision_check(Actor *actor, World *world, int debug) {
       continue;
     if (SDL_HasIntersection(&actor->ECB, &actor2->ECB)) {
       int resolution = collision_with(actor, actor2, world, debug);
-      if (resolution < 0)
+      if (resolution < 0) {
+	switch_benchmark_mode(m);
         return resolution;
+      }
       int resolution2 = collision_with(actor2, actor, world, debug);
-      if (resolution2 < 0)
+      if (resolution2 < 0) {
+	switch_benchmark_mode(m);
         return resolution2;
+      }
     }
   }
   if (!world_has(world, actor->name)) {
     // we do this because the collision_with scripts may change which world the
     // actor is in. (ie, doors)
     world = world_with(actor->name);
-    if (world == NULL)
+    if (world == NULL) {
+      switch_benchmark_mode(m);
       return 0;
+    }
     for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
       buffer[idx] = world->actors[idx];
     }
@@ -285,11 +296,15 @@ int collision_check(Actor *actor, World *world, int debug) {
         continue;
       if (SDL_HasIntersection(&moved, &actor2->ECB)) {
         int resolution3 = collision_with(actor, actor2, world, debug);
-        if (resolution3 < 0)
+        if (resolution3 < 0) {
+	  switch_benchmark_mode(m);
           return resolution3;
+	}
         int resolution4 = collision_with(actor2, actor, world, debug);
-        if (resolution4 < 0)
+        if (resolution4 < 0) {
+	  switch_benchmark_mode(m);
           return resolution4;
+	}
       }
     }
 
@@ -384,11 +399,15 @@ int collision_check(Actor *actor, World *world, int debug) {
         continue;
       if (SDL_HasIntersection(&moved, &actor2->ECB)) {
         int resolution3 = collision_with(actor, actor2, world, debug);
-        if (resolution3 < 0)
+        if (resolution3 < 0) {
+	  switch_benchmark_mode(m);
           return resolution3;
+	}
         int resolution4 = collision_with(actor2, actor, world, debug);
-        if (resolution4 < 0)
+        if (resolution4 < 0) {
+	  switch_benchmark_mode(m);
           return resolution4;
+	}
       }
     }
 
@@ -466,6 +485,7 @@ int collision_check(Actor *actor, World *world, int debug) {
       }
     }
   }
+  switch_benchmark_mode(m);
   return 0;
 }
 

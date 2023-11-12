@@ -6,7 +6,7 @@ void Clock_tick(Clock *clock, Uint32 fps) {
   clock->startTicks = SDL_GetTicks();
   clock->frameTicks = clock->startTicks - clock->lastTicks;
 
-  int targetFrameTicks = 1000 / fps;
+  Uint32 targetFrameTicks = 1000 / fps;
 
   if (targetFrameTicks > clock->frameTicks) {
     int delay = targetFrameTicks - clock->frameTicks;

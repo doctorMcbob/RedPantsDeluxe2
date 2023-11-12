@@ -36,6 +36,10 @@ I will be using uthash.h as my dictionary implementation
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_timer.h>
 
+#ifndef BENCHMARKS
+#include "benchmarks.h"
+#endif
+
 #define WID 1152
 #define HIGH 640
 #define FPS_CAP 20
@@ -162,4 +166,5 @@ int main(int argc, char *argv[]) {
   SDL_DestroyRenderer(rend);
   SDL_DestroyWindow(screen);
   SDL_Quit();
+  print_benchmark_data();
 }

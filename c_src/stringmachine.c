@@ -3,6 +3,9 @@
 #endif
 #include "stringmachine.h"
 
+#ifndef BENCHMARKS
+#include "benchmarks.h"
+#endif
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,9 +17,12 @@ StringIndexer *indexers = NULL;
 DynamicString *dynamic_strings = NULL;
 
 int add_string(char *string, int skipCheck) {
+  int m = get_benchmark_mode();
+  switch_benchmark_mode(STRING_MACHINE_MODE);
   if (!skipCheck) {
     int i = index_string(string);
     if (i != -1) {
+      switch_benchmark_mode(m);
       return i;
     }
   }
@@ -26,12 +32,15 @@ int add_string(char *string, int skipCheck) {
   DYNAMIC_STRINGS++;
   DL_APPEND(dynamic_strings, ds);
   add_indexer(string, idx);
+  switch_benchmark_mode(m);
   return idx;
 }
 
 int concat_strings(char *str1, char *str2) {
   if (str1 == NULL || str2 == NULL)
     return -1;
+  int m = get_benchmark_mode();
+  switch_benchmark_mode(STRING_MACHINE_MODE);
 
   int len1 = strlen(str1);
   int len2 = strlen(str2);
@@ -42,9 +51,11 @@ int concat_strings(char *str1, char *str2) {
   int idx = index_string(concat_str);
   if (idx == -1) {
     int idx = add_string(concat_str, 1);
+    switch_benchmark_mode(m);
     return idx;
   }
   free(concat_str);
+  switch_benchmark_mode(m);
   return idx;
 }
 
@@ -62,15 +73,19 @@ char *get_string(int idx) {
     return NULL;
   if (idx < NUM_STRINGS)
     return (char *)STRINGS[idx];
+  int m = get_benchmark_mode();
+  switch_benchmark_mode(STRING_MACHINE_MODE);
   if (idx < NUM_STRINGS + DYNAMIC_STRINGS) {
     DynamicString *ds;
     int d_idx = idx - NUM_STRINGS;
     DL_FOREACH(dynamic_strings, ds) {
       if (d_idx-- != 0)
         continue;
+      switch_benchmark_mode(m);
       return ds->string;
     }
   }
+  switch_benchmark_mode(m);
   return NULL;
 }
 
@@ -95,6 +110,8 @@ int index_string(char *string) {
   int len = strlen(string);
   if (len == 0)
     return -1;
+  int m = get_benchmark_mode();
+  switch_benchmark_mode(STRING_MACHINE_MODE);
   StringIndexer *si;
   DynamicString *ds = dynamic_strings;
   DL_FOREACH(indexers, si) {
@@ -118,16 +135,19 @@ int index_string(char *string) {
     for (int i = 0; i < tocheck; i++) {
       if (starter + i < NUM_STRINGS) {
         if (strcmp(STRINGS[starter + i], string) == 0) {
+	  switch_benchmark_mode(m);
           return starter + i;
         }
       } else {
         if (strcmp(ds->string, string) == 0) {
+	  switch_benchmark_mode(m);
           return starter + i;
         }
         ds = ds->next;
       }
     }
   }
+  switch_benchmark_mode(m);
   return -1;
 }
 

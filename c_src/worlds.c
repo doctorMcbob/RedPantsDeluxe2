@@ -12,6 +12,9 @@
 #include "utlist.h"
 #include "tree.h"
 #include "worlddata.h"
+#ifndef BENCHMARKS
+#include "benchmarks.h"
+#endif
 
 struct TreeNode *worlds_by_name = NULL;
 
@@ -121,6 +124,8 @@ void _draw_background(World *world, SDL_Renderer *rend, Frame *frame) {
 }
 
 void draw_world(World *world, SDL_Renderer *rend, Frame *frame) {
+  int m = get_benchmark_mode();
+  switch_benchmark_mode(DRAWING_MODE);
   _draw_background(world, rend, frame);
 
   for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
@@ -135,6 +140,7 @@ void draw_world(World *world, SDL_Renderer *rend, Frame *frame) {
     if (in_frame(frame, a))
       draw_actor(rend, a, frame);
   }
+  switch_benchmark_mode(m);
 };
 
 int world_has(World *world, int actorKey) {
