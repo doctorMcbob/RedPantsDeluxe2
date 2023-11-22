@@ -20,7 +20,7 @@ TOUCHED22 touched1022 0,0
 
 |START:0|
 set self state PLATFORM
-set self tileset platform1
+set self tileset platform10
 set self platform 1
 set self frame 0
 set self touched 0
@@ -28,7 +28,7 @@ set self touched 0
 |PLATFORM:0|
 if self.touched > 0
     set self state TOUCHED
-set self tileset touched1
+set self tileset touched10
 endif
 set self frame 0
 

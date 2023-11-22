@@ -110,8 +110,10 @@ void add_actor(int name, int x, int y, int w, int h, int x_vel, int y_vel,
     a->updated = 0;
 
   a->tileset = -1;
+
   actors_by_name = push_to_tree(actors_by_name, name, key);
-  validate_actors();
+
+  // validate_actors();
 }
 
 void copy_actor(Actor *copy, Actor *a) {
@@ -962,14 +964,17 @@ void free_actor(Actor *actor) {
   actors_by_name = remove_from_tree(actors_by_name, ACTORS[idx].name);
   actors_by_name = push_to_tree(actors_by_name, ACTORS[idx].name, idx);
 
-  validate_actors();
+  // validate_actors();
 }
 
 void validate_actors() {
   for (int i = 0; i < DEEPEST_ACTOR; i++) {
     int idx = value_for_key(actors_by_name, ACTORS[i].name);
-    if (idx != i)
+    if (idx != i) {
       printf("Actor %s is at %i in memory but %i in map (DEEPEST ACTOR %i)\n",
              get_string(ACTORS[i].name), i, idx, DEEPEST_ACTOR);
+      printTreeMemState();
+      printPreOrder(actors_by_name);
+    }
   }
 }

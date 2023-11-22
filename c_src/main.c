@@ -25,6 +25,7 @@ I will be using uthash.h as my dictionary implementation
 #include "stringmachine.h"
 #include "worlds.h"
 #include "worlddata.h"
+#include "tree.h"
 #include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -103,7 +104,7 @@ int main(int argc, char *argv[]) {
   }
 
   SDL_Window *screen = SDL_CreateWindow(
-      "Long way to the top, if you wanna make a game engine",
+      "Red Pants Deluxe 2",
       SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WID, HIGH, 0);
   if (!screen) {
     printf("error creating window: %s\n", SDL_GetError());
@@ -123,6 +124,7 @@ int main(int argc, char *argv[]) {
     SDL_Quit();
     return 1;
   }
+  init_tree_nodes();
   load_string_indexers();
   spritesheet_load(rend);
   scripts_load();

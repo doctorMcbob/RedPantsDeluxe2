@@ -1356,6 +1356,7 @@ void resolve_operators(int statement, World *world, int debug) {
           char *s = get_string(leftValue);
           int len = strlen(s);
           if (rightValue < len) {
+		  // potential solution to remove this malloc, intern every character used in every string including 0-9
             char *c = malloc(sizeof(char) * 2);
             c[0] = s[rightValue];
             c[1] = '\0';
@@ -2591,6 +2592,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
         Attribute *attr;
         HASH_FIND_INT(a->attributes, &attrValue, attr);
         if (attr == NULL) {
+		// to remove this malloc, switch attributes to be binary tree, and refactor tree
           attr = malloc(sizeof(Attribute));
           attr->name = attrValue;
           HASH_ADD_INT(a->attributes, name, attr);
@@ -2646,6 +2648,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       char *delim = ":";
 
       char *_string = get_string(oldKeyValue);
+      // to remove this malloc.... idk man consider deprecating reassign cause its fucking stupid
       char *scriptValueStr = malloc(strlen(_string) + 1);
       strcpy(scriptValueStr, _string);
 
@@ -2742,6 +2745,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       int state = scriptValue;
 
       char *_string = get_string(scriptValue);
+      // we should be calculating the : delimiter at compile time, this is silly
       char *scriptValueStr = malloc(strlen(_string) + 1);
       strcpy(scriptValueStr, _string);
 
@@ -3472,6 +3476,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
           v[1] = '\0';
           replacementValue = index_string(&v[0]);
           if (replacementValue == -1) {
+		  // solve this by interning every character as i said earlier in the at operator
             char *newStr = malloc(sizeof(v));
             strcpy(newStr, v);
             replacementValue = add_string(newStr, 1);
@@ -3486,7 +3491,8 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
           replacementType = ln->type;
           replacementValue = ln->value;
         }
-
+	// happy shop salesman gif D:
+	// lets have all these defined at the top and simply set a max depth of like 16?
         int *_keyTypes = malloc(sizeof(int) * (replacerCount + 1));
         int *_keyValues = malloc(sizeof(int) * (replacerCount + 1));
         int *_replacerTypes = malloc(sizeof(int) * (replacerCount + 1));
