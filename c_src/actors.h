@@ -1,5 +1,4 @@
 # include <SDL2/SDL.h>
-# include "uthash.h"
 #ifndef SPRITES_DEF
 # include "sprites.h"
 #endif
@@ -7,7 +6,9 @@
 #ifndef SCRIPT_DATA_LOAD
 # include "scriptdata.h"
 #endif
-
+#ifndef TREE_IMPORT
+#include "tree.h"
+#endif
 #ifndef ACTORS_DEF
 # define ACTORS_DEF 1
 
@@ -19,7 +20,7 @@ typedef struct Attribute {
     int i;
     float f;
   } value;
-  UT_hash_handle hh;
+  int idx;
 } Attribute;
 
 typedef struct Actor {
@@ -46,7 +47,7 @@ typedef struct Actor {
   int updated;
   int background;
   // attribute hash
-  Attribute* attributes;
+  struct TreeNode *attributes;
 } Actor;
 
 void translate_rect_by_actor(Actor *actor, SDL_Rect *rect);
@@ -91,4 +92,10 @@ void free_actor(Actor* actor);
 BoxMapEntry* get_hurtboxes_for_actor(Actor* actor);
 BoxMapEntry* get_hitboxes_for_actor(Actor* actor);
 int hit_check(Actor *self, Actor* related, World *world, int debug);
+void init_attributes();
+struct Attribute *getAttributeFromActor(Actor* actor, int key);
+void add_attribute_to_actor(Actor* actor, int attribute_name, int type, int ivalue, float fvalue);
+void remove_attribute_from_actor(Actor* actor, int attribute_name);
+void free_attribute(struct Attribute *attr);
+void free_attribute_tree(struct TreeNode *root);
 #endif

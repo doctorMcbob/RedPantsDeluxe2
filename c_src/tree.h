@@ -16,4 +16,6 @@ int value_for_key(struct TreeNode* root, int key);
 struct TreeNode *remove_from_tree(struct TreeNode *root, int key);
 void printPreOrder(struct TreeNode *root);
 void printTreeMemState();
+void free_whole_tree(struct TreeNode *root);
+struct TreeNode *getNodeForIdx(int idx);
 #endif

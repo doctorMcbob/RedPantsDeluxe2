@@ -21,6 +21,13 @@
 #include "benchmarks.h"
 #endif
 
+
+#define NUM_ATTRIBUTES 100000
+struct Attribute ATTRIBUTE_HEAP[NUM_ATTRIBUTES];
+int NEXT_ATTRIBUTE = 0;
+int CLEARED_ATTRIBUTES[NUM_ATTRIBUTES];
+int CLEARED_ATTRIBUTES_DEPTH = -1;
+
 struct TreeNode *actors_by_name = NULL;
 struct TreeNode *templates_by_name = NULL;
 int DEEPEST_ACTOR = 0;
@@ -663,8 +670,6 @@ Sprite *get_sprite_for_actor(Actor *actor) {
 }
 
 BoxMapEntry *get_hitboxes_for_actor(Actor *actor) {
-  if (actor->hitboxkey == NULL)
-    return NULL;
   BoxMap *bm = get_hitbox_map(actor->hitboxkey);
   if (!bm)
     return NULL;
@@ -687,8 +692,6 @@ BoxMapEntry *get_hitboxes_for_actor(Actor *actor) {
 }
 
 BoxMapEntry *get_hurtboxes_for_actor(Actor *actor) {
-  if (actor->hurtboxkey == NULL)
-    return NULL;
   BoxMap *bm = get_hurtbox_map(actor->hurtboxkey);
   if (!bm)
     return NULL;
@@ -944,16 +947,8 @@ void draw_actor(SDL_Renderer *rend, Actor *actor, Frame *f) {
 }
 
 void free_actor(Actor *actor) {
-  Attribute *attr, *tmp;
-
-  HASH_ITER(hh, actor->attributes, attr, tmp) {
-    if (attr->type == LIST) {
-      remove_owner(attr->value.i);
-    }
-    HASH_DEL(actor->attributes, attr);
-    free(attr);
-  }
-
+  free_attribute_tree(actor->attributes);
+  actor->attributes = NULL;
   int idx = value_for_key(actors_by_name, actor->name);
   actors_by_name = remove_from_tree(actors_by_name, actor->name);
   if (idx == --DEEPEST_ACTOR) {
@@ -978,3 +973,103 @@ void validate_actors() {
     }
   }
 }
+
+void init_attributes() {
+  for (int i = 0; i < NUM_ATTRIBUTES; i++) {
+    ATTRIBUTE_HEAP[i].idx = i;
+    ATTRIBUTE_HEAP[i].name = -1;
+    ATTRIBUTE_HEAP[i].type = -1;
+    ATTRIBUTE_HEAP[i].value.i = -1;
+  }
+}
+
+struct Attribute *newAttr(int name, int type, int ivalue, float fvalue) {
+  printf("New attribute, name %s, type %i, ivalue %i, fvalue %f\n",
+	 get_string(name), type, ivalue, fvalue);
+  struct Attribute *attr;
+  if (CLEARED_ATTRIBUTES_DEPTH > -1) {
+    attr = &ATTRIBUTE_HEAP[CLEARED_ATTRIBUTES[CLEARED_ATTRIBUTES_DEPTH--]];
+  } else {
+    if (NEXT_ATTRIBUTE >= NUM_ATTRIBUTES) {
+      printf("Ran out of Attributes, consider adding more if this is not a memory leak issue\n");
+      exit(-1);
+    }
+    attr = &ATTRIBUTE_HEAP[NEXT_ATTRIBUTE++];
+  }
+  attr->name = name;
+  attr->type = type;
+  if (type == FLOAT) attr->value.f = fvalue;
+  else attr->value.i = ivalue;
+  printf("grabbed attr at idx %i, type %i, ", attr->idx, attr->type);
+  if (type == FLOAT) printf("value %f\n", attr->value.f);
+  else printf("value %i\n", attr->value.i);
+  return attr;
+}
+
+void free_attribute(struct Attribute *attr) {
+  attr->name = -1;
+  attr->type = -1;
+  attr->value.i = -1;
+  CLEARED_ATTRIBUTES[++CLEARED_ATTRIBUTES_DEPTH] = attr->idx;
+}
+
+struct Attribute *getAttributeFromActor(Actor* actor, int key) {
+  struct Attribute *attr = NULL;
+  printf("get attribute: actor %s %p, key (%i)%s\n", get_string(actor->name), actor->attributes, key, get_string(key));
+  printPreOrder(actor->attributes);
+  int idx = value_for_key(actor->attributes, key);
+  if (idx != -1) {
+    printf("Indexing attribute heap at %i\n", idx);
+    attr = &ATTRIBUTE_HEAP[idx];
+  }
+  return attr;
+}
+
+void add_attribute_to_actor(Actor* actor, int attribute_name, int type, int ivalue, float fvalue) {
+  printf("Adding attribute %s to actor %s\n",
+	 get_string(attribute_name), get_string(actor->name));
+  printf("  type %i ivalue %i fvalue %f\n", type, ivalue, fvalue);
+  struct Attribute *attr = getAttributeFromActor(actor, attribute_name);
+  if (attr == NULL) {
+    printf("  existing attribute NOT found\n");
+    attr = newAttr(attribute_name, type, ivalue, fvalue);
+    actor->attributes = push_to_tree(actor->attributes, attribute_name, attr->idx);
+  } else {
+    printf("  existsing attribute found with type %i\n", attr->type);
+    if (attr->type == LIST) {
+      remove_owner(attr->value.i);
+    }
+    attr->type = type;
+    attr->name = attribute_name;
+    if (type == FLOAT) {
+      printf("  setting float value %f\n", fvalue);
+      attr->value.f = fvalue;
+    }
+    else {
+      printf("  setting int value %i\n", ivalue);
+      attr->value.i = ivalue;
+    }
+    if (attr->type == LIST) {
+      add_owner(attr->value.i);
+    }
+  }
+}
+
+void remove_attribute_from_actor(Actor* actor, int attribute_name) {
+  struct Attribute *attr = getAttributeFromActor(actor, attribute_name);
+  if (attr == NULL) return;
+  free_attribute(attr);
+  actor->attributes = remove_from_tree(actor->attributes, attribute_name);
+}
+
+void free_attribute_tree(struct TreeNode *root) {
+  struct Attribute *attr;
+  if (root != NULL) {
+    free_attribute_tree(getNodeForIdx(root->left));
+    free_attribute_tree(getNodeForIdx(root->right));
+    attr = &ATTRIBUTE_HEAP[root->value];
+    free_attribute(attr);
+    free_whole_tree(root);
+  }
+}
+

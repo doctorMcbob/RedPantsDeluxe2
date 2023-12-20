@@ -270,8 +270,23 @@ void printTreeMemState() {
 
 void printPreOrder(struct TreeNode *root) {
   if (root != NULL) {
-    printf("   %d(%i):%s->%i \n", root->key, root->idx, get_string(root->key), root->value);
+    printf("   %d(%i):%s->%i L:%i R:%i\n",
+	   root->key, root->idx, get_string(root->key), root->value, root->left, root->right);
     printPreOrder(getNodeForIdx(root->left));
     printPreOrder(getNodeForIdx(root->right));
   }
 }
+
+void free_whole_tree(struct TreeNode *root) {
+  if (root != NULL) {
+    free_whole_tree(getNodeForIdx(root->left));
+    free_whole_tree(getNodeForIdx(root->right));
+    root->left = -1;
+    root->right = -1;
+    root->key = -1;
+    root->value = -1;
+    root->height = -1;
+    CLEARED_NODES[++CLEARED_NODES_DEPTH] = root->idx;
+  }
+}
+

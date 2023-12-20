@@ -2198,13 +2198,21 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 	  if (a->tileset == -1) BUFFER[bufferPointer - 2] = INT;
 	  else BUFFER[bufferPointer - 2] = STRING;
 	  BUFFER[bufferPointer - 1] = a->tileset;
+	  break;
 	default: {
           Attribute *attr;
-          HASH_FIND_INT(a->attributes, &rightValue, attr);
+	  printf("Dot notation grabbing %s from %s\n",
+		 get_string(rightValue), get_string(a->name));
+          attr = getAttributeFromActor(a, rightValue);
           if (attr == NULL) {
+	    printf("   not found.\n");
             BUFFER[bufferPointer - 2] = INT;
             BUFFER[bufferPointer - 1] = 0;
           } else {
+	    printf("   found type %i ", attr->type);
+	    if (attr->type == FLOAT) printf("%f\n", attr->value.f);
+	    else if (attr->type == STRING) printf("%s\n", get_string(attr->value.i));
+	    else printf("%i\n", attr->value.i);
             BUFFER[bufferPointer - 2] = attr->type;
             BUFFER[bufferPointer - 1] =
                 attr->type == FLOAT ? push_float(attr->value.f) : attr->value.i;
@@ -2588,9 +2596,11 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 	if (valueType != STRING)
 	  break;
 	a->tileset = valueValue;
+	break;
       default: {
-        Attribute *attr;
-        HASH_FIND_INT(a->attributes, &attrValue, attr);
+	/*
+	Attribute *attr;
+	HASH_FIND_INT(a->attributes, &attrValue, attr);
         if (attr == NULL) {
 		// to remove this malloc, switch attributes to be binary tree, and refactor tree
           attr = malloc(sizeof(Attribute));
@@ -2606,6 +2616,13 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
           attr->value.i = valueValue;
         if (attr->type == LIST)
           add_owner(attr->value.i);
+	*/
+	printf("Set value %s %i on actor %s\n", get_string(attrValue), valueValue, get_string(a->name));
+	if (valueType == FLOAT) {
+	  add_attribute_to_actor(a, attrValue, valueType, -1, get_float(valueValue));
+	} else {
+	  add_attribute_to_actor(a, attrValue, valueType, valueValue, -1.0);
+	}
       }
       }
       break;

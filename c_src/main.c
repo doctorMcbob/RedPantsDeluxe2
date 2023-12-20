@@ -125,6 +125,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
   init_tree_nodes();
+  init_attributes();
   load_string_indexers();
   spritesheet_load(rend);
   scripts_load();
