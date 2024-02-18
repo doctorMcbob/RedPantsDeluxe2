@@ -1,0 +1,37 @@
+SANTA|0,0,0,0|False|
+START:0 santasleigh0 -32,-16
+SLEIGH:0 santasleigh0 -32,-16
+SLEIGH:20 santasleigh1 -32,-16
+BONK:0 santabonk0 -32,-16
+MAD:0 santamad -32,-16
+VANISH:0 santavanish0 -32,-16
+VANISH:6 santavanish1 -32,-16
+VANISH:9 santavanish2 -32,-16
+
+|START:0|
+set self follow santasleigh0
+exec init_follow
+set self state SLEIGH
+
+|SLEIGH:0|
+exec do_follow
+
+|SLEIGH:30|
+set self frame 0
+exec SLEIGH:0
+
+|BONK:0|
+
+
+|init_follow|
+set self offx self.x - self.follow.x
+set self offy self.y - self.follow.y
+
+|do_follow|
+set self direction self.follow.direction
+set self x self.follow.x + self.offx
+if self.direction == 1
+   set self x self.follow.x + self.follow.w - self.offx - self.w
+endif
+set self y self.follow.y + self.offy
+
