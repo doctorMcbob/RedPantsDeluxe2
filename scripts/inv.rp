@@ -45,7 +45,7 @@ if self.cheater_mode
    set self scienceBL 1
 
    set self fighter_unlock 1
-#   set self antlers_unlock 1
+   set self antlers_unlock 1
    set self shoes_unlock 1
    set self moon_unlock 1
 

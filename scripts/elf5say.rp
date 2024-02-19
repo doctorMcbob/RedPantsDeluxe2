@@ -1,0 +1,51 @@
+TEXT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+LAUNCHED:0 empty 0,0
+
+|START:0|
+set self frame 0
+set self state WAIT
+set self max_ 2
+set self sayname self.name + say
+set self has_purchased 0
+
+set self pre_messages []
+add self.pre_messages "YOUR NOT WELCOME BACK HERE"
+add self.pre_messages "MY BOSS WILL KILL ME IF^I LET YOU THROUGH     "
+set self post_messages []
+add self.post_messages "I GUESS YOU CAN GO IN"
+add self.post_messages "NICE PANTS"
+set self messages self.pre_messages
+set self idx 0
+set self length 2
+
+|WAIT:0|
+if self.has_purchased
+   set self messages self.pre_messages
+endif
+set self frame 0
+
+|LAUNCHED:170|
+set self state WAIT
+set self frame 0
+
+|COLLIDE|
+if not self.lakitu
+   break
+endif
+if elf0say0.state == LAUNCHED
+   break
+endif
+if elf2say0.state == LAUNCHED
+   break
+endif
+if related.state == WAIT
+   create say0 related.sayname related.x related.y
+   set related.sayname message related.messages at related.idx
+   set related idx related.idx + 1 % related.length
+   set related.sayname back backgroundsayL0
+   set related state LAUNCHED
+set related frame 0
+endif
+
