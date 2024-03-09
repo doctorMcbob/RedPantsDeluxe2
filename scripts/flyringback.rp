@@ -12,6 +12,10 @@ DONE:12 ringright3 0,0
 set self direction -1
 set self state WAIT
 set self number self.name at 11
+if len self.name > 11
+   set self number2 self.name at 12
+   set self number self.number + self.number2
+endif
 set self front flyringfront + self.number
 set self number int self.number
 set self frame self.number % 7
