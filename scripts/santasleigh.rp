@@ -1,0 +1,36 @@
+SLEIGH|0,0,0,0|False|
+START:0 santasleigh 0,0
+SLEIGH:0 santasleigh 0,0
+HIT:0 santasleigh 0,0
+
+|START:0|
+set self state SLEIGH
+set self physics 1
+set self speed 5
+set self direction -1
+exec sinewave_init
+set self rdeer 0
+
+|SLEIGH:0|
+exec sinewave_do
+set self x_vel self.speed * self.direction * -1
+
+|SLEIGH:50|
+set self frame 0
+exec SLEIGH:0
+
+|XCOLLISION|
+set self direction self.direction * -1
+
+|sinewave_init|
+set self midcenter self.y
+set self c 0
+set self freq 0.1
+set self amp 32
+set self pi 3.14159
+
+|sinewave_do|
+set self c self.c + self.freq
+set self d sin self.c * self.amp
+
+set self y self.midcenter + self.d

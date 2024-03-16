@@ -1,0 +1,38 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+LOCKED:0 empty 0,0
+
+|START:0|
+set self state LOCKED
+set self price 50
+set self sayname self.name + say
+set self p1 "NEED "
+set self p2 " COINS  ^HAVE "
+set self p3 " COINS  "
+set self do_check 0
+
+|LOCKED:0|
+if self.do_check
+   exec check
+   set self do_check 0
+endif
+
+|COLLIDE|
+if not self.lakitu
+   break
+endif
+set related do_check 1
+
+|sayPrices|
+set self message self.p1 + self.price + self.p2 + inv0.coins + self.p3
+create say0 self.sayname self.x self.y
+set self.sayname message self.message
+set self.sayname back backgroundsay0
+
+|check|
+exec sayPrices
+if inv0.coins > self.price
+     set inv0 antlers_unlock 1
+     set elf1say0 messages elf1say0.post_messages
+     goodbye
+endif

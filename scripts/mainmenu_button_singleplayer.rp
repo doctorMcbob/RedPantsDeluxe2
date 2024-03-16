@@ -13,6 +13,7 @@ set self down_button mainmenu_button_twoplayer0
 set self up_button mainmenu_button_quit0
 set self direction -1
 set self player1_location redpantshouseroot
+#set self player1_location swamp0
 
 |SELECTED:2|
 set self events inpEVENTS

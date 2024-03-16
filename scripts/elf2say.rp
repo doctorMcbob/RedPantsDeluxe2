@@ -1,0 +1,42 @@
+TEXT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+LAUNCHED:0 empty 0,0
+
+|START:0|
+set self frame 0
+set self state WAIT
+set self max_ 2
+set self sayname self.name + say
+set self messages []
+add self.messages "BEING AN ELF ISNT AS    ^WHIMSICAL AS YOUD THINK  "
+add self.messages "OLD MAN WORKS YOU PRETTY HARD"
+set self idx 0
+set self length 2
+
+|WAIT:0|
+set self frame 0
+
+|LAUNCHED:160|
+set self state WAIT
+set self frame 0
+
+|COLLIDE|
+if not self.lakitu
+   break
+endif
+if elf1say0.state == LAUNCHED
+   break
+endif
+if elf0say0.state == LAUNCHED
+   break
+endif
+if related.state == WAIT
+   create say0 related.sayname related.x related.y
+   set related.sayname message related.messages at related.idx
+   set related idx related.idx + 1 % related.length
+   set related.sayname back backgroundsayL0
+   set related state LAUNCHED
+set related frame 0
+endif
+

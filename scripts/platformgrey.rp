@@ -28,7 +28,6 @@ set self touched 0
 |PLATFORM:0|
 if self.touched > 0
     set self state TOUCHED
-set self tileset touchedgrey
 endif
 set self frame 0
 

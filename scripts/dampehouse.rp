@@ -1,0 +1,23 @@
+HOUSE|0,0,0,0|False|
+START:0 dampehouse0 0,0
+HOUSE:0 dampehouse0 0,0
+CANNON:0 dampehouse1 -16,-16
+BLAST:0 dampehouse2 -16,-16
+
+|START:0|
+set self state HOUSE
+set self blast 0
+
+|CANNON:0|
+if self.blast
+   set self state BLAST
+   set self frame 0
+endif
+
+|BLAST:5|
+
+|BLAST:6|
+set self blast 0
+
+|BLAST:36|
+set self state CANNON

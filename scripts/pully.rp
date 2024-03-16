@@ -18,7 +18,7 @@ set self tileset pully
 set self state PULLY
 set self h self.h / 32 * 32
 set self max_h self.h
-
+set self platform 1
 
 |PULLY:0|
 # pass

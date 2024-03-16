@@ -1,0 +1,34 @@
+RING|0,0,0,0|False|
+START:0 ringright0 0,0
+WAIT:0 ringright0 0,0
+WAIT:3 ringright1 0,0
+DONE:0 ringright0 0,0
+DONE:3 ringright1 0,0
+DONE:6 ringright0 0,0
+DONE:9 ringright2 0,0
+DONE:12 ringright3 0,0
+
+|START:0|
+set self direction -1
+set self state WAIT
+set self number self.name at 11
+if len self.name > 12
+   set self number2 self.name at 12
+   set self number self.number + self.number2
+endif
+set self front flyringfront + self.number
+set self number int self.number
+set self frame self.number % 7
+
+|WAIT:7|
+set self frame 0
+back
+
+|COLLIDE|
+if not self.lakitu
+   break
+endif
+set related state DONE
+set related.front state DONE
+set related frame 0
+set related.front frame 0
