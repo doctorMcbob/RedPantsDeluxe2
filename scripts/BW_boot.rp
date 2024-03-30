@@ -1,6 +1,6 @@
 MGMT|0,0,0,0|False|
 START:0 empty 0,0
-WAIT:0 splashintro 64,0
+WAIT:0 empty 64,0
 
 |START:0|
 set self direction -1
@@ -10,7 +10,6 @@ set self player1_exists isinputstate PLAYER1
 set self player2_exists isinputstate PLAYER2
 
 set self _input_name PLAYER1
-song opening
 
-|WAIT:90|
+|WAIT:10|
 view BLINDWITCH BW_openingcutscene
