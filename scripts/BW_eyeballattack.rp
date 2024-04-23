@@ -6,14 +6,17 @@ EYE:0 eyen -16,0
 SPLODE:0 empty 0,0
 
 |START:0|
-sfx eye_shoot
 set self state EYE
 set self physics 1
 set self grav 0.5
 hitboxes BW_eyeball
 hurtboxes BW_eyeball
+set self new 1
 
 |EYE:0|
+if self.new
+   sfx eye_shoot
+endif
 img eyen
 if self.y_vel < -5
    img eyeu

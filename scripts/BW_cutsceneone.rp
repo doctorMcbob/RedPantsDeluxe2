@@ -11,6 +11,7 @@ set self direction -1
 set self _input_name PLAYER1
 
 |SCENE:0|
+song opening
 if A_DOWN in inpEVENTS
    exec SCENE:300
    break
