@@ -431,8 +431,7 @@ def evaluate_literals(cmd, reference, world, related=None, logfunc=print):
                 cmd[idx] = sounds.get_song()
             if token == "COLLIDE?":
                 actor = a.get_actor(reference)
-                actors = list(filter(lambda actr:not (actr is actor), world.get_actors()[::-1]))
-                tangibles = list(filter(lambda actr: actr.tangible, actors))
+                tangibles = list(filter(lambda actr:(actr is not actor) and actr.tangible, world.get_actors()[::-1]))
                 hits = actor.collidelistall(tangibles)
                 cmd[idx] = [tangibles[hit].name for hit in hits]
             if token == "None":
