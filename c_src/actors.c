@@ -236,7 +236,7 @@ int collision_check(Actor *actor, World *world, int debug) {
   }
   if (!world_has(world, actor->name)) {
     // we do this because the collision_with scripts may change which world the
-    // actor is in. (ie, doors)
+    // actor is in. (ie, doors, WalkOffs)
     world = world_with(actor->name);
     if (world == NULL) {
       switch_benchmark_mode(m);
@@ -246,209 +246,94 @@ int collision_check(Actor *actor, World *world, int debug) {
       buffer[idx] = world->actors[idx];
     }
   }
+
   SDL_Rect moved;
 
   if (_floor(actor->x_vel) != 0) {
     int direction = actor->x_vel < 0 ? 1 : -1;
-    for (int i = 0; i < (_floor(actor->x_vel) / actor->ECB.w); i++) {
-      int exit = 0;
-      moved.x = actor->ECB.x;
+
+    if (direction == -1) {
+      moved.x = actor->ECB.x + actor->ECB.w;
       moved.y = actor->ECB.y;
-      moved.w = actor->ECB.w;
+      moved.w = _floor(actor->x_vel);
       moved.h = actor->ECB.h;
-      move(&moved, actor->ECB.w * i, 0);
-      for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
-        if (buffer[idx] == -1)
-          break;
-        if (actor->name == buffer[idx])
-          continue;
-        Actor *actor2 = get_actor(buffer[idx]);
-        if (actor2 == NULL)
-          continue;
-        if (!actor2->tangible)
-          continue;
-        if (actor->tangible == 0 && actor2->platform == 0)
-          continue;
-        if (SDL_HasIntersection(&moved, &actor2->ECB)) {
-          actor->x_vel -= actor->ECB.w * i;
-          exit = 1;
-          break;
-        }
-      }
-      if (exit)
-        break;
+    } else {
+      moved.x = actor->ECB.x + _floor(actor->x_vel);
+      moved.y = actor->ECB.y;
+      moved.w = fabs(_floor(actor->x_vel));
+      moved.h = actor->ECB.h;
     }
 
-    moved.x = actor->ECB.x;
-    moved.y = actor->ECB.y;
-    moved.w = actor->ECB.w;
-    moved.h = actor->ECB.h;
-    move(&moved, actor->x_vel, 0);
+    Actor *first_hit = NULL;
     for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
-      if (buffer[idx] == -1)
-        break;
-
-      if (actor->name == buffer[idx])
-        continue;
-
+      if (buffer[idx] == -1) break;
+      if (actor->name == buffer[idx]) continue;
       Actor *actor2 = get_actor(buffer[idx]);
-      if (actor2 == NULL || !actor2->tangible)
-        continue;
-      if (actor->tangible == 0 && actor2->platform == 0)
-        continue;
+      if (actor2 == NULL) continue;
+      if (!actor2->tangible) continue;
+      if (actor->tangible == 0 && actor2->platform == 0) continue;
       if (SDL_HasIntersection(&moved, &actor2->ECB)) {
-        int resolution3 = collision_with(actor, actor2, world, debug);
-        if (resolution3 < 0) {
-	  switch_benchmark_mode(m);
-          return resolution3;
-	}
-        int resolution4 = collision_with(actor2, actor, world, debug);
-        if (resolution4 < 0) {
-	  switch_benchmark_mode(m);
-          return resolution4;
+	if (first_hit == NULL) {
+	  first_hit = actor2;
+	} else if (direction == -1
+		   ? actor2->ECB.x < first_hit->ECB.x
+		   : actor2->ECB.x + actor2->ECB.w > first_hit->ECB.x + first_hit->ECB.w ) {
+	  first_hit = actor2;
 	}
       }
     }
-
-    int check = 0;
-    while (check == 0) {
-      check = 1;
-      moved.x = actor->ECB.x;
-      moved.y = actor->ECB.y;
-      moved.w = actor->ECB.w;
-      moved.h = actor->ECB.h;
-      move(&moved, actor->x_vel, 0);
-      Actor *actor3;
-      for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
-        if (buffer[idx] == -1)
-          break;
-
-        if (actor->name == buffer[idx])
-          continue;
-
-        actor3 = get_actor(buffer[idx]);
-        if (actor3 == NULL || !actor3->tangible)
-          continue;
-        if (actor->tangible == 0 && actor3->platform == 0)
-          continue;
-        if (SDL_HasIntersection(&moved, &actor3->ECB)) {
-          check = 0;
-          break;
-        }
-      }
-      if (check == 0) {
-        int dx;
-        if (direction == 1) {
-          dx = actor3->ECB.x + actor3->ECB.w - moved.x;
-        } else {
-          dx = (moved.x + moved.w - actor3->ECB.x) * -1;
-        }
-        actor->x_vel += dx;
-        actor->x_vel = _floor(actor->x_vel);
-      }
+    if (first_hit != NULL) {
+      actor->x_vel = direction == -1
+	? first_hit->ECB.x - (actor->ECB.x + actor->ECB.w)
+	: (first_hit->ECB.x + first_hit->ECB.w) - actor->ECB.x; 
+      int resolution0 = collision_with(actor, first_hit, world, debug);
+      if (resolution0 < 0) return resolution0;
+      int resolution1 = collision_with(first_hit, actor, world, debug);
+      if (resolution1 < 0) return resolution1;
     }
   }
 
-  if (floor(fabs(actor->y_vel)) != 0) {
+  if (_floor(actor->y_vel) != 0) {
     int direction = actor->y_vel < 0 ? 1 : -1;
-    for (int i = 0; i < (_floor(actor->y_vel) / actor->ECB.h); i++) {
-      int exit = 0;
+
+    if (direction == -1) {
       moved.x = actor->ECB.x;
-      moved.y = actor->ECB.y;
+      moved.y = actor->ECB.y + actor->ECB.h;
       moved.w = actor->ECB.w;
-      moved.h = actor->ECB.h;
-      move(&moved, 0, actor->ECB.h * i);
-      for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
-        if (buffer[idx] == -1)
-          break;
-
-        if (actor->name == buffer[idx])
-          continue;
-
-        Actor *actor2 = get_actor(buffer[idx]);
-        if (actor2 == NULL)
-          continue;
-        if (!actor2->tangible)
-          continue;
-        if (actor->tangible == 0 && actor2->platform == 0)
-          continue;
-        if (SDL_HasIntersection(&moved, &actor2->ECB)) {
-          actor->y_vel -= actor->ECB.h * i;
-          exit = 1;
-          break;
-        }
-      }
-      if (exit)
-        break;
+      moved.h = _floor(actor->y_vel);
+    } else {
+      moved.x = actor->ECB.x;
+      moved.y = actor->ECB.y + _floor(actor->y_vel);;
+      moved.w = actor->ECB.w;
+      moved.h = fabs(_floor(actor->y_vel));
     }
 
-    moved.x = actor->ECB.x;
-    moved.y = actor->ECB.y;
-    moved.w = actor->ECB.w;
-    moved.h = actor->ECB.h;
-    move(&moved, 0, actor->y_vel);
+    Actor *first_hit = NULL;
     for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
-      if (buffer[idx] == -1)
-        break;
-
-      if (actor->name == buffer[idx])
-        continue;
-
+      if (buffer[idx] == -1) break;
+      if (actor->name == buffer[idx]) continue;
       Actor *actor2 = get_actor(buffer[idx]);
-      if (actor2 == NULL || !actor2->tangible)
-        continue;
-      if (actor->tangible == 0 && actor2->platform == 0)
-        continue;
+      if (actor2 == NULL) continue;
+      if (!actor2->tangible) continue;
+      if (actor->tangible == 0 && actor2->platform == 0) continue;
       if (SDL_HasIntersection(&moved, &actor2->ECB)) {
-        int resolution3 = collision_with(actor, actor2, world, debug);
-        if (resolution3 < 0) {
-	  switch_benchmark_mode(m);
-          return resolution3;
-	}
-        int resolution4 = collision_with(actor2, actor, world, debug);
-        if (resolution4 < 0) {
-	  switch_benchmark_mode(m);
-          return resolution4;
+	if (first_hit == NULL) {
+	  first_hit = actor2;
+	} else if (direction == -1
+		   ? actor2->ECB.y < first_hit->ECB.y
+		   : actor2->ECB.y + actor2->ECB.h > first_hit->ECB.y + first_hit->ECB.h ) {
+	  first_hit = actor2;
 	}
       }
     }
-
-    int check = 0;
-    while (check == 0) {
-      check = 1;
-      moved.x = actor->ECB.x;
-      moved.y = actor->ECB.y;
-      moved.w = actor->ECB.w;
-      moved.h = actor->ECB.h;
-      move(&moved, 0, actor->y_vel);
-      Actor *actor3;
-      for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
-        if (world->actors[idx] == -1)
-          break;
-
-        if (actor->name == world->actors[idx])
-          continue;
-
-        actor3 = get_actor(world->actors[idx]);
-        if (actor3 == NULL || !actor3->tangible)
-          continue;
-        if (actor->tangible == 0 && actor3->platform == 0)
-          continue;
-        if (SDL_HasIntersection(&moved, &actor3->ECB)) {
-          check = 0;
-          break;
-        }
-      }
-      if (check == 0) {
-        int dx;
-        if (direction == 1) {
-          dx = actor3->ECB.y + actor3->ECB.h - moved.y;
-        } else {
-          dx = (moved.y + moved.h - actor3->ECB.y) * -1;
-        }
-        actor->y_vel += dx;
-        actor->y_vel = _floor(actor->y_vel);
-      }
+    if (first_hit != NULL) {
+      actor->y_vel = direction == -1
+	? first_hit->ECB.y - (actor->ECB.y + actor->ECB.h)
+	: (first_hit->ECB.y + first_hit->ECB.h) - actor->ECB.y; 
+      int resolution0 = collision_with(actor, first_hit, world, debug);
+      if (resolution0 < 0) return resolution0;
+      int resolution1 = collision_with(first_hit, actor, world, debug);
+      if (resolution1 < 0) return resolution1;
     }
   }
 
