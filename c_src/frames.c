@@ -95,9 +95,17 @@ void draw_frame(SDL_Renderer *rend, Frame *f, int debug) {
     printf("Error setting render target: %s\n", SDL_GetError());
   }
 
-  draw_world(f->world, rend, f);
-  if (debug) {
-    draw_debug_overlay(f->world, rend, f);
+  for (int i = 0; i < NUM_WORLDS; i++) {
+    World *w = &WORLDS[i];
+    if (w == f->world) {
+      draw_world(w, rend, f, 1);
+    }
+    if (w->flagged_for_update) {
+      draw_world(w, rend, f, 0);
+      if (debug) {
+        draw_debug_overlay(f->world, rend, f);
+      }
+    }
   }
 
   if (SDL_SetRenderTarget(rend, render_target) != 0) {

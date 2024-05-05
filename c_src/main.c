@@ -9,9 +9,6 @@ https://www.youtube.com/watch?v=yFLa3ln16w0
 I am starting off with the basics, trying to implement this method i wrote and
 have been using for a long time in pygame.
 
-this is going to need a lot,
-I will be using uthash.h as my dictionary implementation
-
  */
 
 #include "clock.h"
@@ -149,7 +146,6 @@ int main(int argc, char *argv[]) {
         if (update_world(w->name, debug) == -2)
           return 0;
       }
-      w->flagged_for_update = 0;
     }
     actors_reset_updated();
 
@@ -159,6 +155,11 @@ int main(int argc, char *argv[]) {
             draw_frame(rend, f, debug);
         }
     }
+
+    for (int i = 0; i < NUM_WORLDS; i++) {
+       WORLDS[i].flagged_for_update = 0;
+    }
+
     SDL_RenderPresent(rend);
     Clock_tick(c, FPS_CAP);
   }
