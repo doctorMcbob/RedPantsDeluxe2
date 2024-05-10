@@ -123,10 +123,10 @@ void _draw_background(World *world, SDL_Renderer *rend, Frame *frame) {
   }
 }
 
-void draw_world(World *world, SDL_Renderer *rend, Frame *frame) {
+void draw_world(World *world, SDL_Renderer *rend, Frame *frame, int background) {
   int m = get_benchmark_mode();
   switch_benchmark_mode(DRAWING_MODE);
-  _draw_background(world, rend, frame);
+  if (background) _draw_background(world, rend, frame);
 
   for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
     if (world->actors[i] == -1) {
