@@ -26,7 +26,7 @@ int update_world(int worldKey, int debug);
 
 # include "frames.h"
 World* world_with(int actorKey);
-void draw_world(World* world, SDL_Renderer* rend, Frame* frame);
+void draw_world(World* world, SDL_Renderer* rend, Frame* frame, int background);
 int exists(int actorKey);
 int world_has(World *world, int actorKey);
 void remove_actor_from_worlds(int actorKey);
