@@ -43,7 +43,7 @@ have been using for a long time in pygame.
 #define FPS_CAP 20
 
 
-extern TTF_Font *font;
+//extern TTF_Font *font;
 void spritesheet_load(SDL_Renderer *rend);
 void actor_load();
 void world_load();
@@ -64,10 +64,10 @@ int main(int argc, char *argv[]) {
   if (TTF_Init() == -1) {
     return 1;
   }
-  font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
-  if (!font) {
-    printf("Error initializing font: %s\n", TTF_GetError());
-  }
+  //  font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
+  // if (!font) {
+  //   printf("Error initializing font: %s\n", TTF_GetError());
+  // }
   // do IMG_Init
   if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
     printf("Error initializing SDL2_image: %s\n", IMG_GetError());

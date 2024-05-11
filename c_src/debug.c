@@ -10,7 +10,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
-TTF_Font *font;
+//TTF_Font *font;
 
 void _debug_print_verb(int verb) {
   switch (verb) {
@@ -358,35 +358,35 @@ void draw_debug_overlay(World *world, SDL_Renderer *rend, Frame *frame) {
       }
     }
 
-    if (!hasTextDrawn) {
-      if (mouseX >= ECB.x && mouseX < ECB.x + ECB.w && mouseY >= ECB.y &&
-          mouseY < ECB.y + ECB.h) {
-        char data[100]; // buffer to hold the formatted string
-        sprintf(data, "%s %s:%iT?%i", get_string(a->name), get_string(a->state),
-                a->frame, a->tangible);
+    /* if (!hasTextDrawn) { */
+    /*   if (mouseX >= ECB.x && mouseX < ECB.x + ECB.w && mouseY >= ECB.y && */
+    /*       mouseY < ECB.y + ECB.h) { */
+    /*     char data[100]; // buffer to hold the formatted string */
+    /*     sprintf(data, "%s %s:%iT?%i", get_string(a->name), get_string(a->state), */
+    /*             a->frame, a->tangible); */
 
-        SDL_Color textColor = {0, 0, 0};
-        SDL_Surface *surface = TTF_RenderText_Solid(font, data, textColor);
+    /*     SDL_Color textColor = {0, 0, 0}; */
+    /*     SDL_Surface *surface = TTF_RenderText_Solid(font, data, textColor); */
 
-        SDL_Texture *Message = SDL_CreateTextureFromSurface(rend, surface);
-        SDL_Rect Message_rect = {mouseX, mouseY, surface->w, surface->h};
-        SDL_RenderCopy(rend, Message, NULL, &Message_rect);
+    /*     SDL_Texture *Message = SDL_CreateTextureFromSurface(rend, surface); */
+    /*     SDL_Rect Message_rect = {mouseX, mouseY, surface->w, surface->h}; */
+    /*     SDL_RenderCopy(rend, Message, NULL, &Message_rect); */
 
-        SDL_FreeSurface(surface);
-        SDL_DestroyTexture(Message);
-        hasTextDrawn = 1;
-      }
-    }
+    /*     SDL_FreeSurface(surface); */
+    /*     SDL_DestroyTexture(Message); */
+    /*     hasTextDrawn = 1; */
+    /*   } */
+    /* } */
   }
-  char data[100]; // buffer to hold the formatted string
-  sprintf(data, "ACTOR COUNT: %i", DEEPEST_ACTOR);
-  SDL_Color textColor = {0, 0, 0};
-  SDL_Surface *surface = TTF_RenderText_Solid(font, data, textColor);
+  // char data[100]; // buffer to hold the formatted string
+  // sprintf(data, "ACTOR COUNT: %i", DEEPEST_ACTOR);
+  // SDL_Color textColor = {0, 0, 0};
+  // SDL_Surface *surface = TTF_RenderText_Solid(font, data, textColor);
 
-  SDL_Texture *Message = SDL_CreateTextureFromSurface(rend, surface);
-  SDL_Rect Message_rect = {16, 16, surface->w, surface->h};
-  SDL_RenderCopy(rend, Message, NULL, &Message_rect);
+  // SDL_Texture *Message = SDL_CreateTextureFromSurface(rend, surface);
+  // SDL_Rect Message_rect = {16, 16, surface->w, surface->h};
+  // SDL_RenderCopy(rend, Message, NULL, &Message_rect);
 
-  SDL_FreeSurface(surface);
-  SDL_DestroyTexture(Message);
+  // SDL_FreeSurface(surface);
+  // SDL_DestroyTexture(Message);
 }
