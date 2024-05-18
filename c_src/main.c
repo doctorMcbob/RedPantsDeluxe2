@@ -42,8 +42,10 @@ have been using for a long time in pygame.
 #define HIGH 640
 #define FPS_CAP 20
 
+int WIDTH = WID;
+int HEIGHT = HIGH;
 
-extern TTF_Font *font;
+//extern TTF_Font *font;
 void spritesheet_load(SDL_Renderer *rend);
 void actor_load();
 void world_load();
@@ -52,6 +54,14 @@ void audio_load();
 void scripts_load();
 void load_string_indexers();
 extern Frame *frames;
+
+SDL_Renderer *rend;
+SDL_Window *screen;
+
+void set_scale() {
+  SDL_GetWindowSize(screen, &WIDTH, &HEIGHT);
+  SDL_RenderSetLogicalSize(rend, WIDTH, HEIGHT);
+}
 
 int main(int argc, char *argv[]) {
   int debug = 0;
@@ -64,10 +74,10 @@ int main(int argc, char *argv[]) {
   if (TTF_Init() == -1) {
     return 1;
   }
-  font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
-  if (!font) {
-    printf("Error initializing font: %s\n", TTF_GetError());
-  }
+  //  font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
+  // if (!font) {
+  //   printf("Error initializing font: %s\n", TTF_GetError());
+  // }
   // do IMG_Init
   if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
     printf("Error initializing SDL2_image: %s\n", IMG_GetError());
@@ -102,7 +112,7 @@ int main(int argc, char *argv[]) {
 
   SDL_Window *screen = SDL_CreateWindow(
       "Red Pants Deluxe 2",
-      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WID, HIGH, 0);
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WID, HIGH, SDL_WINDOW_RESIZABLE);
   if (!screen) {
     printf("error creating window: %s\n", SDL_GetError());
     SDL_Quit();
@@ -110,7 +120,7 @@ int main(int argc, char *argv[]) {
   }
 
   Uint32 render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-  SDL_Renderer *rend = SDL_CreateRenderer(screen, -1, render_flags);
+  rend = SDL_CreateRenderer(screen, -1, render_flags);
 
   // Set the hint to enable linear texture filtering
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");

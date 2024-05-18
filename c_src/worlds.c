@@ -123,7 +123,7 @@ void _draw_background(World *world, SDL_Renderer *rend, Frame *frame) {
   }
 }
 
-void draw_world(World *world, SDL_Renderer *rend, Frame *frame, int background) {
+void draw_world(World *world, SDL_Renderer *rend, Frame *frame, int background, int firstPass) {
   int m = get_benchmark_mode();
   switch_benchmark_mode(DRAWING_MODE);
   if (background) _draw_background(world, rend, frame);
@@ -135,8 +135,12 @@ void draw_world(World *world, SDL_Renderer *rend, Frame *frame, int background) 
     Actor *a;
     a = get_actor(world->actors[i]);
 
-    if (!a)
+    if (!a) {
       continue;
+    }
+    if (a->background != firstPass) {
+      continue;
+    }
     if (in_frame(frame, a))
       draw_actor(rend, a, frame);
   }

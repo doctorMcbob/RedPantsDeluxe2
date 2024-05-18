@@ -21,7 +21,10 @@
 #include "uthash.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+
 #define MAX_NUM_STICKS 4
+
+extern void set_scale();
 
 InputHashNode *input_states = NULL;
 KeyHashNode *key_maps = NULL;
@@ -185,6 +188,10 @@ int input_update() {
       case SDL_QUIT: {
         return -1;
       }
+      case SDL_WINDOWEVENT:
+      case SDL_WINDOWEVENT_RESIZED: {
+	set_scale();
+      }
       case SDL_KEYDOWN: {
         if (event.key.repeat != 0)
           continue;
@@ -205,57 +212,57 @@ int input_update() {
             continue;
           }
 
-          if (inputNode->data->joy != -1)
+	  else if (inputNode->data->joy != -1)
           {
             continue;
           }
 
-          if (event.key.keysym.sym == km->keymap->A)
+          else if (event.key.keysym.sym == km->keymap->A)
           {
             inputNode->data->A = 1;
             inputNode->data->EVENTS[A_DOWN] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->B)
+          else if (event.key.keysym.sym == km->keymap->B)
           {
             inputNode->data->B = 1;
             inputNode->data->EVENTS[B_DOWN] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->X)
+          else if (event.key.keysym.sym == km->keymap->X)
           {
             inputNode->data->X = 1;
             inputNode->data->EVENTS[X_DOWN] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->Y)
+          else if (event.key.keysym.sym == km->keymap->Y)
           {
             inputNode->data->Y = 1;
             inputNode->data->EVENTS[Y_DOWN] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->LEFT)
+          else if (event.key.keysym.sym == km->keymap->LEFT)
           {
             inputNode->data->LEFT = 1;
             inputNode->data->EVENTS[LEFT_DOWN] = 1;
           }
-          if (event.key.keysym.sym == km->keymap->UP)
+          else if (event.key.keysym.sym == km->keymap->UP)
           {
             inputNode->data->UP = 1;
             inputNode->data->EVENTS[UP_DOWN] = 1;
           }
-          if (event.key.keysym.sym == km->keymap->RIGHT)
+          else if (event.key.keysym.sym == km->keymap->RIGHT)
           {
             inputNode->data->RIGHT = 1;
             inputNode->data->EVENTS[RIGHT_DOWN] = 1;
           }
-          if (event.key.keysym.sym == km->keymap->DOWN)
+          else if (event.key.keysym.sym == km->keymap->DOWN)
           {
             inputNode->data->DOWN = 1;
             inputNode->data->EVENTS[DOWN_DOWN] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->START)
+          else if (event.key.keysym.sym == km->keymap->START)
           {
             inputNode->data->START = 1;
             inputNode->data->EVENTS[START_DOWN] = 1;
@@ -276,57 +283,57 @@ int input_update() {
             continue;
           }
 
-          if (inputNode->data->joy != -1)
+          else if (inputNode->data->joy != -1)
           {
             continue;
           }
 
-          if (event.key.keysym.sym == km->keymap->A)
+          else if (event.key.keysym.sym == km->keymap->A)
           {
             inputNode->data->A = 0;
             inputNode->data->EVENTS[A_UP] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->B)
+          else if (event.key.keysym.sym == km->keymap->B)
           {
             inputNode->data->B = 0;
             inputNode->data->EVENTS[B_UP] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->X)
+          else if (event.key.keysym.sym == km->keymap->X)
           {
             inputNode->data->X = 0;
             inputNode->data->EVENTS[X_UP] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->Y)
+          else if (event.key.keysym.sym == km->keymap->Y)
           {
             inputNode->data->Y = 0;
             inputNode->data->EVENTS[Y_UP] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->LEFT)
+          else if (event.key.keysym.sym == km->keymap->LEFT)
           {
             inputNode->data->LEFT = 0;
             inputNode->data->EVENTS[LEFT_UP] = 1;
           }
-          if (event.key.keysym.sym == km->keymap->UP)
+          else if (event.key.keysym.sym == km->keymap->UP)
           {
             inputNode->data->UP = 0;
             inputNode->data->EVENTS[UP_UP] = 1;
           }
-          if (event.key.keysym.sym == km->keymap->RIGHT)
+          else if (event.key.keysym.sym == km->keymap->RIGHT)
           {
             inputNode->data->RIGHT = 0;
             inputNode->data->EVENTS[RIGHT_UP] = 1;
           }
-          if (event.key.keysym.sym == km->keymap->DOWN)
+          else if (event.key.keysym.sym == km->keymap->DOWN)
           {
             inputNode->data->DOWN = 0;
             inputNode->data->EVENTS[DOWN_UP] = 1;
           }
 
-          if (event.key.keysym.sym == km->keymap->START)
+          else if (event.key.keysym.sym == km->keymap->START)
           {
             inputNode->data->START = 0;
             inputNode->data->EVENTS[START_UP] = 1;
@@ -341,35 +348,35 @@ int input_update() {
               inputNode->data->A = 1;
               inputNode->data->EVENTS[A_DOWN] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].B) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].B) {
               inputNode->data->B = 1;
               inputNode->data->EVENTS[B_DOWN] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].X) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].X) {
               inputNode->data->X = 1;
               inputNode->data->EVENTS[X_DOWN] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].Y) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].Y) {
               inputNode->data->Y = 1;
               inputNode->data->EVENTS[Y_DOWN] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].START) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].START) {
               inputNode->data->START = 1;
               inputNode->data->EVENTS[START_DOWN] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].LEFT) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].LEFT) {
               inputNode->data->LEFT = 1;
               inputNode->data->EVENTS[LEFT_DOWN] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].UP) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].UP) {
               inputNode->data->UP = 1;
               inputNode->data->EVENTS[UP_DOWN] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].RIGHT) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].RIGHT) {
               inputNode->data->RIGHT = 1;
               inputNode->data->EVENTS[RIGHT_DOWN] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].DOWN) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].DOWN) {
               inputNode->data->DOWN = 1;
               inputNode->data->EVENTS[DOWN_DOWN] = 1;
             }
@@ -386,35 +393,35 @@ int input_update() {
               inputNode->data->A = 0;
               inputNode->data->EVENTS[A_UP] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].B) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].B) {
               inputNode->data->B = 0;
               inputNode->data->EVENTS[B_UP] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].X) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].X) {
               inputNode->data->X = 0;
               inputNode->data->EVENTS[X_UP] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].Y) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].Y) {
               inputNode->data->Y = 0;
               inputNode->data->EVENTS[Y_UP] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].START) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].START) {
               inputNode->data->START = 0;
               inputNode->data->EVENTS[START_UP] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].LEFT) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].LEFT) {
               inputNode->data->LEFT = 0;
               inputNode->data->EVENTS[LEFT_UP] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].UP) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].UP) {
               inputNode->data->UP = 0;
               inputNode->data->EVENTS[UP_UP] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].RIGHT) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].RIGHT) {
               inputNode->data->RIGHT = 0;
               inputNode->data->EVENTS[RIGHT_UP] = 1;
             }
-            if (event.cbutton.button == JOYMAPS[inputNode->data->joy].DOWN) {
+            else if (event.cbutton.button == JOYMAPS[inputNode->data->joy].DOWN) {
               inputNode->data->DOWN = 0;
               inputNode->data->EVENTS[DOWN_UP] = 1;
             }
