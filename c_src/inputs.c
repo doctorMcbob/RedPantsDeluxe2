@@ -191,6 +191,7 @@ int input_update() {
       case SDL_WINDOWEVENT:
       case SDL_WINDOWEVENT_RESIZED: {
 	set_scale();
+	break;
       }
       case SDL_KEYDOWN: {
         if (event.key.repeat != 0)

@@ -35,6 +35,7 @@ Actor *get_actor(int name) {
 void actors_reset_updated() {
   for (int i = 0; i < DEEPEST_ACTOR; i++) {
     ACTORS[i].updated = 0;
+    //    ACTORS[i].currenthitboxes = get_hitboxes_for_actor(&ACTORS[i]);
   }
 }
 
@@ -436,6 +437,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
   actor->updated = 1;
   actor->img = -1;
   int scriptKey = get_script_for_actor(actor);
+
   if (scriptKey != -1) {
     int resolution = resolve_script(scriptKey, actor, NULL, world, debug, -1,
                                     -1, -1, -1, -1, 0);
@@ -472,6 +474,13 @@ int update_actor(int actorKey, int worldKey, int debug) {
         return resolution;
     }
   }
+  BoxMapEntry *hurtboxes, *hitboxes;
+
+  hurtboxes = get_hurtboxes_for_actor(actor);
+  if (hurtboxes == NULL) {
+    actor->frame += 1;
+    return 0;
+  }
 
   int buffer[WORLD_BUFFER_SIZE];
   for (int idx = 0; idx < WORLD_BUFFER_SIZE; idx++) {
@@ -485,13 +494,19 @@ int update_actor(int actorKey, int worldKey, int debug) {
     Actor *actor2 = get_actor(buffer[idx]);
     if (actor2 == NULL)
       continue;
-    int resolution = hit_check(actor, actor2, world, debug);
+    // potential further optomization here... currently performing lookup on hitboxes for every actor every frame :thinking:
+    // maybe theres a way to look them up once at the beginning of the frame for every actor?
+    hitboxes = get_hitboxes_for_actor(actor2);
+    if (hitboxes == NULL)
+      continue;
+    int resolution = hit_check(actor, hurtboxes, actor2, hitboxes, world, debug);
+    hurtboxes = get_hurtboxes_for_actor(actor);
+    if (hurtboxes == NULL)
+      break;
     if (resolution < 0)
       return resolution;
   }
-
   actor->frame += 1;
-
   return 0;
 }
 
@@ -660,16 +675,12 @@ void translate_rect_by_actor(Actor *actor, SDL_Rect *rect) {
   rotate_box_by_actor(actor, rect, actor->rotation);
 }
 
-int hit_check(Actor *self, Actor *related, World *world, int debug) {
-  BoxMapEntry *hurtboxes, *hitboxes;
-
-  hurtboxes = get_hurtboxes_for_actor(self);
-  if (hurtboxes == NULL)
-    return 0;
-  hitboxes = get_hitboxes_for_actor(related);
-  if (hitboxes == NULL)
-    return 0;
-
+int hit_check(Actor *self,
+	      BoxMapEntry *hurtboxes,
+	      Actor *related,
+	      BoxMapEntry *hitboxes,
+	      World *world,
+	      int debug) {
   for (int i = 0; i < hurtboxes->count; i++) {
     SDL_Rect hurtbox = {hurtboxes->rect[i].x, hurtboxes->rect[i].y,
                         hurtboxes->rect[i].w, hurtboxes->rect[i].h};

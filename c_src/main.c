@@ -61,6 +61,7 @@ SDL_Window *screen;
 void set_scale() {
   SDL_GetWindowSize(screen, &WIDTH, &HEIGHT);
   SDL_RenderSetLogicalSize(rend, WIDTH, HEIGHT);
+  SDL_RenderClear(rend);
 }
 
 int main(int argc, char *argv[]) {
@@ -141,6 +142,7 @@ int main(int argc, char *argv[]) {
   audio_load();
   add_frame(ROOT, get_world(_ROOT), NULL, 0, 0, WID, HIGH);
   Clock *c = new_clock();
+  //  actors_reset_updated();
 
   while (input_update() != -1) {
     Frame *f, *tmpf;

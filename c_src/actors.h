@@ -10,7 +10,7 @@
 
 #ifndef ACTORS_DEF
 # define ACTORS_DEF 1
-
+#include "boxes.h"
 extern int DEEPEST_ACTOR;
 typedef struct Attribute {
   int name;
@@ -54,26 +54,26 @@ void validate_actors();
 Actor* get_actor(int name);
 void add_actor(
          int name,
-	       int x,
-	       int y,
-	       int w,
-	       int h,
-	       int x_vel,
-	       int y_vel,
-	       int hurtboxkey,
-	       int hitboxkey,
-	       int scriptMapKey,
-	       int spritemapkey,
-	       int img,
-	       int inputKey,
-	       int state,
-	       int frame,
-	       int direction,
-	       int rotation,
-	       int platform,
-	       int tangible,
-	       int physics,
-	       int updated);
+	 int x,
+	 int y,
+	 int w,
+	 int h,
+	 int x_vel,
+	 int y_vel,
+	 int hurtboxkey,
+	 int hitboxkey,
+	 int scriptMapKey,
+	 int spritemapkey,
+	 int img,
+	 int inputKey,
+	 int state,
+	 int frame,
+	 int direction,
+	 int rotation,
+	 int platform,
+	 int tangible,
+	 int physics,
+	 int updated);
 void copy_actor(Actor *copy,  Actor *a);
 Actor* add_actor_from_templatekey(int templateKey, int name);
 Actor* get_template(int name);
@@ -90,5 +90,10 @@ void pop_from_script_map(Actor* actor, int scriptName, int scriptFrame);
 void free_actor(Actor* actor);
 BoxMapEntry* get_hurtboxes_for_actor(Actor* actor);
 BoxMapEntry* get_hitboxes_for_actor(Actor* actor);
-int hit_check(Actor *self, Actor* related, World *world, int debug);
+int hit_check(Actor *self,
+	      BoxMapEntry *hurtboxes,
+	      Actor* related,
+	      BoxMapEntry *hitboxes,
+	      World *world,
+	      int debug);
 #endif

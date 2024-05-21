@@ -155,6 +155,7 @@ class Actor(Rect):
     def _index(self, data):
         bestkey = None
         bestframe = None
+
         for key in data.keys():
             if ":" not in key: continue
             state, frame = key.split(":")
