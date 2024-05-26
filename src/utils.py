@@ -77,20 +77,36 @@ def expect_input(expectlist=[], args=None, cb=lambda *args:None):
 
 def select_from_list(G, list, pos, args=None, cb=lambda *args: None):
     idx = 0
+    search = ""
     while True:
-        surf = Surface((256, 32*len(list)))
+        matches = [n for n in filter(lambda n: n.startswith(search), list)]
+        surf = Surface((256, 32*len(matches)))
         surf.fill((230, 230, 230))
         cb(args)
-        for i, text in enumerate(list):
+        for i, text in enumerate(matches):
             col = (0, 0, 0) if i != idx else (160, 110, 190)
             surf.blit(G["HEL32"].render(str(text), 0, col), (0, i*32))
+            surf.blit(G["HEL32"].render(str(search), 0, (255, 10, 10)), (0, i*32))
         G["SCREEN"].blit(surf, (pos[0], pos[1] - idx*32))
         inp = expect_input()
 
+        if inp == K_BACKSPACE: search = search[:-1]
+        if inp in ALPHABET_SHIFT_MAP and pygame.key.get_mods() & KMOD_SHIFT:
+            search += ALPHABET_SHIFT_MAP[inp]
+            continue
+        if inp in NUMBERS_ONLY:
+            search += NUMBERS_ONLY[idx]
+            continue
+        if inp in ALPHABET_KEY_MAP:
+            if pygame.key.get_mods() & KMOD_SHIFT:
+                search += ALPHABET_KEY_MAP[inp].upper()
+            else:
+                search += ALPHABET_KEY_MAP[inp]
+        
         if inp == K_UP: idx -= 1
         if inp == K_DOWN: idx += 1
-        if inp in [K_RETURN, K_SPACE]: return list[idx]
-        if inp in [K_ESCAPE, K_BACKSPACE] or not list: return False
+        if inp in [K_RETURN]: return matches[idx]
+        if inp in [K_ESCAPE] or not list: return False
         idx %= len(list)
 
 def input_rect(G, col=(100, 100, 100), cb=lambda *args: None, snap=4, pos=None):
