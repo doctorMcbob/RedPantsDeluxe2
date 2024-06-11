@@ -35,6 +35,7 @@ Actor *get_actor(int name) {
 void actors_reset_updated() {
   for (int i = 0; i < DEEPEST_ACTOR; i++) {
     ACTORS[i].updated = 0;
+    // see potential performance improvements on line ~500
     //    ACTORS[i].currenthitboxes = get_hitboxes_for_actor(&ACTORS[i]);
   }
 }

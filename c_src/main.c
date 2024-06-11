@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
       }
     }
     actors_reset_updated();
-
+    SDL_RenderClear(rend);
     HASH_ITER(hh, frames, f, tmpf) {
         if (f->active) {
             update_frame(f);
