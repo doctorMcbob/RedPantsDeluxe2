@@ -70,7 +70,8 @@ def run(G, noquit=False):
 
         for world in worlds_for_updating:
             world.flagged_for_update = False
-            world.update()
+            if world.update(noquit=noquit) == "quit":
+                return
 
         for a in  actor.get_actors():
             a.updated = False

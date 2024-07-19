@@ -68,7 +68,6 @@ class MenuHeader:
         surf.fill(self.MENU_BG)
 
         mpos = pygame.mouse.get_pos()
-        #print(mpos)
         h_ = 0
 
         picked = None, None
@@ -80,7 +79,6 @@ class MenuHeader:
                 text = self.HEL16.render(item, 0, self.MENU_TXT_SEL)
                 pygame.draw.rect(surf, self.MENU_BG_SEL, Rect((0, h_), (w, 32)))
                 if self.CLICK:
-                    print("HERE!?")
                     picked = item, (pos[0] + w, pos[1] + h_)
             surf.blit(text, (8, h_ + 8))
             h_ += 32

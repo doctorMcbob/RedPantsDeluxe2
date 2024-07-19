@@ -1,5 +1,8 @@
 """
 Another stab at it eh?
+I know src/editor_v2.py exists and this is editor.py
+   but this is actually v3 where v1 is long lost to the git history
+   maybe someday i dig around for it for funsies
 
 This time I want to change the focus to be on UX
 This should include drop down menus and selecting multiple actors
@@ -47,9 +50,14 @@ SCRIPT_LOCATION = "scripts/"
 WORLD_TEMPLATE = {"actors":[], "background":None, "x_lock": None, "y_lock": None}
 
 SCROLLER = {
-    "X": 0, "Y": 0,
     "CX": 0, "CY": 0
 }
+CURSOR = {
+    "X": 0, "Y": 0,
+    "CORNER": None,
+    "DRAG": False,
+}
+
 # ~~~ menu functions ~~~
 def load():
     global WORLDS, SPRITESHEETS, SPRITEMAPS, ACTORS, SCRIPTS, OFFSETS, HITBOXES, HURTBOXES, TILEMAPS
@@ -159,6 +167,12 @@ def update_frames(G):
         "MAIN": (0, 0),
     }
 
+def demo(G):
+    load_game()
+    game.run(G, noquit=True)
+    load_game()
+    update_frames(G)
+
 def run(G):
     while True:
         draw(G)
@@ -169,3 +183,6 @@ def run(G):
         for e in pygame.event.get():
             if e.type == pygame.MOUSEBUTTONUP:
                 G["HEADER"].CLICK = True
+
+            if e.type == pygame.KEYDOWN and e.key == K_RETURN:
+                demo(G)
