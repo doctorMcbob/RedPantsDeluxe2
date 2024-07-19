@@ -80,6 +80,7 @@ def select_from_list(G, list, pos, args=None, cb=lambda *args: None):
     search = ""
     while True:
         matches = [n for n in filter(lambda n: n.startswith(search), list)]
+        idx %= max(len(matches), 1)
         surf = Surface((256, 32*len(matches)))
         surf.fill((230, 230, 230))
         cb(args)
@@ -107,7 +108,6 @@ def select_from_list(G, list, pos, args=None, cb=lambda *args: None):
         if inp == K_DOWN: idx += 1
         if inp in [K_RETURN]: return matches[idx]
         if inp in [K_ESCAPE] or not list: return False
-        idx %= len(list)
 
 def input_rect(G, col=(100, 100, 100), cb=lambda *args: None, snap=4, pos=None):
     scrollx, scrolly = (G["ctx"]["scrollx"], G["ctx"]["scrolly"]) if "ctx" in G and "scrollx" in G["ctx"] else (0, 0)
