@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from pygame import Surface, Rect
+from src.editor_windows import THEMES
 
 NUMBERS_ONLY = {
     K_0: "0", K_1: "1", K_2: "2", K_3: "3", K_4: "4",
@@ -151,3 +152,35 @@ def input_rect(G, col=(100, 100, 100), cb=lambda *args: None, snap=4, pos=None):
     y2 -= y2 % snap
 
     return (x1, y1), (x2 - x1, y2 - y1)
+
+def scroller_list(l, mpos, dim, font, scroll=0, search="", theme="SOULLESS"):
+    theme = THEMES[theme]
+    surf = Surface(dim)
+    surf.fill(theme.get("MENU_BG"))
+    longest = max(l, key=len)
+    w, h = font.render(longest, 0, (0, 0, 0)).get_size()
+    h = h * 2
+    x, y = 4, 4 - scroll
+    selected = None
+    for option in filter(lambda s: s.startswith(search), l):
+        option_rect = Rect(
+            (x, y),
+            (w, h),
+        )
+        if option_rect.collidepoint(mpos) and surf.get_rect().collidepoint(mpos):
+            selected = option
+            option_text = font.render(
+                option, 0, theme.get("MENU_TXT_SEL")
+            )
+            pygame.draw.rect(surf, theme.get("MENU_BG_SEL"), option_rect)
+        else:
+            option_text = font.render(
+                option, 0, theme.get("MENU_TXT")
+            )
+            pygame.draw.rect(surf, theme.get("MENU_BG_ALT"), option_rect)
+        surf.blit(option_text, (x, y))
+        x += w
+        if x + w > dim[0] - 8:
+            x = 4
+            y += h
+    return surf, selected

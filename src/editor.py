@@ -25,6 +25,7 @@ from src import actor
 from src import worlds
 from src.editor_menuing import MenuHeader
 from src import editor_windows as windows
+from src import utils
 
 # # # # # # # #
 # Soft Layer  #
@@ -102,13 +103,77 @@ MENU_ITEMS = {
     "File": {
         "Load": load,
         "Save": save,
-        "quit": quit,
+        "Build": {
+            # TODO
+            "Build Executable": off,
+            "Run Makefile Only": off,
+            "Build Without Makefile": off,
+        },
+        "Quit": quit,
     },
     "Windows": {
         "Info": lambda: windows.activate_window("Info"),
-    }
+        "World Select": lambda: windows.activate_window("World Select"),
+    },
 }
 
+# ~~~ window functions ~~~
+def update_info_window(G, window):
+    windows.window_base_update(G, window)
+    text_rect = Rect((4, 36), (window["BODY"].get_width()-8, window["BODY"].get_height()-32-8))
+    pygame.draw.rect(window["BODY"], (255, 255, 255), text_rect)
+    x, y = 4, 36
+    window["BODY"].blit(G["HEL16"].render(
+        f"World: {G['WORLD']}",
+        0,
+        (0, 0, 0)
+    ), (x, y))
+    y += 32
+    window["BODY"].blit(G["HEL16"].render(
+        f"Actors in world: {len(worlds.get_world(G['WORLD']).actors)}",
+        0,
+        (0, 0, 0)
+    ), (x, y))
+
+def update_worlds_window(G, window):
+    windows.window_base_update(G, window)
+    # enforced strings
+    for s, default in [("SELECTED", None), ("SEARCH", ""), ("SCROLL", 0)]:
+        if s not in window: window[s] = default
+    text_rect = Rect((4, 36), (window["BODY"].get_width()-8, window["BODY"].get_height()-32-8))
+    pygame.draw.rect(window["BODY"], (255, 255, 255), text_rect)
+
+    mpos = pygame.mouse.get_pos()
+    mpos = (
+        mpos[0] - window["POS"][0] - 4,
+        mpos[1] - window["POS"][1] - 36,
+    )
+    surf, selected = utils.scroller_list(
+        worlds.get_all_worlds(),
+        mpos,
+        (window["BODY"].get_width()-8,
+         window["BODY"].get_height()-40),
+        G["HEL16"],
+        scroll=window["SCROLL"],
+        search=window["SEARCH"],
+        theme=window["THEME"],
+    )
+    window["BODY"].blit(surf, (4, 36))
+    window["SELECTED"] = selected
+    
+
+def handle_worlds_window_events(e, G, window):
+    if e.type == pygame.MOUSEBUTTONDOWN:
+        if e.button == 4: window["SCROLL"] -= 16
+        if e.button == 5: window["SCROLL"] += 16
+        if e.button == 1 and window["SELECTED"] is not None:
+            G["WORLD"] = window["SELECTED"]
+
+    if e.type == pygame.KEYDOWN:
+        if e.key == K_UP: window["SCROLL"] += 128
+        if e.key == K_DOWN: window["SCROLL"] -= 128
+
+# ~~~ other ~~~
 def load_game():
     sprites.swap_in(offsets=OFFSETS, sprite_maps=SPRITEMAPS, tile_maps=TILEMAPS)
     scripts.swap_in(SCRIPTS)
@@ -157,9 +222,17 @@ def set_up():
     windows.add_window(
         "Info", (32, 32), (256, 256),
         sys=True, theme="FUNKY",
-        update_callback=windows.window_base_update, args=[G]
+        update_callback=update_info_window, args=[G]
     )
 
+    windows.add_window(
+        "World Select", (40, 40), (512, 640),
+        sys=True, theme="FUNKY",
+        update_callback=update_worlds_window,
+        event_callback=handle_worlds_window_events,
+        args=[G],
+    )
+    
     return G
 
 

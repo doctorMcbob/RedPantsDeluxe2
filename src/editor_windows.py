@@ -41,13 +41,14 @@ def window_base_update(G, window):
 
 def off(*args, **kwargs): pass
 
-def add_window(name, pos, dim, sys=False, theme="SOULLESS", update_callback=off, args=[], kwargs={}):
+def add_window(name, pos, dim, sys=False, theme="SOULLESS", update_callback=off, event_callback=off, args=[], kwargs={}):
     WINDOWS[name] = {
         "NAME": name,
         "BODY": Surface(dim),
         "POS": pos,
         "THEME": theme,
         "UPDATE": lambda : update_callback(*args + [WINDOWS.get(name)], **kwargs),
+        "EVENTS": lambda e: event_callback(*([e] + [*args] + [WINDOWS.get(name)]), **kwargs),
         "ACTIVE": False,
         "SYS": sys,
         "DRAG": False,
@@ -116,3 +117,5 @@ def handle_window_events(G, e, window):
                 )
             )
         )
+
+    window["EVENTS"](e)
