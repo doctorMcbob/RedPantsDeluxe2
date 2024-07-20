@@ -101,8 +101,7 @@ MENU_ITEMS = {
     "File": {
         "Load": load,
         "Save": save,
-        "----------": off,
-        "quit": quit
+        "quit": quit,
     },
     
 }
@@ -132,7 +131,7 @@ def set_up():
     G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
     G["HEL32"] = pygame.font.SysFont("Helvetica", 32)
     G["WORLD"] = 'root' if "-l" not in sys.argv else sys.argv[sys.argv.index("-l") + 1]
-
+    pygame.display.set_caption(",.+'*'+., Red Pants Editor V3 ,.+'*'+.,")
     inputs.add_state("PLAYER1")
     inputs.add_state("PLAYER2")
 
@@ -149,6 +148,7 @@ def set_up():
     G["WORLDS"] = worlds
     G["ACTOR"] = actor
     G["CLOCK"] = pygame.time.Clock()
+    G["DEBUG"] = True
     update_frames(G)
     return G
 
@@ -162,14 +162,30 @@ def update_frames(G):
             G["SCREEN"].get_height() - 32
         )
     )
-    frames.add_frame("MAIN", G["WORLD"], (1152, 640))
-    G["FRAMEMAP"] = {
-        "MAIN": (0, 0),
-    }
 
+def draw_demo(G):
+    G["SCREEN"].blit(
+        G["DEMO"]["SCREEN"],
+        (
+            (G["SCREEN"].get_width()/2) - (G["DEMO"]["SCREEN"].get_width()/2),
+            (G["SCREEN"].get_height()/2) - (G["DEMO"]["SCREEN"].get_height()/2),
+        )
+    )
 def demo(G):
+    frames.clear()
+    frames.add_frame("ROOT", G["WORLD"], (1152, 640))
+    demo_G = {
+        "W": 1152,"H": 640,
+        "DEBUG": True,
+        "CLOCK": G["CLOCK"],
+    }
+    demo_G["SCREEN"] = pygame.Surface((demo_G["W"], demo_G["H"]))
+    G["DEMO"] = demo_G
+    demo_G["ROOT"] = G["WORLD"]
+    demo_G["HEL16"] = G["HEL16"]
+    demo_G["HEL32"] = G["HEL32"]
     load_game()
-    game.run(G, noquit=True)
+    game.run(demo_G, noquit=True, cb=draw_demo, args=[G])
     load_game()
     update_frames(G)
 

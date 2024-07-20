@@ -52,7 +52,9 @@ def set_up():
     G["DEBUG"] = "-d" in sys.argv
     return G
 
-def run(G, noquit=False):
+def off(*args, **kwargs): pass
+
+def run(G, noquit=False, cb=off, args=[], kwargs={}):
     while True:
         if inputs.update(noquit) == "QUIT":
             return
@@ -119,6 +121,7 @@ def run(G, noquit=False):
                 execute_console_command(G)
         
         G["CLOCK"].tick(30)
+        cb(*args, **kwargs)
 
 
 def execute_console_command(G):
