@@ -45,12 +45,15 @@ TEMPLATES = {}
 ACTORS = {}
 
 def swap_in(actors):
-    global ACTORS
+    global ACTORS, TEMPLATES
     ACTORS = {}
+    TEMPLATES = {}
 
     for name in actors.keys():
+        TEMPLATES[name] = actors[name]
         ACTORS[name] = Actor(actors[name])
 
+        
 def load():
     from src.lib import ACTORS as A
 

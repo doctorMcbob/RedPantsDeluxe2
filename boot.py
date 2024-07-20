@@ -2,10 +2,10 @@ import sys
 
 if __name__ == "__main__":
     if "-l" in sys.argv or "--load" in sys.argv:
-        from src import editor
-        editor.load()
-        editor.load_all_templates_button(0)
-        editor.save(True)
+        from src import editor_v2
+        editor_v2.load()
+        editor_v2.load_all_templates_button(0)
+        editor_v2.save(True)
 
     if "-e" in sys.argv or "--editor" in sys.argv:
         if "-v2" in sys.argv:
