@@ -50,12 +50,12 @@ SCRIPT_LOCATION = "scripts/"
 WORLD_TEMPLATE = {"actors":[], "background":None, "x_lock": None, "y_lock": None}
 
 SCROLLER = {
-    "CX": 0, "CY": 0
+    "CX": 0, "CY": 0,
+    "DRAG": False,
 }
 CURSOR = {
     "X": 0, "Y": 0,
     "CORNER": None,
-    "DRAG": False,
 }
 
 # ~~~ menu functions ~~~
@@ -164,6 +164,9 @@ def update_frames(G):
     )
 
 def draw_demo(G):
+    # Thinking about how we could keep the menu bar
+    #  updating along side the demo simulation...
+    #  might need a seperate instance of frames module
     G["SCREEN"].blit(
         G["DEMO"]["SCREEN"],
         (
@@ -189,6 +192,25 @@ def demo(G):
     load_game()
     update_frames(G)
 
+def update_cursor_events(e):
+    drag = SCROLLER["DRAG"]
+
+    if e.type == MOUSEBUTTONDOWN:
+        SCROLLER["DRAG"] = True
+
+    if e.type == MOUSEMOTION and drag:
+        SCROLLER["CX"] -= e.rel[0]
+        SCROLLER["CY"] -= e.rel[1]
+        CURSOR["X"] -= e.rel[0]
+        CURSOR["Y"] -= e.rel[1]
+        
+    if e.type == MOUSEBUTTONUP:
+        SCROLLER["DRAG"] = False
+        SCROLLER["CX"] = SCROLLER["CX"] // 16 * 16
+        SCROLLER["CY"] = SCROLLER["CY"] // 16 * 16
+        CURSOR["X"] = CURSOR["X"] // 16 * 16
+        CURSOR["Y"] = CURSOR["Y"] // 16 * 16
+
 def run(G):
     while True:
         draw(G)
@@ -201,4 +223,13 @@ def run(G):
                 G["HEADER"].CLICK = True
 
             if e.type == pygame.KEYDOWN and e.key == K_RETURN:
+                # <>
+                # For now the demo is going to darken the screen...
+                # If i find a way to run the demo concurrently to the other windows/header then
+                #  perhaps this will be removed
+                G["SCREEN"].fill((0,0,0))
+                pygame.display.update()
+                # </>
                 demo(G)
+
+            update_cursor_events(e)
