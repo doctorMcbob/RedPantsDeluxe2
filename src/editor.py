@@ -24,6 +24,7 @@ from src import boxes
 from src import actor
 from src import worlds
 from src.editor_menuing import MenuHeader
+from src import editor_windows as windows
 
 # # # # # # # #
 # Soft Layer  #
@@ -103,7 +104,9 @@ MENU_ITEMS = {
         "Save": save,
         "quit": quit,
     },
-    
+    "Windows": {
+        "Info": lambda: windows.activate_window("Info"),
+    }
 }
 
 def load_game():
@@ -150,6 +153,13 @@ def set_up():
     G["CLOCK"] = pygame.time.Clock()
     G["DEBUG"] = True
     update_frames(G)
+
+    windows.add_window(
+        "Info", (32, 32), (256, 256),
+        sys=True, theme="FUNKY",
+        update_callback=windows.window_base_update, args=[G]
+    )
+
     return G
 
 
@@ -216,6 +226,8 @@ def run(G):
     while True:
         draw(G)
         update_frames(G)
+        windows.update_windows(G)
+        
         G["HEADER"].update()
         pygame.display.update()
         G["HEADER"].CLICK = False
@@ -233,4 +245,8 @@ def run(G):
                 # </>
                 demo(G)
 
-            update_cursor_events(e)
+            window = windows.window_at_mouse()
+            if window is not None:
+                windows.handle_window_events(G, e, window)
+            else:
+                update_cursor_events(e)

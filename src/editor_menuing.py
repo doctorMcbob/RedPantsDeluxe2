@@ -1,24 +1,9 @@
 import pygame
 from pygame import Surface, Rect
+from src.editor_windows import THEMES
 
 class MenuHeader:
-    # THEMES
-    THEMES = {
-        "SOULLESS": {
-            "MENU_BG" : (100, 100, 100),
-            "MENU_BG_ALT" : (200, 200, 200),
-            "MENU_BG_SEL"  : (150, 150, 150),
-            "MENU_TXT" : (210, 210, 255),
-            "MENU_TXT_SEL" : (255, 200, 200),
-        },
-        "FUNKY": {
-            "MENU_BG" : (90, 36, 115),
-            "MENU_BG_ALT" : (190, 106, 200),
-            "MENU_BG_SEL"  : (115, 59, 145),
-            "MENU_TXT" : (210, 215, 30),
-            "MENU_TXT_SEL" : (180, 190, 35),
-        }
-    }
+    THEMES = THEMES
     # when a click happens this will be True otherwise it will be False
     CLICK = False
 
