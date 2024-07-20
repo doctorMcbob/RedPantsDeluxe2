@@ -71,7 +71,6 @@ def resolve(reference, script, world, related=None, logfunc=print, noquit=False)
             verb = cmd.pop(0)
 
             if verb == "quit":
-                print(noquit)
                 if noquit:
                     return "quit"
                 sys.exit()

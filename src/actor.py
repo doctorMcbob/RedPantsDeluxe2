@@ -53,7 +53,6 @@ def swap_in(actors):
         TEMPLATES[name] = actors[name]
         ACTORS[name] = Actor(actors[name])
 
-        
 def load():
     from src.lib import ACTORS as A
 
