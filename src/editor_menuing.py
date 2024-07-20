@@ -2,7 +2,7 @@ import pygame
 from pygame import Surface, Rect
 
 class MenuHeader:
-    MENU_BG = (100, 100, 100)
+    MENU_BG = (220, 150, 150)
     MENU_BG_ALT = (200, 200, 200)
     MENU_BG_SEL  = (150, 150, 150)
     MENU_TXT = (255, 255, 255)

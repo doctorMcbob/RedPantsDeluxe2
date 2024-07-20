@@ -174,6 +174,7 @@ def draw_demo(G):
             (G["SCREEN"].get_height()/2) - (G["DEMO"]["SCREEN"].get_height()/2),
         )
     )
+
 def demo(G):
     frames.clear()
     frames.add_frame("ROOT", G["WORLD"], (1152, 640))
