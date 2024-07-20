@@ -2,16 +2,27 @@ import pygame
 from pygame import Surface, Rect
 
 class MenuHeader:
-    MENU_BG = (220, 150, 150)
-    MENU_BG_ALT = (200, 200, 200)
-    MENU_BG_SEL  = (150, 150, 150)
-    MENU_TXT = (255, 255, 255)
-    MENU_TXT_SEL = (255, 200, 200)
-
+    # THEMES
+    THEMES = {
+        "SOULLESS": {
+            "MENU_BG" : (100, 100, 100),
+            "MENU_BG_ALT" : (200, 200, 200),
+            "MENU_BG_SEL"  : (150, 150, 150),
+            "MENU_TXT" : (210, 210, 255),
+            "MENU_TXT_SEL" : (255, 200, 200),
+        },
+        "FUNKY": {
+            "MENU_BG" : (90, 36, 115),
+            "MENU_BG_ALT" : (190, 106, 200),
+            "MENU_BG_SEL"  : (115, 59, 145),
+            "MENU_TXT" : (210, 215, 30),
+            "MENU_TXT_SEL" : (180, 190, 35),
+        }
+    }
     # when a click happens this will be True otherwise it will be False
     CLICK = False
 
-    def __init__(self, destination, template, pos=(0, 0)):
+    def __init__(self, destination, template, pos=(0, 0), theme="SOULLESS"):
         self.HEL16 = pygame.font.SysFont("Helvetica", 16)
 
         self.menu_items = template
@@ -21,7 +32,15 @@ class MenuHeader:
         # key "File", value { ... } or Callable
         self.sub_menus = {}
         self.path = set()
-
+        self.set_theme(theme)
+        
+    def set_theme(self, name):
+        self.MENU_BG = MenuHeader.THEMES[name]["MENU_BG"]
+        self.MENU_BG_ALT = MenuHeader.THEMES[name]["MENU_BG_ALT"]
+        self.MENU_BG_SEL = MenuHeader.THEMES[name]["MENU_BG_SEL"] 
+        self.MENU_TXT = MenuHeader.THEMES[name]["MENU_TXT"]
+        self.MENU_TXT_SEL = MenuHeader.THEMES[name]["MENU_TXT_SEL"]
+        
     def draw_header(self):
         w = self.destination.get_width()
         surf = Surface((w, 32))
@@ -91,6 +110,7 @@ class MenuHeader:
     def update(self):
         mkey = self.draw_header()
         submenu, pos = mkey
+        passed = False
         if submenu is not None:
             if isinstance(self.menu_items[submenu], dict):
                 self.sub_menus = {}
@@ -99,7 +119,8 @@ class MenuHeader:
                     self.path.add(submenu)
             else:
                 self.menu_items[submenu]()
-
+            passed = True
+                
         for key in list(self.sub_menus.keys()):
             if key not in self.sub_menus:
                 continue
@@ -108,6 +129,7 @@ class MenuHeader:
             if choice is None:
                 continue
 
+            passed = True
             if isinstance(self.sub_menus[key][choice], dict):
                 _sub_menus = {}
                 for name, pos in self.sub_menus:
@@ -124,3 +146,7 @@ class MenuHeader:
                 self.sub_menus[key][choice]()
                 self.sub_menus = {}
                 self.path.clear()
+
+        if not passed and self.CLICK:
+            self.sub_menus = {}
+            self.path.clear()

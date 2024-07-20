@@ -138,7 +138,7 @@ def set_up():
     load()
     load_game()
 
-    header = MenuHeader(G["SCREEN"], MENU_ITEMS)
+    header = MenuHeader(G["SCREEN"], MENU_ITEMS, theme="FUNKY")
     G["HEADER"] = header
     from src import printer
     printer.GIF_SIZE = 30 * 4
