@@ -32,8 +32,9 @@ def window_base_update(G, window):
     close_button = Rect((0 + dim[0]-32, 0), (32, 32))
 
     window["BODY"].fill(theme["MENU_BG"])
-    pygame.draw.rect(window["BODY"], theme["MENU_BG_ALT"], header)
+    pygame.draw.rect(window["BODY"], theme["MENU_BG"], header)
     pygame.draw.rect(window["BODY"], (255, 80, 80), close_button)
+    pygame.draw.rect(window["BODY"], theme["MENU_BG_ALT"], header, width=1)
     text = G["HEL32"].render(window["NAME"], 0, theme["MENU_TXT"])
     X = G["HEL32"].render("X", 0, theme["MENU_TXT"])
     window["BODY"].blit(text, (4, 0))

@@ -153,7 +153,7 @@ def input_rect(G, col=(100, 100, 100), cb=lambda *args: None, snap=4, pos=None):
 
     return (x1, y1), (x2 - x1, y2 - y1)
 
-def scroller_list(l, mpos, dim, font, scroll=0, search="", theme="SOULLESS"):
+def scroller_list(l, mpos, dim, font, scroll=0, search="", theme="SOULLESS", new=False):
     theme = THEMES[theme]
     surf = Surface(dim)
     surf.fill(theme.get("MENU_BG"))
@@ -162,6 +162,25 @@ def scroller_list(l, mpos, dim, font, scroll=0, search="", theme="SOULLESS"):
     h = h * 2
     x, y = 4, 4 - scroll
     selected = None
+    search_text = font.render(search if search else "Type to search...", 0, theme.get("MENU_TXT"))
+    surf.blit(search_text, (x, y))
+
+    button_rect = Rect((dim[0] / 2, y), (dim[0] / 2, h))
+    if button_rect.collidepoint(mpos):
+        pygame.draw.rect(surf, theme["MENU_BG_SEL"], button_rect)
+        surf.blit(
+            font.render("New..", 0, theme["MENU_TXT_SEL"]),
+            (surf.get_width() / 2, y+4))
+        selected = "new"
+    else:
+        pygame.draw.rect(surf, theme["MENU_BG"], button_rect)
+        surf.blit(
+            font.render("New..", 0, theme["MENU_TXT"]),
+            (surf.get_width() / 2, y+4))
+        pygame.draw.rect(surf, theme["MENU_BG_ALT"], button_rect, width=1)
+
+    y += h
+
     for option in filter(lambda s: s.startswith(search), l):
         option_rect = Rect(
             (x, y),
@@ -177,7 +196,8 @@ def scroller_list(l, mpos, dim, font, scroll=0, search="", theme="SOULLESS"):
             option_text = font.render(
                 option, 0, theme.get("MENU_TXT")
             )
-            pygame.draw.rect(surf, theme.get("MENU_BG_ALT"), option_rect)
+            pygame.draw.rect(surf, theme.get("MENU_BG"), option_rect)
+            pygame.draw.rect(surf, theme.get("MENU_BG_ALT"), option_rect, width=1)
         surf.blit(option_text, (x, y))
         x += w
         if x + w > dim[0] - 8:

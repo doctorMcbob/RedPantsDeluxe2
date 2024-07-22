@@ -6,6 +6,19 @@ I know src/editor_v2.py exists and this is editor.py
 
 This time I want to change the focus to be on UX
 This should include drop down menus and selecting multiple actors
+
+So far I have staretd with a header bar i put in src/editor_menuing.py 
+  it acceps a dictionary reperesenting the structure of options as
+  HEADER_OPTIONS["File"]["Save As"] <- a callable save as function
+  so that would mean if the option is a dictionary then that shall
+  be rendered as a submenu
+
+Additionally there are little windows
+  I made a window for changing worlds so far.
+
+  They take in two callbacks, a callback for updating and a callback for handling events
+
+Good luck, feel free to email me if you have questions about any of this
 """
 import pygame
 from pygame.locals import *
@@ -14,6 +27,7 @@ import sys
 import os
 
 from pprint import pformat
+from copy import deepcopy
 
 from src import game
 from src import inputs
@@ -52,7 +66,7 @@ SCRIPT_LOCATION = "scripts/"
 WORLD_TEMPLATE = {"actors":[], "background":None, "x_lock": None, "y_lock": None}
 
 SCROLLER = {
-    "CX": 0, "CY": 0,
+    "CX": -224, "CY": -160,
     "DRAG": False,
 }
 CURSOR = {
@@ -129,8 +143,9 @@ def update_info_window(G, window):
         (0, 0, 0)
     ), (x, y))
     y += 32
+    tangible_count = len(list(filter(lambda a: G["ACTOR"].get_actor(a).tangible, G["WORLDS"].get_world(G['WORLD']).actors)))
     window["BODY"].blit(G["HEL16"].render(
-        f"Actors in world: {len(worlds.get_world(G['WORLD']).actors)}",
+        f"Actors in world (tangible): {len(G['WORLDS'].get_world(G['WORLD']).actors)} {tangible_count}",
         0,
         (0, 0, 0)
     ), (x, y))
@@ -159,19 +174,46 @@ def update_worlds_window(G, window):
         theme=window["THEME"],
     )
     window["BODY"].blit(surf, (4, 36))
-    window["SELECTED"] = selected
-    
+    window["SELECTED"] = selected        
 
 def handle_worlds_window_events(e, G, window):
     if e.type == pygame.MOUSEBUTTONDOWN:
         if e.button == 4: window["SCROLL"] -= 16
         if e.button == 5: window["SCROLL"] += 16
         if e.button == 1 and window["SELECTED"] is not None:
-            G["WORLD"] = window["SELECTED"]
+            if window["SELECTED"] == "new":
+                name = window["SEARCH"] if window["SEARCH"] else "NewWorld"
+                num = ""
+                while name + num in WORLDS:
+                    if num == "":
+                        num = "0"
+                    else:
+                        num = int(num) + 1
+                name = name + num
+                create_new_world(name)
+                G["WORLD"] = name
+            else:
+                G["WORLD"] = window["SELECTED"]
+                
+            G["SEARCH"] = ""
 
     if e.type == pygame.KEYDOWN:
-        if e.key == K_UP: window["SCROLL"] += 128
-        if e.key == K_DOWN: window["SCROLL"] -= 128
+        if e.key == pygame.K_UP: window["SCROLL"] += 128
+        if e.key == pygame.K_DOWN: window["SCROLL"] -= 128
+
+        if e.key == pygame.K_RETURN:
+            if window["SEARCH"] in worlds.get_all_worlds():
+                G["WORLD"] = wiondow["SEARCH"]
+                G["SEARCH"] = ""
+
+        if e.key == pygame.K_BACKSPACE: window["SEARCH"] = window["SEARCH"][:-1]
+        if pygame.key.get_mods() & pygame.KMOD_SHIFT:
+            if e.key in utils.ALPHABET_SHIFT_MAP:
+                window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_SHIFT_MAP[e.key]
+            elif e.key in utils.ALPHABET_KEY_MAP:
+                window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_KEY_MAP[e.key].upper()
+        elif e.key in utils.ALPHABET_KEY_MAP:
+            window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_KEY_MAP[e.key]
 
 # ~~~ other ~~~
 def load_game():
@@ -190,12 +232,18 @@ def draw(G):
     frame.world = world
     drawn = frame.drawn(DEBUG=G)
     G["SCREEN"].blit(drawn, (0, 32))
+    pygame.draw.rect(
+        G["SCREEN"],
+        (0, 255, 0),
+        Rect((G["SCREEN"].get_width()/2-576, G["SCREEN"].get_height()/2-320), (1152, 640)),
+        width=1
+    )
     
 def set_up():
     pygame.init()
     pygame.mixer.init()
     G = {}
-    G["SCREEN"] = pygame.display.set_mode((1600, 1000))
+    G["SCREEN"] = pygame.display.set_mode((1600, 1024))
     G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
     G["HEL32"] = pygame.font.SysFont("Helvetica", 32)
     G["WORLD"] = 'root' if "-l" not in sys.argv else sys.argv[sys.argv.index("-l") + 1]
@@ -203,10 +251,12 @@ def set_up():
     inputs.add_state("PLAYER1")
     inputs.add_state("PLAYER2")
 
+    theme = "FUNKY" if "-t" not in sys.argv else sys.argv[sys.argv.index("-t") + 1]
+
     load()
     load_game()
 
-    header = MenuHeader(G["SCREEN"], MENU_ITEMS, theme="FUNKY")
+    header = MenuHeader(G["SCREEN"], MENU_ITEMS, theme=theme)
     G["HEADER"] = header
     from src import printer
     printer.GIF_SIZE = 30 * 4
@@ -221,13 +271,13 @@ def set_up():
 
     windows.add_window(
         "Info", (32, 32), (256, 256),
-        sys=True, theme="FUNKY",
+        sys=True, theme=theme,
         update_callback=update_info_window, args=[G]
     )
 
     windows.add_window(
         "World Select", (40, 40), (512, 640),
-        sys=True, theme="FUNKY",
+        sys=True, theme=theme,
         update_callback=update_worlds_window,
         event_callback=handle_worlds_window_events,
         args=[G],
@@ -290,10 +340,14 @@ def update_cursor_events(e):
         
     if e.type == MOUSEBUTTONUP:
         SCROLLER["DRAG"] = False
-        SCROLLER["CX"] = SCROLLER["CX"] // 16 * 16
-        SCROLLER["CY"] = SCROLLER["CY"] // 16 * 16
-        CURSOR["X"] = CURSOR["X"] // 16 * 16
-        CURSOR["Y"] = CURSOR["Y"] // 16 * 16
+        SCROLLER["CX"] = (SCROLLER["CX"]+8) // 16 * 16
+        SCROLLER["CY"] = (SCROLLER["CY"]+8) // 16 * 16
+        CURSOR["X"] = (CURSOR["X"]+8) // 16 * 16
+        CURSOR["Y"] = (CURSOR["Y"]+8) // 16 * 16
+
+def create_new_world(name):
+    WORLDS[name] = deepcopy(WORLD_TEMPLATE)
+    load_game()
 
 def run(G):
     while True:
