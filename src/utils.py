@@ -164,20 +164,20 @@ def scroller_list(l, mpos, dim, font, scroll=0, search="", theme="SOULLESS", new
     selected = None
     search_text = font.render(search if search else "Type to search...", 0, theme.get("MENU_TXT"))
     surf.blit(search_text, (x, y))
-
-    button_rect = Rect((dim[0] / 2, y), (dim[0] / 2, h))
-    if button_rect.collidepoint(mpos):
-        pygame.draw.rect(surf, theme["MENU_BG_SEL"], button_rect)
-        surf.blit(
-            font.render("New..", 0, theme["MENU_TXT_SEL"]),
-            (surf.get_width() / 2, y+4))
-        selected = "new"
-    else:
-        pygame.draw.rect(surf, theme["MENU_BG"], button_rect)
-        surf.blit(
-            font.render("New..", 0, theme["MENU_TXT"]),
-            (surf.get_width() / 2, y+4))
-        pygame.draw.rect(surf, theme["MENU_BG_ALT"], button_rect, width=1)
+    if new:
+        button_rect = Rect((dim[0] / 2, y), (dim[0] / 2, h))
+        if button_rect.collidepoint(mpos):
+            pygame.draw.rect(surf, theme["MENU_BG_SEL"], button_rect)
+            surf.blit(
+                font.render("New..", 0, theme["MENU_TXT_SEL"]),
+                (surf.get_width() / 2, y+4))
+            selected = "new"
+        else:
+            pygame.draw.rect(surf, theme["MENU_BG"], button_rect)
+            surf.blit(
+                font.render("New..", 0, theme["MENU_TXT"]),
+                (surf.get_width() / 2, y+4))
+            pygame.draw.rect(surf, theme["MENU_BG_ALT"], button_rect, width=1)
 
     y += h
 

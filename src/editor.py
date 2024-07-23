@@ -65,8 +65,10 @@ IMG_LOCATION = "img/"
 SCRIPT_LOCATION = "scripts/"
 WORLD_TEMPLATE = {"actors":[], "background":None, "x_lock": None, "y_lock": None}
 
+OFFX, OFFY = -224, -160
+
 SCROLLER = {
-    "CX": -224, "CY": -160,
+    "CX": OFFX, "CY": OFFY,
     "DRAG": False,
 }
 CURSOR = {
@@ -127,7 +129,10 @@ MENU_ITEMS = {
     },
     "Windows": {
         "Info": lambda: windows.activate_window("Info"),
-        "World Select": lambda: windows.activate_window("World Select"),
+        "Worlds": {
+            "World Select": lambda: windows.activate_window("World Select"),
+            "World Actors": lambda: windows.activate_window("World Actors"),
+        },
     },
 }
 
@@ -155,8 +160,8 @@ def update_worlds_window(G, window):
     # enforced strings
     for s, default in [("SELECTED", None), ("SEARCH", ""), ("SCROLL", 0)]:
         if s not in window: window[s] = default
-    text_rect = Rect((4, 36), (window["BODY"].get_width()-8, window["BODY"].get_height()-32-8))
-    pygame.draw.rect(window["BODY"], (255, 255, 255), text_rect)
+#    text_rect = Rect((4, 36), (window["BODY"].get_width()-8, window["BODY"].get_height()-32-8))
+#    pygame.draw.rect(window["BODY"], (255, 255, 255), text_rect)
 
     mpos = pygame.mouse.get_pos()
     mpos = (
@@ -172,6 +177,7 @@ def update_worlds_window(G, window):
         scroll=window["SCROLL"],
         search=window["SEARCH"],
         theme=window["THEME"],
+        new=True,
     )
     window["BODY"].blit(surf, (4, 36))
     window["SELECTED"] = selected        
@@ -195,6 +201,61 @@ def handle_worlds_window_events(e, G, window):
             else:
                 G["WORLD"] = window["SELECTED"]
                 
+            G["SEARCH"] = ""
+
+    if e.type == pygame.KEYDOWN:
+        if e.key == pygame.K_UP: window["SCROLL"] += 128
+        if e.key == pygame.K_DOWN: window["SCROLL"] -= 128
+
+        if e.key == pygame.K_RETURN:
+            if window["SEARCH"] in worlds.get_all_worlds():
+                G["WORLD"] = wiondow["SEARCH"]
+                G["SEARCH"] = ""
+
+        if e.key == pygame.K_BACKSPACE: window["SEARCH"] = window["SEARCH"][:-1]
+        if pygame.key.get_mods() & pygame.KMOD_SHIFT:
+            if e.key in utils.ALPHABET_SHIFT_MAP:
+                window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_SHIFT_MAP[e.key]
+            elif e.key in utils.ALPHABET_KEY_MAP:
+                window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_KEY_MAP[e.key].upper()
+        elif e.key in utils.ALPHABET_KEY_MAP:
+            window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_KEY_MAP[e.key]
+
+def update_actors_in_world_window(G, window):
+    windows.window_base_update(G, window)
+    # enforced strings
+    for s, default in [("SELECTED", None), ("SEARCH", ""), ("SCROLL", 0)]:
+        if s not in window: window[s] = default
+
+    mpos = pygame.mouse.get_pos()
+    mpos = (
+        mpos[0] - window["POS"][0] - 4,
+        mpos[1] - window["POS"][1] - 36,
+    )
+
+    surf, selected = utils.scroller_list(
+        worlds.get_world(G["WORLD"]).actors,
+        mpos,
+        (window["BODY"].get_width()-8,
+         window["BODY"].get_height()-40),
+        G["HEL16"],
+        scroll=window["SCROLL"],
+        search=window["SEARCH"],
+        theme=window["THEME"],
+        new=False,
+    )
+    window["BODY"].blit(surf, (4, 36))
+    window["SELECTED"] = selected
+
+def handle_actors_in_world_window_events(e, G, window):
+    if e.type == pygame.MOUSEBUTTONDOWN:
+        if e.button == 4: window["SCROLL"] -= 16
+        if e.button == 5: window["SCROLL"] += 16
+        if e.button == 1 and window["SELECTED"] is not None:
+            a = actor.get_actor(window["SELECTED"])
+            if a is not None:
+                SCROLLER["CX"] = a.x + OFFX
+                SCROLLER["CY"] = a.y + OFFY
             G["SEARCH"] = ""
 
     if e.type == pygame.KEYDOWN:
@@ -282,7 +343,15 @@ def set_up():
         event_callback=handle_worlds_window_events,
         args=[G],
     )
-    
+
+    windows.add_window(
+        "World Actors", (48, 48), (512, 256),
+        sys=True, theme=theme,
+        update_callback=update_actors_in_world_window,
+        event_callback=handle_actors_in_world_window_events,
+        args=[G],
+    )
+
     return G
 
 

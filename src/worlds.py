@@ -138,6 +138,6 @@ class World(object):
                                 frame.scroll((Actor.x+Actor.w, Actor.y)),
                                 DEBUG["HEL16"],
                                 frame.scroll_x, frame.scroll_y,
-                                text=maketext
+                                text=False
                     )
 
