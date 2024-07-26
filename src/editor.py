@@ -130,6 +130,7 @@ MENU_ITEMS = {
     "Windows": {
         "Info": lambda: windows.activate_window("Info"),
         "Worlds": {
+            "World Edit": lambda: windows.activate_window("World Edit"),
             "World Select": lambda: windows.activate_window("World Select"),
             "World Actors": lambda: windows.activate_window("World Actors"),
         },
@@ -139,20 +140,18 @@ MENU_ITEMS = {
 # ~~~ window functions ~~~
 def update_info_window(G, window):
     windows.window_base_update(G, window)
-    text_rect = Rect((4, 36), (window["BODY"].get_width()-8, window["BODY"].get_height()-32-8))
-    pygame.draw.rect(window["BODY"], (255, 255, 255), text_rect)
     x, y = 4, 36
     window["BODY"].blit(G["HEL16"].render(
         f"World: {G['WORLD']}",
         0,
-        (0, 0, 0)
+        windows.THEMES[window["THEME"]].get("MENU_TXT")
     ), (x, y))
     y += 32
     tangible_count = len(list(filter(lambda a: G["ACTOR"].get_actor(a).tangible, G["WORLDS"].get_world(G['WORLD']).actors)))
     window["BODY"].blit(G["HEL16"].render(
         f"Actors in world (tangible): {len(G['WORLDS'].get_world(G['WORLD']).actors)} {tangible_count}",
         0,
-        (0, 0, 0)
+        windows.THEMES[window["THEME"]].get("MENU_TXT"),
     ), (x, y))
 
 def update_worlds_window(G, window):
@@ -220,6 +219,82 @@ def handle_worlds_window_events(e, G, window):
                 window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_KEY_MAP[e.key].upper()
         elif e.key in utils.ALPHABET_KEY_MAP:
             window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_KEY_MAP[e.key]
+
+def update_world_window(G, window):
+    windows.window_base_update(G, window)
+    for s, default in [("SELECTED", None)]:
+        if s not in window: window[s] = default
+
+    mpos = pygame.mouse.get_pos()
+    theme = windows.THEMES[window["THEME"]]
+    name_text = G["HEL16"].render(
+        f"Name: {G['WORLD']}",
+        0,
+        theme.get("MENU_TXT"),
+    )
+
+    background_text = G["HEL16"].render(
+        f"Background: {WORLDS[G['WORLD']]['background']}",
+        0,
+        theme.get("MENU_TXT"),
+    )
+
+    actor_count = len(G["WORLDS"].get_world(G['WORLD']).actors)
+    tangible_count = len(list(filter(lambda a: G["ACTOR"].get_actor(a).tangible, G["WORLDS"].get_world(G['WORLD']).actors)))
+
+    actors_text = G["HEL16"].render(
+        f"Actors (tangible): {actor_count} ({tangible_count})",
+        0,
+        theme.get("MENU_TXT")
+    )
+
+    window["SELECTED"] = None
+
+    x, y = 4, 36
+    for text, name in [
+            (name_text, "name"), (background_text, "background"), (actors_text, "actors")
+    ]:
+        rect = Rect(
+            (window["POS"][0] + window["BODY"].get_width() - 68, window["POS"][1] + y),
+            (64, 32)
+        )
+        if rect.collidepoint(mpos):
+            window["SELECTED"] = name
+
+        window["BODY"].blit(text, (x, y))
+        button_rect = Rect((window["BODY"].get_width() - 68, y), (64, 32))
+        if window["SELECTED"] == name:
+            pygame.draw.rect(window["BODY"], theme.get("MENU_BG_SEL"), button_rect)
+        else:
+            pygame.draw.rect(window["BODY"], theme.get("MENU_BG"), button_rect)
+        pygame.draw.rect(window["BODY"], theme.get("MENU_BG_ALT"), button_rect, width=1)
+        
+        y += 32
+
+def handle_world_window_events(e, G, window):
+    if e.type == MOUSEBUTTONDOWN:
+        if window["SELECTED"] == "name":
+            def world_name_on_entry(G, text):
+                WORLDS[text] = WORLDS[G["WORLD"]]
+                G["WORLD"] = text
+                load_game()
+
+            updater, event_handler = windows.make_text_entry_window(
+                G, "World Name:", G["WORLD"], on_entry=world_name_on_entry)
+
+            windows.add_window(
+                "World Name Edit",
+                (64, 64), (288, 256),
+                theme=window["THEME"],
+                update_callback=updater,
+                event_callback=event_handler,
+                args=[G]
+            )
+            windows.activate_window("World Name Edit")
+
+        elif window["SELECTED"] == "background":
+            pass
+
 
 def update_actors_in_world_window(G, window):
     windows.window_base_update(G, window)
@@ -334,6 +409,14 @@ def set_up():
         "Info", (32, 32), (256, 256),
         sys=True, theme=theme,
         update_callback=update_info_window, args=[G]
+    )
+
+    windows.add_window(
+        "World Edit", (56, 56), (256, 256),
+        sys=True, theme=theme,
+        update_callback=update_world_window,
+        event_callback=handle_world_window_events,
+        args=[G],
     )
 
     windows.add_window(

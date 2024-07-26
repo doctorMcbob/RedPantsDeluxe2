@@ -1,6 +1,8 @@
 import pygame
 from pygame import Surface, Rect
 
+from src import utils
+
 WINDOWS = {}
 
 THEMES = {
@@ -88,7 +90,7 @@ def handle_window_events(G, e, window):
             if window["SYS"]:
                 window["ACTIVE"] = False
             else:
-                WINDOWS.pop(name)
+                WINDOWS.pop(window["NAME"])
             return
 
         elif real_header.collidepoint(mpos):
@@ -120,3 +122,66 @@ def handle_window_events(G, e, window):
         )
 
     window["EVENTS"](e)
+
+def make_text_entry_window(G, text, starting_text="",  on_entry=off):
+    def text_entry_window_callback(G, window):
+        window_base_update(G, window)
+        if "TEXT" not in window:
+            window["TEXT"] = starting_text
+
+        rendered_text = G["HEL32"].render(
+            text,
+            0,
+            THEMES.get(window["THEME"])["MENU_TXT"]
+        )
+
+        rendered_search = G["HEL16"].render(
+            window["TEXT"],
+            0,
+            THEMES.get(window["THEME"])["MENU_TXT"]
+        )
+
+        rendered_submit = G["HEL16"].render(
+            "Submit",
+            0,
+            THEMES.get(window["THEME"])["MENU_TXT"]
+        )
+
+        window["BODY"].blit(rendered_text, (32, 48))
+        pygame.draw.rect(
+            window["BODY"],
+            THEMES.get(window["THEME"])["MENU_BG_SEL"],
+            Rect((32, 80), (128, 16))
+        )
+        window["BODY"].blit(rendered_search, (32, 80))
+        pygame.draw.rect(
+            window["BODY"],
+            THEMES.get(window["THEME"])["MENU_BG_ALT"],
+            Rect((32, 112), (64, 16))
+        )
+        window["BODY"].blit(rendered_submit, (38, 112))
+
+    def text_entry_window_event_handler(e, G, window):
+        mpos = pygame.mouse.get_pos()
+        if e.type == pygame.MOUSEBUTTONDOWN:
+            if Rect(
+                    (window["POS"][0] + 32, window["POS"][1] + 96), (64, 32)
+            ).collidepoint(mpos):
+                WINDOWS.pop(window["NAME"])
+                on_entry(G, window["TEXT"])
+
+        if e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_RETURN:
+                WINDOWS.pop(window["NAME"])
+                on_entry(G, text)
+
+            if e.key == pygame.K_BACKSPACE: window["TEXT"] = window["TEXT"][:-1]
+            if pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                if e.key in utils.ALPHABET_SHIFT_MAP:
+                    window["TEXT"] = window["TEXT"] + utils.ALPHABET_SHIFT_MAP[e.key]
+                elif e.key in utils.ALPHABET_KEY_MAP:
+                    window["TEXT"] = window["TEXT"] + utils.ALPHABET_KEY_MAP[e.key].upper()
+            elif e.key in utils.ALPHABET_KEY_MAP:
+                window["TEXT"] = window["TEXT"] + utils.ALPHABET_KEY_MAP[e.key]
+
+    return text_entry_window_callback, text_entry_window_event_handler
