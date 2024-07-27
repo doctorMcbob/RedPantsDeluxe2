@@ -293,8 +293,26 @@ def handle_world_window_events(e, G, window):
             windows.activate_window("World Name Edit")
 
         elif window["SELECTED"] == "background":
-            pass
+            def background_on_entry(G, text):
+                if sprites.get_sprite(text) is not None:
+                    WORLDS[G["WORLD"]]["background"] = text
+                    load_game()
 
+            updater, event_handler = windows.make_text_entry_window(
+                G, "Background:", WORLDS[G["WORLD"]]["background"], on_entry=background_on_entry)
+
+            windows.add_window(
+                "World Background Edit",
+                (64, 64), (288, 256),
+                theme=window["THEME"],
+                update_callback=updater,
+                event_callback=event_handler,
+                args=[G]
+            )
+            windows.activate_window("World Background Edit")
+
+        elif window["SELECTED"] == "actors":
+            windows.activate_window("World Actors")
 
 def update_actors_in_world_window(G, window):
     windows.window_base_update(G, window)
