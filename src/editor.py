@@ -13,10 +13,39 @@ So far I have staretd with a header bar i put in src/editor_menuing.py
   so that would mean if the option is a dictionary then that shall
   be rendered as a submenu
 
-Additionally there are little windows
+Additionally there are little windows (src/editor_windows.py)
   I made a window for changing worlds so far.
 
   They take in two callbacks, a callback for updating and a callback for handling events
+
+~~~ TODO ~~~
+   Windows
+   -------
+  [] Sys
+   \ [] Info (needs to add metadata around selectors)
+     [x] Text Entry
+      \ list display?
+  [] Worlds
+   \ [x] Edit (name, background)
+     [x] World Select
+     [x] World Actor View
+      \ [] send actors to different world
+        [] get actor from another world
+  [] Actors
+   \ [] Edit (name, direction, tabgible, physics, keys
+              tileset, spritesheet, script map, hutbox, hurtbox)
+      \ [] Hitbox Editor
+     [] Template Select
+  [] Sprites
+   \ [] Spritesheet Editor
+     [] Sprite List
+     [] Sprite Map Editor
+
+   Selector
+   --------
+  [] Drag Rect Selector (multiple actors)
+  [] Single Click Selector
+  [] Move Selected Actor(s)
 
 Good luck, feel free to email me if you have questions about any of this
 """
@@ -40,6 +69,10 @@ from src import worlds
 from src.editor_menuing import MenuHeader
 from src import editor_windows as windows
 from src import utils
+from src import build
+
+import threading
+BUILD_THREAD = None
 
 # # # # # # # #
 # Soft Layer  #
@@ -113,6 +146,14 @@ def save(noload=False):
     if noload: return
     load_game()
 
+def build_on_thread(no_make=False, make_only=False):
+    global BUILD_THREAD
+    if BUILD_THREAD is not None and BUILD_THREAD.is_alive():
+        return
+    BUILD_THREAD = threading.Thread(target=build.build, args=(no_make, make_only))
+    BUILD_THREAD.start()
+
+    
 def off(*args, **kwargs): pass
 # ~~~ menu buttons ~~~
 MENU_ITEMS = {
@@ -120,21 +161,24 @@ MENU_ITEMS = {
         "Load": load,
         "Save": save,
         "Build": {
-            # TODO
-            "Build Executable": off,
-            "Run Makefile Only": off,
-            "Build Without Makefile": off,
+            "Build Executable": lambda: build_on_thread(),
+            "Run Makefile Only": lambda: build_on_thread(make_only=True),
+            "Build Without Makefile": lambda: build_on_thread(no_make=True),
         },
         "Quit": quit,
     },
-    "Windows": {
-        "Info": lambda: windows.activate_window("Info"),
-        "Worlds": {
-            "World Edit": lambda: windows.activate_window("World Edit"),
-            "World Select": lambda: windows.activate_window("World Select"),
-            "World Actors": lambda: windows.activate_window("World Actors"),
-        },
+    "Info": lambda: windows.activate_window("Info"),
+    "Worlds": {
+        "World Edit": lambda: windows.activate_window("World Edit"),
+        "World Select": lambda: windows.activate_window("World Select"),
+        "World Actors": lambda: windows.activate_window("World Actors"),
     },
+    "Template Select": lambda: windows.activate_window("Not Implemented"),
+    "Sprites": {
+        "Sprites List": lambda: windows.activate_window("Not Implemented"),
+        "Spritesheet Editor": lambda: windows.activate_window("Not Implemented"),
+        "Sprite Map Editor": lambda: windows.activate_window("Not Implemented"),
+    }
 }
 
 # ~~~ window functions ~~~
@@ -396,6 +440,7 @@ def draw(G):
 def set_up():
     pygame.init()
     pygame.mixer.init()
+    pygame.mixer.music.set_volume(0)
     G = {}
     G["SCREEN"] = pygame.display.set_mode((1600, 1024))
     G["HEL16"] = pygame.font.SysFont("Helvetica", 16)
@@ -453,6 +498,13 @@ def set_up():
         args=[G],
     )
 
+    windows.add_window(
+        "Not Implemented",
+        (80, 80), (320, 64),
+        sys=True, theme=theme,
+        update_callback=windows.window_base_update,
+        args=[G],
+    )
     return G
 
 
@@ -499,7 +551,7 @@ def demo(G):
 def update_cursor_events(e):
     drag = SCROLLER["DRAG"]
 
-    if e.type == MOUSEBUTTONDOWN:
+    if e.type == MOUSEBUTTONDOWN and e.button == 3:
         SCROLLER["DRAG"] = True
 
     if e.type == MOUSEMOTION and drag:
