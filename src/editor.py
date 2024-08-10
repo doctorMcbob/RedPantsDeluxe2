@@ -25,6 +25,10 @@ Additionally there are little windows (src/editor_windows.py)
    \ [] Info (needs to add metadata around selectors)
      [x] Text Entry
       \ list display?
+     [x] Build
+      \ [x] Full Build
+        [x] Makefile Only
+        [x] No Makefile
   [] Worlds
    \ [x] Edit (name, background)
      [x] World Select
@@ -43,9 +47,10 @@ Additionally there are little windows (src/editor_windows.py)
 
    Selector
    --------
-  [] Drag Rect Selector (multiple actors)
+  [x] Drag Rect Selector (multiple actors)
   [] Single Click Selector
-  [] Move Selected Actor(s)
+  [x] Move Selected Actor(s)
+  [] Draw templates
 
 Good luck, feel free to email me if you have questions about any of this
 """
@@ -105,8 +110,9 @@ SCROLLER = {
     "DRAG": False,
 }
 CURSOR = {
-    "X": 0, "Y": 0,
     "CORNER": None,
+    "SELECTED": [],
+    "DRAG": False,
 }
 
 # ~~~ menu functions ~~~
@@ -414,6 +420,13 @@ def handle_actors_in_world_window_events(e, G, window):
             window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_KEY_MAP[e.key]
 
 # ~~~ other ~~~
+def make_rect(pos, pos2):
+    x1 = min(pos[0], pos2[0])
+    x2 = max(pos[0], pos2[0])
+    y1 = min(pos[1], pos2[1])
+    y2 = max(pos[1], pos2[1])
+    return (x1, y1), ((x2 - x1), (y2 - y1))
+
 def load_game():
     sprites.swap_in(offsets=OFFSETS, sprite_maps=SPRITEMAPS, tile_maps=TILEMAPS)
     scripts.swap_in(SCRIPTS)
@@ -436,7 +449,32 @@ def draw(G):
         Rect((G["SCREEN"].get_width()/2-576, G["SCREEN"].get_height()/2-320), (1152, 640)),
         width=1
     )
-    
+    if CURSOR["CORNER"] is not None:
+        mpos = pygame.mouse.get_pos()
+        rect = make_rect(
+            (
+                CURSOR["CORNER"][0] - SCROLLER["CX"],
+                CURSOR["CORNER"][1] - SCROLLER["CY"]
+            ),
+            mpos
+        )
+        pygame.draw.rect(G["SCREEN"], (1, 255, 1), rect, width=4)
+        rect = make_rect(
+            CURSOR["CORNER"],
+            (
+                mpos[0] + SCROLLER["CX"],
+                mpos[1] + SCROLLER["CY"]
+            )
+        )
+        pygame.draw.rect(G["SCREEN"], (1, 1, 1), rect, width=1)
+    for name in CURSOR["SELECTED"]:
+        a = G["ACTOR"].get_actor(name)
+        a_rect = Rect((
+            a.x - SCROLLER["CX"],
+            a.y - SCROLLER["CY"] + 32
+        ), (a.w, a.h))
+        pygame.draw.rect(G["SCREEN"], (255, 255, 255), a_rect, width=2)
+
 def set_up():
     pygame.init()
     pygame.mixer.init()
@@ -483,7 +521,7 @@ def set_up():
     )
 
     windows.add_window(
-        "World Select", (40, 40), (512, 640),
+        "World Select", (32, 32), (512, 640),
         sys=True, theme=theme,
         update_callback=update_worlds_window,
         event_callback=handle_worlds_window_events,
@@ -548,29 +586,88 @@ def demo(G):
     load_game()
     update_frames(G)
 
-def update_cursor_events(e):
-    drag = SCROLLER["DRAG"]
+def update_cursor_events(G, e):
+    c_drag = CURSOR["DRAG"]
+    s_drag = SCROLLER["DRAG"]
 
-    if e.type == MOUSEBUTTONDOWN and e.button == 3:
-        SCROLLER["DRAG"] = True
+    mpos = pygame.mouse.get_pos()
 
-    if e.type == MOUSEMOTION and drag:
-        SCROLLER["CX"] -= e.rel[0]
-        SCROLLER["CY"] -= e.rel[1]
-        CURSOR["X"] -= e.rel[0]
-        CURSOR["Y"] -= e.rel[1]
-        
+    if e.type == MOUSEBUTTONDOWN:
+        if e.button == 3:
+            SCROLLER["DRAG"] = True
+        if e.button == 1:
+            hits = False
+            for name in CURSOR["SELECTED"]:
+                a = G["ACTOR"].get_actor(name)
+                if a.collidepoint(
+                        (
+                            mpos[0] + SCROLLER["CX"],
+                            mpos[1] + SCROLLER["CY"] - 32
+                        )
+                ):
+                    hits = True
+            if hits:
+                CURSOR["DRAG"] = True
+            else:
+                CURSOR["SELECTED"] = []
+                if CURSOR["CORNER"] is None:
+                    CURSOR["CORNER"] = (
+                        mpos[0] + SCROLLER["CX"],
+                        mpos[1] + SCROLLER["CY"],
+                    )
+                CURSOR["DRAG"] = True
+
+    if e.type == MOUSEMOTION:
+        if s_drag:
+            SCROLLER["CX"] -= e.rel[0]
+            SCROLLER["CY"] -= e.rel[1]
+        if c_drag:
+            for name in CURSOR["SELECTED"]:
+                a = G["ACTOR"].get_actor(name)
+                if s_drag:
+                    a.x -= e.rel[0]
+                    a.y -= e.rel[1]
+                else:
+                    a.x += e.rel[0]
+                    a.y += e.rel[1]
+            
     if e.type == MOUSEBUTTONUP:
-        SCROLLER["DRAG"] = False
-        SCROLLER["CX"] = (SCROLLER["CX"]+8) // 16 * 16
-        SCROLLER["CY"] = (SCROLLER["CY"]+8) // 16 * 16
-        CURSOR["X"] = (CURSOR["X"]+8) // 16 * 16
-        CURSOR["Y"] = (CURSOR["Y"]+8) // 16 * 16
+        if e.button == 3:
+            SCROLLER["DRAG"] = False
+            SCROLLER["CX"] = (SCROLLER["CX"]+8) // 16 * 16
+            SCROLLER["CY"] = (SCROLLER["CY"]+8) // 16 * 16
+        if e.button == 1:
+            CURSOR["DRAG"] = False
+            if c_drag:
+                for name in CURSOR["SELECTED"]:
+                    a = G["ACTOR"].get_actor(name)
+                    a.x = a.x // 16 * 16
+                    a.y = a.y // 16 * 16
+
+            if CURSOR["CORNER"] is not None:
+                CURSOR["SELECTED"] = actors_in_rect(G,
+                                                    (
+                                                        mpos[0] + SCROLLER["CX"],
+                                                        mpos[1] + SCROLLER["CY"] - 32
+                                                    ),
+                                                    CURSOR["CORNER"])
+                CURSOR["CORNER"] = None
 
 def create_new_world(name):
     WORLDS[name] = deepcopy(WORLD_TEMPLATE)
     load_game()
 
+def actors_in_rect(G, pos1, pos2):
+    pos, dim = make_rect(pos1, pos2)
+    rect = Rect(pos, dim)
+    world = G["WORLDS"].get_world(G["WORLD"])
+    selected = []
+    for name in world.actors:
+        a = G["ACTOR"].get_actor(name)
+        if rect.colliderect(a):
+            selected.append(name)
+    return selected
+    
 def run(G):
     while True:
         draw(G)
@@ -598,4 +695,4 @@ def run(G):
             if window is not None:
                 windows.handle_window_events(G, e, window)
             else:
-                update_cursor_events(e)
+                update_cursor_events(G, e)

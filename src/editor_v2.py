@@ -86,7 +86,7 @@ def load_game():
     worlds.swap_in(WORLDS)
     actor.swap_in(ACTORS)
     boxes.swap_in(hitboxes=HITBOXES, hurtboxes=HURTBOXES)
-    
+
 def make_rect(pos, pos2):
     x1 = min(pos[0], pos2[0])
     x2 = max(pos[0], pos2[0])

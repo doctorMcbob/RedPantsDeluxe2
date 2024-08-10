@@ -157,7 +157,10 @@ def scroller_list(l, mpos, dim, font, scroll=0, search="", theme="SOULLESS", new
     theme = THEMES[theme]
     surf = Surface(dim)
     surf.fill(theme.get("MENU_BG"))
-    longest = max(l, key=len)
+    if l:
+        longest = max(l, key=len)
+    else:
+        longest = ""
     w, h = font.render(longest, 0, (0, 0, 0)).get_size()
     h = h * 2
     x, y = 4, 4 - scroll
