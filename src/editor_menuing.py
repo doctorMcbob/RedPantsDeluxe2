@@ -18,6 +18,7 @@ class MenuHeader:
         self.sub_menus = {}
         self.path = set()
         self.set_theme(theme)
+        self.theme = THEMES[theme]
         
     def set_theme(self, name):
         self.MENU_BG = MenuHeader.THEMES[name]["MENU_BG"]

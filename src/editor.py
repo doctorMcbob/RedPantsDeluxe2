@@ -177,8 +177,68 @@ def load_all_templates(G):
         except Exception as e:
             print("Failed to load {} because of {}".format(filename, e))
 
+# TODO refactor this
+def template_from_script(filename, name=None):
+    with open(SCRIPT_LOCATION + filename) as f:
+        script = f.read()
+
+    segments = script.split("|")
     
+    if name is None:
+        name = segments.pop(0)
+    else:
+        segments.pop(0)
+    
+    rect = segments.pop(0)
+    x, y, w, h = [int(n) for n in rect.split(",")]
+    
+    tangible = segments.pop(0)
+
+    sprites = {}
+    offsets = {}
+    for line in segments.pop(0).splitlines():
+        if not line: continue
+        key, sprite, offset = line.split()
+        offset = [int(n) for n in offset.split(",")]
+
+        sprites[key] = sprite
+        offsets[sprite] = offset
+
+    actor_scripts = {}
+    while segments:
+        key = segments.pop(0)
+        cmds = segments.pop(0)
+        script = [
+            scripts.parse_tokens(cmd)
+            for cmd in cmds.splitlines()
+        ]
+        actor_scripts[key] = list(filter(lambda n: bool(n), script))
+        
+
+    offsetkey = filename.split(".")[0]
+    OFFSETS[offsetkey]= offsets
+    
+    spritekey = filename.split(".")[0]
+    SPRITEMAPS[spritekey] = sprites
+
+    scriptkey = filename.split(".")[0]
+    SCRIPTS[scriptkey] = actor_scripts
+    
+    return {
+        "name": name,
+        "POS": (x, y),
+        "DIM": (w, h),
+        "sprites": spritekey,
+        "scripts": scriptkey,
+        "offsetkey": offsetkey,
+        "tangible": tangible == "True"
+    }
+
 def off(*args, **kwargs): pass
+def clear_template():
+    global SELECTED_TEMPLATE
+    SELECTED_TEMPLATE = None
+    
 # ~~~ menu buttons ~~~
 MENU_ITEMS = {
     "File": {
@@ -197,7 +257,10 @@ MENU_ITEMS = {
         "World Select": lambda: windows.activate_window("World Select"),
         "World Actors": lambda: windows.activate_window("World Actors"),
     },
-    "Template Select": lambda: windows.activate_window("Not Implemented"),
+    "Templates": {
+        "Template Select": lambda: windows.activate_window("Template Select"),
+        "Clear Template": clear_template,
+    },
     "Sprites": {
         "Sprites List": lambda: windows.activate_window("Not Implemented"),
         "Spritesheet Editor": lambda: windows.activate_window("Not Implemented"),
@@ -244,7 +307,7 @@ def update_worlds_window(G, window):
         scroll=window["SCROLL"],
         search=window["SEARCH"],
         theme=window["THEME"],
-        new=True,
+        button="New...",
     )
     window["BODY"].blit(surf, (4, 36))
     window["SELECTED"] = selected        
@@ -254,7 +317,7 @@ def handle_worlds_window_events(e, G, window):
         if e.button == 4: window["SCROLL"] -= 16
         if e.button == 5: window["SCROLL"] += 16
         if e.button == 1 and window["SELECTED"] is not None:
-            if window["SELECTED"] == "new":
+            if window["SELECTED"] == "New...":
                 name = window["SEARCH"] if window["SEARCH"] else "NewWorld"
                 num = ""
                 while name + num in WORLDS:
@@ -383,7 +446,7 @@ def handle_world_window_events(e, G, window):
             windows.activate_window("World Actors")
 
 def update_template_select_window(G, window):
-    window.window_base_update(G, window)
+    windows.window_base_update(G, window)
 
     for s, default in [("SELECTED", None), ("SEARCH", ""), ("SCROLL", 0)]:
         if s not in window: window[s] = default
@@ -395,7 +458,7 @@ def update_template_select_window(G, window):
     )
 
     surf, selected = utils.scroller_list(
-        list(TEMPLATES.keys()),
+        sorted(list(TEMPLATES.keys())),
         mpos,
         (window["BODY"].get_width()-8,
          window["BODY"].get_height()-40),
@@ -403,18 +466,20 @@ def update_template_select_window(G, window):
         scroll=window["SCROLL"],
         search=window["SEARCH"],
         theme=window["THEME"],
-        new=False,
+        button="Load...",
     )
     window["BODY"].blit(surf, (4, 36))
     window["SELECTED"] = selected
 
 def handle_template_window_events(e, G, window):
+    global SELECTED_TEMPLATE
     if e.type == pygame.MOUSEBUTTONDOWN:
         if e.button == 4: window["SCROLL"] -= 16
         if e.button == 5: window["SCROLL"] += 16
         if e.button == 1 and window["SELECTED"] is not None:
-            a = actor.get_actor(window["SELECTED"])
-            if a is not None:
+            if window["SELECTED"] == "Load...":
+                load_all_templates(G)
+            else:
                 SELECTED_TEMPLATE = window["SELECTED"]
             G["SEARCH"] = ""
 
@@ -458,7 +523,7 @@ def update_actors_in_world_window(G, window):
         scroll=window["SCROLL"],
         search=window["SEARCH"],
         theme=window["THEME"],
-        new=False,
+        button=False,
     )
     window["BODY"].blit(surf, (4, 36))
     window["SELECTED"] = selected
@@ -523,6 +588,7 @@ def draw(G):
         Rect((G["SCREEN"].get_width()/2-576, G["SCREEN"].get_height()/2-320), (1152, 640)),
         width=1
     )
+
     if CURSOR["CORNER"] is not None:
         mpos = pygame.mouse.get_pos()
         rect = make_rect(
@@ -530,9 +596,12 @@ def draw(G):
                 CURSOR["CORNER"][0] - SCROLLER["CX"],
                 CURSOR["CORNER"][1] - SCROLLER["CY"]
             ),
-            mpos
+            (
+                mpos[0] // 16 * 16,
+                mpos[1] // 16 * 16,
+            )
         )
-        pygame.draw.rect(G["SCREEN"], (1, 255, 1), rect, width=4)
+        pygame.draw.rect(G["SCREEN"], (1, 255, 1), rect, width=1)
     for name in CURSOR["SELECTED"]:
         a = G["ACTOR"].get_actor(name)
         a_rect = Rect((
@@ -609,6 +678,14 @@ def set_up():
         update_callback=windows.window_base_update,
         args=[G],
     )
+
+    windows.add_window(
+        "Template Select", (32, 32), (512, 640),
+        sys=True, theme=theme,
+        update_callback=update_template_select_window,
+        event_callback=handle_template_window_events,
+        args=[G],
+    )
     return G
 
 
@@ -678,8 +755,8 @@ def update_cursor_events(G, e):
                 CURSOR["SELECTED"] = []
                 if CURSOR["CORNER"] is None:
                     CURSOR["CORNER"] = (
-                        mpos[0] + SCROLLER["CX"],
-                        mpos[1] + SCROLLER["CY"],
+                        mpos[0] + SCROLLER["CX"] // 16 * 16,
+                        mpos[1] + SCROLLER["CY"] // 16 * 16,
                     )
                 CURSOR["DRAG"] = True
 
@@ -711,18 +788,41 @@ def update_cursor_events(G, e):
                     a = G["ACTOR"].get_actor(name)
                     a.x = a.x // 16 * 16
                     a.y = a.y // 16 * 16
+                    ACTORS[name]["POS"] = (a.x, a.y)
 
             if CURSOR["CORNER"] is not None:
                 if SELECTED_TEMPLATE is not None:
-                    pass
+                    actor = deepcopy(TEMPLATES[SELECTED_TEMPLATE])
+                    pos, dim = make_rect(
+                        (
+                            CURSOR["CORNER"][0] // 16 * 16,
+                            CURSOR["CORNER"][1] // 16 * 16
+                        ),
+                        (
+                            mpos[0]  // 16 * 16 + SCROLLER["CX"],
+                            mpos[1]  // 16 * 16 + SCROLLER["CY"]
+                        )
+                    )
+                    if dim[0] != 0 and dim[1] != 0:
+                        actor["POS"] = pos
+                        actor["DIM"] = dim
+                        n = 0
+                        while G["ACTOR"].get_actor(f"{SELECTED_TEMPLATE}{n}") is not None:
+                            n += 1
+                        name = f"{SELECTED_TEMPLATE}{n}"
+                        actor["name"] = name
+                        ACTORS[name] = actor
+                        WORLDS[G["WORLD"]]["actors"].append(name)
+                        load_game()
                 else:
-                    CURSOR["SELECTED"] = actors_in_rect(G,
-                                                        (
-                                                            mpos[0] + SCROLLER["CX"],
-                                                            mpos[1] + SCROLLER["CY"] - 32
-                                                        ),
-                                                        CURSOR["CORNER"])
-                    CURSOR["CORNER"] = None
+                    CURSOR["SELECTED"] = actors_in_rect(
+                        G,
+                        (
+                            mpos[0] // 16 * 16 + SCROLLER["CX"],
+                            mpos[1] // 16 * 16 + SCROLLER["CY"] - 32
+                        ),
+                        CURSOR["CORNER"])
+                CURSOR["CORNER"] = None
 
 def create_new_world(name):
     WORLDS[name] = deepcopy(WORLD_TEMPLATE)
@@ -746,6 +846,20 @@ def run(G):
         windows.update_windows(G)
         
         G["HEADER"].update()
+        template_text = G["HEL32"].render(
+            f"Template: {SELECTED_TEMPLATE}",
+            0,
+            G["HEADER"].theme["MENU_TXT"]
+        )
+        
+        G["SCREEN"].blit(
+            template_text,
+            (
+                G["SCREEN"].get_width() - template_text.get_width(),
+                0
+            )
+        )
+        
         pygame.display.update()
         G["HEADER"].CLICK = False
         for e in pygame.event.get():
@@ -761,6 +875,13 @@ def run(G):
                 pygame.display.update()
                 # </>
                 demo(G)
+
+            if e.type == pygame.KEYDOWN and (e.key == K_DELETE or e.key == K_BACKSPACE):
+                for name in CURSOR["SELECTED"]:
+                    WORLDS[G["WORLD"]]["actors"].remove(name)
+                    ACTORS.pop(name)
+                    load_game()
+                CURSOR["SELECTED"] = []
 
             window = windows.window_at_mouse()
             if window is not None:
