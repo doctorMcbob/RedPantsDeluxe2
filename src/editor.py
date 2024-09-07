@@ -593,8 +593,8 @@ def draw(G):
         mpos = pygame.mouse.get_pos()
         rect = make_rect(
             (
-                CURSOR["CORNER"][0] - SCROLLER["CX"],
-                CURSOR["CORNER"][1] - SCROLLER["CY"]
+                (CURSOR["CORNER"][0] - SCROLLER["CX"]) // 16*16,
+                (CURSOR["CORNER"][1] - SCROLLER["CY"]) // 16*16
             ),
             (
                 mpos[0] // 16 * 16,
