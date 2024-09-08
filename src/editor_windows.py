@@ -160,10 +160,26 @@ def make_actor_edit_window(G, actor_template):
         pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], direction_button, width=2)
         window["BODY"].blit(direction_text, (x + 32, y))
 
+        y += 32
+
+        sprites_text = G["HEL16"].render(
+            f"Sprites: {actor_template['sprites']}",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        window["BODY"].blit(sprites_text, (x + 32, y))
+
+        y += 32
+
+        scripts_text = G["HEL16"].render(
+            f"Scripts: {actor_template['scripts']}",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        window["BODY"].blit(scripts_text, (x + 32, y))
+
     def actor_edit_window_event_handler(e, G, window):
         mpos = pygame.mouse.get_pos()
         mpos = (mpos[0] - window["POS"][0], mpos[1] - window["POS"][1])
-
+        update = False
         if e.type == pygame.MOUSEBUTTONDOWN:
             update = True
             if window["TANG_BTN"].collidepoint(mpos):
@@ -174,8 +190,8 @@ def make_actor_edit_window(G, actor_template):
                 actor_template["direction"] = -1 if actor_template["direction"] == 1 else 1
             else:
                 update = False
-            if update:
-                editor.load_game()
+        if update:
+            editor.load_game()
     return actor_edit_window_callback, actor_edit_window_event_handler
 
 def make_text_entry_window(G, text, starting_text="",  on_entry=off):
