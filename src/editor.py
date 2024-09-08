@@ -224,7 +224,7 @@ def template_from_script(filename, name=None):
     scriptkey = filename.split(".")[0]
     SCRIPTS[scriptkey] = actor_scripts
     
-    return {
+    a = actor.Actor({
         "name": name,
         "POS": (x, y),
         "DIM": (w, h),
@@ -232,7 +232,8 @@ def template_from_script(filename, name=None):
         "scripts": scriptkey,
         "offsetkey": offsetkey,
         "tangible": tangible == "True"
-    }
+    })
+    return a.as_template()
 
 def off(*args, **kwargs): pass
 def clear_template():
@@ -624,7 +625,7 @@ def set_up():
     inputs.add_state("PLAYER2")
 
     theme = "FUNKY" if "-t" not in sys.argv else sys.argv[sys.argv.index("-t") + 1]
-
+    G["WINDOW_THEME"] = theme
     load()
     load_game()
 
@@ -718,9 +719,11 @@ def demo(G):
         "W": 1152,"H": 640,
         "DEBUG": True,
         "CLOCK": G["CLOCK"],
+        "G": G # what the fuck
     }
     demo_G["SCREEN"] = pygame.Surface((demo_G["W"], demo_G["H"]))
     G["DEMO"] = demo_G
+    demo_G["DRAW_CB"] = draw_demo
     demo_G["ROOT"] = G["WORLD"]
     demo_G["HEL16"] = G["HEL16"]
     demo_G["HEL32"] = G["HEL32"]
@@ -840,6 +843,14 @@ def actors_in_rect(G, pos1, pos2):
     return selected
     
 def run(G):
+    # # MIGRATIONS :O
+    # for name in ACTORS:
+    #     template = ACTORS.get(name)
+    #     newTemplate = actor.Actor(template).as_template()
+    #     ACTORS[name] = newTemplate
+
+    # save()
+    
     while True:
         draw(G)
         update_frames(G)
@@ -887,4 +898,19 @@ def run(G):
             if window is not None:
                 windows.handle_window_events(G, e, window)
             else:
+                if e.type == pygame.KEYDOWN and e.key == K_SPACE:
+                    for name in CURSOR["SELECTED"]:
+                        actor_template = ACTORS.get(name, None)
+                        if actor_template is not None:
+                            update, handler = windows.make_actor_edit_window(G, actor_template)
+                            windows.add_window(
+                                f"{name} Edit",
+                                (128, 128), (640, 480),
+                                theme=G["WINDOW_THEME"],
+                                update_callback=update,
+                                event_callback=handler,
+                                args=[G]
+                            )
+                            windows.activate_window(f"{name} Edit")
+
                 update_cursor_events(G, e)

@@ -125,7 +125,7 @@ def run(G, noquit=False, cb=off, args=[], kwargs={}):
 
 
 def execute_console_command(G):
-    cmd = get_text_input(G, (0, G["H"] - 32))
+    cmd = get_text_input(G, (0, 0))
     if cmd is None: return
     if "REFERENCE" not in G:
         G["REFERENCE"] = "player10"

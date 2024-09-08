@@ -1,7 +1,23 @@
 import pygame
 from pygame.locals import *
 from pygame import Surface, Rect
-from src.editor_windows import THEMES
+
+THEMES = {
+    "SOULLESS": {
+        "MENU_BG" : (100, 100, 100),
+        "MENU_BG_ALT" : (200, 200, 200),
+        "MENU_BG_SEL"  : (150, 150, 150),
+        "MENU_TXT" : (210, 210, 255),
+        "MENU_TXT_SEL" : (255, 200, 200),
+    },
+    "FUNKY": {
+        "MENU_BG" : (90, 36, 115),
+        "MENU_BG_ALT" : (190, 106, 200),
+        "MENU_BG_SEL"  : (115, 59, 145),
+        "MENU_TXT" : (210, 215, 30),
+        "MENU_TXT_SEL" : (180, 190, 35),
+    }
+}
 
 NUMBERS_ONLY = {
     K_0: "0", K_1: "1", K_2: "2", K_3: "3", K_4: "4",
@@ -37,6 +53,8 @@ def get_text_input(G, pos, numeric=False):
         surf.fill((230, 230, 230))
         surf.blit(G["HEL32"].render(string, 0, (0, 0, 0)), (0, 0))
         G["SCREEN"].blit(surf, pos)
+        if "DRAW_CB" in G:
+            G["DRAW_CB"](G["G"]) # @n@
         pygame.display.update()
 
         inp = expect_input()

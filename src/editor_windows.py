@@ -1,26 +1,12 @@
 import pygame
 from pygame import Surface, Rect
 
+from src import editor
 from src import utils
+from src.utils import THEMES
+from src import sprites
 
 WINDOWS = {}
-
-THEMES = {
-    "SOULLESS": {
-        "MENU_BG" : (100, 100, 100),
-        "MENU_BG_ALT" : (200, 200, 200),
-        "MENU_BG_SEL"  : (150, 150, 150),
-        "MENU_TXT" : (210, 210, 255),
-        "MENU_TXT_SEL" : (255, 200, 200),
-    },
-    "FUNKY": {
-        "MENU_BG" : (90, 36, 115),
-        "MENU_BG_ALT" : (190, 106, 200),
-        "MENU_BG_SEL"  : (115, 59, 145),
-        "MENU_TXT" : (210, 215, 30),
-        "MENU_TXT_SEL" : (180, 190, 35),
-    }
-}
 
 def activate_window(name):
     WINDOWS.get(name, {})["ACTIVE"] = True
@@ -122,6 +108,75 @@ def handle_window_events(G, e, window):
         )
 
     window["EVENTS"](e)
+
+def make_actor_edit_window(G, actor_template):
+    sprite_map = sprites.get_sprite_map(actor_template["sprites"])
+    def actor_edit_window_callback(G, window):
+        window_base_update(G, window)
+        for key, default in [("STATE", "START"), ("FRAME", 0)]: #required keys
+            if key not in window:
+                window[key] = default
+        sprite_name = sprite_map.get(f"{window['STATE']}:{window['FRAME']}")
+        sprite = sprites.get_sprite(sprite_name)
+        if sprite is not None:
+            window["BODY"].blit(sprite, (16, 48))
+
+        x, y = 256, 48
+
+        tangible_button = Rect((x, y), (16, 16))
+        window["TANG_BTN"] = tangible_button
+        tangible_text = G["HEL16"].render(
+            f"Tangible: {actor_template['tangible']}",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        color = "MENU_BG_SEL" if actor_template["tangible"] else "MENU_BG"
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]][color], tangible_button)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], tangible_button, width=2)
+        window["BODY"].blit(tangible_text, (x + 32, y))
+
+        y += 32
+
+        physics_button = Rect((x, y), (16, 16))
+        window["PHYS_BTN"] = physics_button
+        physics_text = G["HEL16"].render(
+            f"Physics: {actor_template['physics']}",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        color = "MENU_BG_SEL" if actor_template["physics"] else "MENU_BG"
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]][color], physics_button)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], physics_button, width=2)
+        window["BODY"].blit(physics_text, (x + 32, y))
+
+        y += 32
+
+        direction_button = Rect((x, y), (16, 16))
+        window["DIR_BTN"] = direction_button
+        direction_text = G["HEL16"].render(
+            f"Direction: {actor_template['direction']}",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        color = "MENU_BG_SEL" if actor_template["direction"] else "MENU_BG"
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]][color], direction_button)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], direction_button, width=2)
+        window["BODY"].blit(direction_text, (x + 32, y))
+
+    def actor_edit_window_event_handler(e, G, window):
+        mpos = pygame.mouse.get_pos()
+        mpos = (mpos[0] - window["POS"][0], mpos[1] - window["POS"][1])
+
+        if e.type == pygame.MOUSEBUTTONDOWN:
+            update = True
+            if window["TANG_BTN"].collidepoint(mpos):
+                actor_template["tangible"] = not actor_template["tangible"]
+            elif window["PHYS_BTN"].collidepoint(mpos):
+                actor_template["physics"] = not actor_template["physics"]
+            elif window["DIR_BTN"].collidepoint(mpos):
+                actor_template["direction"] = -1 if actor_template["direction"] == 1 else 1
+            else:
+                update = False
+            if update:
+                editor.load_game()
+    return actor_edit_window_callback, actor_edit_window_event_handler
 
 def make_text_entry_window(G, text, starting_text="",  on_entry=off):
     def text_entry_window_callback(G, window):
