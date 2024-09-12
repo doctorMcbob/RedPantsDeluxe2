@@ -5,6 +5,7 @@ from src import editor
 from src import utils
 from src.utils import THEMES
 from src import sprites
+from src import scripts
 
 WINDOWS = {}
 
@@ -111,6 +112,14 @@ def handle_window_events(G, e, window):
 
 def make_actor_edit_window(G, actor_template):
     sprite_map = sprites.get_sprite_map(actor_template["sprites"])
+    script_map = scripts.get_script_map(actor_template["scripts"])
+    states = set()
+    for key in list(sprite_map.keys()) + list(script_map.keys()):
+        if ":" not in key: continue
+        state, frame = key.split(":")
+        states.add(state)
+    states = list(states)
+
     def actor_edit_window_callback(G, window):
         window_base_update(G, window)
         for key, default in [("STATE", "START"), ("FRAME", 0)]: #required keys
@@ -118,9 +127,38 @@ def make_actor_edit_window(G, actor_template):
                 window[key] = default
         sprite_name = sprite_map.get(f"{window['STATE']}:{window['FRAME']}")
         sprite = sprites.get_sprite(sprite_name)
+        f = window["FRAME"]
+        while sprite is None:
+            f -= 1
+            if f < 0: break
+            sprite_name = sprite_map.get(f"{window['STATE']}:{f}")
+            sprite = sprites.get_sprite(sprite_name)
+
         if sprite is not None:
             window["BODY"].blit(sprite, (16, 48))
 
+        state_text = G["HEL16"].render(window["STATE"], 0, THEMES[window["THEME"]]["MENU_TXT"])
+        frame_text = G["HEL16"].render(f"{window['FRAME']}", 0, THEMES[window["THEME"]]["MENU_TXT"])
+        state_left_btn = Rect((16, 256), (16, 16))
+        state_right_btn = Rect((48 + state_text.get_width(), 256), (16, 16))
+        frame_left_btn = Rect((16, 288), (16, 16))
+        frame_right_btn = Rect((48 + frame_text.get_width(), 288), (16, 16))
+        window["STATE_L_BTN"] = state_left_btn
+        window["STATE_R_BTN"] = state_right_btn
+        window["FRAME_L_BTN"] = frame_left_btn
+        window["FRAME_R_BTN"] = frame_right_btn
+
+        window["BODY"].blit(state_text, (32, 256))
+        window["BODY"].blit(frame_text, (32, 288))
+
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_SEL"], state_left_btn)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], state_left_btn, width=2)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_SEL"], state_right_btn)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], state_right_btn, width=2)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_SEL"], frame_left_btn)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], frame_left_btn, width=2)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_SEL"], frame_right_btn)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], frame_right_btn, width=2)
         x, y = 256, 48
 
         tangible_button = Rect((x, y), (16, 16))
@@ -190,6 +228,17 @@ def make_actor_edit_window(G, actor_template):
                 actor_template["direction"] = -1 if actor_template["direction"] == 1 else 1
             else:
                 update = False
+            if window["STATE_L_BTN"].collidepoint(mpos):
+                window["STATE"] = states[(states.index(window["STATE"]) - 1) % len(states)]
+                window["FRAME"] = 0
+            elif window["STATE_R_BTN"].collidepoint(mpos):
+                window["STATE"] = states[(states.index(window["STATE"]) + 1) % len(states)]
+                window["FRAME"] = 0
+            elif window["FRAME_L_BTN"].collidepoint(mpos):
+                window["FRAME"] = window["FRAME"] - 1
+            elif window["FRAME_R_BTN"].collidepoint(mpos):
+                window["FRAME"] = window["FRAME"] + 1 
+
         if update:
             editor.load_game()
     return actor_edit_window_callback, actor_edit_window_event_handler

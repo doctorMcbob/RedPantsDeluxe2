@@ -52,6 +52,17 @@ Additionally there are little windows (src/editor_windows.py)
   [x] Move Selected Actor(s)
   [] Draw templates
 
+   System Overhauls *gulp*
+   -----------------------
+  [] Actor width/height should be included in the script (or maybe a single actor's template)
+      if an actor's template/script does NOT include a w/h then they will be dynamic
+      and drawn in the editor (such as platforms)
+  [] Also Physics
+  [] Also Platform
+
+  [] It would be cool to have a system where when adding an actor, it could create a partner actor
+       such as in the case of the flyring or the switch/gate in the castle
+
 Good luck, feel free to email me if you have questions about any of this
 """
 import pygame
