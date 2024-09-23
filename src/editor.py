@@ -810,11 +810,11 @@ def update_cursor_events(G, e):
                     pos, dim = make_rect(
                         (
                             CURSOR["CORNER"][0] // 16 * 16,
-                            CURSOR["CORNER"][1] // 16 * 16
+                            CURSOR["CORNER"][1] // 16 * 16 - 32
                         ),
                         (
                             mpos[0]  // 16 * 16 + SCROLLER["CX"],
-                            mpos[1]  // 16 * 16 + SCROLLER["CY"]
+                            mpos[1]  // 16 * 16 + SCROLLER["CY"] - 32
                         )
                     )
                     if dim[0] != 0 and dim[1] != 0:
