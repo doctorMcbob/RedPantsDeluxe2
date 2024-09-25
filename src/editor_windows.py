@@ -4,6 +4,7 @@ from pygame import Surface, Rect
 from src import editor
 from src import utils
 from src.utils import THEMES
+from src import boxes
 from src import sprites
 from src import scripts
 
@@ -214,6 +215,34 @@ def make_actor_edit_window(G, actor_template):
         )
         window["BODY"].blit(scripts_text, (x + 32, y))
 
+        y += 32
+
+        box_edit_button = Rect((x + 128, y), (128, 64))
+        window["BOX_EDIT_BTN"] = box_edit_button
+        box_edit_text = G["HEL16"].render(
+            f"Edit Boxes", 0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], box_edit_button)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], box_edit_button, width=2)
+        window["BODY"].blit(box_edit_text, (x + 128 + 32, y + 16))
+        
+        
+        hitbox_text = G["HEL16"].render(
+            f"Hitboxes: {actor_template['hitboxes']}",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        window["BODY"].blit(hitbox_text, (x + 32, y))
+
+        y += 32
+
+        hurtbox_text = G["HEL16"].render(
+            f"Hurtboxes: {actor_template['hurtboxes']}",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        window["BODY"].blit(hurtbox_text, (x + 32, y))
+        
+        
+        
     def actor_edit_window_event_handler(e, G, window):
         mpos = pygame.mouse.get_pos()
         mpos = (mpos[0] - window["POS"][0], mpos[1] - window["POS"][1])
@@ -238,7 +267,18 @@ def make_actor_edit_window(G, actor_template):
                 window["FRAME"] = window["FRAME"] - 1
             elif window["FRAME_R_BTN"].collidepoint(mpos):
                 window["FRAME"] = window["FRAME"] + 1 
-
+            elif window["BOX_EDIT_BTN"].collidepoint(mpos):
+                cb, eh = make_box_draw_window(G, actor_template,
+                                              None) #TODO... gulp
+                add_window(
+                    f"Boxes: {actor_template['name']}",
+                    (window["POS"][0]+32, window["POS"][1] + 32), (640, 480),
+                    theme=window["THEME"],
+                    update_callback=cb,
+                    event_callback=eh,
+                    args=[G],
+                )
+                activate_window(f"Boxes: {actor_template['name']}")
         if update:
             editor.load_game()
     return actor_edit_window_callback, actor_edit_window_event_handler
@@ -305,3 +345,74 @@ def make_text_entry_window(G, text, starting_text="",  on_entry=off):
                 window["TEXT"] = window["TEXT"] + utils.ALPHABET_KEY_MAP[e.key]
 
     return text_entry_window_callback, text_entry_window_event_handler
+
+def make_box_draw_window(G, actor, boxkey):
+    def box_draw_window_callback(G, window):
+        window_base_update(G, window)
+        for key, default in [("STATE", "START"), ("FRAME", 0),
+                             ("sx", 64), ("sy", 64),
+                             ("SCROLL", False)]:
+            if key not in window: window[key] = default
+        # draw actor sprite, 2x scaled
+        sprite_map = sprites.get_sprite_map(actor["sprites"])
+        sprite_name = sprite_map.get(f"{window['STATE']}:{window['FRAME']}")
+        sprite = sprites.get_sprite(sprite_name)
+        f = window["FRAME"]
+        while sprite is None:
+            f -= 1
+            if f < 0: break
+            sprite_name = sprite_map.get(f"{window['STATE']}:{f}")
+            sprite = sprites.get_sprite(sprite_name)
+        if sprite is not None:
+            sprite = pygame.transform.scale2x(sprite)
+            sprite = pygame.transform.scale2x(sprite)
+            offx, offy = sprites.get_offset(actor["sprites"], sprite_name)
+            sx, sy = window["sx"], window["sy"]
+            window["BODY"].blit(sprite, (sx + (offx * 4), sy + (offy * 4)))
+        # draw 16,16 grid
+        w, h = window["BODY"].get_size()
+        h -= 32 # header
+        for x in range(w // 16):
+            pygame.draw.line(window["BODY"], (100,100,100), (x*16, 32), (x*16, h+32))
+        for y in range(h // 16):
+            pygame.draw.line(window["BODY"], (100,100,100), (0, y*16+32), (w, y*16+32))
+        # draw ECB, hitboxes, hurtboxes
+        hitboxes = boxes.get_hitbox_map(boxkey)
+        hurtboxes = boxes.get_hurtbox_map(boxkey)
+        pygame.draw.rect(
+            window["BODY"], (0, 0, 255),
+            Rect((window["sx"], window["sy"]),
+                 (actor["DIM"][0]*4, actor["DIM"][1]*4)),
+            width=2
+        )
+        for boxmap, color in [(hitboxes, (255, 0, 0)), (hurtboxes, (0, 255, 0))]:
+            if boxmap is None: continue
+            boxs = boxmap.get(f"{window['STATE']}:{window['FRAME']}")
+            f = window["FRAME"]
+            while boxs is None:
+                f -= 1
+                if f < 0: break
+                boxs = boxmap.get(f"{window['STATE']}:{f}")
+            if boxs is not None:
+                for pos, dim in boxs:
+                    pygame.draw.rect(window["BODY"], color, Rect(pos, dim))
+        # draw buttons (hit/hurt)
+
+        
+    def box_draw_event_handler(e, G, window):
+        if e.type == pygame.MOUSEBUTTONDOWN:
+            if e.button == 3:
+                window["SCROLL"] = True
+
+        if e.type == pygame.MOUSEMOTION:
+            if window["SCROLL"]:
+                window["sx"] += e.rel[0]
+                window["sy"] += e.rel[1]
+
+        if e.type == pygame.MOUSEBUTTONUP:
+            if e.button == 3:
+                window["SCROLL"] = False
+                window["sx"] = window["sx"] // 16 * 16
+                window["sy"] = window["sy"] // 16 * 16
+
+    return box_draw_window_callback, box_draw_event_handler
