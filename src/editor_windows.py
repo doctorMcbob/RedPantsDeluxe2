@@ -333,7 +333,7 @@ def make_text_entry_window(G, text, starting_text="",  on_entry=off):
         if e.type == pygame.KEYDOWN:
             if e.key == pygame.K_RETURN:
                 WINDOWS.pop(window["NAME"])
-                on_entry(G, text)
+                on_entry(G, window["TEXT"])
 
             if e.key == pygame.K_BACKSPACE: window["TEXT"] = window["TEXT"][:-1]
             if pygame.key.get_mods() & pygame.KMOD_SHIFT:
@@ -346,12 +346,63 @@ def make_text_entry_window(G, text, starting_text="",  on_entry=off):
 
     return text_entry_window_callback, text_entry_window_event_handler
 
+def make_select_from_list(G, selectList, allowNew=False, on_select=off):
+    def update(G, window):
+        window_base_update(G, window)
+        # enforced strings
+        for s, default in [("SELECTED", None), ("SEARCH", ""), ("SCROLL", 0)]:
+            if s not in window: window[s] = default
+            mpos = pygame.mouse.get_pos()
+        mpos = (
+            mpos[0] - window["POS"][0] - 4,
+            mpos[1] - window["POS"][1] - 36,
+        )
+        surf, selected = utils.scroller_list(
+            selectList,
+            mpos,
+            (window["BODY"].get_width()-8,
+             window["BODY"].get_height()-40),
+            G["HEL16"],
+            scroll=window["SCROLL"],
+            search=window["SEARCH"],
+            theme=window["THEME"],
+            button="New..." if allowNew else False,
+        )
+        window["BODY"].blit(surf, (4, 36))
+        window["SELECTED"] = selected
+
+    def events(e, G, window):
+        if e.type == pygame.MOUSEBUTTONDOWN:
+            if e.button == 4: window["SCROLL"] -= 16
+            if e.button == 5: window["SCROLL"] += 16
+            if e.button == 1 and window["SELECTED"] is not None:
+                return on_select(window["SELECTED"])
+
+        if e.type == pygame.KEYDOWN:
+            if e.key == pygame.K_UP: window["SCROLL"] += 128
+            if e.key == pygame.K_DOWN: window["SCROLL"] -= 128
+
+            if e.key == pygame.K_RETURN:
+                if window["SEARCH"] in selectList:
+                    return on_select(window["SEARCH"])
+
+            if e.key == pygame.K_BACKSPACE: window["SEARCH"] = window["SEARCH"][:-1]
+            if pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                if e.key in utils.ALPHABET_SHIFT_MAP:
+                    window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_SHIFT_MAP[e.key]
+                elif e.key in utils.ALPHABET_KEY_MAP:
+                    window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_KEY_MAP[e.key].upper()
+            elif e.key in utils.ALPHABET_KEY_MAP:
+                window["SEARCH"] = window["SEARCH"] + utils.ALPHABET_KEY_MAP[e.key]
+
+    return update, events
+
 def make_box_draw_window(G, actor, boxkey):
     def box_draw_window_callback(G, window):
         window_base_update(G, window)
         for key, default in [("STATE", "START"), ("FRAME", 0),
-                             ("sx", 64), ("sy", 64),
-                             ("SCROLL", False)]:
+                             ("sx", 64),         ("sy", 64),
+                             ("SCROLL", False),  ("BOXKEY", boxkey)]:
             if key not in window: window[key] = default
         # draw actor sprite, 2x scaled
         sprite_map = sprites.get_sprite_map(actor["sprites"])
@@ -377,8 +428,8 @@ def make_box_draw_window(G, actor, boxkey):
         for y in range(h // 16):
             pygame.draw.line(window["BODY"], (100,100,100), (0, y*16+32), (w, y*16+32))
         # draw ECB, hitboxes, hurtboxes
-        hitboxes = boxes.get_hitbox_map(boxkey)
-        hurtboxes = boxes.get_hurtbox_map(boxkey)
+        hitboxes = boxes.get_hitbox_map(window["BOXKEY"])
+        hurtboxes = boxes.get_hurtbox_map(window["BOXKEY"])
         pygame.draw.rect(
             window["BODY"], (0, 0, 255),
             Rect((window["sx"], window["sy"]),
@@ -395,14 +446,123 @@ def make_box_draw_window(G, actor, boxkey):
                 boxs = boxmap.get(f"{window['STATE']}:{f}")
             if boxs is not None:
                 for pos, dim in boxs:
-                    pygame.draw.rect(window["BODY"], color, Rect(pos, dim))
+                    pygame.draw.rect(
+                        window["BODY"], color,
+                        Rect(
+                            (pos[0] * 4 + window["sx"], pos[1] * 4 + window["sy"]),
+                            (dim[0] * 4, dim[1] * 4)
+                        ),
+                        width=2
+                    )
         # draw buttons (hit/hurt)
+        boxmap_button_text = G["HEL16"].render(
+            'Select' if window["BOXKEY"] is None else window["BOXKEY"],
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        boxmap_button_rect = Rect((0, 32), (128, 32))
+        window["BOXMAP_BTN"] = boxmap_button_rect
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], boxmap_button_rect)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], boxmap_button_rect, width=2)
+        window["BODY"].blit(boxmap_button_text, (8, 40))
+        state_button_text = G["HEL16"].render(
+            window["STATE"],
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        state_button_rect = Rect((128, 32), (64, 32))
+        window["STATE_BTN"] = state_button_rect
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], state_button_rect)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], state_button_rect, width=2)
+        window["BODY"].blit(state_button_text, (136, 40))
+        frame_l_button_rect = Rect((200, 40), (16, 16))
+        window["FRAME_L_BTN"] = frame_l_button_rect
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], frame_l_button_rect)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], frame_l_button_rect, width=2)
+        frame_text = G["HEL16"].render(
+            f"{window['FRAME']}",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        window["BODY"].blit(frame_text, (224, 32))
+        frame_r_button_rect = Rect((232 + frame_text.get_width(), 40), (16, 16))
+        window["FRAME_R_BTN"] = frame_r_button_rect
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], frame_r_button_rect)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], frame_r_button_rect, width=2)
 
-        
     def box_draw_event_handler(e, G, window):
+        mpos = pygame.mouse.get_pos()
+        mpos = (mpos[0] - window["POS"][0], mpos[1] - window["POS"][1])
         if e.type == pygame.MOUSEBUTTONDOWN:
             if e.button == 3:
                 window["SCROLL"] = True
+            if e.button == 1:
+                if window["STATE_BTN"].collidepoint(mpos):
+                    name = f"Select State For Boxmap"
+                    def state_select_callback(G, entry):
+                        if entry:
+                            window["STATE"] = entry
+                            window["FRAME"] = 0
+                    update, events = make_text_entry_window(
+                        G, "Enter State:",
+                        on_entry=state_select_callback
+                    )
+                    add_window(
+                        name,
+                        (window["POS"][0]+16, window["POS"][1]+16),
+                        (256, 256),
+                        update_callback=update,
+                        event_callback=events,
+                        args=[G],
+                        theme=window["THEME"],
+                    )
+                    activate_window(name)
+                elif window["FRAME_L_BTN"].collidepoint(mpos):
+                    window["FRAME"] = window["FRAME"] - 1
+                elif window["FRAME_R_BTN"].collidepoint(mpos):
+                    window["FRAME"] = window["FRAME"] + 1 
+                elif window["BOXMAP_BTN"].collidepoint(mpos):
+                    name = f"Box map for {actor['name']}"
+                    def selector_callback(selection):
+                        WINDOWS.pop(name)
+                        if selection == "New...":
+                            _name = "Boxman Name Entry"
+                            def add_new(G, entry):
+                                if entry:
+                                    window["BOXKEY"] = entry
+                                    if entry not in editor.HITBOXES:
+                                        editor.HITBOXES[entry] = {}
+                                    if entry not in editor.HURTBOXES:
+                                        editor.HURTBOXES[entry] = {}
+                                    editor.load_game()
+                            update, events = make_text_entry_window(
+                                G, "Enter name:",
+                                on_entry=add_new
+                            )
+                            add_window(
+                                name,
+                                (window["POS"][0]+16, window["POS"][1]+16),
+                                (256, 256),
+                                update_callback=update,
+                                event_callback=events,
+                                args=[G],
+                                theme=window["THEME"],
+                            )
+                            activate_window(name)
+                        else:
+                            window["BOXKEY"] = selection
+                        
+                    update, events = make_select_from_list(
+                        G, boxes.get_hitbox_maps(),
+                        True, selector_callback
+                    )
+                    add_window(
+                        name,
+                        (window["POS"][0]+16, window["POS"][1]+16),
+                        (256, 256),
+                        update_callback=update,
+                        event_callback=events,
+                        args=[G],
+                        theme=window["THEME"],
+                    )
+                    activate_window(name)
 
         if e.type == pygame.MOUSEMOTION:
             if window["SCROLL"]:

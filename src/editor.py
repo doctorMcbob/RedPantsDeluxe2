@@ -351,7 +351,7 @@ def handle_worlds_window_events(e, G, window):
 
         if e.key == pygame.K_RETURN:
             if window["SEARCH"] in worlds.get_all_worlds():
-                G["WORLD"] = wiondow["SEARCH"]
+                G["WORLD"] = window["SEARCH"]
                 G["SEARCH"] = ""
 
         if e.key == pygame.K_BACKSPACE: window["SEARCH"] = window["SEARCH"][:-1]
@@ -888,27 +888,27 @@ def run(G):
             if e.type == pygame.MOUSEBUTTONUP:
                 G["HEADER"].CLICK = True
 
-            if e.type == pygame.KEYDOWN and e.key == K_RETURN:
-                # <>
-                # For now the demo is going to darken the screen...
-                # If i find a way to run the demo concurrently to the other windows/header then
-                #  perhaps this will be removed
-                G["SCREEN"].fill((0,0,0))
-                pygame.display.update()
-                # </>
-                demo(G)
-
-            if e.type == pygame.KEYDOWN and (e.key == K_DELETE or e.key == K_BACKSPACE):
-                for name in CURSOR["SELECTED"]:
-                    WORLDS[G["WORLD"]]["actors"].remove(name)
-                    ACTORS.pop(name)
-                    load_game()
-                CURSOR["SELECTED"] = []
-
             window = windows.window_at_mouse()
             if window is not None:
                 windows.handle_window_events(G, e, window)
             else:
+                if e.type == pygame.KEYDOWN and e.key == K_RETURN:
+                    # <>
+                    # For now the demo is going to darken the screen...
+                    # If i find a way to run the demo concurrently to the other windows/header then
+                    #  perhaps this will be removed
+                    G["SCREEN"].fill((0,0,0))
+                    pygame.display.update()
+                    # </>
+                    demo(G)
+
+                if e.type == pygame.KEYDOWN and (e.key == K_DELETE or e.key == K_BACKSPACE):
+                    for name in CURSOR["SELECTED"]:
+                        WORLDS[G["WORLD"]]["actors"].remove(name)
+                        ACTORS.pop(name)
+                        load_game()
+                    CURSOR["SELECTED"] = []
+
                 if e.type == pygame.KEYDOWN and e.key == K_SPACE:
                     for name in CURSOR["SELECTED"]:
                         actor_template = ACTORS.get(name, None)
