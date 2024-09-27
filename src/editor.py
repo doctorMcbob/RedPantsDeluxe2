@@ -21,10 +21,10 @@ Additionally there are little windows (src/editor_windows.py)
 ~~~ TODO ~~~
    Windows
    -------
-  [] Sys
-   \ [] Info (needs to add metadata around selectors)
+  [x] Sys
+   \ [x] Info (needs to add metadata around selectors)
      [x] Text Entry
-      \ list display?
+     [x] Select From List
      [x] Build
       \ [x] Full Build
         [x] Makefile Only
@@ -35,11 +35,11 @@ Additionally there are little windows (src/editor_windows.py)
      [x] World Actor View
       \ [] send actors to different world
         [] get actor from another world
-  [] Actors
-   \ [] Edit (name, direction, tabgible, physics, keys
+  [x] Actors
+   \ [x] Edit (name, direction, tabgible, physics, keys
               tileset, spritesheet, script map, hutbox, hurtbox)
-      \ [] Hitbox Editor
-     [] Template Select
+      \ [x] Hitbox Editor
+     [x] Template Select
   [] Sprites
    \ [] Spritesheet Editor
      [] Sprite List
@@ -50,9 +50,9 @@ Additionally there are little windows (src/editor_windows.py)
   [x] Drag Rect Selector (multiple actors)
   [] Single Click Selector
   [x] Move Selected Actor(s)
-  [] Draw templates
+  [x] Draw templates
 
-   System Overhauls *gulp*
+   System Overhauls *gulp* (bonus?)
    -----------------------
   [] Actor width/height should be included in the script (or maybe a single actor's template)
       if an actor's template/script does NOT include a w/h then they will be dynamic

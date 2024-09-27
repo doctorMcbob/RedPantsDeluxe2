@@ -402,7 +402,9 @@ def make_box_draw_window(G, actor, boxkey):
         window_base_update(G, window)
         for key, default in [("STATE", "START"), ("FRAME", 0),
                              ("sx", 64),         ("sy", 64),
-                             ("SCROLL", False),  ("BOXKEY", boxkey)]:
+                             ("SCROLL", False),  ("BOXKEY", boxkey),
+                             ("MODE", "HIT"),    ("CORNER", None),
+                             ("DRAW", [])]:
             if key not in window: window[key] = default
         # draw actor sprite, 2x scaled
         sprite_map = sprites.get_sprite_map(actor["sprites"])
@@ -454,6 +456,33 @@ def make_box_draw_window(G, actor, boxkey):
                         ),
                         width=2
                     )
+        col = {
+            "HIT": (255, 0, 0),
+            "HURT": (0, 255, 0),
+            "DEL": (0, 0, 0),
+        }[window["MODE"]]
+        mpos = pygame.mouse.get_pos()
+        mpos = (mpos[0] - window["POS"][0], mpos[1] - window["POS"][1])
+        if window["CORNER"]:
+            pygame.draw.rect(
+                window["BODY"],
+                col,
+                editor.make_rect(
+                    mpos,
+                    window["CORNER"]
+                ),
+                width=2
+            )
+        else:
+            pygame.draw.circle(
+                window["BODY"],
+                col,
+                mpos,
+                2
+            )
+        for pos, dim, col in window["DRAW"]:
+            pygame.draw.rect(window["BODY"], col, Rect(pos, dim), width=2)
+
         # draw buttons (hit/hurt)
         boxmap_button_text = G["HEL16"].render(
             'Select' if window["BOXKEY"] is None else window["BOXKEY"],
@@ -486,10 +515,56 @@ def make_box_draw_window(G, actor, boxkey):
         window["FRAME_R_BTN"] = frame_r_button_rect
         pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], frame_r_button_rect)
         pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], frame_r_button_rect, width=2)
+        keyframe_text = G["HEL16"].render(
+            "Add Keyframe",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        keyframe_button_rect = Rect((0, 64), (128, 32))
+        window["KEYFRAME_BTN"] = keyframe_button_rect
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], keyframe_button_rect)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], keyframe_button_rect, width=2)
+        window["BODY"].blit(keyframe_text, (8, 72))
+        del_keyframe_text = G["HEL16"].render(
+            "Delete Keyframe",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        del_keyframe_button_rect = Rect((128, 64), (128, 32))
+        window["DEL_KEYFRAME_BTN"] = del_keyframe_button_rect
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], del_keyframe_button_rect)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], del_keyframe_button_rect, width=2)
+        window["BODY"].blit(del_keyframe_text, (136, 72))
+        hitmode_text = G["HEL16"].render(
+            "HIT",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        hitmode_button_rect = Rect((0, 96), (48, 32))
+        window["HITMODE_BTN"] = hitmode_button_rect
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], hitmode_button_rect)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], hitmode_button_rect, width=2)
+        window["BODY"].blit(hitmode_text, (8, 104))
+        hurtmode_text = G["HEL16"].render(
+            "HURT",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        hurtmode_button_rect = Rect((48, 96), (48, 32))
+        window["HURTMODE_BTN"] = hurtmode_button_rect
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], hurtmode_button_rect)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], hurtmode_button_rect, width=2)
+        window["BODY"].blit(hurtmode_text, (56, 104))
+        delmode_text = G["HEL16"].render(
+            "REM",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        delmode_button_rect = Rect((96, 96), (48, 32))
+        window["DELMODE_BTN"] = delmode_button_rect
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], delmode_button_rect)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], delmode_button_rect, width=2)
+        window["BODY"].blit(delmode_text, (104, 104))
 
     def box_draw_event_handler(e, G, window):
         mpos = pygame.mouse.get_pos()
         mpos = (mpos[0] - window["POS"][0], mpos[1] - window["POS"][1])
+        window["DRAW"] = []
         if e.type == pygame.MOUSEBUTTONDOWN:
             if e.button == 3:
                 window["SCROLL"] = True
@@ -517,7 +592,29 @@ def make_box_draw_window(G, actor, boxkey):
                 elif window["FRAME_L_BTN"].collidepoint(mpos):
                     window["FRAME"] = window["FRAME"] - 1
                 elif window["FRAME_R_BTN"].collidepoint(mpos):
-                    window["FRAME"] = window["FRAME"] + 1 
+                    window["FRAME"] = window["FRAME"] + 1
+                elif window["HITMODE_BTN"].collidepoint(mpos):
+                    window["MODE"] = "HIT"
+                elif window["HURTMODE_BTN"].collidepoint(mpos):
+                    window["MODE"] = "HURT"
+                elif window["DELMODE_BTN"].collidepoint(mpos):
+                    window["MODE"] = "DEL"
+                elif window["KEYFRAME_BTN"].collidepoint(mpos):
+                    if window["BOXKEY"]:
+                        keyframe = f"{window['STATE']}:{window['FRAME']}"
+                        if keyframe not in editor.HURTBOXES[window["BOXKEY"]]:
+                            editor.HURTBOXES[window["BOXKEY"]][keyframe] = []
+                        if keyframe not in editor.HITBOXES[window["BOXKEY"]]:
+                            editor.HITBOXES[window["BOXKEY"]][keyframe] = []
+                        editor.load_game()
+                elif window["DEL_KEYFRAME_BTN"].collidepoint(mpos):
+                    if window["BOXKEY"]:
+                        keyframe = f"{window['STATE']}:{window['FRAME']}"
+                        if keyframe in editor.HURTBOXES[window["BOXKEY"]]:
+                            editor.HURTBOXES[window["BOXKEY"]].pop(keyframe)
+                        if keyframe in editor.HITBOXES[window["BOXKEY"]]:
+                            editor.HITBOXES[window["BOXKEY"]].pop(keyframe)
+                        editor.load_game()
                 elif window["BOXMAP_BTN"].collidepoint(mpos):
                     name = f"Box map for {actor['name']}"
                     def selector_callback(selection):
@@ -527,9 +624,9 @@ def make_box_draw_window(G, actor, boxkey):
                             def add_new(G, entry):
                                 if entry:
                                     window["BOXKEY"] = entry
-                                    if entry not in editor.HITBOXES:
+                                    if entry not in editor.HITBOXES[window["BOXKEY"]]:
                                         editor.HITBOXES[entry] = {}
-                                    if entry not in editor.HURTBOXES:
+                                    if entry not in editor.HURTBOXES[window["BOXKEY"]]:
                                         editor.HURTBOXES[entry] = {}
                                     editor.load_game()
                             update, events = make_text_entry_window(
@@ -563,16 +660,86 @@ def make_box_draw_window(G, actor, boxkey):
                         theme=window["THEME"],
                     )
                     activate_window(name)
-
+                else:
+                    if window["CORNER"] is None and window["BOXKEY"] in editor.HURTBOXES:
+                        window["CORNER"] = mpos
+                    
         if e.type == pygame.MOUSEMOTION:
             if window["SCROLL"]:
                 window["sx"] += e.rel[0]
                 window["sy"] += e.rel[1]
+            if window["MODE"] == "DEL" and window["BOXKEY"] is not None:
+                keyframe = f"{window['STATE']}:{window['FRAME']}"
+                f = window["FRAME"]
+                while keyframe not in editor.HITBOXES[window["BOXKEY"]]:
+                    f -= 1
+                    if f < 0:
+                        keyframe = None
+                        break
+                    keyframe = f"{window['STATE']}:{f}"
+                if keyframe is not None:
+                    for BOXES, color in [(editor.HITBOXES[window["BOXKEY"]][keyframe], (255, 200, 200)),
+                                         (editor.HURTBOXES[window["BOXKEY"]][keyframe], (200, 255, 200))]:
+                        for pos, dim in BOXES:
+                            pos = (pos[0]*4+window["sx"], pos[1]*4+window["sy"])
+                            dim = (dim[0]*4, dim[1]*4)
+                            if Rect(pos, dim).collidepoint(mpos):
+                                window["DRAW"].append((pos, dim, color))
 
         if e.type == pygame.MOUSEBUTTONUP:
             if e.button == 3:
                 window["SCROLL"] = False
                 window["sx"] = window["sx"] // 16 * 16
                 window["sy"] = window["sy"] // 16 * 16
+            if e.button == 1 and window["MODE"] == "DEL":
+                keyframe = f"{window['STATE']}:{window['FRAME']}"
+                f = window["FRAME"]
+                while keyframe not in editor.HITBOXES[window["BOXKEY"]]:
+                    f -= 1
+                    if f < 0:
+                        keyframe = None
+                        break
+                    keyframe = f"{window['STATE']}:{f}"
+                if keyframe is not None:
+                    for BOXES in [editor.HITBOXES[window["BOXKEY"]][keyframe],
+                                  editor.HURTBOXES[window["BOXKEY"]][keyframe]]:
+                        for pos, dim in BOXES:
+                            _pos = (pos[0]*4+window["sx"], pos[1]*4+window["sy"])
+                            _dim = (dim[0]*4, dim[1]*4)
+                            if Rect(_pos, _dim).collidepoint(mpos):
+                                BOXES.remove((pos, dim))
+                    editor.load_game()
+            if e.button == 1 and window["CORNER"] is not None:
+                keyframe = f"{window['STATE']}:{window['FRAME']}"
+                mode = {
+                    "HIT":editor.HITBOXES,
+                    "HURT": editor.HURTBOXES,
+                    "DEL": {}
+                }[window["MODE"]]
+                if window["MODE"] != "DEL" and window["BOXKEY"] in mode:
+                    f = window["FRAME"]
+                    while keyframe not in mode[window["BOXKEY"]]:
+                        f -= 1
+                        if f < 0:
+                            keyframe = None
+                            break
+                        keyframe = f"{window['STATE']}:{f}"
+                    if keyframe is not None:
+                        pos, dim = editor.make_rect(
+                            (
+                                (mpos[0]-window["sx"])//4,
+                                (mpos[1]-window["sy"])//4
+                            ),
+                            (
+                                (window["CORNER"][0]-window["sx"])//4,
+                                (window["CORNER"][1]-window["sy"])//4
+                            )
+                        )
+                        if 0 not in dim:
+                            mode[window["BOXKEY"]][keyframe].append(
+                                (pos, dim)
+                            )
+                            editor.load_game()
+                window["CORNER"] = None
 
     return box_draw_window_callback, box_draw_event_handler
