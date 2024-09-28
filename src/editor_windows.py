@@ -376,7 +376,7 @@ def make_select_from_list(G, selectList, allowNew=False, on_select=off):
             if e.button == 4: window["SCROLL"] -= 16
             if e.button == 5: window["SCROLL"] += 16
             if e.button == 1 and window["SELECTED"] is not None:
-                return on_select(window["SELECTED"])
+                return on_select(G, window["SELECTED"])
 
         if e.type == pygame.KEYDOWN:
             if e.key == pygame.K_UP: window["SCROLL"] += 128
@@ -384,7 +384,7 @@ def make_select_from_list(G, selectList, allowNew=False, on_select=off):
 
             if e.key == pygame.K_RETURN:
                 if window["SEARCH"] in selectList:
-                    return on_select(window["SEARCH"])
+                    return on_select(G, window["SEARCH"])
 
             if e.key == pygame.K_BACKSPACE: window["SEARCH"] = window["SEARCH"][:-1]
             if pygame.key.get_mods() & pygame.KMOD_SHIFT:
@@ -617,7 +617,7 @@ def make_box_draw_window(G, actor, boxkey):
                         editor.load_game()
                 elif window["BOXMAP_BTN"].collidepoint(mpos):
                     name = f"Box map for {actor['name']}"
-                    def selector_callback(selection):
+                    def selector_callback(G, selection):
                         WINDOWS.pop(name)
                         if selection == "New...":
                             _name = "Boxman Name Entry"
@@ -663,7 +663,7 @@ def make_box_draw_window(G, actor, boxkey):
                 else:
                     if window["CORNER"] is None and window["BOXKEY"] in editor.HURTBOXES:
                         window["CORNER"] = mpos
-                    
+
         if e.type == pygame.MOUSEMOTION:
             if window["SCROLL"]:
                 window["sx"] += e.rel[0]
@@ -743,3 +743,119 @@ def make_box_draw_window(G, actor, boxkey):
                 window["CORNER"] = None
 
     return box_draw_window_callback, box_draw_event_handler
+
+def start_spritesheet_window(G, filename):
+    image = pygame.image.load(f"./img/{filename}").convert()
+    if filename not in editor.SPRITESHEETS:
+        editor.SPRITESHEETS[filename] = {}
+    sheet = editor.SPRITESHEETS[filename]
+    def update(G, window):
+        window_base_update(G, window)
+        for key, default in [("sx", 64), ("sy", 64),
+                             ("SCROLL", False), ("CORNER", None)]:
+            if key not in window: window[key] = default
+        mpos = pygame.mouse.get_pos()
+        mpos = (mpos[0] - window["POS"][0], mpos[1] - window["POS"][1])
+        # Draw the image
+        window["BODY"].blit(image, (window["sx"], window["sy"]))
+        # Draw grid
+        
+        # Draw the sprite rects
+        for name, rect in sheet.items():
+            pos, dim = rect
+            sprite_rect = Rect((pos[0] + window["sx"], pos[1] + window["sy"]), dim)
+            pygame.draw.rect(window["BODY"], (0, 0, 255),
+                             sprite_rect,
+                             width=2)
+            if sprite_rect.collidepoint(mpos):
+                sprite_name = G["HEL16"].render(name, 0, THEMES[window["THEME"]]["MENU_TXT"])
+                window["BODY"].blit(sprite_name, sprite_rect.bottomleft)
+        # Draw the cursor rect
+        if window["CORNER"] is not None:
+            pygame.draw.rect(
+                window["BODY"], (0, 0, 255),
+                Rect(
+                    editor.make_rect(
+                        (
+                            mpos[0],
+                            mpos[1]
+                        ),
+                        (
+                            window["CORNER"][0]//16*16+window["sx"],
+                            window["CORNER"][1]//16*16+window["sy"]
+                        )
+                    )
+                ),
+                width=2
+            )
+            
+    def events(e, G, window):
+        mpos = pygame.mouse.get_pos()
+        mpos = (mpos[0] - window["POS"][0], mpos[1] - window["POS"][1])
+        if e.type == pygame.MOUSEBUTTONDOWN:
+            if e.button == 3:
+                window["SCROLL"] = True
+            elif e.button == 1:
+                if window["CORNER"] is None:
+                    window["CORNER"] = (
+                        mpos[0]-window["sx"]//16*16,
+                        mpos[1]-window["sy"]//16*16
+                    )
+
+        if e.type == pygame.MOUSEBUTTONUP:
+            if e.button == 3:
+                window["SCROLL"] = False
+                window["sx"] = window["sx"] // 16 * 16
+                window["sy"] = window["sy"] // 16 * 16
+            if e.button == 1 and window["CORNER"] is not None:
+                pos, dim = editor.make_rect(
+                    (
+                        mpos[0]//16*16-window["sx"],
+                        mpos[1]//16*16-window["sy"]
+                    ),
+                    (
+                        window["CORNER"][0],
+                        window["CORNER"][1]
+                    )
+                )
+                def make_sprite(G, name):
+                    i = 0
+                    namecheck = name
+                    while namecheck in sheet:
+                        namecheck = f"{name}{i}"
+                        i += 1
+                    sheet[name] = pos, dim
+                    editor.load_game()
+                    if "Name Sprite" in WINDOWS:
+                        WINDOWS.pop("Name Sprite")
+                update, events = make_text_entry_window(
+                    G, "Name Sprite:", 
+                    on_entry=make_sprite
+                )
+                add_window(
+                    "Name Sprite",
+                    (window["POS"][0]+64, window["POS"][0]+32),
+                    (256, 256),
+                    update_callback=update,
+                    event_callback=events,
+                    theme=window["THEME"],
+                    args=[G]
+                )
+                activate_window("Name Sprite")
+                window["CORNER"] = None
+
+        if e.type == pygame.MOUSEMOTION:
+            if window["SCROLL"]:
+                window["sx"] += e.rel[0]
+                window["sy"] += e.rel[1]
+
+    name = f"{filename} Spritesheet"
+    add_window(
+        name,
+        (32, 128), (800, 640),
+        update_callback=update,
+        event_callback=events,
+        theme=G["WINDOW_THEME"],
+        args=[G]
+    )
+    activate_window(name)

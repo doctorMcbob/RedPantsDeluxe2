@@ -273,11 +273,7 @@ MENU_ITEMS = {
         "Template Select": lambda: windows.activate_window("Template Select"),
         "Clear Template": clear_template,
     },
-    "Sprites": {
-        "Sprites List": lambda: windows.activate_window("Not Implemented"),
-        "Spritesheet Editor": lambda: windows.activate_window("Not Implemented"),
-        "Sprite Map Editor": lambda: windows.activate_window("Not Implemented"),
-    }
+    "Sprites":  lambda: windows.activate_window("Spritesheet Select"),
 }
 
 # ~~~ window functions ~~~
@@ -696,6 +692,19 @@ def set_up():
         sys=True, theme=theme,
         update_callback=update_template_select_window,
         event_callback=handle_template_window_events,
+        args=[G],
+    )
+
+    directory = "./img"
+    filenames = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f)) and f.endswith('.png')]
+    update, events = windows.make_select_from_list(
+        G, filenames, on_select=windows.start_spritesheet_window
+    )
+    windows.add_window(
+        "Spritesheet Select", (32, 32), (512, 640),
+        sys=True, theme=theme,
+        update_callback=update,
+        event_callback=events,
         args=[G],
     )
     return G
