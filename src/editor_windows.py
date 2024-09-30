@@ -777,8 +777,8 @@ def start_spritesheet_window(G, filename):
                 Rect(
                     editor.make_rect(
                         (
-                            mpos[0],
-                            mpos[1]
+                            mpos[0]//16*16,
+                            mpos[1]//16*16
                         ),
                         (
                             window["CORNER"][0]//16*16+window["sx"],
@@ -787,6 +787,13 @@ def start_spritesheet_window(G, filename):
                     )
                 ),
                 width=2
+            )
+        else:
+            pygame.draw.circle(
+                window["BODY"],
+                (0, 0, 255),
+                (mpos[0]//16*16, mpos[1]//16*16),
+                2
             )
             
     def events(e, G, window):
@@ -798,8 +805,8 @@ def start_spritesheet_window(G, filename):
             elif e.button == 1:
                 if window["CORNER"] is None:
                     window["CORNER"] = (
-                        mpos[0]-window["sx"]//16*16,
-                        mpos[1]-window["sy"]//16*16
+                        mpos[0]//16*16-window["sx"],
+                        mpos[1]//16*16-window["sy"]
                     )
 
         if e.type == pygame.MOUSEBUTTONUP:
