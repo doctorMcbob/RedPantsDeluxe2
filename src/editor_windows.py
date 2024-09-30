@@ -856,6 +856,14 @@ def start_spritesheet_window(G, filename):
                 window["sx"] += e.rel[0]
                 window["sy"] += e.rel[1]
 
+        if e.type == KEYDOWN and e.key == K_BACKSPACE:
+            for name, rect in sheet.items():
+                pos, dim = rect
+                if Rect(pos, dim).collidepoint(
+                        (mpos[0]-window["sx"], mpos[1]-window["sy"])
+                ):
+                    sheet.pop(name)
+
     name = f"{filename} Spritesheet"
     add_window(
         name,
