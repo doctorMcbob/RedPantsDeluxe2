@@ -28,6 +28,8 @@ hurtboxes, hitboxes, scripts and sprites
   frames 4 trough 9 will index at RUNNING:3
 
 """
+import sys # for some editor specific functionality, (if "-e" in sys.argv)
+
 import pygame
 from pygame import Surface, Rect
 
@@ -43,10 +45,12 @@ TEMPLATES = {}
 ACTORS = {}
 
 def swap_in(actors):
-    global ACTORS
+    global ACTORS, TEMPLATES
     ACTORS = {}
+    TEMPLATES = {}
 
     for name in actors.keys():
+        TEMPLATES[name] = actors[name]
         ACTORS[name] = Actor(actors[name])
 
 def load():
@@ -218,7 +222,19 @@ class Actor(Rect):
         return boxes
 
     def get_sprite(self):
-        if self.platform and self.tileset:
+        # A little bit of hacky bullshit to fix a bug in the editor view
+        # since tilesets are set in the START:0, we're going to scan START:0 for a set to tileset
+        # stupid i know, but were not doing it in the C build so who gives a
+        # <bullshit>
+        tileset = False
+        if "-e" in sys.argv:
+            if "START:0" in self.scripts and self.state == "START":
+                for cmd in self.scripts["START:0"]:
+                    if cmd[0:3] == ["set", "self", "tileset"]:
+                        tileset = cmd[3]
+                        self.tileset = tileset
+        # </bullshit>
+        if self.platform and self.tileset or tileset:
             tile_map = sprites.get_tile_map(self.tileset)
             if tile_map == None:
                 print(self.name + " has no tile_map for " + str(self.tileset))
@@ -271,7 +287,7 @@ class Actor(Rect):
         name = self.img if self.img is not None else self._index(self.sprites)
         return sprites.get_offset(self.offsetkey, name)
 
-    def update(self, world):
+    def update(self, world, noquit=False):
         if self.updated:
             if (self.physics or self.tangible) and self.name in world.actors: self.collision_check(world)
             return
@@ -280,8 +296,11 @@ class Actor(Rect):
         self.img = None
         script = self._index(self.scripts)
         if script is not None:
-            if scripts.resolve(self.name, script, world) == 'goodbye':
-                return     
+            response = scripts.resolve(self.name, script, world, noquit=noquit)
+            if response == "goodbye":
+                return
+            if response == "quit":
+                return "quit"
             
         xflag, yflag = self.x_vel, self.y_vel
         if self.physics or self.tangible:
@@ -294,15 +313,21 @@ class Actor(Rect):
             if abs(self.x_vel) < 1:
                 self.x_vel = 0
             if "XCOLLISION" in self.scripts:
-                if scripts.resolve(self.name, self.scripts["XCOLLISION"], world) == 'goodbye':
+                response = scripts.resolve(self.name, self.scripts["XCOLLISION"], world, noquit=noquit)
+                if response == "goodbye":
                     return
+                if response == "quit":
+                    return "quit"
         if yflag != self.y_vel and int(self.y_vel) == 0:
             if abs(self.y_vel) < 1:
                 self.y_vel = 0
 
             if "YCOLLISION" in self.scripts:
-                if scripts.resolve(self.name, self.scripts["YCOLLISION"], world) == 'goodbye':
+                response = scripts.resolve(self.name, self.scripts["YCOLLISION"], world, noquit=noquit)
+                if response == "goodbye":
                     return
+                if response == "quit":
+                    return "quit"
 
         self.hit_check(world)
         self.frame += 1
@@ -418,7 +443,10 @@ class Actor(Rect):
                          
     def collision_with(self, actor, world):
         if "COLLIDE" in self.scripts:
-            if scripts.resolve(actor.name, self.scripts["COLLIDE"], world, related=self.name) == 'goodbye':
+            response = scripts.resolve(actor.name, self.scripts["COLLIDE"], world, related=self.name)
+            if response == "goodbye":
+                return
+            if response == "quit":
                 return
 
     def hit_check(self, world):
@@ -436,6 +464,7 @@ class Actor(Rect):
                     
     def hit(self, actor, world):
         if "HIT" in self.scripts:
-            scripts.resolve(actor.name, self.scripts["HIT"], world, related=self.name)
-            
+            response = scripts.resolve(actor.name, self.scripts["HIT"], world, related=self.name)
+            if response == "quit":
+                return
 

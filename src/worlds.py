@@ -64,14 +64,15 @@ class World(object):
             "flagged_for_update": self.flagged_for_update,
         }
         
-    def update(self):
+    def update(self, noquit=False):
         for name in self.actors:
             Actor = actor.get_actor(name)
             if Actor is None:
                 continue
             if not Actor.updated:
-                Actor.update(self)
-
+                response = Actor.update(self, noquit=noquit)
+                if response == "quit":
+                    return "quit"
     def get_actors(self):
         # weird but fixes editor bug
         # old version:
@@ -137,6 +138,6 @@ class World(object):
                                 frame.scroll((Actor.x+Actor.w, Actor.y)),
                                 DEBUG["HEL16"],
                                 frame.scroll_x, frame.scroll_y,
-                                text=maketext
+                                text=False
                     )
 

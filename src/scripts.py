@@ -55,7 +55,7 @@ def load():
 def get_script_map(name):
     return deepcopy(SCRIPTS[name]) if name in SCRIPTS else None
 
-def resolve(reference, script, world, related=None, logfunc=print):
+def resolve(reference, script, world, related=None, logfunc=print, noquit=False):
     cmd_idx = 0
 
     while cmd_idx < len(script):
@@ -71,6 +71,8 @@ def resolve(reference, script, world, related=None, logfunc=print):
             verb = cmd.pop(0)
 
             if verb == "quit":
+                if noquit:
+                    return "quit"
                 sys.exit()
 
             elif verb == "goodbye":
@@ -126,8 +128,11 @@ def resolve(reference, script, world, related=None, logfunc=print):
                 key = cmd.pop(0)
                 if key not in a.get_actor(reference).scripts:
                     raise Exception("Cannot exec {}. Does not exist.".format(key))
-                if resolve(reference, a.get_actor(reference).scripts[key], world, logfunc=logfunc) == 'goodbye':
+                response = resolve(reference, a.get_actor(reference).scripts[key], world, logfunc=logfunc, noquit=noquit)
+                if response == "goodbye":
                     return 'goodbye'
+                if response == "quit":
+                    return "quit"
 
             elif verb == "print":
                 print(cmd.pop(0))

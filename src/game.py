@@ -52,7 +52,9 @@ def set_up():
     G["DEBUG"] = "-d" in sys.argv
     return G
 
-def run(G, noquit=False):
+def off(*args, **kwargs): pass
+
+def run(G, noquit=False, cb=off, args=[], kwargs={}):
     while True:
         if inputs.update(noquit) == "QUIT":
             return
@@ -70,7 +72,8 @@ def run(G, noquit=False):
 
         for world in worlds_for_updating:
             world.flagged_for_update = False
-            world.update()
+            if world.update(noquit=noquit) == "quit":
+                return
 
         for a in  actor.get_actors():
             a.updated = False
@@ -118,10 +121,11 @@ def run(G, noquit=False):
                 execute_console_command(G)
         
         G["CLOCK"].tick(30)
+        cb(*args, **kwargs)
 
 
 def execute_console_command(G):
-    cmd = get_text_input(G, (0, G["H"] - 32))
+    cmd = get_text_input(G, (0, 0))
     if cmd is None: return
     if "REFERENCE" not in G:
         G["REFERENCE"] = "player10"

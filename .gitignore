@@ -1,0 +1,17 @@
+# Emacs files
+*~
+\#*\#
+
+# C obj
+*.o
+
+# Procedurally generated files
+*data.c
+*data.h
+
+# misc
+*.txt
+*.wav
+*.aseprite
+*.aup
+*.gif

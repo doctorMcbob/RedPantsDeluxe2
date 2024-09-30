@@ -1,0 +1,15 @@
+PLAT|66,608,1026,66|True|
+START:0 empty 0,0
+WALL:0 empty 0,0
+
+|START:0|
+set self state WALL
+set self frame 0
+
+|WALL:0|
+set self frame 0
+
+|COLLIDE|
+if CELL in self.name
+   goodbye
+endif

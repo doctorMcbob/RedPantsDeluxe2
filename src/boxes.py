@@ -23,3 +23,8 @@ def get_hitbox_map(name):
 def get_hurtbox_map(name):
     return HURTBOXES[name] if name in HURTBOXES else None
 
+def get_hitbox_maps():
+    return list(HITBOXES.keys())
+
+def get_hurtbox_maps():
+    return list(HURTBOXES.keys())
