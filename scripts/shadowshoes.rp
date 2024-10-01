@@ -311,7 +311,7 @@ endif
 |AIRIAL:0|
 set self calc1 self.y_vel > self.airspeedcontrol
 set self calc2 self.airspeedcontrol * -1 > self.y_vel
-if not self.calc1 nor self.calc2
+#if not self.calc1 nor self.calc2
    if self.x_vel - self.airdrift > self.negspeed and inpLEFT
 	set self x_vel self.x_vel - self.airdrift
    endif
@@ -322,7 +322,7 @@ if not self.calc1 nor self.calc2
       set self state DIVESTART
       set self frame 0
    endif
-endif
+#endif
 if self.calc1
    img shadowshoejump2
 endif
@@ -410,14 +410,14 @@ set self frame 0
 |WALLTOUCH:0|
 exec AIRIAL:0
 set self state AIRIAL
-if not self.calc1 nor self.calc2
+#if not self.calc1 nor self.calc2
    img shadowshoewalljump0
    # bufferable pog?
    if inpA
       set self state WALLJUMP
       set self frame 0
    endif
-endif
+#endif
 
 |WALLJUMP:0|
 set self y_vel 0
