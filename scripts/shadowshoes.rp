@@ -80,7 +80,7 @@ set self bonkstrength 2
 set self walljumpstrength -12
 set self walljumpoff 10
 set self airdrift 0.7
-set self traction 0.3 * -1
+set self traction 0.5 * -1
 set self limit 20
 set self airspeedcontrol 12
 set self negairspeedcontrol self.airspeedcontrol * -1
