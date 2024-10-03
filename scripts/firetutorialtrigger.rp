@@ -1,0 +1,15 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+if COLLIDE?
+   if firetutorialtext0.state != SHOW
+      set firetutorialtext0 state SHOW
+      set firetutorialtext0 frame 0
+   endif
+   break
+endif
+if firetutorialtext0.state == SHOW
+   set firetutorialtext0 state OFF
+   set firetutorialtext0 frame 0   
+endif
