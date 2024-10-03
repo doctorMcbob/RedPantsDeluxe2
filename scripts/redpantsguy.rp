@@ -314,19 +314,16 @@ endif
 |AIRIAL:0|
 set self calc1 self.y_vel > self.airspeedcontrol
 set self calc2 self.airspeedcontrol * -1 > self.y_vel
-# Experiement with turning this off
-# if not self.calc1 nor self.calc2
-   if self.x_vel - self.airdrift > self.negspeed and inpLEFT
-      set self x_vel self.x_vel - self.airdrift
-   endif
-   if self.x_vel + self.airdrift < self.speed and inpRIGHT
-      set self x_vel self.x_vel + self.airdrift
-   endif
-   if B_DOWN in inpEVENTS
-      set self state DIVESTART
-      set self frame 0
-   endif
-#endif
+if self.x_vel - self.airdrift > self.negspeed and inpLEFT
+   set self x_vel self.x_vel - self.airdrift
+endif
+if self.x_vel + self.airdrift < self.speed and inpRIGHT
+   set self x_vel self.x_vel + self.airdrift
+endif
+if B_DOWN in inpEVENTS
+   set self state DIVESTART
+   set self frame 0
+endif
 if self.calc1
    img redpantsjump2
 endif
@@ -418,14 +415,13 @@ set self frame 0
 |WALLTOUCH:0|
 exec AIRIAL:0
 set self state AIRIAL
-#if not self.calc1 nor self.calc2
-   img redpantswalljump0
-   # bufferable pog?
-   if inpA
-      set self state WALLJUMP
-      set self frame 0
-   endif
-#endif
+img redpantswalljump0
+# bufferable pog?
+if inpA
+   set self state WALLJUMP
+   set self frame 0
+endif
+
 
 |WALLJUMP:0|
 set self y_vel 0
@@ -488,7 +484,7 @@ endif
 set self calc1 self.state == SLIDEFLIP
 if self.state == AIRIAL or self.calc1
    set self state WALLTOUCH
-   set self frame 0
+   img redpantswalljump0
    if self.x_vel > 0
       set self direction 1
    endif

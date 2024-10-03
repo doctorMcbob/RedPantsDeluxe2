@@ -3,13 +3,13 @@ START:0 empty 0,0
 
 |START:0|
 if COLLIDE?
-   if yougotthis0.state != SHOW
-      set yougotthis0 state SHOW
-      set yougotthis0 frame 0
+   if yougotthistext0.state != SHOW
+      set yougotthistext0 state SHOW
+      set yougotthistext0 frame 0
    endif
    break
 endif
-if yougotthis0.state == SHOW
-   set yougotthis0 state OFF
-   set yougotthis0 frame 0   
+if yougotthistext0.state == SHOW
+   set yougotthistext0 state OFF
+   set yougotthistext0 frame 0   
 endif
