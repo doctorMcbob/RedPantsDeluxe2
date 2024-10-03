@@ -858,6 +858,9 @@ def actors_in_rect(G, pos1, pos2):
     selected = []
     for name in world.actors:
         a = G["ACTOR"].get_actor(name)
+        if a is None:
+            print(f"{name} is not found")
+            continue
         if rect.colliderect(a):
             selected.append(name)
     return selected
@@ -913,9 +916,12 @@ def run(G):
 
                 if e.type == pygame.KEYDOWN and (e.key == K_DELETE or e.key == K_BACKSPACE):
                     for name in CURSOR["SELECTED"]:
-                        WORLDS[G["WORLD"]]["actors"].remove(name)
+                        for key in WORLDS.keys():
+                            world = WORLDS[key]
+                            if name in world["actors"]:
+                                world["actors"].remove(name)
                         ACTORS.pop(name)
-                        load_game()
+                    load_game()
                     CURSOR["SELECTED"] = []
 
                 if e.type == pygame.KEYDOWN and e.key == K_SPACE:

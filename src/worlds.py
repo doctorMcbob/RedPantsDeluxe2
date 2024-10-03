@@ -73,6 +73,7 @@ class World(object):
                 response = Actor.update(self, noquit=noquit)
                 if response == "quit":
                     return "quit"
+
     def get_actors(self):
         # weird but fixes editor bug
         # old version:
@@ -89,7 +90,7 @@ class World(object):
             self.actors.remove(a)
         return ret
 
-    def draw(self, dest, frame, DEBUG=False):
+    def draw_bg(self, dest, frame):
         if self.background is not None:
             blitz = []
             for y in range((dest.get_height() // self.background.get_height())+2):
@@ -102,7 +103,8 @@ class World(object):
             dest.blits(blitz)
         else:
             dest.fill((185, 185, 185))
-        
+
+    def draw(self, dest, frame, DEBUG=False):
         for name in self.actors:
             Actor = actor.get_actor(name)
             if Actor is None: continue

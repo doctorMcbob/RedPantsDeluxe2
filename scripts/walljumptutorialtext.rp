@@ -1,30 +1,12 @@
 TEXT|0,0,0,0|False|
 START:0 empty 0,0
-WAIT:0 empty 0,0
-LAUNCHED:0 empty 0,0
+SHOW:0 tutorialstart3 40,96
+SHOW:2 tutorialstart4 32,80
+SHOW:4 tutorialstart5 24,72
+SHOW:6 walljumptutorial 0,0
+OFF:0 tutorialstart5 24,72
+OFF:2 tutorialstart4 32,80
+OFF:4 tutorialstart3 40,96
 
-|START:0|
-set self frame 0
-set self state WAIT
-set self max_ 2
-set self sayname self.name + say
-
-|WAIT:0|
-set self frame 0
-
-|LAUNCHED:160|
-set self state WAIT
-set self frame 0
-
-|COLLIDE|
-if not self.lakitu
-   break
-endif
-if related.state == WAIT
-   create say0 related.sayname related.x related.y
-   set related.sayname message "HOLD DOWN JUMP FOR^BUFFER WALLJUMP"
-   set related.sayname back backgroundsay0
-   set related state LAUNCHED
-set related frame 0
-endif
-
+|OFF:6|
+set self state START

@@ -13,7 +13,7 @@ set self frame 0
 if self.noWO
    break
 endif
-if background in self.name
+if self.background or self.platform
    break
 endif
 

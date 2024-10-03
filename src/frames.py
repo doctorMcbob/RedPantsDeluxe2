@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 from pygame import Surface, Rect
 
@@ -58,6 +60,12 @@ class Frame(object):
             self.update()
         
         surf = Surface((self.w, self.h))
+        self.world.draw_bg(surf, self)
+        if "-e" not in sys.argv:
+            for world in worlds.get_worlds():
+                if world == self.world: continue
+                if world.flagged_for_update:
+                    world.draw(surf, self, DEBUG=False)
         self.world.draw(surf, self, DEBUG=DEBUG)
         if self.should_zoom:
             self.w = orig_w

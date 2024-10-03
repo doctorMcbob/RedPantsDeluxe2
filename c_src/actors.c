@@ -428,11 +428,11 @@ int update_actor(int actorKey, int worldKey, int debug) {
   if (!world)
     return 0;
   if (actor->updated) {
-    if ((actor->physics || actor->tangible) && world_has(world, actorKey)) {
+    /*if ((actor->physics || actor->tangible) && world_has(world, actorKey)) {
       int resolution = collision_check(actor, world, debug);
       if (resolution < 0)
         return resolution;
-    }
+      }*/
     return 0;
   }
   actor->updated = 1;
@@ -448,9 +448,15 @@ int update_actor(int actorKey, int worldKey, int debug) {
   }
   float x_flag = actor->x_vel, y_flag = actor->y_vel;
   if (actor->physics || actor->tangible) {
-    int resolution = collision_check(actor, world, debug);
-    if (resolution < 0)
-      return resolution;
+    World *worldAtIndex;
+    for (int worldIndex = 0; worldIndex < NUM_WORLDS; worldIndex++) {
+      worldAtIndex = &WORLDS[worldIndex];
+      if (world_has(worldAtIndex, actor->name)) {
+	int resolution = collision_check(actor, worldAtIndex, debug);
+	if (resolution < 0)
+	  return resolution;
+      }
+    }
     actor->ECB.x += _floor(actor->x_vel);
     actor->ECB.y += _floor(actor->y_vel);
   }

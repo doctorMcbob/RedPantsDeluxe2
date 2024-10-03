@@ -1,29 +1,12 @@
 TEXT|0,0,0,0|False|
 START:0 empty 0,0
-WAIT:0 empty 0,0
-LAUNCHED:0 empty 0,0
+SHOW:0 tutorialstart0 96,40
+SHOW:2 tutorialstart1 80,32
+SHOW:4 tutorialstart2 72,24
+SHOW:6 longjumptutorial 0,0
+OFF:0 tutorialstart2 72,24
+OFF:2 tutorialstart1 80,32
+OFF:4 tutorialstart0 96,40
 
-|START:0|
-set self frame 0
-set self state WAIT
-set self max_ 2
-set self sayname self.name + say
-
-|WAIT:0|
-set self frame 0
-
-|LAUNCHED:200|
-set self state WAIT
-set self frame 0
-
-|COLLIDE|
-if not self.lakitu
-   break
-endif
-if related.state == WAIT
-   create say0 related.sayname related.x related.y
-   set related.sayname message "HOLD CROUCH AND JUMP^  WHILE MOVING TO  ^  BUFFER LONG JUMP  "
-   set related state LAUNCHED
-set related frame 0
-endif
-
+|OFF:6|
+set self state START

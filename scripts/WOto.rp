@@ -13,6 +13,9 @@ set self frame 0
 if self.noWO
    break
 endif
+if self.background or self.platform
+   break
+endif
 if self.frame_name and related.init
    view self.frame_name related.to
 endif

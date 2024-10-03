@@ -13,6 +13,10 @@ set self frame 0
 if self.noWO
    break
 endif
+if self.background or self.platform
+   break
+endif
+
 if related.init
    take related.from self
    if self.lakitu

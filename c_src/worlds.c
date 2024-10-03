@@ -149,10 +149,10 @@ void draw_world(World *world, SDL_Renderer *rend, Frame *frame, int background, 
 
 int world_has(World *world, int actorKey) {
   for (int i = 0; i < WORLD_BUFFER_SIZE; i++) {
-    if (world->actors[i] == actorKey)
-      return 1;
     if (world->actors[i] == -1)
       return 0;
+    if (world->actors[i] == actorKey)
+      return 1;
   }
   return 0;
 }

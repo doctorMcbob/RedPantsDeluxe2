@@ -120,7 +120,7 @@ class Actor(Rect):
             "y_vel": self.y_vel,
             "hurtboxes": self.hurtboxes,
             "hitboxes": self.hitboxes,
-            "attributes": self.attributes,
+            #"attributes": self.attributes,
             "img": self.img,
             "sprites": self.offsetkey,
             "scripts": self.offsetkey,
@@ -289,7 +289,6 @@ class Actor(Rect):
 
     def update(self, world, noquit=False):
         if self.updated:
-            if (self.physics or self.tangible) and self.name in world.actors: self.collision_check(world)
             return
         self.updated = True
         
@@ -304,7 +303,9 @@ class Actor(Rect):
             
         xflag, yflag = self.x_vel, self.y_vel
         if self.physics or self.tangible:
-            self.collision_check(world)
+            for _world in worlds.get_worlds():
+                if self.name in _world.actors:
+                    self.collision_check(_world)
             
             self.x += int(self.x_vel)
             self.y += int(self.y_vel)

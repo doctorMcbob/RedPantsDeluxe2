@@ -112,6 +112,7 @@ def handle_window_events(G, e, window):
     window["EVENTS"](e)
 
 def make_actor_edit_window(G, actor_template):
+    world = G["WORLD"]
     sprite_map = sprites.get_sprite_map(actor_template["sprites"])
     script_map = scripts.get_script_map(actor_template["scripts"])
     states = set()
@@ -240,9 +241,22 @@ def make_actor_edit_window(G, actor_template):
             0, THEMES[window["THEME"]]["MENU_TXT"]
         )
         window["BODY"].blit(hurtbox_text, (x + 32, y))
-        
-        
-        
+        y += 32
+        y += 32
+        y += 32
+        bottom_btn = Rect((x, y), (64, 32))
+        top_btn = Rect((x+80, y), (64, 32))
+        window["BOTTOM_BTN"] = bottom_btn
+        window["TOP_BTN"] = top_btn
+        bottom_text = G["HEL16"].render("Bottom", 0, THEMES[window["THEME"]]["MENU_TXT"]) 
+        top_text = G["HEL16"].render("Top", 0, THEMES[window["THEME"]]["MENU_TXT"]) 
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], bottom_btn)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], bottom_btn, width=2)
+        window["BODY"].blit(bottom_text, (x+8, y+8))
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG"], top_btn)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], top_btn, width=2)
+        window["BODY"].blit(top_text, (x+88, y+8))
+
     def actor_edit_window_event_handler(e, G, window):
         mpos = pygame.mouse.get_pos()
         mpos = (mpos[0] - window["POS"][0], mpos[1] - window["POS"][1])
@@ -255,6 +269,14 @@ def make_actor_edit_window(G, actor_template):
                 actor_template["physics"] = not actor_template["physics"]
             elif window["DIR_BTN"].collidepoint(mpos):
                 actor_template["direction"] = -1 if actor_template["direction"] == 1 else 1
+            elif window["TOP_BTN"].collidepoint(mpos):
+                if actor_template["name"] in editor.WORLDS[world]["actors"]:
+                    editor.WORLDS[world]["actors"].remove(actor_template["name"])
+                    editor.WORLDS[world]["actors"].append(actor_template["name"])
+            elif window["BOTTOM_BTN"].collidepoint(mpos):
+                if actor_template["name"] in editor.WORLDS[world]["actors"]:
+                    editor.WORLDS[world]["actors"].remove(actor_template["name"])
+                    editor.WORLDS[world]["actors"].insert(0, actor_template["name"])
             else:
                 update = False
             if window["STATE_L_BTN"].collidepoint(mpos):
@@ -266,7 +288,7 @@ def make_actor_edit_window(G, actor_template):
             elif window["FRAME_L_BTN"].collidepoint(mpos):
                 window["FRAME"] = window["FRAME"] - 1
             elif window["FRAME_R_BTN"].collidepoint(mpos):
-                window["FRAME"] = window["FRAME"] + 1 
+                window["FRAME"] = window["FRAME"] + 1
             elif window["BOX_EDIT_BTN"].collidepoint(mpos):
                 cb, eh = make_box_draw_window(G, actor_template,
                                               None) #TODO... gulp
