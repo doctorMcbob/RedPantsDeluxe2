@@ -4,8 +4,8 @@ DOOR:0 door0 0,0
 
 |START:0|
 set self state DOOR
-set self destination yard0
-set self partner doorrph10
+set self destination redpantshouse1
+set self partner dooryard00
 
 |DOOR:0|
 set self frame 0
