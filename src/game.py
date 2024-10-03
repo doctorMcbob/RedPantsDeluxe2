@@ -71,7 +71,6 @@ def run(G, noquit=False, cb=off, args=[], kwargs={}):
                 worlds_for_updating.append(world)
 
         for world in worlds_for_updating:
-            world.flagged_for_update = False
             if world.update(noquit=noquit) == "quit":
                 return
 
@@ -87,6 +86,8 @@ def run(G, noquit=False, cb=off, args=[], kwargs={}):
             drawn = frame.drawn(DEBUG=G) if "DEBUG" in G and G["DEBUG"] else frame.drawn()
             blitz.append((drawn, position))
 
+        for world in worlds_for_updating:
+            world.flagged_for_update = False
         G["SCREEN"].blits(blitz)
 
          # maybe remove FPS counter before release, dont worry about it for a while though
