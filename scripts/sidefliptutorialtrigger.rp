@@ -1,0 +1,15 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+if COLLIDE?
+   if sidefliptutorialtext0.state != SHOW
+      set sidefliptutorialtext0 state SHOW
+      set sidefliptutorialtext0 frame 0
+   endif
+   break
+endif
+if sidefliptutorialtext0.state == SHOW
+   set sidefliptutorialtext0 state OFF
+   set sidefliptutorialtext0 frame 0   
+endif

@@ -1,0 +1,15 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+if COLLIDE?
+   if walljumptutorialtext0.state != SHOW
+      set walljumptutorialtext0 state SHOW
+      set walljumptutorialtext0 frame 0
+   endif
+   break
+endif
+if walljumptutorialtext0.state == SHOW
+   set walljumptutorialtext0 state OFF
+   set walljumptutorialtext0 frame 0   
+endif
