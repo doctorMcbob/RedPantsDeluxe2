@@ -28,6 +28,6 @@ $(EXEC): $(OBJS) $(HDRS)
 
 # recipe to clean the workspace
 clean:
-	rm -f $(EXEC) $(OBJS)
+	rm -f $(EXEC) $(OBJS) $(C_DIR)/*data.c $(C_DIR)/*data.h
 
 .PHONY: all clean

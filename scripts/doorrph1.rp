@@ -11,9 +11,13 @@ set self partner dooryard00
 set self frame 0
 
 |COLLIDE|
+if self.state == EMPTY
+   break
+endif
 if self.door_key
    create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
+      print "Moving " + self.name
       move self related.destination
       view self.frame_name related.destination
 

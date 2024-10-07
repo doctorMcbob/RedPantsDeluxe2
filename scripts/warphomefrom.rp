@@ -7,7 +7,7 @@ ON:6 warp2 0,0
 
 |START:0|
 set self state OFF
-set self destination yard3
+set self destination yard1
 set self partner warphome0
 back
 set self background 1
@@ -19,16 +19,14 @@ set self frame 0
 set self frame 0
 
 |COLLIDE|
+if self.state == EMPTY
+   break
+endif
 if self.door_key
    if related.state == ON
       create upicon0 upicon related.x related.y - 32
-   if self.door_key + _DOWN in inpEVENTS
+      if self.door_key + _DOWN in inpEVENTS
       	 move self related.destination
-		       if self.lakitu
-         move self.lakitu related.destination
-         set self.lakitu x self.x
-         set self.lakitu y self.y
-      endif
       	 view self.frame_name related.destination
 	 
 	 set self calcx related.x - self.x
@@ -37,9 +35,17 @@ if self.door_key
 	 set self x warphome0.x - self.calcx
 	 set self y warphome0.y - self.calcy
 
+         if self.lakitu
+            move self.lakitu related.destination
+            set self.lakitu x self.x
+            set self.lakitu y self.y
+         endif
+
       	 set self respawnx self.x
       	 set self respawny self.y
-      	 remove inpEVENTS self.door_key + _DOWN
+	 set self tangible 0
+	 set self state EMPTY
+         remove inpEVENTS self.door_key + _DOWN
       endif
    endif
 endif

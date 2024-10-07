@@ -3,8 +3,8 @@ START:0 empty 0,0
 
 |START:0|
 # to is _left, from is _right
-set self _left yard0
-set self _right yard3
+set self _left yard3
+set self _right yard0
 set self offset_left 64
 set self offset_right 64
 

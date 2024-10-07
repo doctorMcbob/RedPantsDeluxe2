@@ -10,8 +10,11 @@ set self partner doorrph10
 |DOOR:0|
 set self frame 0
 
-|COLLIDE|
-if self.door_key
+|COLLIDE|i
+if self.state == EMPTY
+   break
+endif
+f self.door_key
    create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
       move self related.destination
@@ -32,4 +35,3 @@ if self.door_key
       remove inpEVENTS self.door_key + _DOWN
    endif
 endif
-

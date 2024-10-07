@@ -609,6 +609,19 @@ def draw(G):
                 mpos[1] // 16 * 16,
             )
         )
+        pos, dim = rect
+        for x in range(dim[0] // 32):
+            pygame.draw.line(
+                G["SCREEN"],
+                (100, 0, 0, 100),
+                (pos[0] + (x*32), pos[1]),
+                (pos[0] + (x*32), pos[1] + dim[1]))
+        for y in range(dim[1] // 32):
+            pygame.draw.line(
+                G["SCREEN"],
+                (100, 0, 0, 100),
+                (pos[0], pos[1] + (y*32)),
+                (pos[0] + dim[0], pos[1] + (y*32)))
         pygame.draw.rect(G["SCREEN"], (1, 255, 1), rect, width=1)
     for name in CURSOR["SELECTED"]:
         a = G["ACTOR"].get_actor(name)
@@ -866,6 +879,7 @@ def actors_in_rect(G, pos1, pos2):
     return selected
     
 def run(G):
+    global SELECTED_TEMPLATE
     # # MIGRATIONS :O
     # for name in ACTORS:
     #     template = ACTORS.get(name)
@@ -923,6 +937,9 @@ def run(G):
                         ACTORS.pop(name)
                     load_game()
                     CURSOR["SELECTED"] = []
+
+                if e.type == pygame.KEYDOWN and e.key == K_ESCAPE:
+                    SELECTED_TEMPLATE = None
 
                 if e.type == pygame.KEYDOWN and e.key == K_SPACE:
                     for name in CURSOR["SELECTED"]:

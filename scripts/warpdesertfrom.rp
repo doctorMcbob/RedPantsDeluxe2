@@ -22,13 +22,8 @@ set self frame 0
 if self.door_key
    if related.state == ON
       create upicon0 upicon related.x related.y - 32
-   if self.door_key + _DOWN in inpEVENTS
+      if self.door_key + _DOWN in inpEVENTS
       	 move self related.destination
-		       if self.lakitu
-         move self.lakitu related.destination
-         set self.lakitu x self.x
-         set self.lakitu y self.y
-      endif
       	 view self.frame_name related.destination
 	 
 	 set self calcx related.x - self.x
@@ -36,6 +31,11 @@ if self.door_key
 
 	 set self x warpdesert0.x - self.calcx
 	 set self y warpdesert0.y - self.calcy
+         if self.lakitu
+            move self.lakitu related.destination
+            set self.lakitu x self.x
+            set self.lakitu y self.y
+         endif
 
       	 set self respawnx self.x
       	 set self respawny self.y

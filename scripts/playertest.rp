@@ -1,0 +1,18 @@
+PLAYER1|128,256,32,64|False|
+START:0 empty -16,0
+
+|START:0|
+if isframe ROOT
+   set self _input_name PLAYER1
+   set self frame_name ROOT
+   rebrand redpantsguy
+   set self tangible 1
+   set self respawnx self.x
+   set self respawny self.y
+   set self respawnworld WORLD?
+   set self lakitu testlakitu
+   create lakitu0 self.lakitu self.x self.y
+   focus ROOT self.lakitu
+   set self.lakitu follow self.name
+   set self.lakitu _input_name PLAYER1
+endif

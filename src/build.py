@@ -159,6 +159,19 @@ def build(no_make=False, make_only=False, buffer=4000):
     no_make = "-nm" in sys.argv or "--no-make" in sys.argv or no_make
     make_only = "-mo" in sys.argv or "--make-only" in sys.argv or make_only
 
+    if not no_make and not make_only:
+        print(f"Running make clean from Makefile at {MAKEFILE_PATH}...")
+        clean_result = subprocess.run(
+            ['make', '-f', str(MAKEFILE_PATH), 'clean', f'C_DIR={str(C_PATH)}', f'BUILD_DIR={str(BUILD_TO)}'],
+            capture_output=True, text=True
+        )
+
+        if clean_result.returncode != 0:
+            print(clean_result.stderr)
+            return
+        else:
+            print("Clean finished.")
+        
     if not make_only:
         print("Building Script Data...")
         make_script_data()
