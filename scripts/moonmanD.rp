@@ -558,7 +558,8 @@ if self.state == ROLLOUT or self.calc1
    set self frame 0
 endif
 set self calc1 self.state == SLIDEFLIP
-if self.state == AIRIAL or self.calc1
+set self calc1 self.state == AIRIAL or self.calc1
+if self.calc1 and self.frame > 4
    set self state WALLTOUCH
    set self frame 0
    if self.x_vel > 0

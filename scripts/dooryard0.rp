@@ -14,7 +14,7 @@ set self frame 0
 if self.state == EMPTY
    break
 endif
-f self.door_key
+if self.door_key
    create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
       move self related.destination
@@ -31,6 +31,7 @@ f self.door_key
          set self.lakitu y self.y
       endif
       set self tangible 0
+      set self emptyto self.state
       set self state EMPTY
       remove inpEVENTS self.door_key + _DOWN
    endif

@@ -32,6 +32,7 @@ if self.door_key
          set self.lakitu y self.y
       endif
       set self tangible 0
+      set self emptyto self.state
       set self state EMPTY
       remove inpEVENTS self.door_key + _DOWN
    endif

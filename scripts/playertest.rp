@@ -3,6 +3,7 @@ START:0 empty -16,0
 
 |START:0|
 if isframe ROOT
+   set self noWO 1
    set self _input_name PLAYER1
    set self frame_name ROOT
    rebrand redpantsguy

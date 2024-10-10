@@ -44,6 +44,7 @@ if self.door_key
       	 set self respawnx self.x
       	 set self respawny self.y
 	 set self tangible 0
+         set self emptyto self.state
 	 set self state EMPTY
          remove inpEVENTS self.door_key + _DOWN
       endif
