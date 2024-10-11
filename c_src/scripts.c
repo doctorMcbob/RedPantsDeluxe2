@@ -898,104 +898,182 @@ void resolve_operators(int statement, World *world, int debug) {
         switch (leftType + 3 * rightType) {
         case (INT + 3 * INT): {
           PARAMS[paramPointer - 2] = INT;
-          PARAMS[paramPointer - 1] = leftValue && rightValue;
+	  if (leftValue && rightValue) {
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (INT + 3 * FLOAT): {
           float f = get_float(rightValue);
-          PARAMS[paramPointer - 2] = INT;
-          PARAMS[paramPointer - 1] = leftValue && f;
+	  if (leftValue && f) {
+	    PARAMS[paramPointer - 2] = FLOAT;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (FLOAT + 3 * INT): {
           float f = get_float(leftValue);
           PARAMS[paramPointer - 2] = INT;
-          PARAMS[paramPointer - 1] = f && rightValue;
+	  if (f && rightValue) {
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (FLOAT + 3 * FLOAT): {
           float f = get_float(leftValue);
           float f2 = get_float(rightValue);
-          PARAMS[paramPointer - 2] = INT;
-          PARAMS[paramPointer - 1] = f && f2;
+	  if (f && f2) {
+	    PARAMS[paramPointer - 2] = FLOAT;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (INT + 3 * STRING): {
-          PARAMS[paramPointer - 2] = INT;
-          int l2 = strlen(get_string(rightValue));
-          PARAMS[paramPointer - 1] = leftValue && l2;
+	  int l2 = strlen(get_string(rightValue));
+	  if (leftValue && l2) {
+	    PARAMS[paramPointer - 2] = STRING;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (STRING + 3 * INT): {
-          PARAMS[paramPointer - 2] = INT;
           int l1 = strlen(get_string(leftValue));
-          PARAMS[paramPointer - 1] = l1 && rightValue;
+	  if (l1 && rightValue) {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (FLOAT + 3 * STRING): {
-          PARAMS[paramPointer - 2] = INT;
-          float f = get_float(leftValue);
+	  float f = get_float(leftValue);
           int l2 = strlen(get_string(rightValue));
-          PARAMS[paramPointer - 1] = f && l2;
+	  if (f && l2) {
+	    PARAMS[paramPointer - 2] = STRING;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (STRING + 3 * FLOAT): {
-          PARAMS[paramPointer - 2] = INT;
           float f = get_float(rightValue);
           int l1 = strlen(get_string(leftValue));
-          PARAMS[paramPointer - 1] = l1 && f;
+	  if (l1 && f) {
+	    PARAMS[paramPointer - 2] = FLOAT;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (STRING + 3 * STRING): {
-          PARAMS[paramPointer - 2] = INT;
           int l1 = strlen(get_string(leftValue)),
-              l2 = strlen(get_string(rightValue));
-          PARAMS[paramPointer - 1] = l1 && l2;
+	      l2 = strlen(get_string(rightValue));
+	  if (l1 && l2) {
+	    PARAMS[paramPointer - 2] = STRING;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (INT + 3 * LIST): {
-          PARAMS[paramPointer - 2] = INT;
           int l2 = len_list(rightValue);
-          PARAMS[paramPointer - 1] = leftValue && l2;
+	  if (leftValue && l2) {
+	    PARAMS[paramPointer - 2] = LIST;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (LIST + 3 * INT): {
-          PARAMS[paramPointer - 2] = INT;
           int l1 = len_list(leftValue);
-          PARAMS[paramPointer - 1] = l1 && rightValue;
+	  if (l1 && rightValue) {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (FLOAT + 3 * LIST): {
-          PARAMS[paramPointer - 2] = INT;
           float f = get_float(leftValue);
           int l2 = len_list(rightValue);
-          PARAMS[paramPointer - 1] = f && l2;
+	  if (f && l2) {
+	    PARAMS[paramPointer - 2] = LIST;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (LIST + 3 * FLOAT): {
-          PARAMS[paramPointer - 2] = INT;
           float f = get_float(rightValue);
           int l1 = len_list(leftValue);
-          PARAMS[paramPointer - 1] = l1 && f;
+	  if (l1 && f) {
+	    PARAMS[paramPointer - 2] = FLOAT;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (STRING + 3 * LIST): {
-          PARAMS[paramPointer - 2] = INT;
           int l1 = strlen(get_string(leftValue)), l2 = len_list(rightValue);
-          PARAMS[paramPointer - 1] = l1 && l2;
+	  if (l1 && l2) {
+	    PARAMS[paramPointer - 2] = LIST;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
           break;
         }
         case (LIST + 3 * STRING): {
-          PARAMS[paramPointer - 2] = INT;
           int l1 = len_list(leftValue), l2 = strlen(get_string(rightValue));
-          PARAMS[paramPointer - 1] = l1 && l2;
-          break;
+	  if (l1 && l2) {
+	    PARAMS[paramPointer - 2] = STRING;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
+	  break;
         }
         case (LIST + 3 * LIST): {
-          PARAMS[paramPointer - 2] = INT;
           int l1 = len_list(leftValue), l2 = len_list(rightValue);
-          PARAMS[paramPointer - 1] = l1 && l2;
-          break;
+	  if (l1 && l2) {
+	    PARAMS[paramPointer - 2] = LIST;
+	    PARAMS[paramPointer - 1] = rightValue;
+	  } else {
+	    PARAMS[paramPointer - 2] = INT;
+	    PARAMS[paramPointer - 1] = 0;
+	  }
+	  break;
         }
         default: {
           print_statement(statement);
@@ -1023,7 +1101,7 @@ void resolve_operators(int statement, World *world, int debug) {
         }
         switch (leftType + 3 * rightType) {
         case (INT + 3 * INT): {
-          PARAMS[paramPointer - 2] = INT;
+	  PARAMS[paramPointer - 2] = INT;
           PARAMS[paramPointer - 1] = leftValue || rightValue;
           break;
         }
@@ -1051,6 +1129,7 @@ void resolve_operators(int statement, World *world, int debug) {
           int l1 = strlen(get_string(leftValue)),
               l2 = strlen(get_string(rightValue));
           PARAMS[paramPointer - 1] = l1 || l2;
+	  break;
         }
         case (INT + 3 * LIST): {
           PARAMS[paramPointer - 2] = INT;

@@ -10,7 +10,7 @@ set self partner doorrph10
 |DOOR:0|
 set self frame 0
 
-|COLLIDE|i
+|COLLIDE|
 if self.state == EMPTY
    break
 endif
