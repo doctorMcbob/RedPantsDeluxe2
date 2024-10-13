@@ -23,7 +23,7 @@ have been using for a long time in pygame.
 #include "worlds.h"
 #include "worlddata.h"
 #include "tree.h"
-#include <SDL2/SDL_ttf.h>
+//#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -72,9 +72,9 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if (TTF_Init() == -1) {
-    return 1;
-  }
+  /* if (TTF_Init() == -1) { */
+  /*   return 1; */
+  /* } */
   //  font = TTF_OpenFont("/usr/share/fonts/truetype/tlwg/Waree-Bold.ttf", 16);
   // if (!font) {
   //   printf("Error initializing font: %s\n", TTF_GetError());
