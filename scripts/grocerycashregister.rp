@@ -1,6 +1,7 @@
 MILK|0,0,0,0|False|
 START:0 cashregister 0,0
 WAIT:0 cashregister 0,0
+COOL:0 cashregister 0,0
 HITSTUN:0 cashregisterbonk 0,0
 BONK:0 cashregisterbonk2 0,0
 
@@ -16,9 +17,10 @@ hurtboxes cashregister
 |WAIT:0|
 set self frame 0
 
-|HITSTUN:4|
+|HITSTUN:3|
 set self state BONK
 set self frame 0
+exec BONK:0
 
 |BONK:0|
 if self.coinnumber < self.coinlimit
@@ -26,6 +28,9 @@ if self.coinnumber < self.coinlimit
    set self coinnumber self.coinnumber + 1
 endif
 
-|BONK:4|
-set self state WAIT
+|BONK:3|
+set self state COOL
 set self frame 0
+
+|COOL:4|
+set self state WAIT
