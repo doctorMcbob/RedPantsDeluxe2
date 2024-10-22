@@ -1,0 +1,37 @@
+FOCUS|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self noWO 1
+set self state WAIT
+
+|WAIT:0|
+exec p1update
+exec p2update
+
+|p1update|
+set self check exists player10
+if not self.check
+   break
+endif
+set self check self collideswith player10
+if not self.check
+   break
+endif
+if isframe MAIN
+   scrollbound MAIN left self.x
+endif
+
+|p2update|
+set self check exists player20
+if not self.check
+   break
+endif
+set self check self collideswith player20
+if not self.check
+   break
+endif
+if isframe MAIN2
+   scrollbound MAIN left self.x
+endif
