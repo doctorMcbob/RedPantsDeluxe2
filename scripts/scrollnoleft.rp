@@ -15,7 +15,7 @@ set self check exists player10
 if not self.check
    break
 endif
-set self check self collideswith player10
+set self check self.name collideswith player10
 if not self.check
    break
 endif
@@ -28,7 +28,7 @@ set self check exists player20
 if not self.check
    break
 endif
-set self check self collideswith player20
+set self check self.name collideswith player20
 if not self.check
    break
 endif
