@@ -149,8 +149,7 @@ if self.frame_name
    scrollbound self.frame_name right None
    scrollbound self.frame_name top None
    scrollbound self.frame_name bottom None
-
-  view self.frame_name self.respawnworld
+   view self.frame_name self.respawnworld
 endif
 
 move self.name self.respawnworld

@@ -21,6 +21,9 @@ if not self.check
 endif
 if isframe MAIN
    scrollbound MAIN left self.x
+   scrollbound MAIN right None
+   scrollbound MAIN up None
+   scrollbound MAIN bottom None
 endif
 
 |p2update|
@@ -33,8 +36,8 @@ if not self.check
    break
 endif
 if isframe MAIN2
-   scrollbound MAIN left self.x
-   scrollbound MAIN right None
-   scrollbound MAIN up None
-   scrollbound MAIN down None
+   scrollbound MAIN2 left self.x
+   scrollbound MAIN2 right None
+   scrollbound MAIN2 up None
+   scrollbound MAIN2 bottom None
 endif

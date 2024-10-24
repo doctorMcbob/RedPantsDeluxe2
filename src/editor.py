@@ -41,8 +41,8 @@ Additionally there are little windows (src/editor_windows.py)
       \ [x] Hitbox Editor
      [x] Template Select
   [] Sprites
-   \ [] Spritesheet Editor
-     [] Sprite List
+   \ [x] Spritesheet Editor
+     [x] Sprite List
      [] Sprite Map Editor
 
    Selector
