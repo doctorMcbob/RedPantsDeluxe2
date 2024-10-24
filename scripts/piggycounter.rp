@@ -5,7 +5,7 @@ PASS:0 empty 0,0
 
 |START:0|
 set self state LOOK
-set self target_piggies 9
+set self target_piggies 6
 set self piggies []
 
 |LOOK:0|
