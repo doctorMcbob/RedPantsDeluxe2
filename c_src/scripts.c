@@ -3087,22 +3087,26 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
       }
 
       switch (directionValue) {
-      case TOP:
+      case TOP: {
         f->bound_top = valueType != NONE;
         f->top_bind = valueValue;
         break;
-      case _LEFT:
+      }
+      case _LEFT: {
         f->bound_left = valueType != NONE;
         f->left_bind = valueValue;
         break;
-      case BOTTOM:
+      }
+      case BOTTOM: {
         f->bound_bottom = valueType != NONE;
         f->bottom_bind = valueValue;
         break;
-      case _RIGHT:
+      }
+      case _RIGHT: {
         f->bound_right = valueType != NONE;
         f->right_bind = valueValue;
         break;
+      }
       }
       break;
     }
