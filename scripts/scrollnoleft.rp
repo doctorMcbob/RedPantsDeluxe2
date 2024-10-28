@@ -22,7 +22,7 @@ endif
 if isframe MAIN
    scrollbound MAIN left self.x
    scrollbound MAIN right None
-   scrollbound MAIN up None
+   scrollbound MAIN top None
    scrollbound MAIN bottom None
 endif
 
@@ -38,6 +38,6 @@ endif
 if isframe MAIN2
    scrollbound MAIN2 left self.x
    scrollbound MAIN2 right None
-   scrollbound MAIN2 up None
+   scrollbound MAIN2 top None
    scrollbound MAIN2 bottom None
 endif
