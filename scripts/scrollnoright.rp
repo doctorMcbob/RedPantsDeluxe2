@@ -15,12 +15,15 @@ set self check exists player10
 if not self.check
    break
 endif
-set self check self.name collideswith player10
+set self check self.name collideswith player11
 if not self.check
    break
 endif
 if isframe MAIN
-   scrollbound MAIN right self.right
+   scrollbound MAIN right self.x + self.w
+   scrollbound MAIN left None
+   scrollbound MAIN top None
+   scrollbound MAIN bottom None
 endif
 
 |p2update|
@@ -33,5 +36,8 @@ if not self.check
    break
 endif
 if isframe MAIN2
-   scrollbound MAIN right self.right
+   scrollbound MAIN2 right self.x + self.w
+   scrollbound MAIN2 left None
+   scrollbound MAIN2 top None
+   scrollbound MAIN2 bottom None
 endif

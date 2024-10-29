@@ -275,13 +275,8 @@ def resolve(reference, script, world, related=None, logfunc=print, noquit=False)
                     "name": actor_name, "POS": (int(x), int(y))
                 })
                 actor = a.get_actor(actor_name)
-                if "lakitu" in actor_name:
-                    print(f"CREATED {actor_name}", actor)
                 if actor_name not in world.actors:
                     world.actors.append(actor_name)
-                if "lakitu" in actor_name:
-                    print(f"Added to {world.name}")
-                    print(world.actors)
                 if "START:0" in actor.scripts:
                     if resolve(actor_name, actor.scripts["START:0"], world, logfunc=logfunc) == 'goodbye':
                         return 'goodbye'
