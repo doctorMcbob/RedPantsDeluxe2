@@ -17,6 +17,11 @@ set self state SPRING
 set self frame 0
 
 |COLLIDE|
+if self.state == DANGLE
+   set self state AIRIAL
+   set self frame 0
+   set self y_vel self.jumpstrength
+endif
 set self x_vel related.strength
 set related state SHOT
 set related frame 0
