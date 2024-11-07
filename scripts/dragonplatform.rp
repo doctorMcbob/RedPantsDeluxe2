@@ -1,4 +1,6 @@
 PLATFORM|0,0,0,0|False|
+START:0 empty 0,0
+OFF:0 empty 0,0
 OFF00 empty 0,0
 OFF01 empty 0,0
 OFF02 empty 0,0
@@ -35,6 +37,7 @@ PLAT12 dragonplat12 0,0
 PLAT20 dragonplat20 0,0
 PLAT21 dragonplat21 0,0
 PLAT22 dragonplat22 0,0
+DESPAWN:0 empty 0,0
 DESPAWN00 dragonplatphasing00 0,0
 DESPAWN01 dragonplatphasing01 0,0
 DESPAWN02 dragonplatphasing02 0,0
@@ -57,7 +60,7 @@ WARN22 dragonplatwarning22 0,0
 |START:0|
 set self platform 1
 set self state OFF
-set self tileset empty
+set self tileset 0
 set self frame 0
 set self target dragon0
 set self spawn_distance 512
@@ -103,7 +106,7 @@ endif
 
 |DESPAWN:8|
 set self state OFF
-set self tileset empty
+set self tileset 0
 
 |calculateDist|
 set self dist 0

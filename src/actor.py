@@ -231,16 +231,19 @@ class Actor(Rect):
             if "START:0" in self.scripts and self.state == "START":
                 for cmd in self.scripts["START:0"]:
                     if cmd[0:3] == ["set", "self", "tileset"]:
-                        tileset = cmd[3]
+                        try:
+                            tileset = int(cmd[3])
+                        except ValueError:
+                            tileset = cmd[3]
                         self.tileset = tileset
         # </bullshit>
         if self.platform and self.tileset or tileset:
             tile_map = sprites.get_tile_map(self.tileset)
-            if tile_map == None:
-                print(self.name + " has no tile_map for " + str(self.tileset))
             surf = Surface((self.w, self.h))
             surf.fill((1, 255, 1))
-            
+            if tile_map == None:
+                print(self.name + " has no tile_map for " + str(self.tileset))
+                return surf
             blitz = []
             for y in range(self.h // 32):
                 for x in range(self.w // 32):
