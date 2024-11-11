@@ -73,7 +73,7 @@ exec calculateDist
 if self.dist < self.spawn_distance
    if self.dist > 0
       set self state SPAWN
-set self tileset dragonplatphasing
+      set self tileset dragonplatphasing
       set self frame 0
    endif
 endif
@@ -90,7 +90,7 @@ exec calculateDist
 set self calc self.dist > self.spawn_distance
 if self.dist <= 64 or self.calc
    set self state WARN
-set self tileset dragonplatwarning
+   set self tileset dragonplatwarning
    set self frame 0
 endif
 
@@ -99,7 +99,7 @@ exec calculateDist
 set self calc self.dist > self.spawn_distance
 if self.dist <= 0 or self.calc
    set self state DESPAWN
-set self tileset dragonplatphasing
+   set self tileset dragonplatphasing
    set self frame 0
    set self tangible 0
 endif

@@ -77,6 +77,9 @@ set self y_vel 0 - self.speed
 set self frame 0
 
 |COLLIDE|
+if not self.frame_name
+   break
+endif
 if related.state == SLEEP
    set related state AWAKE
    set related frame 0
