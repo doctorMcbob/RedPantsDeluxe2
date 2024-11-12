@@ -19,6 +19,8 @@ SHOOT:106 dragonblast1 -128,-128
 SHOOT:112 dragonblast0 -128,-128
 
 |START:0|
+set self orig_x self.x
+set self orig_y self.y
 set self direction -1
 set self state SLEEP
 set self frame 0
@@ -64,8 +66,8 @@ set self state FLY
 set self frame 0
 
 |RESET:0|
-set self x -27696
-set self y 10096
+set self x self.orig_x
+set self y self.orig_y
 exec START:0
 
 |AWAKE:30|

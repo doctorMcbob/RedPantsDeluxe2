@@ -6,11 +6,15 @@ WAITING:0 empty 0,0
 set self state WAITING
 
 |WAITING:0|
-set self reset 1
 if inworld player10
-   set self reset 0
+   break
 endif
-if self.reset
-   set dragon0 state RESET
-   set dgn_countdown_spawnpl0 state RESET
+if inworld player20
+   break
 endif
+if inworld player11
+   break
+endif
+set dragon0 state RESET
+#set dgn_countdown_spawnpl0 state RESET
+
