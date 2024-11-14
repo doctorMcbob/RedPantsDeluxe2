@@ -871,7 +871,15 @@ def update_cursor_events(G, e):
                         CURSOR["CORNER"])
                     mods = pygame.key.get_mods()
                     if not mods & KMOD_SHIFT:
-                        print("Not shifting!")
+                        CURSOR["SELECTED"] = list(
+                            filter(
+                                lambda actor: not (
+                                    "locked" in ACTORS[actor]
+                                    and ACTORS[actor]["locked"]
+                                ), CURSOR["SELECTED"]
+                            )
+                        )
+
                 CURSOR["CORNER"] = None
 
 def create_new_world(name):
