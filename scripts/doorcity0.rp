@@ -5,7 +5,8 @@ DOOR:0 door0 0,0
 |START:0|
 set self state DOOR
 set self destination city0
-set self partner doorgrocery00
+set self partner doorgrocery01
+
 |DOOR:0|
 set self frame 0
 
