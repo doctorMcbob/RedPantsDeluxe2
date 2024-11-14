@@ -201,6 +201,17 @@ def make_actor_edit_window(G, actor_template):
         window["BODY"].blit(direction_text, (x + 32, y))
 
         y += 32
+        lock_button = Rect((x, y), (16, 16))
+        window["LOCK_BTN"] = lock_button
+        lock_text = G["HEL16"].render(
+            f"Locked: {0 if 'locked' not in actor_template else actor_template['locked']}",
+            0, THEMES[window["THEME"]]["MENU_TXT"]
+        )
+        color = "MENU_BG_SEL" if 'locked' in actor_template and actor_template["locked"] else "MENU_BG"
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]][color], lock_button)
+        pygame.draw.rect(window["BODY"], THEMES[window["THEME"]]["MENU_BG_ALT"], lock_button, width=2)
+        window["BODY"].blit(lock_text, (x+32, y))
+        y += 32
 
         sprites_text = G["HEL16"].render(
             f"Sprites: {actor_template['sprites']}",
@@ -243,7 +254,6 @@ def make_actor_edit_window(G, actor_template):
         window["BODY"].blit(hurtbox_text, (x + 32, y))
         y += 32
         y += 32
-        y += 32
         bottom_btn = Rect((x, y), (64, 32))
         top_btn = Rect((x+80, y), (64, 32))
         window["BOTTOM_BTN"] = bottom_btn
@@ -269,6 +279,8 @@ def make_actor_edit_window(G, actor_template):
                 actor_template["physics"] = not actor_template["physics"]
             elif window["DIR_BTN"].collidepoint(mpos):
                 actor_template["direction"] = -1 if actor_template["direction"] == 1 else 1
+            elif window["LOCK_BTN"].collidepoint(mpos):
+                actor_template["locked"] = 0 if "locked" in actor_template and actor_template["locked"] == 1 else 1
             elif window["TOP_BTN"].collidepoint(mpos):
                 if actor_template["name"] in editor.WORLDS[world]["actors"]:
                     editor.WORLDS[world]["actors"].remove(actor_template["name"])

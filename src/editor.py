@@ -869,6 +869,9 @@ def update_cursor_events(G, e):
                             mpos[1] // 16 * 16 + SCROLLER["CY"] - 32
                         ),
                         CURSOR["CORNER"])
+                    mods = pygame.key.get_mods()
+                    if not mods & KMOD_SHIFT:
+                        print("Not shifting!")
                 CURSOR["CORNER"] = None
 
 def create_new_world(name):
@@ -910,11 +913,25 @@ def run(G):
             0,
             G["HEADER"].theme["MENU_TXT"]
         )
+
+        world_text = G["HEL32"].render(
+            f"World: {G['WORLD']}",
+            0,
+            G["HEADER"].theme["MENU_TXT"]
+        )
         
         G["SCREEN"].blit(
             template_text,
             (
                 G["SCREEN"].get_width() - template_text.get_width(),
+                0
+            )
+        )
+        
+        G["SCREEN"].blit(
+            world_text,
+            (
+                G["SCREEN"].get_width() - template_text.get_width() - 64 - world_text.get_width(),
                 0
             )
         )
