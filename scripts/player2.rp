@@ -15,4 +15,6 @@ if isframe MAIN2
    focus MAIN2 self.lakitu
    set self.lakitu follow self.name
    set self.lakitu _input_name PLAYER2
+   break
 endif
+rebrand puppetredpants
