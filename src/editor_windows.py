@@ -658,9 +658,9 @@ def make_box_draw_window(G, actor, boxkey):
                             def add_new(G, entry):
                                 if entry:
                                     window["BOXKEY"] = entry
-                                    if entry not in editor.HITBOXES[window["BOXKEY"]]:
+                                    if entry not in editor.HITBOXES:
                                         editor.HITBOXES[entry] = {}
-                                    if entry not in editor.HURTBOXES[window["BOXKEY"]]:
+                                    if entry not in editor.HURTBOXES:
                                         editor.HURTBOXES[entry] = {}
                                     editor.load_game()
                             update, events = make_text_entry_window(

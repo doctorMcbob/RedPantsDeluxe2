@@ -601,7 +601,7 @@ def draw(G):
         # I need to get the actors START:0 sprite and display it on the mpos
         spritekey = TEMPLATES[SELECTED_TEMPLATE]["sprites"]
         sprite_map = sprites.get_sprite_map(spritekey)
-        if "START:0" in sprite_map:
+        if sprite_map and "START:0" in sprite_map:
             sprite = sprites.get_sprite(sprite_map["START:0"])
             offset = sprites.get_offset(spritekey, sprite_map["START:0"])
             if CURSOR["CORNER"] is None:
