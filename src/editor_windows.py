@@ -702,6 +702,11 @@ def make_box_draw_window(G, actor, boxkey):
             if window["SCROLL"]:
                 window["sx"] += e.rel[0]
                 window["sy"] += e.rel[1]
+                if window["CORNER"] is not None:
+                    window["CORNER"] = (
+                        window["CORNER"][0] + e.rel[0],
+                        window["CORNER"][1] + e.rel[1],
+                    )
             if window["MODE"] == "DEL" and window["BOXKEY"] is not None:
                 keyframe = f"{window['STATE']}:{window['FRAME']}"
                 f = window["FRAME"]

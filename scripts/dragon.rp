@@ -17,6 +17,14 @@ SHOOT:12 dragonblast1 -128,-128
 SHOOT:18 dragonblast2 -128,-128
 SHOOT:106 dragonblast1 -128,-128
 SHOOT:112 dragonblast0 -128,-128
+HITSTUN:0 dragonhit1 -128,-128
+HITSTUN:2 dragonhit0 -128,-128
+HITSTUN:4 dragonhit1 -128,-128
+HITSTUN:6 dragonhit0 -128,-128
+HITSTUN:8 dragonhit1 -128,-128
+HITSTUN:10 dragonhit0 -128,-128
+HITSTUN:12 dragonhit1 -128,-128
+HITSTUN:14 dragonhit0 -128,-128
 
 |START:0|
 set self orig_x self.x
@@ -32,6 +40,8 @@ set self firenumber 0
 set self firenmax 3
 back
 set self background 1
+hitboxes dragon
+hurtboxes dragon
 
 |SHOOT_DOWN:18|
 set self fireball self.name + fireball + self.firenumber
@@ -86,3 +96,9 @@ if related.state == SLEEP
    set related state AWAKE
    set related frame 0
 endif
+
+|HITSTUN:0|
+set self direction -1
+
+|HITSTUN:16|
+set self state FLY
