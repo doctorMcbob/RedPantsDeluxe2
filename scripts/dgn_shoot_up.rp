@@ -11,6 +11,9 @@ set self state SHOOT
 
 |COLLIDE|
 if self.name == dragon0
+   if self.state == DONE
+       break
+   endif
    if related.state == SHOOT
       set self state SHOOT
       set self frame 0

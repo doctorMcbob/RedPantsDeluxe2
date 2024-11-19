@@ -77,11 +77,15 @@ if self.dist < self.spawn_distance
       set self frame 0
    endif
 endif
+if dragon0.state == DONE
+   set self state SPAWN
+   set self frame 0
+endif
 
 |SPAWN:8|
 if not COLLIDE?
    set self state PLAT
-set self tileset dragonplat
+   set self tileset dragonplat
    set self tangible 1
 endif
 
@@ -110,6 +114,10 @@ set self tileset 0
 
 |calculateDist|
 set self dist 0
+if dragon0.state == DONE
+   set self dist 65
+   break
+endif
 set self dl self.target.x + self.target.w
 if self.x > self.dl
    set self dist self.x - self.dl
