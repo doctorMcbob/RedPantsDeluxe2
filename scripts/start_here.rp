@@ -1,0 +1,19 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+
+|START:0|
+deactivate ROOT
+
+if isframe MAIN
+   activate MAIN
+   makezoom MAIN 0 0
+   resizeframe MAIN 0 0 1152 640
+   break
+   focus MAIN dragon0
+endif
+
+
+set player10 state OFF
+
+makeframe MAIN WORLD? 0 0 1152 640
+goodbye

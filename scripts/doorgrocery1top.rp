@@ -1,0 +1,40 @@
+DOOR|0,0,0,0|False|
+START:0 door0 8,0
+DOOR:0 door0 8,0
+
+|START:0|
+set self state DOOR
+set self destination grocery1
+set self partner doorgrocery30
+
+|DOOR:0|
+set self frame 0
+
+|COLLIDE|
+if self.state == EMPTY
+   break
+endif
+if self.door_key
+   create upicon0 upicon related.x related.y - 32
+   if self.door_key + _DOWN in inpEVENTS
+      move self related.destination
+      view self.frame_name related.destination
+
+      set self calcx related.x - self.x
+      set self calcy related.y - self.y
+
+      set self x related.partner.x - self.calcx
+      set self y related.partner.y - self.calcy
+      if self.lakitu
+         move self.lakitu related.destination
+         set self.lakitu x self.x
+         set self.lakitu y self.y
+      endif
+      set self tangible 0
+      set self emptyto self.state
+      set self state EMPTY
+      remove inpEVENTS self.door_key + _DOWN
+   endif
+endif
+
+
