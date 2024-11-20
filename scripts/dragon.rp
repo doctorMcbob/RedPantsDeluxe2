@@ -129,6 +129,7 @@ if self.HP == 0
    set self physics 0
    set self state DONE
    set dragonresetmanager0 state DONE
+   create goldcoindragon0 dragonsgoldcoin self.x self.y
    break
 endif
 set self counter 0
