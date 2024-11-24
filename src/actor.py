@@ -237,6 +237,10 @@ class Actor(Rect):
                             tileset = cmd[3]
                         self.tileset = tileset
         # </bullshit>
+        # this line is weird too, its because -1 is used in the C implementation
+        # as 0 could still be a string key...
+        if self.tileset == -1: self.tileset = 0
+
         if self.platform and self.tileset or tileset:
             tile_map = sprites.get_tile_map(self.tileset)
             surf = Surface((self.w, self.h))

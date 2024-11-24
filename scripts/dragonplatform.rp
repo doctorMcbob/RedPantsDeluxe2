@@ -60,7 +60,7 @@ WARN22 dragonplatwarning22 0,0
 |START:0|
 set self platform 1
 set self state OFF
-set self tileset 0
+set self tileset -1
 set self frame 0
 set self target dragon0
 set self spawn_distance 512
@@ -110,7 +110,7 @@ endif
 
 |DESPAWN:8|
 set self state OFF
-set self tileset 0
+set self tileset -1
 
 |calculateDist|
 set self dist 0

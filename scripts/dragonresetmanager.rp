@@ -20,5 +20,6 @@ if inworld player20
    endif
 endif
 set dragon0 state RESET
+set dgn_wait_and_down_once0 state WAIT
 #set dgn_countdown_spawnpl0 state RESET
 
