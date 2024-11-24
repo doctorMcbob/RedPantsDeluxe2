@@ -582,6 +582,7 @@ def load_game():
     boxes.swap_in(hitboxes=HITBOXES, hurtboxes=HURTBOXES)
 
 def draw(G):
+    mpos = pygame.mouse.get_pos()
     CX, CY = SCROLLER["CX"], SCROLLER["CY"]
     frame = frames.get_frame("EDITOR_VIEW")
     frame.scroll_x = CX
@@ -596,9 +597,18 @@ def draw(G):
         Rect((G["SCREEN"].get_width()/2-576, G["SCREEN"].get_height()/2-320), (1152, 640)),
         width=1
     )
-
+    if SELECTED_TEMPLATE is not None:
+        # I need to get the actors START:0 sprite and display it on the mpos
+        spritekey = TEMPLATES[SELECTED_TEMPLATE]["sprites"]
+        sprite_map = sprites.get_sprite_map(spritekey)
+        if sprite_map and "START:0" in sprite_map:
+            sprite = sprites.get_sprite(sprite_map["START:0"])
+            offset = sprites.get_offset(spritekey, sprite_map["START:0"])
+            if CURSOR["CORNER"] is None:
+                G["SCREEN"].blit(sprite, (mpos[0] + offset[0], mpos[1] + offset[1]))
+            else:
+                G["SCREEN"].blit(sprite, (CURSOR["REAL"][0] + offset[0], CURSOR["REAL"][1] + offset[1]))
     if CURSOR["CORNER"] is not None:
-        mpos = pygame.mouse.get_pos()
         rect = make_rect(
             (
                 (CURSOR["CORNER"][0] - SCROLLER["CX"]) // 16*16,
@@ -790,6 +800,7 @@ def update_cursor_events(G, e):
             else:
                 CURSOR["SELECTED"] = []
                 if CURSOR["CORNER"] is None:
+                    CURSOR["REAL"] = mpos
                     CURSOR["CORNER"] = (
                         mpos[0] // 16 * 16 + SCROLLER["CX"],
                         mpos[1] // 16 * 16 + SCROLLER["CY"]
@@ -858,6 +869,17 @@ def update_cursor_events(G, e):
                             mpos[1] // 16 * 16 + SCROLLER["CY"] - 32
                         ),
                         CURSOR["CORNER"])
+                    mods = pygame.key.get_mods()
+                    if not mods & KMOD_SHIFT:
+                        CURSOR["SELECTED"] = list(
+                            filter(
+                                lambda actor: not (
+                                    "locked" in ACTORS[actor]
+                                    and ACTORS[actor]["locked"]
+                                ), CURSOR["SELECTED"]
+                            )
+                        )
+
                 CURSOR["CORNER"] = None
 
 def create_new_world(name):
@@ -899,11 +921,25 @@ def run(G):
             0,
             G["HEADER"].theme["MENU_TXT"]
         )
+
+        world_text = G["HEL32"].render(
+            f"World: {G['WORLD']}",
+            0,
+            G["HEADER"].theme["MENU_TXT"]
+        )
         
         G["SCREEN"].blit(
             template_text,
             (
                 G["SCREEN"].get_width() - template_text.get_width(),
+                0
+            )
+        )
+        
+        G["SCREEN"].blit(
+            world_text,
+            (
+                G["SCREEN"].get_width() - template_text.get_width() - 64 - world_text.get_width(),
                 0
             )
         )

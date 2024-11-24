@@ -2,13 +2,4 @@ PLAYER1|128,256,32,64|False|
 START:0 empty -16,0
 
 |START:0|
-if isframe MAIN3
-   set self _input_name PLAYER3
-   focus MAIN3 self
-   set self frame_name MAIN3
-   rebrand redpantsguy
-   set self tangible 1
-   set self respawnx self.x
-   set self respawny self.y
-   set self respawnworld WORLD?
-endif
+rebrand puppetredpants

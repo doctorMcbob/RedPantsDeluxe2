@@ -6,6 +6,14 @@ FLY:0 dragonfly0 -128,-128
 FLY:6 dragonfly1 -128,-128
 FLY:14 dragonfly2 -128,-128
 FLY:20 dragonfly3 -128,-128
+POSTHIT:0 dragonfly0 -128,-128
+POSTHIT:6 dragonfly1 -128,-128
+POSTHIT:14 dragonfly2 -128,-128
+POSTHIT:20 dragonfly3 -128,-128
+DONE:0 dragonfly0 -128,-128
+DONE:6 dragonfly1 -128,-128
+DONE:14 dragonfly2 -128,-128
+DONE:20 dragonfly3 -128,-128
 RESET:0 empty 0,0
 SHOOT_DOWN:0 dragonblastlow0 -128,-128
 SHOOT_DOWN:12 dragonblastlow1 -128,-128
@@ -17,6 +25,14 @@ SHOOT:12 dragonblast1 -128,-128
 SHOOT:18 dragonblast2 -128,-128
 SHOOT:106 dragonblast1 -128,-128
 SHOOT:112 dragonblast0 -128,-128
+HITSTUN:0 dragonhit1 -128,-128
+HITSTUN:2 dragonhit0 -128,-128
+HITSTUN:4 dragonhit1 -128,-128
+HITSTUN:6 dragonhit0 -128,-128
+HITSTUN:8 dragonhit1 -128,-128
+HITSTUN:10 dragonhit0 -128,-128
+HITSTUN:12 dragonhit1 -128,-128
+HITSTUN:14 dragonhit0 -128,-128
 
 |START:0|
 set self orig_x self.x
@@ -32,6 +48,9 @@ set self firenumber 0
 set self firenmax 3
 back
 set self background 1
+hitboxes dragon
+hurtboxes dragon
+set self HP 4
 
 |SHOOT_DOWN:18|
 set self fireball self.name + fireball + self.firenumber
@@ -75,7 +94,21 @@ set self state FLY
 set self frame 0
 set self y_vel 0 - self.speed
 
+|POSTHIT:28|
+set self frame 0
+if self.counter == 3
+   set self state FLY
+endif
+set self counter self.counter + 1
+
 |FLY:28|
+set self frame 0
+
+|DONE:0|
+set self y self.y - self.speed
+
+|DONE:28|
+exec DONE:0
 set self frame 0
 
 |COLLIDE|
@@ -86,3 +119,19 @@ if related.state == SLEEP
    set related state AWAKE
    set related frame 0
 endif
+
+|HITSTUN:0|
+set self direction -1
+
+|HITSTUN:24|
+set self HP self.HP - 1
+if self.HP == 0
+   set self physics 0
+   set self state DONE
+   set dragonresetmanager0 state DONE
+   create goldcoindragon0 dragonsgoldcoin self.x self.y
+   break
+endif
+set self counter 0
+set self state POSTHIT
+set self frame 0

@@ -5,7 +5,7 @@ DOOR:0 door0 0,0
 |START:0|
 set self state DOOR
 set self destination city0
-set self partner doorgrocery01
+set self partner doorgrocerytop0
 
 |DOOR:0|
 set self frame 0
@@ -21,7 +21,7 @@ if self.door_key
       view self.frame_name related.destination
 
       set self calcx related.x - self.x
-      set self calcy related.y - self.y
+      set self calcy related.y - self.y + 1
 
       set self x related.partner.x - self.calcx
       set self y related.partner.y - self.calcy

@@ -16,6 +16,9 @@ set self state WAIT
 
 |COLLIDE|
 if self.name == dragon0
+   if self.state == DONE
+       break
+   endif
    if related.state == WAIT
       set self x_vel 0
       set self y_vel 0
