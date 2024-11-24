@@ -8,15 +8,17 @@ set self state WAITING
 
 |WAITING:0|
 if inworld player10
-   break
+   set self check player10.state != DEAD 
+   if player10.frame != 45 or self.check
+      break
+   endif
 endif
 if inworld player20
-   break
-endif
-if inworld player11
-   break
+   set self check player20.state != DEAD
+   if player20.frame != 45 or self.check
+      break
+   endif
 endif
 set dragon0 state RESET
 #set dgn_countdown_spawnpl0 state RESET
-
 
