@@ -1,0 +1,19 @@
+COIN|0,0,0,0|False|
+START:0 gcdragon 0,0
+WAIT:0 empty 0,0
+COIN:0 gcdragon 0,0
+COIN:4 gcside 0,0
+COIN:8 gcback 0,0
+COIN:12 gcside 0,0
+
+|START:0|
+set self state WAIT
+set self frame 0
+set self collected 0
+
+|COIN:0|
+#wait...
+
+|COIN:16|
+set self frame 0
+exec COIN:0

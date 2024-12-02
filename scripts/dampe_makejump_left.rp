@@ -9,6 +9,6 @@ if self.name == dampe0 and self.can_jump
    set self can_jump 0
    set self state JUMPSQUAT
    set self frame 0
-   set self jumpxv -7
-   set self jumpyv -10
+   set self jumpxv -9
+   set self jumpyv -14
 endif

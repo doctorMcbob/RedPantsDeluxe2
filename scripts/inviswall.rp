@@ -6,6 +6,7 @@ WALL:0 empty 0,0
 set self state WALL
 set self frame 0
 set self tangible 1
+set self platform 1
 
 |WALL:0|
 set self frame 0
