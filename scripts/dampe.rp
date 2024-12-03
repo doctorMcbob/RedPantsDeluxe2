@@ -28,6 +28,7 @@ set self can_jump 1
 hurtboxes dampe
 set self jmpvel -8
 
+
 |IDLE:0|
 set self x_vel 0
 exec applyGrav
