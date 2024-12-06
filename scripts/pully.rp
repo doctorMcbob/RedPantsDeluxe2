@@ -64,6 +64,7 @@ set self frame 0
 |COLLIDE|
 set self calc self.dangle_from != related.name
 set self calc self.state != DANGLE and self.calc
+set self calc not self.on_fire and self.calc
 if player in self.name and self.calc
    if related.y + related.h - 48 < self.y
       set self state DANGLE

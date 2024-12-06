@@ -24,6 +24,7 @@ set self physics 1
 set self mode STAND
 set self speed 9
 set self buffer 0
+#focus ROOT self
 
 |STAND:0|
 set self frame 0
@@ -42,7 +43,6 @@ set self frame 0
 set self x_vel self.speed * self.direction
 if self.state != self.mode
    set self state self.mode
-   set self frame 0
 endif
 exec checkAir
 exec applyGrav
@@ -55,21 +55,10 @@ exec RUN:0
 |JUMP:0|
 exec applyGrav
 
-|LAND:0|
-# pass
-
-|LAND:8|
-set self frame 0
-set self buffer 0
-set self state self.mode
-exec checkAir
-exec applyGrav
-
 |YCOLLISION|
 if self.state == JUMP
    set self buffer 0
-   set self state LAND
-   set self frame 0
+   set self state self.mode
 endif
 
 |applyGrav|

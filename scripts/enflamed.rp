@@ -64,6 +64,7 @@ set self width 32
 set self height 64
 set self door_key UP
 set self bloodmax 10
+set self on_fire 1
 
 |FLAMING:16|
 set self state FIRERUN
@@ -110,6 +111,7 @@ set self y_vel 0
 |DEFLAME:12|
 set self hat 0
 rebrand self.base
+set self on_fire 0
 
 |JUMPSQUAT:0|
 exec applyGrav

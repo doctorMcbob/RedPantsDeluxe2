@@ -51,7 +51,7 @@ if self.messageidx == self.messagecap
    set raceflag0 state RACE
    if shadow0.buffer == 0
       set shadow0 mode RUN
-      set shadow0 direction 1
+      set shadow0 direction -1
       set shadow0 state RUN
       set shadow0 buffer shadow0.buffer + 1
    endif
@@ -79,7 +79,7 @@ endif
 
 |COLLIDE|
 if related.state == LOOK
-   if shadow in self.name
+   if shadow0 == self.name
       if self.buffer == 0
       	 set self mode STAND
 	 set self x_vel 0

@@ -14,7 +14,7 @@ if isframe ROOT
    set self lakitu testlakitu
    create lakitu0 self.lakitu self.x self.y
    set self.lakitu follow self.name
-   focus ROOT self.lakitu
+   #focus ROOT self.lakitu
    view ROOT WORLD?
    set self.lakitu _input_name PLAYER1
 endif
