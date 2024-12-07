@@ -42,11 +42,11 @@ if self.direction == -1
    endif
 endif
 
-|WANDER:30|
+|WANDER:40|
 set self state SHOOT
 set self frame 0
 
-|SHOOT:5|
+|SHOOT:10|
 set self bulletname  self.name + bullet + self.bulletnumber
 create robotbullet0 self.bulletname self.w / 2 + self.x  self.y + 32
 set self.bulletname creatorname self.name
@@ -56,10 +56,10 @@ if self.bulletnumber == self.bulletmax
     set self bulletnumber 0
 endif
 
-|SHOOT:6|
+|SHOOT:11|
 # pass
 
-|SHOOT:10|
+|SHOOT:15|
 set self state WANDER
 set self frame 0
 

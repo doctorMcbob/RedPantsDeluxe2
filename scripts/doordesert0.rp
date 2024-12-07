@@ -4,11 +4,12 @@ DOOR:0 door0 0,0
 
 |START:0|
 set self state DOOR
-set self destination pizzapetes
-set self partner doordesert00
+set self destination desert0
+set self partner doorpizzapetes0
 
 |DOOR:0|
 set self frame 0
+
 
 |COLLIDE|
 if self.state == EMPTY

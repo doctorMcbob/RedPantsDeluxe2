@@ -5,6 +5,7 @@ WALL:0 empty 0,0
 |START:0|
 set self state WALL
 set self frame 0
+set self tangible 1
 
 |WALL:0|
 set self frame 0
