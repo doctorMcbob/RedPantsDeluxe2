@@ -19,32 +19,37 @@ set self frame 0
 set self frame 0
 
 |COLLIDE|
+if self.state == EMPTY
+   break
+endif
 if self.door_key
    if related.state == ON
       create upicon0 upicon related.x related.y - 32
       if self.door_key + _DOWN in inpEVENTS
-	 move self related.destination
-      	 view self.frame_name related.destination
+          move self related.destination
+      	  view self.frame_name related.destination
 
-	 set self calcx related.x - self.x
-	 set self calcy related.y - self.y
+          set self calcx related.x - self.x
+          set self calcy related.y - self.y
 
-	 set self x warpdesertfrom0.x - self.calcx
-	 set self y warpdesertfrom0.y - self.calcy
-         if self.lakitu
-            move self.lakitu related.destination
-            set self.lakitu x self.x
-            set self.lakitu y self.y
-         endif
-
-	 set self respawnx self.x
-      	 set self respawny self.y
-      	 remove inpEVENTS self.door_key + _DOWN
+          set self x warphomefrom0.x - self.calcx
+          set self y warphomefrom0.y - self.calcy
+          if self.lakitu
+             move self.lakitu related.destination
+             set self.lakitu x self.x
+             set self.lakitu y self.y
+          endif
+          set self respawnx self.x
+          set self respawny self.y
+	  set self tangible 0
+          set self emptyto self.state
+	  set self state EMPTY
+      	  remove inpEVENTS self.door_key + _DOWN
       endif
    endif
    if related.state == OFF
       set related state ON
-      set warpdesertfrom0 state ON
+      set warphomefrom0 state ON
    endif
 endif
 
