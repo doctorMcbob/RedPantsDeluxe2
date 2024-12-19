@@ -23,6 +23,9 @@ set self.next head self.name
 set self timer 2
 set self timermax self.timer
 hitboxes baselisk
+#if self.name == baseliskhead0
+#   focus ROOT self.name
+#endif
 
 |L:6|
 set self frame 0
