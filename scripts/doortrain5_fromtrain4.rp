@@ -5,7 +5,7 @@ DOOR:0 door0 0,0
 |START:0|
 set self state DOOR
 set self destination trainride5
-set self partner doorswamp20
+set self partner doortrain4_fromtrain50
 
 |DOOR:0|
 set self frame 0

@@ -8,6 +8,7 @@
 # Procedurally generated files
 *data.c
 *data.h
+c_src/spritesheets.c
 
 # misc
 *.txt

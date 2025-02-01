@@ -4,8 +4,8 @@ DOOR:0 door0 0,0
 
 |START:0|
 set self state DOOR
-set self destination trainride5
-set self partner doorswamp20
+set self destination desert0
+set self partner doortrain00
 
 |DOOR:0|
 set self frame 0
@@ -36,4 +36,3 @@ if self.door_key
       remove inpEVENTS self.door_key + _DOWN
    endif
 endif
-
