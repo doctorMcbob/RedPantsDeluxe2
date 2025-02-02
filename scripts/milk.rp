@@ -14,6 +14,7 @@ if self.w != 32
 endif
 if player in self.name
    if self.hat != milk
+      set self on_fire 0
       rebrand bloated
       set self hat milk
    endif

@@ -1,11 +1,11 @@
 DOOR|0,0,0,0|False|
-START:0 door0 0,0
-DOOR:0 door0 0,0
+START:0 door0 8,0
+DOOR:0 door0 8,0
 
 |START:0|
 set self state DOOR
-set self destination elfshop
-set self partner doorswamp00
+set self destination city0
+set self partner doordojo0fromcity00
 
 |DOOR:0|
 set self frame 0
@@ -23,12 +23,6 @@ if self.door_key
       set self calcx related.x - self.x
       set self calcy related.y - self.y
 
-      # why does this have to be here @.x
-      set self y_vel 0
-      # seems like gravity is happening after going through the door..?
-      # locking the player in the ground as EMPTY intangible...
-      # maybe it has to do with the order of the worlds?
-      
       set self x related.partner.x - self.calcx
       set self y related.partner.y - self.calcy
       if self.lakitu

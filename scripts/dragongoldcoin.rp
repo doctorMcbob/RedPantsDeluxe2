@@ -1,6 +1,7 @@
 SHOW|0,0,0,0|False|
 START:0 empty 0,0
 WAIT:0 empty 0,0
+DONE:0 gcdragon 0,0
 COIN:0 gcdragon 0,0
 COIN:4 gcside 0,0
 COIN:8 gcback 0,0
@@ -37,3 +38,4 @@ if isframe MAIN2
    view MAIN2 self.return2
    focus MAIN2 player10.lakitu
 endif
+set self state DONE

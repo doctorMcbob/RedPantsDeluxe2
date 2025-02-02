@@ -22,6 +22,7 @@ endif
 if player in self.name
    if self.hat != fighter
       if related.state == HAT
+         set self on_fire 0
          rebrand fighter
          set self hat fighter
       endif

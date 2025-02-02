@@ -73,7 +73,6 @@ set self state IDLE
 set self frame 0
 exec respawn
 
-
 |DANGLE:0|
 if self.dangle_from
    set self x_vel 0

@@ -12,13 +12,11 @@ exec p2update
 
 |p1update|
 set self check exists player10
-set self check2 exists player11
-if not self.check nor self.check2
+if not self.check
    break
 endif
 set self check self.name collideswith player10
-set self check2 self.name collideswith player11
-if not self.check nor self.check2
+if not self.check
    break
 endif
 if isframe MAIN

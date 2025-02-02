@@ -903,12 +903,10 @@ def actors_in_rect(G, pos1, pos2):
 def run(G):
     global SELECTED_TEMPLATE
     # # MIGRATIONS :O
-    # for name in ACTORS:
-    #     template = ACTORS.get(name)
-    #     newTemplate = actor.Actor(template).as_template()
-    #     ACTORS[name] = newTemplate
-
+    # for name in WORLDS["swamp2"]["actors"]:
+    #     ACTORS[name]["POS"] = (ACTORS[name]["POS"][0] + 18720, ACTORS[name]["POS"][1] - 10672)
     # save()
+    # load_game()
     
     while True:
         draw(G)
