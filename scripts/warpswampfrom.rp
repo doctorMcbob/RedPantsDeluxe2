@@ -29,9 +29,9 @@ if self.door_key
 	 set self calcx related.x - self.x
 	 set self calcy related.y - self.y
 
-	 set self x warpswamp0.x - self.calcx
-	 set self y warpswamp0.y - self.calcy
-         if self.lakitu
+	 set self x related.partner.x - self.calcx
+	 set self y related.partner.y - self.calcy
+	 if self.lakitu
             move self.lakitu related.destination
             set self.lakitu x self.x
             set self.lakitu y self.y
