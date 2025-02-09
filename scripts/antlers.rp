@@ -99,8 +99,6 @@ set self flyupbuffer 4
 set self door_key UP
 
 set self can_die 1
-set self respawnx self.x
-set self respawny self.y
 
 set self flyangle 0
 set self rotation 0
