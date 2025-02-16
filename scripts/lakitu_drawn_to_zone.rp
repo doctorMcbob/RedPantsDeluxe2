@@ -1,0 +1,45 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+
+|START:0|
+set self number ""
+for char self.name
+    set self calc char in lakitu_drawn_to_zone
+    if not self.calc
+       set self number self.number + char
+    endif
+endfor
+set self partner lakitu_drawn_to + self.number
+set self tracking []
+set self state WAIT
+
+|WAIT:0|
+set self next_tracking []
+for actor self.tracking
+   if not actor.lakitu
+      break
+   endif
+   set self check self.name collideswith actor
+   if self.check
+      add self.next_tracking actor
+   endif
+   if not self.check
+      set actor.lakitu state FOLLOW
+      set actor.lakitu drawn 0
+   endif
+endfor
+set self tracking self.next_tracking
+
+|COLLIDE|
+if not self.lakitu
+   break
+endif
+if self.lakitu.state == DRAWN
+   break
+endif
+
+set self.lakitu state DRAWN
+set self.lakitu drawn related.partner
+
+add related.tracking self.name

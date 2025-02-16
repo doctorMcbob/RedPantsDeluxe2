@@ -1,3 +1,6 @@
+"""
+Yeah, you know we buildin' shit now
+"""
 from src.lib.SCRIPTS import SCRIPTS
 from src.lib.WORLDS import WORLDS
 from src.lib import ACTORS
@@ -151,15 +154,17 @@ UNIQUE_FLOATS = []
 UNIQUE_STRINGS = []
 STRING_INDEXERS = {}
 
-def build(no_make=False, make_only=False, buffer=4000):
+def build(no_make=False, make_only=False, buffer=4000, no_img=False, no_audio=False):
     global ACTOR_BUFFER_SIZE, WORLD_ACTOR_SIZE
     if "--buffer" in sys.argv: ACTOR_BUFFER_SIZE = int(sys.argv[sys.argv.index("--buffer") + 1])
     else: ACTOR_BUFFER_SIZE = buffer
     if "--world" in sys.argv: WORLD_ACTOR_SIZE = int(sys.argv[sys.argv.index("--world") + 1])
     no_make = "-nm" in sys.argv or "--no-make" in sys.argv or no_make
     make_only = "-mo" in sys.argv or "--make-only" in sys.argv or make_only
-
-    if not no_make and not make_only:
+    no_img = "-ni" in sys.argv or "--no-img" in sys.argv or no_img
+    no_audio = "-na" in sys.argv or "--no-audio" in sys.argv or no_audio
+    
+    if not no_make and not make_only and not no_img and not no_audio:
         print(f"Running make clean from Makefile at {MAKEFILE_PATH}...")
         clean_result = subprocess.run(
             ['make', '-f', str(MAKEFILE_PATH), 'clean', f'C_DIR={str(C_PATH)}', f'BUILD_DIR={str(BUILD_TO)}'],
@@ -188,12 +193,14 @@ def build(no_make=False, make_only=False, buffer=4000):
         print("Building Actor Data...")
         make_actor_data()
         print("    ...Done")
-        print("Building Image data...")
-        make_image_data()
-        print("    ...Done")
-        print("Building Audio data...")
-        make_audio_data()
-        print("    ...Done")
+        if not no_img:
+            print("Building Image data...")
+            make_image_data()
+            print("    ...Done")
+        if not no_audio:
+            print("Building Audio data...")
+            make_audio_data()
+            print("    ...Done")
     else: print("Skipping to makefile")
 
     if not no_make:

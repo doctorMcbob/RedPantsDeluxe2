@@ -153,10 +153,12 @@ Actor *add_actor_from_templatekey(int templateKey, int name) {
     printf("Template %s not found\n", get_string(templateKey));
     return NULL;
   }
+
   if (DEEPEST_ACTOR >= NUM_ACTORS) {
     printf("Could not add actor %s from template %s because we ran out of space. Consider adding to buffer size.\n");
     return NULL;
   }
+
   copy_actor(&TEMPLATES[idx], &ACTORS[DEEPEST_ACTOR]);
   ACTORS[DEEPEST_ACTOR].name = name;
 
@@ -847,16 +849,7 @@ void draw_actor(SDL_Renderer *rend, Actor *actor, Frame *f) {
 }
 
 void free_actor(Actor *actor) {
-  Attribute *attr, *tmp;
-
-  HASH_ITER(hh, actor->attributes, attr, tmp) {
-    if (attr->type == LIST) {
-      remove_owner(attr->value.i);
-    }
-    HASH_DEL(actor->attributes, attr);
-    free(attr);
-  }
-
+  clear_actor_attributes(actor);
   int idx = value_for_key(actors_by_name, actor->name);
   actors_by_name = remove_from_tree(actors_by_name, actor->name);
   if (idx == --DEEPEST_ACTOR) {
@@ -870,6 +863,18 @@ void free_actor(Actor *actor) {
   // validate_actors();
 }
 
+void clear_actor_attributes(Actor *actor) {
+  Attribute *attr, *tmp;
+
+  HASH_ITER(hh, actor->attributes, attr, tmp) {
+    if (attr->type == LIST) {
+      remove_owner(attr->value.i);
+    }
+    HASH_DEL(actor->attributes, attr);
+    free(attr);
+  }
+}
+
 void validate_actors() {
   for (int i = 0; i < DEEPEST_ACTOR; i++) {
     int idx = value_for_key(actors_by_name, ACTORS[i].name);
@@ -878,6 +883,7 @@ void validate_actors() {
              get_string(ACTORS[i].name), i, idx, DEEPEST_ACTOR);
       printTreeMemState();
       printPreOrder(actors_by_name);
+      exit(1);
     }
   }
 }

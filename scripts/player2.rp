@@ -17,4 +17,3 @@ if isframe MAIN2
    set self.lakitu _input_name PLAYER2
    break
 endif
-rebrand puppetredpants

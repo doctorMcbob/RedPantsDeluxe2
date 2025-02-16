@@ -1,11 +1,46 @@
 MGMT|0,0,0,0|False|
 START:0 empty 0,0
 FOLLOW:0 empty 0,0
+DRAWN:0 empty 0,0
 
 |START:0|
 set self follow 0
-set self max_dist 256
+set self max_dist 512
 set self state FOLLOW
+
+|DRAWN:0|
+if not self.drawn
+   break
+endif
+set self check inworld self.drawn
+if not self.check
+   set self state FOLLOW
+endif
+
+# calculate the difference between the follow and the drawn
+set self x_diff self.follow.x + self.follow.x_vel - self.drawn.x
+set self y_diff self.follow.y + self.follow.y_vel - self.drawn.y
+# gimme halfa that
+set self x_diff self.x_diff / 2
+set self y_diff self.y_diff / 2
+# drawn plus that vector, ya dig?
+set self x_diff self.drawn.x + self.x_diff - self.x
+set self y_diff self.drawn.y + self.y_diff - self.y
+
+if self._input_name
+    if inpUP
+        set self y_diff self.y_diff - 64
+    endif
+    if inpDOWN
+        set self y_diff self.y_diff + 64
+    endif
+endif
+
+set self x_v self.x_diff / 9
+set self y_v self.y_diff / 7
+
+set self x self.x + self.x_v
+set self y self.y + self.y_v
 
 |FOLLOW:0|
 if self.follow == 0
@@ -34,6 +69,7 @@ set self x_v self.x_diff / 9
 set self y_v self.y_diff / 7
 
 if abs self.x_diff > self.max_dist
+    print "Yoh"
     set self x self.follow.x
     set self y self.follow.y
 endif

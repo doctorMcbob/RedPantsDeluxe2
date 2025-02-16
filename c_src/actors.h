@@ -88,6 +88,7 @@ void actors_reset_updated();
 int find_script_from_map(Actor* actor, int scriptName, int scriptFrame);
 void pop_from_script_map(Actor* actor, int scriptName, int scriptFrame);
 void free_actor(Actor* actor);
+void clear_actor_attributes(Actor* actor);
 BoxMapEntry* get_hurtboxes_for_actor(Actor* actor);
 BoxMapEntry* get_hitboxes_for_actor(Actor* actor);
 int hit_check(Actor *self,

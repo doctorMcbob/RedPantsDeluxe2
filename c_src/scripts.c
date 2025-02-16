@@ -15,6 +15,7 @@
 #include "stringmachine.h"
 #include "utlist.h"
 #include "worlds.h"
+#include "tree.h"
 #ifndef STRING_DATA_LOAD
 #include "stringdata.h"
 #endif
@@ -3376,17 +3377,23 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 
       Actor *a;
       a = get_actor(nameValue);
+      // Actor with that name value already exists?
       if (a != NULL) {
         remove_actor_from_worlds(a->name);
-        remove_actor_from_frames(a->name);
-        free_actor(a);
-        clear_ownerless_lists();
+	remove_actor_from_frames(a->name);
+	clear_actor_attributes(a);
+	clear_ownerless_lists();
+
+	Actor* template = get_template(templateNameValue);
+	copy_actor(template, a);
+	a->name = nameValue;
+      } else {
+	a = add_actor_from_templatekey(templateNameValue, nameValue);
       }
 
-      a = add_actor_from_templatekey(templateNameValue, nameValue);
       a->ECB.x = xValue;
       a->ECB.y = yValue;
-
+      
       add_actor_to_world(world->name, nameValue);
 
       int script = get_script_for_actor(a);
@@ -3398,7 +3405,8 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 	  return resolution;
 	}
       }
-
+      // Remove this line before release pls rmember :(
+      validate_actors();
       a->updated = 1;
       break;
     }

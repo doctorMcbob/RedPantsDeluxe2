@@ -32,8 +32,8 @@ if self.door_key
           set self calcx related.x - self.x
           set self calcy related.y - self.y
 
-          set self x warphomefrom0.x - self.calcx
-          set self y warphomefrom0.y - self.calcy
+          set self x related.partner.x - self.calcx
+          set self y related.partner.y - self.calcy
           if self.lakitu
              move self.lakitu related.destination
              set self.lakitu x self.x
@@ -49,7 +49,7 @@ if self.door_key
    endif
    if related.state == OFF
       set related state ON
-      set warphomefrom0 state ON
+      set related.partner state ON
    endif
 endif
 
