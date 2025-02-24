@@ -1,0 +1,14 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+
+|COLLIDE|
+if self.direction != 1
+   break
+endif
+if self.name == dampe0 and self.can_jump
+   set self can_jump 0
+   set self state JUMPSQUAT
+   set self frame 0
+   set self jumpxv 9
+   set self jumpyv -9
+endif

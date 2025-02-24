@@ -1,0 +1,115 @@
+DANCER|0,0,0,0|False|
+START:0 dancer10 -16,-16
+DANCE1:0 dancer10 -16,-16
+DANCE1:3 dancer11 -16,-16
+DANCE1:6 dancer12 -16,-16
+DANCE1:9 dancer13 -16,-16
+DANCE1:12 dancer14 -16,-16
+DANCE1:15 dancer15 -16,-16
+DANCE1:18 dancer16 -16,-16
+DANCE2:0 dancer17 -16,-16
+DANCE2:3 dancer18 -16,-16
+DANCE2:6 dancer19 -16,-16
+DANCE2:9 dancer110 -16,-16
+DANCE2:12 dancer111 -16,-16
+DANCE2:15 dancer112 -16,-16
+DANCE2:18 dancer113 -16,-16
+DANCE2:21 dancer114 -16,-16
+DANCE2:24 dancer115 -16,-16
+HITSTUN:0 dancer1bonk -16,-16
+BONK:0 dancer1bonk -16,-16
+GETUP:0 dancer1getup0 -16,-16
+GETUP:5 dancer1getup1 -16,-16
+GETUP:10 dancer1getup2 -16,-16
+
+|START:0|
+set self physics 1
+set self state DANCE1
+if RAND?
+   set self state DANCE2
+endif
+hitboxes dancer
+hurtboxes dancer
+set self traction 0.8 * -1
+set self grav 1
+
+|DANCE1:0|
+exec applyTraction
+exec checkAir
+exec applyGrav
+
+|DANCE1:21|
+exec applyTraction
+exec checkAir
+exec applyGrav
+if RAND?
+   set self direction self.direction * -1
+endif
+set self frame 0
+
+|DANCE2:0|
+exec applyTraction
+exec checkAir
+exec applyGrav
+
+|DANCE2:27|
+exec applyTraction
+exec checkAir
+exec applyGrav
+set self frame 0
+
+|BONK:0|
+exec applyGrav
+
+|GETUP:0|
+exec applyTraction
+exec checkAir
+exec applyGrav
+
+|GETUP:15|
+set self state DANCE1
+if RAND?
+   set self state DANCE2
+endif
+set self frame 0
+
+|HITSTUN:0|
+set self x_vel 0
+set self y_vel 0
+
+|HITSTUN:4|
+set self x_vel self.hit_x_vel 
+set self y_vel self.hit_y_vel
+set self x_vel RAND? * 1 + self.x_vel
+set self x_vel RAND? * 2 + self.x_vel
+set self x_vel RAND? * 1 + self.x_vel
+set self y_vel RAND? * 2 + self.hit_y_vel
+set self state BONK
+set self frame 0
+
+|YCOLLISION|
+if self.state == BONK
+   set self state GETUP
+   set self frame 0
+endif
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+
+|checkAir|
+if self.y_vel
+   set self state BONK
+endif
+
+|applyTraction|
+if self.x_vel != 0
+   if self.x_vel > 0
+      set self x_vel self.traction + self.x_vel
+   endif
+   if self.x_vel < 0
+      set self x_vel self.traction * -1 + self.x_vel
+   endif
+endif
+if abs self.x_vel / 1 == 0
+   set self x_vel 0
+endif
