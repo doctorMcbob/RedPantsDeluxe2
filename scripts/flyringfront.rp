@@ -1,5 +1,6 @@
 RING|0,0,0,0|False|
 START:0 ringleft0 0,0
+OFF:0 empty 0,0
 WAIT:0  ringleft0 0,0
 WAIT:3  ringleft1 0,0
 DONE:0  ringleft0 0,0
@@ -10,11 +11,11 @@ DONE:12 ringleft3 0,0
 
 |START:0|
 set self direction -1
-set self state WAIT
 set self number self.name at 12
 set self below flyringback + self.number
 set self number int self.number
 set self frame self.number % 7
+set self state OFF
 
 |WAIT:7|
 set self frame 0
