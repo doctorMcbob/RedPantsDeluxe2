@@ -32,5 +32,27 @@ if player in self.name
    if related.name in inv0.collected == 0
       add inv0.collected related.name
       set inv0 gcmoon 1
+      if isframe MAIN
+          scrollbound MAIN left None
+          scrollbound MAIN right None
+          scrollbound MAIN top None
+          scrollbound MAIN bottom None
+          set moongoldcoin0 return1 WORLD?
+          set player10 emptyto player10.state
+          set player10 state EMPTY
+          view MAIN fountain
+          focus MAIN moongoldcoin0
+      endif
+      if isframe MAIN2
+          scrollbound MAIN2 left None
+          scrollbound MAIN2 right None
+          scrollbound MAIN2 top None
+          scrollbound MAIN2 bottom None
+          set moongoldcoin0 return2 WORLD?
+          set player20 emptyto player20.state
+          set player20 state EMPTY
+          view MAIN2 fountain
+          focus MAIN2 moongoldcoin0
+      endif
    endif
 endif

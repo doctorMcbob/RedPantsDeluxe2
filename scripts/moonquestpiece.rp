@@ -47,7 +47,7 @@ exec onFind
 if exists self.nextlocation
    create moonmanpoof0 moonpooffrom self.location.x self.location.y
    set moonpooffrom rotation moonmanguy0.rotation
-   create moonmanpoof0 moonpoofto self.nextlocation.x self.nextlocation.y1
+   create moonmanpoof0 moonpoofto self.nextlocation.x self.nextlocation.y
    set moonpoofto rotation moonmanguy0.rotation + 90
    break
 endif

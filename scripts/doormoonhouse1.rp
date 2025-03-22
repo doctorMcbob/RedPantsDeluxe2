@@ -6,28 +6,40 @@ DOOR:0 door0 8,0
 set self state DOOR
 set self destination moonmanhouse1
 set self lock self.name + lockicon
+set self partner doormoonhouse0from10
 
 |DOOR:0|
 set self frame 0
 
 |COLLIDE|
+if self.state == EMPTY
+   break
+endif
 if self.door_key
    create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
       if inv0.moonhousebacklocked
-      	 create lockicon0 related.lock related.x + 24 related.y
+      	create lockicon0 related.lock related.x + 24 related.y
       endif
       if not inv0.moonhousebacklocked
-      	 move self related.destination
-                if self.lakitu
-         move self.lakitu related.destination
-         set self.lakitu x self.x
-         set self.lakitu y self.y
-         set self.lakitu state FOLLOW
-      endif
-      	 view self.frame_name related.destination
-
-      	 remove inpEVENTS self.door_key + _DOWN
+         move self related.destination
+         view self.frame_name related.destination
+         
+         set self calcx related.x - self.x
+         set self calcy related.y - self.y
+         
+         set self x related.partner.x - self.calcx
+         set self y related.partner.y - self.calcy
+         if self.lakitu
+            move self.lakitu related.destination
+            set self.lakitu x self.x
+            set self.lakitu y self.y
+            set self.lakitu state FOLLOW
+         endif
+         set self tangible 0
+         set self emptyto self.state
+         set self state EMPTY
+         remove inpEVENTS self.door_key + _DOWN
       endif
    endif
 endif

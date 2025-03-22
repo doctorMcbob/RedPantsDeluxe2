@@ -4,8 +4,9 @@ DOOR:0 door0 8,0
 
 |START:0|
 set self state DOOR
-set self destination moon0
-set self partner doormoonhouse00
+set self destination moonmanhouse0
+set self lock self.name + lockicon
+set self partner doormoonhouse10
 
 |DOOR:0|
 set self frame 0
@@ -19,10 +20,10 @@ if self.door_key
    if self.door_key + _DOWN in inpEVENTS
       move self related.destination
       view self.frame_name related.destination
-
+      
       set self calcx related.x - self.x
       set self calcy related.y - self.y
-
+      
       set self x related.partner.x - self.calcx
       set self y related.partner.y - self.calcy
       if self.lakitu
@@ -37,3 +38,4 @@ if self.door_key
       remove inpEVENTS self.door_key + _DOWN
    endif
 endif
+
