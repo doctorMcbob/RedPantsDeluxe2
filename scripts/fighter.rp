@@ -522,14 +522,13 @@ set self frame 0
 |WALLTOUCH:0|
 exec AIRIAL:0
 set self state AIRIAL
-#if not self.calc1 nor self.calc2
-   img fighterwalltouch
-   # bufferable pog?
-   if inpA
-      set self state WALLJUMP
-      set self frame 0
-   endif
+img fighterwalltouch
+# bufferable pog?
+if inpA
+   set self state WALLJUMP
+   set self frame 0
 endif
+
 
 |WALLJUMP:0|
 set self y_vel 0
@@ -750,7 +749,7 @@ set self calc1 self.state == SLIDEFLIP or self.calc1
 set self calc1 self.state == AIRIAL or self.calc1
 if self.frame > 4 and self.calc1
    set self state WALLTOUCH
-   set self frame 0
+   img fighterwalltouch
    if self.x_vel > 0
       set self direction 1
    endif

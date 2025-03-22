@@ -321,7 +321,7 @@ def make_text_entry_window(G, text, starting_text="",  on_entry=off):
     def text_entry_window_callback(G, window):
         window_base_update(G, window)
         if "TEXT" not in window:
-            window["TEXT"] = starting_text
+            window["TEXT"] = starting_text if starting_text is not None else ""
 
         rendered_text = G["HEL32"].render(
             text,

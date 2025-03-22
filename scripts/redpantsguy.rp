@@ -58,7 +58,7 @@ if self.dangle_from
    set self y_vel 0
    set self y self.dangle_from.y + self.dangle_from.h - 32
    set self x self.dangle_from.x
-
+   
    if A_DOWN in inpEVENTS
       set self state AIRIAL
       set self frame 0
@@ -108,7 +108,7 @@ set self dustnumber 0
 set self dustmax 10
 set self dustfreq 4
 set self dustcounter 0
-
+ 
 |makeDust|
 set self dustcounter self.dustcounter + 1
 if self.dustcounter > self.dustfreq

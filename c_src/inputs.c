@@ -143,7 +143,7 @@ void add_input_state(int name, int stick) {
     key_map->RIGHT = SDLK_RIGHT;
     key_map->DOWN = SDLK_DOWN;
 
-    key_map->START = SDLK_RETURN;
+    key_map->START = SDLK_ESCAPE;
 
     km->keymap = key_map;
     km->name = name;
@@ -196,11 +196,13 @@ int input_update() {
       case SDL_KEYDOWN: {
         if (event.key.repeat != 0)
           continue;
-        // remove this eventually
+        /* today's the day
+	// remove this eventually
         if (event.key.keysym.sym == SDLK_ESCAPE)
         {
           return -1;
         }
+	*/
         KeyHashNode *km, *tmp;
         HASH_ITER(hh, key_maps, km, tmp)
         {

@@ -7,11 +7,15 @@ OFF:0 empty 0,0
 
 |START:0|
 set self messages []
-add self.messages "ZOINKS"
+add self.messages "HIDE AND SEEK ME"
 add self.messages "GEE WONKLERS"
-add self.messages "WHOS WHATSTHA"
-add self.messages "DOINK"
-add self.messages "WELCOME IN"
+add self.messages "ZOINKS"
+add self.messages "BAH I SAY"
+add self.messages "FOOF"
+add self.messages "GYAHH"
+add self.messages "JUMBLIN JIMMINY  "
+add self.messages "AH RATS  "
+add self.messages "OKAY YOU GOT ME  ^WELCOME IN   "
 
 set self state OFF
 set self number ""
@@ -29,7 +33,6 @@ set self location moonquestlocation + self.number
 set self nextlocation moonquestlocation + self.calc
 if self.number == 0
    set self state LOOK
-   print "MOON MAN STATE " + moonmanguy0.state
    set moonmanguy0 x self.location.x
    set moonmanguy0 y self.location.y
 endif
@@ -42,14 +45,15 @@ exec onFind
 
 |FOUND:35|
 if exists self.nextlocation
-   create moonmanpoof0 moonpooffrom self.location.x - 32 self.location.y - 48
+   create moonmanpoof0 moonpooffrom self.location.x self.location.y
    set moonpooffrom rotation moonmanguy0.rotation
-   create moonmanpoof0 moonpoofto self.nextlocation.x - 32 self.nextlocation.y - 48
+   create moonmanpoof0 moonpoofto self.nextlocation.x self.nextlocation.y1
    set moonpoofto rotation moonmanguy0.rotation + 90
    break
 endif
 set inv0 moonhouselocked 0
 set moonmanguy0 state DANCE
+
 |FOUND:36|
 #pass
 

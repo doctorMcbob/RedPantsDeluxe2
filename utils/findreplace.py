@@ -10,10 +10,12 @@ SCRIPTS_LOCATION = "scripts/"
 
 #find = sys.argv[sys.argv.index("-f") + 1]
 #replace = sys.argv[sys.argv.index("-r") + 1]
-find = "set related state LAUNCHED"
-replace = """set related state LAUNCHED
-set related frame 0"""
-
+find = """set self.lakitu x self.x
+         set self.lakitu y self.y"""
+replace = """set self.lakitu x self.x
+         set self.lakitu y self.y
+         set self.lakitu state FOLLOW"""
+prefix = "door"
 if input(f"Find \"{find}\" and replace with \"{replace}\" ? (y/n): ") != "y": quit()
 
 filenames = []
@@ -25,6 +27,7 @@ for _, _, files in os.walk(SCRIPTS_LOCATION):
 print("found {} redpantsscript files".format(len(filenames)))
 for f in filenames:
     changed = False
+    if prefix and prefix not in f: continue
     with open(f, "r") as script:
         code = script.read()
 
