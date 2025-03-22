@@ -38,6 +38,16 @@ set self arcadeBlindWitch 0
 set self arcadeBlitzorb 0
 
 if self.cheater_mode
+   exec cheat
+endif
+
+
+|INV:0|
+if self.cheater_mode
+   set self cheater_mode 0
+   exec cheat
+endif
+|cheat|
    # CHEATER MODE
    set self scienceTR 1
    set self scienceTL 1
@@ -66,5 +76,3 @@ if self.cheater_mode
 
    set self coins 100
    set self bananas 100
-endif
-

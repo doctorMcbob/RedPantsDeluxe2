@@ -5,6 +5,7 @@ DOOR:0 door0 8,0
 |START:0|
 set self state DOOR
 set self destination rocket
+set self partner doorcity1fromrocket0
 set self lock self.name + lockicon
 
 |DOOR:0|
@@ -14,20 +15,28 @@ set self frame 0
 if self.door_key
    create upicon0 upicon related.x related.y - 32
    if self.door_key + _DOWN in inpEVENTS
-      set self calc inv0.scienceTR and inv0.scienceBR and self.calc and inv0.scienceTL and inv0.scienceBL
+      set self calc inv0.scienceTR and inv0.scienceBR and inv0.scienceTL and inv0.scienceBL
       if not self.calc
       	 create lockicon0 related.lock related.x + 24 related.y
+	 break
       endif
-      if self.calc
-      	 move self related.destination
-                if self.lakitu
+      move self related.destination
+      view self.frame_name related.destination
+
+      set self calcx related.x - self.x
+      set self calcy related.y - self.y
+
+      set self x related.partner.x - self.calcx
+      set self y related.partner.y - self.calcy
+      if self.lakitu
          move self.lakitu related.destination
          set self.lakitu x self.x
          set self.lakitu y self.y
+         set self.lakitu state FOLLOW
       endif
-      	 view self.frame_name related.destination
-      	 remove inpEVENTS self.door_key + _DOWN
-      endif
+      set self tangible 0
+      set self emptyto self.state
+      set self state EMPTY
+      remove inpEVENTS self.door_key + _DOWN
    endif
 endif
-

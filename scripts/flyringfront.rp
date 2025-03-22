@@ -1,11 +1,11 @@
 RING|0,0,0,0|False|
 START:0 ringleft0 0,0
-WAIT:0 ringleft0 0,0
-WAIT:3 ringleft1 0,0
-DONE:0 ringleft0 0,0
-DONE:3 ringleft1 0,0
-DONE:6 ringleft0 0,0
-DONE:9 ringleft2 0,0
+WAIT:0  ringleft0 0,0
+WAIT:3  ringleft1 0,0
+DONE:0  ringleft0 0,0
+DONE:3  ringleft1 0,0
+DONE:6  ringleft0 0,0
+DONE:9  ringleft2 0,0
 DONE:12 ringleft3 0,0
 
 |START:0|

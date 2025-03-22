@@ -1,3 +1,4 @@
+
 HITBOX|0,0,0,0|False|
 START:0 empty 0,0
 LOOK:0 empty 0,0
@@ -28,6 +29,7 @@ set self location moonquestlocation + self.number
 set self nextlocation moonquestlocation + self.calc
 if self.number == 0
    set self state LOOK
+   print "MOON MAN STATE " + moonmanguy0.state
    set moonmanguy0 x self.location.x
    set moonmanguy0 y self.location.y
 endif

@@ -30,6 +30,7 @@ if self.door_key
          move self.lakitu related.destination
          set self.lakitu x self.x
          set self.lakitu y self.y
+         set self.lakitu state FOLLOW
       endif
       set self tangible 0
       set self emptyto self.state

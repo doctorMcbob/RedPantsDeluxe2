@@ -14,9 +14,7 @@ set self backname self.name + back
 
 |SAY:0|
 if self.frame == 0 and self.back
-   print self.name + " creating " + self.backname
    create self.back self.backname self.x self.y
-   print "My name is " + self.name
    set self calc countof self.message "^"
    set self calc2 self.calc + 1
    set self backname self.name + back

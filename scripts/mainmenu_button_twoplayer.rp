@@ -76,6 +76,6 @@ if not self.c2
 endif
 
 makezoom MAIN2 1
-setzoom MAIN2 1.5
+setzoom MAIN2 1.4
 makezoom MAIN 1
-setzoom MAIN 1.5
+setzoom MAIN 1.4

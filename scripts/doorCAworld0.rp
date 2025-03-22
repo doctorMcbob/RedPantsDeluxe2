@@ -19,6 +19,7 @@ if self.door_key and self.calc
          move self.lakitu related.destination
          set self.lakitu x self.x
          set self.lakitu y self.y
+         set self.lakitu state FOLLOW
       endif
       view self.frame_name related.destination
 
