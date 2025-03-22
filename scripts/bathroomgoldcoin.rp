@@ -11,6 +11,7 @@ DONE:0 gcmilk 12,0
 
 |START:0|
 set self state WAIT
+set self orig_y self.y
 
 |WAIT:0|
 if inv0.gcmilk
