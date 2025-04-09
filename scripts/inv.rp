@@ -48,31 +48,38 @@ if self.cheater_mode
    exec cheat
 endif
 |cheat|
-   # CHEATER MODE
-   set self scienceTR 1
-   set self scienceTL 1
-   set self scienceBR 1
-   set self scienceBL 1
+# CHEATER MODE
+set self scienceTR 1
+set self scienceTL 1
+set self scienceBR 1
+set self scienceBL 1
 
-   set self fighter_unlock 1
-   set self antlers_unlock 1
-   set self shoes_unlock 1
-   set self moon_unlock 1
+set self fighter_unlock 1
+set self antlers_unlock 1
+set self shoes_unlock 1
+set self moon_unlock 1
 
-   set self breakroomlocked 0
-   set self moonhouselocked 0
-   set self moonhousebacklocked 0
-   set self workshoplocked 0
+set self breakroomlocked 0
+set self moonhouselocked 0
+set self moonhousebacklocked 0
+set self workshoplocked 0
 
-   set self gcmilk 1
-   set self gcpizza 1
-   set self gcdragon 1
-   set self gcwitch 1
-   set self gcmoon 1
-   set self gcsanta 1
+set self gcmilk 1
+set self gcpizza 1
+set self gcdragon 1
+set self gcwitch 1
+set self gcmoon 1
+set self gcsanta 1
 
-   set self arcadeBlindWitch 1
-   set self arcadeBlitzorb 1
+set dragongoldcoin0 state DONE
+set pizzagoldcoin0 state DONE
+set bathroomgoldcoin0 state DONE
+set witchgoldcoin0 state DONE
+set moongoldcoin0 state DONE
+set santagoldcoin0 state DONE
 
-   set self coins 100
-   set self bananas 100
+set self arcadeBlindWitch 1
+set self arcadeBlitzorb 1
+
+set self coins 100
+set self bananas 100

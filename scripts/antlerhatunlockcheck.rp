@@ -16,7 +16,6 @@ if self.do_check
    exec check
    set self do_check 0
 endif
-set self timer self.timer - 1
 
 |COLLIDE|
 if not self.lakitu

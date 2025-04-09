@@ -2,6 +2,7 @@ SHOW|0,0,0,0|False|
 START:0 empty 0,0
 WAIT:0 empty 0,0
 SHOW:0 gcwitch 10,3
+DONE:0 gcwitch 10,3
 
 |START:0|
 set self state WAIT

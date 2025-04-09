@@ -32,6 +32,9 @@ if player in self.name
    if related.name in inv0.collected == 0
       add inv0.collected related.name
       set inv0 gcdragon 1
+      if dragongoldcoin0.state == DONE
+         break
+      endif
       if isframe MAIN
           scrollbound MAIN left None
           scrollbound MAIN right None

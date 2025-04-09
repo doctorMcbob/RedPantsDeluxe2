@@ -30,12 +30,13 @@ set self frame 0
 exec COIN:0
 
 |SHOW:32|
+print "return1 : " + self.return1
 if isframe MAIN
    view MAIN self.return1
    focus MAIN player10.lakitu
 endif
 if isframe MAIN2
    view MAIN2 self.return2
-   focus MAIN2 player10.lakitu
+   focus MAIN2 player20.lakitu
 endif
 set self state DONE

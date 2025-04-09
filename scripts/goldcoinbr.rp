@@ -26,21 +26,26 @@ set self y self.y - 3
 
 |COLLECT:20|
 goodbye
+
 |COLLIDE|
 if player in self.name
    if related.name in inv0.collected == 0
       add inv0.collected related.name
       set inv0 gcmilk 1
+      if bathroomgoldcoin0.state == DONE
+         break
+      endif
       if isframe MAIN
-          scrollbound MAIN left None
-          scrollbound MAIN right None
-          scrollbound MAIN top None
-          scrollbound MAIN bottom None
-          set bathroomgoldcoin0 return1 WORLD?
-          set player10 emptyto player10.state
-          set player10 state EMPTY
-          view MAIN fountain
-          focus MAIN bathroomgoldcoin0
+         scrollbound MAIN left None
+         scrollbound MAIN right None
+         scrollbound MAIN top None
+         scrollbound MAIN bottom None
+         print "WORLD " + WORLD?
+         set bathroomgoldcoin0 return1 WORLD?
+         set player10 emptyto player10.state
+         set player10 state EMPTY
+         view MAIN fountain
+         focus MAIN bathroomgoldcoin0
       endif
       if isframe MAIN2
           scrollbound MAIN2 left None

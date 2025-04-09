@@ -1,0 +1,60 @@
+TEXT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+LAUNCHED:0 empty 0,0
+
+|START:0|
+set self frame 0
+set self state WAIT
+set self sayname self.name + say
+set self messages []
+add self.messages "ELFS EH      ^ WHAT A WORLD    "
+add self.messages "YOU CAN BUY A HAT HERE        ^ FOR 50 GOLD      "
+set self idx 0
+set self length 2
+set self post_messages []
+add self.post_messages "IF YOU CAN FLY THROUGH ALL    ^ OF THESE RINGS ILL LET YOU INTO^OUR WORKSHOP     "
+set self post_idx 0
+add self.post_messages "YOU MIGHT NOW LIKE IT BACK THERE"
+set self done_messages []
+add self.done_messages "OKAY GOOD JOB   ^YOU CAN GO IN NOW"
+add self.done_messages "FLY UP TO THE     ^ TOP LEFT OF THE SHOP"
+set self done_idx 0
+
+|WAIT:0|
+set self frame 0
+
+|LAUNCHED:160|
+set self state WAIT
+set self frame 0
+
+|COLLIDE|
+if not self.lakitu
+   break
+endif
+if related.state == WAIT
+   if raindeerquestmgr0.state == WAIT
+      create say0 related.sayname related.x + related.w - 32 related.y
+      set related.sayname message related.messages at related.idx
+      set related idx related.idx + 1 % related.length
+      set related.sayname back backgroundsayL0
+      set related state LAUNCHED
+      set related frame 0
+   endif
+   if raindeerquestmgr0.state == ACTIVE
+      create say0 related.sayname related.x + related.w - 32 related.y
+      set related.sayname message related.post_messages at related.post_idx
+      set related post_idx related.post_idx + 1 % related.length
+      set related.sayname back backgroundsayL0
+      set related state LAUNCHED
+      set related frame 0
+   endif
+   if raindeerquestmgr0.state == DONE
+      create say0 related.sayname related.x + related.w - 32 related.y
+      set related.sayname message related.done_messages at related.done_idx
+      set related done_idx related.done_idx + 1 % related.length
+      set related.sayname back backgroundsayL0
+      set related state LAUNCHED
+      set related frame 0
+   endif   
+endif

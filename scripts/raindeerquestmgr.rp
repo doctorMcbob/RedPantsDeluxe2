@@ -1,0 +1,35 @@
+MGMT|0,0,0,0|False|
+START:0 empty 0,0
+WAIT:0 empty 0,0
+ACTIVE:0 empty 0,0
+DONE:0 empty 0,0
+
+|START:0|
+set self state WAIT
+set self num_fly_rings 70
+
+|WAIT:0|
+if inv0.antlers_unlock
+   set self state ACTIVE
+   for num range self.num_fly_rings
+      set flyringback + num state WAIT   
+      set flyringfront + num state WAIT
+   endfor
+endif
+
+|WAIT:1|
+set self frame 1
+
+|ACTIVE:0|
+set self done  1
+for num range self.num_fly_rings
+   set self flyringcheck flyringback + num
+   if self.flyringcheck.state != DONE
+      set self done 0
+      # break here?
+   endif
+endfor
+if self.done
+   set inv0 workshoplocked 0
+   set self state DONE
+endif
