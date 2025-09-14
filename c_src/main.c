@@ -42,6 +42,7 @@ have been using for a long time in pygame.
 #define HIGH 640
 #define FPS_CAP 20
 
+extern int ACTOR_UPDATE_COUNTER;
 int WIDTH = WID;
 int HEIGHT = HIGH;
 
@@ -159,7 +160,8 @@ int main(int argc, char *argv[]) {
           return 0;
       }
     }
-    actors_reset_updated();
+    ACTOR_UPDATE_COUNTER++;
+    // actors_reset_updated();
     SDL_RenderClear(rend);
     HASH_ITER(hh, frames, f, tmpf) {
         if (f->active) {

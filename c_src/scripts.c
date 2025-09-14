@@ -23,6 +23,7 @@
 #include "benchmarks.h"
 #endif
 
+extern int ACTOR_UPDATE_COUNTER;
 extern int SCRIPT_MAPS[];
 ScriptMap *scriptmaps;
 int BUFFER[512];
@@ -3405,9 +3406,7 @@ int resolve_script(int scriptIdx, Actor *self, Actor *related, World *world,
 	  return resolution;
 	}
       }
-      // Remove this line before release pls rmember :(
-      validate_actors();
-      a->updated = 1;
+      a->updated = ACTOR_UPDATE_COUNTER;
       break;
     }
     case UPDATE: {

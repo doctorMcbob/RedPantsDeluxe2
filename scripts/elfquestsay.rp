@@ -15,7 +15,7 @@ set self length 2
 set self post_messages []
 add self.post_messages "IF YOU CAN FLY THROUGH ALL    ^ OF THESE RINGS ILL LET YOU INTO^OUR WORKSHOP     "
 set self post_idx 0
-add self.post_messages "YOU MIGHT NOW LIKE IT BACK THERE"
+add self.post_messages "YOU MIGHT NOT LIKE IT BACK THERE"
 set self done_messages []
 add self.done_messages "OKAY GOOD JOB   ^YOU CAN GO IN NOW"
 add self.done_messages "FLY UP TO THE     ^ TOP LEFT OF THE SHOP"

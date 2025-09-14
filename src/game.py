@@ -116,10 +116,10 @@ def run(G, noquit=False, cb=off, args=[], kwargs={}):
             printer.make_gif()
             printer.clear_em()
 
-        if "DEBUG" in G and G["DEBUG"]:
-            if any(["CONSOLEDEBUG" in inputs.get_state(state)["EVENTS"]
-                    for state in inputs.STATES]):
-                execute_console_command(G)
+            # if "DEBUG" in G and G["DEBUG"]:
+        if any(["CONSOLEDEBUG" in inputs.get_state(state)["EVENTS"]
+                for state in inputs.STATES]):
+            execute_console_command(G)
         
         G["CLOCK"].tick(30)
         cb(*args, **kwargs)

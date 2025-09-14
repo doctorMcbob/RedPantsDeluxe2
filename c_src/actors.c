@@ -24,7 +24,7 @@
 struct TreeNode *actors_by_name = NULL;
 struct TreeNode *templates_by_name = NULL;
 int DEEPEST_ACTOR = 0;
-
+int ACTOR_UPDATE_COUNTER = 1;
 Actor *get_actor(int name) {
   int idx = value_for_key(actors_by_name, name);
   if (idx < 0)
@@ -429,7 +429,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
   World *world = get_world(worldKey);
   if (!world)
     return 0;
-  if (actor->updated) {
+  if (actor->updated == ACTOR_UPDATE_COUNTER) {
     /*if ((actor->physics || actor->tangible) && world_has(world, actorKey)) {
       int resolution = collision_check(actor, world, debug);
       if (resolution < 0)
@@ -437,7 +437,7 @@ int update_actor(int actorKey, int worldKey, int debug) {
       }*/
     return 0;
   }
-  actor->updated = 1;
+  actor->updated = ACTOR_UPDATE_COUNTER;
   actor->img = -1;
   int scriptKey = get_script_for_actor(actor);
 
