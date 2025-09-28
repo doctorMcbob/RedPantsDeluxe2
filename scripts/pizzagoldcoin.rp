@@ -1,13 +1,40 @@
 SHOW|0,0,0,0|False|
 START:0 empty 0,0
 WAIT:0 empty 0,0
+COIN:0 gcpizza 0,0
+COIN:4 gcside 0,0
+COIN:8 gcback 0,0
+COIN:12 gcside 0,0
 SHOW:0 gcpizza 4,0
 DONE:0 gcpizza 4,0
 
 |START:0|
 set self state WAIT
+set self orig_y self.y
 
 |WAIT:0|
 if inv0.gcpizza
+   set self state COIN
+   set self y self.y - 256
+endif
+
+|COIN:0|
+set self y self.y + 4
+if self.y == self.orig_y
    set self state SHOW
 endif
+
+|COIN:16|
+set self frame 0
+exec COIN:0
+
+|SHOW:32|
+if isframe MAIN
+   view MAIN self.return1
+   focus MAIN player10.lakitu
+endif
+if isframe MAIN2
+   view MAIN2 self.return2
+   focus MAIN2 player20.lakitu
+endif
+set self state DONE

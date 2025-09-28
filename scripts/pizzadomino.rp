@@ -17,6 +17,7 @@ set self timer self.timermax
 set self moveleft 0
 set self moveright 0
 set self swap 0
+set self rot 0
 
 |PLACE:0|
 set self tangible 1
@@ -71,23 +72,62 @@ if self.movedown
    set self timer self.timermax
 endif
 if self.swap
-   set self temp self.L
-   set self L self.R
-   set self R self.temp
-   set self temp self.leftpiece
-   set self leftpiece self.rightpiece
-   set self rightpiece self.temp
+   set self rot self.rot + 1
+   if self.rot % 2 == 0
+      set self origy self.y
+      set self origw self.w
+      set self origh self.h
+      set self w 128
+      set self h 64
+      if COLLIDE?
+         set self rot self.rot - 1
+         set self y self.origy
+         set self w self.origw
+         set self h self.origh
+      endif
+
+      set self temp self.L
+      set self L self.R
+      set self R self.temp
+      set self temp self.leftpiece
+      set self leftpiece self.rightpiece
+      set self rightpiece self.temp
+   endif
+   if self.rot % 2 == 1
+      set self origy self.y
+      set self origw self.w
+      set self origh self.h
+      set self w 64
+      set self h 128
+      if COLLIDE?
+         set self rot self.rot - 1
+         set self y self.origy
+         set self w self.origw
+         set self h self.origh
+      endif
+   endif
    set self swap 0
 endif
 exec updatePiecePosition
 
 |updatePiecePosition|
-set self.leftpiece x self.x
-set self.leftpiece y self.y
-set self.rightpiece x self.x + 64
-set self.rightpiece y self.y
+if self.rot % 2 == 0
+   set self.leftpiece x self.x
+   set self.leftpiece y self.y
+   set self.rightpiece x self.x + 64
+   set self.rightpiece y self.y
+endif
+if self.rot % 2 == 1
+   set self.leftpiece x self.x 
+   set self.leftpiece y self.y
+   set self.rightpiece x self.x 
+   set self.rightpiece y self.y + 64 
+endif
 
 |YCOLLISION|
+set self rot 0
+set self w 128
+set self h 64
 set self tangible 0
 set self.leftpiece tangible 1
 set self.rightpiece tangible 1

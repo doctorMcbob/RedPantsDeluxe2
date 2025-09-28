@@ -1,4 +1,4 @@
-TEXT|0,0,0,0|False|
+MGMT|0,0,0,0|False|
 START:0 empty 0,0
 WAIT:0 empty 0,0
 LAUNCHED:0 empty 0,0
@@ -6,18 +6,18 @@ LAUNCHED:0 empty 0,0
 |START:0|
 set self frame 0
 set self state WAIT
-set self max_ 2
-set self sayname self.name + say
+
 set self messages []
-add self.messages "BEING AN ELF ISNT AS    ^WHIMSICAL AS YOUD THINK  "
-add self.messages "OLD MAN WORKS YOU PRETTY HARD"
+add self.messages "HOWDY HO KID WELCOME   ^TO PIZZA PETES"
+add self.messages "WE NEED A NEW COOK IN THE OL PIZZA ROOM"
+add self.messages "IF YOU CAN UNLOCK MY ARCADE MACHINES    ^ILL GIVE YOU THE JOB                   "
 set self idx 0
-set self length 2
+set self length 3
+set self sayname petesasayinit
 
 |WAIT:0|
-set self frame 0
 
-|LAUNCHED:160|
+|LAUNCHED:180|
 set self state WAIT
 set self frame 0
 
@@ -32,7 +32,7 @@ if elf0say0.state == LAUNCHED
    break
 endif
 if related.state == WAIT
-   create say0 related.sayname related.x related.y
+   create say0 related.sayname pizzapete0.x + pizzapete0.w related.y - 16
    set related.sayname message related.messages at related.idx
    set related idx related.idx + 1 % related.length
    set related.sayname back backgroundsayL0

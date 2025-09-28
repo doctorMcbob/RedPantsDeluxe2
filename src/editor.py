@@ -540,7 +540,7 @@ def handle_actors_in_world_window_events(e, G, window):
     if e.type == pygame.MOUSEBUTTONDOWN:
         if e.button == 4: window["SCROLL"] -= 16
         if e.button == 5: window["SCROLL"] += 16
-        if e.button == 1 and window["SELECTED"] is not None:
+        if e.button == 1 and window.get("SELECTED") is not None:
             a = actor.get_actor(window["SELECTED"])
             if a is not None:
                 SCROLLER["CX"] = a.x + OFFX

@@ -24,6 +24,8 @@ exec populateOrders
 set self doAgain 0
 set self nextl choiceof self.types
 set self nextr choiceof self.types
+set self levels 2
+set self level 1
 
 |WAIT:0|
 set self do_check 0
@@ -87,8 +89,15 @@ for order_name self.orders
     endif
 endfor
 if self.reset
+   set self level self.level + 1
    exec populateOrders
-   view PIZZAPOD pizzapod2
+   if self.level > self.levels
+      set self state OVER
+      set goldcoinpizza0 state COIN   
+      exec OVER:0   
+      break
+   endif
+   view PIZZAPOD pizzapod + self.level
 endif
 
 |populateOrders|
@@ -115,7 +124,7 @@ for _name self.pieces
     set self calc2 self.A == self.C
     set self calc2 self.B == self.D and self.calc2
     if self.calc1 or self.calc2
-        for _order self.orders
+         for _order self.orders
 	    set self calc order + _order
 	    set self calc exists self.calc
             if _order.state == OFF or self.doAgain or self.calc
