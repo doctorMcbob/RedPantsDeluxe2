@@ -7,28 +7,45 @@ LAUNCHED:0 empty 0,0
 set self frame 0
 set self state WAIT
 
-set self messages []
-add self.messages "HOWDY HO KID WELCOME   ^TO PIZZA PETES"
-add self.messages "WE NEED A NEW COOK IN THE OL PIZZA ROOM"
-add self.messages "IF YOU CAN UNLOCK MY ARCADE MACHINES    ^ILL GIVE YOU THE JOB                   "
+set self messages1 []
+add self.messages1 "HOWDY HO KID WELCOME   ^TO PIZZA PETES"
+add self.messages1 "WE NEED A NEW COOK IN THE OL PIZZA ROOM"
+add self.messages1 "IF YOU CAN UNLOCK MY ARCADE MACHINES    ^ILL GIVE YOU THE JOB                   "
+set self messages2 []
+add self.messages2 "WOWZA YOU GOT A GAME UNLOCKED"
+add self.messages2 "ONE MORE OF THOSE AND ILL BE PIPED^AS A PICKED PEPPERONCINI              "
+add self.messages2 "BY THE WAY CANONICALLY PIZZA PETES^ FAVORITE BAND IS WEEN          "
+set self messages3 []
+add self.messages3 "WELL DONE KID YOUVE GOT THE JOB           ^YOU CAN JOIN PETES CREW AND BE A PIZZA COOK"
+add self.messages3 "GET IN THERE KID ^ OPEN THE DOOR TO MY LEFT     "
+add self.messages3 "BY THE WAY HAVE YOU EVER MADE PIZZA BEFORE   "
+set self messages4 []
+add self.messages4 "WELL ILL BE FLABERGHASTED YOU MUST BE THE^BEST PIZZA CHEF IN ALL OF RED PANTS LAND         "
+add self.messages4 "IF I WERE A DEITY ID COME RIGHT OUTTA THIS SCREEN                ^AND GIVE YOU A FREE VOUCHER FOR A BIRTHDAY PARTY AT PIZZA PETES"
+add self.messages4 "I GUESS THATS THE END OF THE PIZZA PETES QUESTLINE EH"
+
+set self messages self.messages1
+
 set self idx 0
 set self length 3
 set self sayname petesasayinit
 
 |WAIT:0|
+exec updateState
+
+|LAUNCHED:0|
+exec updateState
 
 |LAUNCHED:180|
 set self state WAIT
 set self frame 0
 
 |COLLIDE|
+exec updateState
 if not self.lakitu
    break
 endif
-if elf1say0.state == LAUNCHED
-   break
-endif
-if elf0say0.state == LAUNCHED
+if related.state == LAUNCHED
    break
 endif
 if related.state == WAIT
@@ -40,3 +57,26 @@ if related.state == WAIT
    set related frame 0
 endif
 
+|updateState|
+set self count inv0.arcadeBlindWitch + inv0.arcadeBlitzorb
+set self changed 0
+if self.count == 0
+   if self.messages != self.messages1
+      set self idx 0
+      set self messages self.messages1
+   endif
+   break
+endif
+if self.count == 1
+   if self.messages != self.messages2
+      set self idx 0
+      set self messages self.messages2
+   endif
+   break
+endif
+if self.count == 2
+   if self.messages != self.messages3
+      set self idx 0
+      set self messages self.messages3
+   endif
+endif

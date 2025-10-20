@@ -588,7 +588,8 @@ void resolve_operators(int statement, World *world, int debug) {
           PARAMS[paramPointer - 1] = f == f2;
           break;
         }
-        case (STRING + 3 * STRING): {
+        case (STRING + 3 * STRING):
+	case (LIST + 3 * LIST): {
           PARAMS[paramPointer - 2] = INT;
           PARAMS[paramPointer - 1] = leftValue == rightValue;
           break;
@@ -868,7 +869,8 @@ void resolve_operators(int statement, World *world, int debug) {
           PARAMS[paramPointer - 1] = 1;
           break;
         }
-        case (STRING + 3 * STRING): {
+	case (LIST + 3 * LIST): 
+	case (STRING + 3 * STRING): {
           PARAMS[paramPointer - 2] = INT;
           PARAMS[paramPointer - 1] = leftValue != rightValue;
           break;
