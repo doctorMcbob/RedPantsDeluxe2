@@ -12,6 +12,8 @@ VANISH:9 santavanish2 -32,-16
 set self follow santasleigh0
 exec init_follow
 set self state SLEIGH
+hitboxes santa
+hurtboxes santa
 
 |SLEIGH:0|
 exec do_follow

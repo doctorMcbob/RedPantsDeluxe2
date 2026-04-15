@@ -2,6 +2,7 @@ LETTER|0,0,0,0|False|
 START:0 empty 0,0
 ASC:0 empty 0,0
 DESC:0 empty 0,0
+BYE:0 empty 0,0
 
 |START:0|
 set self frame 0
@@ -43,3 +44,5 @@ if self.timer != -1
    set self timer self.timer - 1
 endif
 
+|BYE:0|
+goodbye

@@ -8,6 +8,7 @@ PLATFORM12 backgroundsay112 0,0
 PLATFORM20 backgroundsay120 0,0
 PLATFORM21 backgroundsay121 0,0
 PLATFORM22 backgroundsay122 0,0
+BYE:0 empty 0,0
 
 |START:0|
 set self platform 1
@@ -17,8 +18,10 @@ set self timer -1
 back
 set self background 1 
 
-
 |PLATFORM:0|
 if self.frame > self.timer
     goodbye
 endif
+
+|BYE:0|
+goodbye

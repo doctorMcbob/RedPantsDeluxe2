@@ -11,8 +11,27 @@ set self y_off 16
 set self x_off 16
 set self back backgroundsay0
 set self backname self.name + back
+set self cleared 0
+
+|clear|
+if self.back
+   if exists self.backname
+      set self.backname state BYE
+   endif 
+endif
+set self message_length len self.message
+for index range self.message_length
+   set self lettername self.name + letter + index
+   if exists self.lettername
+      set self.lettername state BYE
+   endif
+endfor
+set self cleared 1
 
 |SAY:0|
+if not self.cleared
+   exec clear
+endif
 if self.frame == 0 and self.back
    create self.back self.backname self.x self.y
    set self calc countof self.message "^"

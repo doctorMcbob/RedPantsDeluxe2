@@ -16,9 +16,7 @@ if inv0.antlers_unlock
       set flyringfront + num state WAIT
    endfor
 endif
-
-|WAIT:1|
-set self frame 1
+print inv0.antlers_unlock
 
 |ACTIVE:0|
 set self done  1
