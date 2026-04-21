@@ -368,10 +368,10 @@ def resolve(reference, script, world, related=None, logfunc=print, noquit=False)
                 frame_key = cmd.pop(0)
                 frame = frames.get_frame(frame_key)
                 if frame == None:
-                    raise Exception('Frame does not exist for setzoom {}'.format(frame_key))
+                    raise Exception('Frame does not exist for makezoom {}'.format(frame_key))
                 value = cmd.pop(0)
                 if type(value) not in [int, float]:
-                    raise Exception('Value for setzoom must be int or float, not {}'.format(type(value)))
+                    raise Exception('Value for makezoom must be int or float, not {}'.format(type(value)))
                 frame.should_zoom = bool(value)
 
         except Exception as e:

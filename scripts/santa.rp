@@ -2,11 +2,14 @@ SANTA|0,0,0,0|False|
 START:0 santasleigh0 -32,-16
 SLEIGH:0 santasleigh0 -32,-16
 SLEIGH:20 santasleigh1 -32,-16
-BONK:0 santabonk0 -32,-16
+HITSTUN:0 santabonk -32,-16
+BONK:0 santabonk -32,-16
 MAD:0 santamad -32,-16
+YELL:0 santayell0 -32,-16
+YELL:8 santayell1 -32,-16
 VANISH:0 santavanish0 -32,-16
-VANISH:6 santavanish1 -32,-16
-VANISH:9 santavanish2 -32,-16
+VANISH:20 santavanish1 -32,-16
+VANISH:26 santavanish2 -32,-16
 
 |START:0|
 set self follow santasleigh0
@@ -14,6 +17,13 @@ exec init_follow
 set self state SLEIGH
 hitboxes santa
 hurtboxes santa
+set self limit 20
+set self neglimit self.limit * -1
+set self grav 1
+set self isfocus 0
+set self physics 1
+set self tangible 0
+set self counter 0
 
 |SLEIGH:0|
 exec do_follow
@@ -22,8 +32,61 @@ exec do_follow
 set self frame 0
 exec SLEIGH:0
 
-|BONK:0|
+|HITSTUN:0|
+exec makeFocus
+set self x_vel 0
+set self y_vel 0
 
+|HITSTUN:4|
+set self state BONK
+set self frame 0
+set self x_vel self.hit_x_vel
+set self y_vel self.hit_y_vel
+set self hit_x_vel 0
+set self hit_y_vel 0
+
+|MAD:0|
+set self offx -2 + RAND? + RAND? + RAND? + RAND?
+set self offy -2 + RAND? + RAND? + RAND? + RAND?
+set self x self.cx + self.offx
+set self y self.cy + self.offy
+
+|MAD:30|
+set self x self.cx
+set self y self.cy
+set self state YELL
+
+|YELL:16|
+if self.counter == 10
+    set self state VANISH
+endif
+set self frame 0
+set self counter self.counter + 1
+
+|BONK:0|
+exec applyGrav
+
+|VANISH:32|
+exec releaseFocus
+goodbye
+
+|YCOLLISION|
+set self x_vel 0
+set self y_vel 0
+set self cx self.x
+set self cy self.y
+set self state MAD
+set self frame 0
+set self physics 0
+
+|applyGrav|
+set self y_vel self.y_vel + self.grav
+if self.y_vel > self.limit
+   set self y_vel self.limit
+endif
+if self.y_vel < self.neglimit
+   set self y_vel self.neglimit
+endif
 
 |init_follow|
 set self offx self.x - self.follow.x
@@ -36,4 +99,29 @@ if self.direction == 1
    set self x self.follow.x + self.follow.w - self.offx - self.w
 endif
 set self y self.follow.y + self.offy
+
+|makeFocus|
+if self.isfocus
+   break
+endif
+set self isfocus 1
+if isframe MAIN
+   focus MAIN self    
+endif
+if isframe MAIN2
+   focus MAIN2 self
+endif
+front
+
+|releaseFocus|
+if not self.isfocus
+   break
+endif
+set self isfocus 0
+if isframe MAIN
+   focus MAIN player10.lakitu
+endif
+if isframe MAIN2
+   focus MAIN2 player20.lakitu
+endif
 
