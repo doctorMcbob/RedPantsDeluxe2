@@ -40,7 +40,6 @@ if player in self.name
          scrollbound MAIN right None
          scrollbound MAIN top None
          scrollbound MAIN bottom None
-         print "WORLD " + WORLD?
          set bathroomgoldcoin0 return1 WORLD?
          set player10 emptyto player10.state
          set player10 state EMPTY

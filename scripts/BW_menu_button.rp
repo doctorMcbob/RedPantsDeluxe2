@@ -45,4 +45,3 @@ if UP_DOWN in inpEVENTS
 endif
 
 |press|
-print self.name  + " was pressed!"

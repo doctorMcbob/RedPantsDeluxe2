@@ -30,7 +30,6 @@ set self frame 0
 exec COIN:0
 
 |SHOW:32|
-print "return1 : " + self.return1
 if isframe MAIN
    view MAIN self.return1
    focus MAIN player10.lakitu

@@ -69,7 +69,6 @@ set self x_v self.x_diff / 9
 set self y_v self.y_diff / 7
 
 if abs self.x_diff > self.max_dist
-    print "Yoh"
     set self x self.follow.x
     set self y self.follow.y
 endif
