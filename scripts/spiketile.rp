@@ -1,0 +1,28 @@
+DOOR|0,0,0,0|False|
+SPIKE00:0 spike 0,0
+SPIKE01:0 spike 0,0
+SPIKE02:0 spike 0,0
+SPIKE10:0 spike 0,0
+SPIKE11:0 spike 0,0
+SPIKE12:0 spike 0,0
+SPIKE20:0 spike 0,0
+SPIKE21:0 spike 0,0
+SPIKE22:0 spike 0,0
+
+PLATFORM00:0 spike 0,0
+PLATFORM01:0 spike 0,0
+PLATFORM02:0 spike 0,0
+PLATFORM10:0 spike 0,0
+PLATFORM11:0 spike 0,0
+PLATFORM12:0 spike 0,0
+PLATFORM20:0 spike 0,0
+PLATFORM21:0 spike 0,0
+PLATFORM22:0 spike 0,0
+
+|START:0|
+set self platform 1
+set self tileset spiketile
+set self state SPIKE
+
+|SPIKE:0|
+set self frame 0

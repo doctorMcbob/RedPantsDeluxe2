@@ -10,6 +10,7 @@ YELL:8 santayell1 -32,-16
 VANISH:0 santavanish0 -32,-16
 VANISH:20 santavanish1 -32,-16
 VANISH:26 santavanish2 -32,-16
+DROP:0 empty 0, 0
 
 |START:0|
 set self follow santasleigh0
@@ -46,8 +47,8 @@ set self hit_x_vel 0
 set self hit_y_vel 0
 
 |MAD:0|
-set self offx -2 + RAND? + RAND? + RAND? + RAND?
-set self offy -2 + RAND? + RAND? + RAND? + RAND?
+set self offx -4 + RAND? + RAND? + RAND? + RAND? + RAND? + RAND? + RAND? + RAND?
+set self offy -4 + RAND? + RAND? + RAND? + RAND? + RAND? + RAND? + RAND? + RAND?
 set self x self.cx + self.offx
 set self y self.cy + self.offy
 
@@ -67,6 +68,14 @@ set self counter self.counter + 1
 exec applyGrav
 
 |VANISH:32|
+set self state DROP
+set self frame 0
+
+|DROP:0|
+create goldcoinsanta0 goldcoinsanta self.x self.y
+|DROP:1|
+
+|DROP:30|
 exec releaseFocus
 goodbye
 
